@@ -1,7 +1,7 @@
 byteflood
 =========
 
-A free as in freedom BitTorrent client, designed for the masses.
+A free as in freedom BitTorrent client, designed for everyone.
 
 [Binaries](https://github.com/hexafluoride/byteflood/releases)
 
