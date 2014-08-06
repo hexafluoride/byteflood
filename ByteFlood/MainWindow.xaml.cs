@@ -82,7 +82,6 @@ namespace ftorrent
                 AddTorrentByPath(str);
             }
         }
-
         public void ReDrawGraph()
         {
             if (mainlist.SelectedIndex == -1)

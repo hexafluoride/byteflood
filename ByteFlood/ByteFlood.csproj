@@ -106,20 +106,21 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="F:\monotorrent\MonoTorrent.Dht\MonoTorrent.Dht.csproj">
-      <Project>{7A2A7E73-FD43-4171-AA34-DA413D35459E}</Project>
-      <Name>MonoTorrent.Dht</Name>
-    </ProjectReference>
-    <ProjectReference Include="F:\monotorrent\MonoTorrent\MonoTorrent.csproj">
-      <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
-      <Name>MonoTorrent</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoTorrent.Dht\MonoTorrent.Dht.csproj">
+      <Project>{7A2A7E73-FD43-4171-AA34-DA413D35459E}</Project>
+      <Name>MonoTorrent.Dht</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
+      <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
+      <Name>MonoTorrent</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
