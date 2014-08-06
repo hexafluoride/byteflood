@@ -34,7 +34,7 @@ namespace ftorrent
             base.OnStartup(e);
 
             var themerd = new ResourceDictionary();
-            themerd.Source = new Uri(@"PresentationFramework.Aero;V3.0.0.0;31bf3856ad364e35;component\themes/aero.normalcolor.xaml", UriKind.Relative);
+            themerd.Source = new Uri(@"PresentationFramework.Aero2;V3.0.0.0;31bf3856ad364e35;component\themes/aero2.normalcolor.xaml", UriKind.Relative);
             Resources.MergedDictionaries.Add(themerd);
         }
     }

@@ -32,8 +32,11 @@
                         VerticalScrollBarVisibility="Disabled"
                         Height="Auto"
                         Width="Auto">
-                        <Canvas Name="overview_canvas">
-                            <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text="Transfer" Visibility="Collapsed" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" />
+                        <Canvas Name="overview_canvas" Height="1500">
+                            <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Visibility="Collapsed" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
+                            <TextBlock Canvas.Left="6" Canvas.Top="35" Height="23" Name="textBlock1" Text="TextBlock" />
+                            <TextBlock Canvas.Left="6" Canvas.Top="55" Height="23" Name="textBlock2" Text="TextBlock" />
+                            <TextBlock Canvas.Left="6" Canvas.Top="75" Height="23" Name="textBlock3" Text="TextBlock" />
                         </Canvas>
                     </ScrollViewer>
                 </TabItem>
@@ -156,5 +159,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <TextBlock Height="23" Name="textBlock4" Text="TextBlock" Margin="9,356,887,7" />
+        <TextBlock Height="23" Name="textBlock5" Text="TextBlock" Margin="9,375,887,-12" />
     </Grid>
 </Window>
