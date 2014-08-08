@@ -39,7 +39,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Net;
 
-namespace ftorrent
+namespace ByteFlood
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -81,6 +81,10 @@ namespace ftorrent
             {
                 AddTorrentByPath(str);
             }
+        }
+        public void SaveSettings()
+        {
+            Settings.Save(App.Settings, "./config.xml");
         }
         public void ReDrawGraph()
         {
@@ -169,6 +173,7 @@ namespace ftorrent
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            SaveSettings();
             thr.Abort();
             ce.DiskManager.Flush();
             ce.PauseAll();
@@ -274,6 +279,16 @@ namespace ftorrent
         private void graphtab_MouseUp(object sender, MouseButtonEventArgs e)
         {
             ReDrawGraph();
+        }
+
+        private void Exit(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void OpenPreferences(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

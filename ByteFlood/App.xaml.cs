@@ -21,20 +21,25 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Windows;
+using System.IO;
 
-namespace ftorrent
+namespace ByteFlood
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
+        public static ByteFlood.Settings Settings = new Settings();
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
+            Settings = Settings.Load("./config.xml");
+
             var themerd = new ResourceDictionary();
-            themerd.Source = new Uri(@"PresentationFramework.Aero2;V3.0.0.0;31bf3856ad364e35;component\themes/aero2.normalcolor.xaml", UriKind.Relative);
+            
+            themerd.Source = new Uri(string.Format(@"PresentationFramework.{0};V3.0.0.0;31bf3856ad364e35;component\themes/{0}.normalcolor.xaml", Settings.Theme.ToString()), UriKind.Relative);
             Resources.MergedDictionaries.Add(themerd);
         }
     }
