@@ -31,7 +31,7 @@ using MonoTorrent;
 using MonoTorrent.Client;
 using System.Text.RegularExpressions;
 
-namespace ftorrent
+namespace ByteFlood
 {
     /// <summary>
     /// Interaction logic for TorrentProperties.xaml

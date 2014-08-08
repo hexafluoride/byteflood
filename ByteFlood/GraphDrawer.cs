@@ -39,7 +39,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Net;
 
-namespace ftorrent
+namespace ByteFlood
 {
     class GraphDrawer
     {
