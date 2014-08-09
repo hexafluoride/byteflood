@@ -266,10 +266,10 @@ namespace ByteFlood
     }
     public class Utility
     {
-        static ulong K = 1024;
-        static ulong M = 1024 * 1024;
-        static ulong G = 1024 * 1024 * 1024;
-        static ulong T = 1024L * 1024L * 1024L * 1024L;
+        static const ulong K = 1024;
+        static const ulong M = 1024 * 1024;
+        static const ulong G = 1024 * 1024 * 1024;
+        static const ulong T = 1024L * 1024L * 1024L * 1024L;
         public static string PrettifyAmount(ulong amount)
         {
             if (amount > T)

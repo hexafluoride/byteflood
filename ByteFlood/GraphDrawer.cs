@@ -110,16 +110,16 @@ namespace ByteFlood
         }
         public void Draw(float[] down, float[] up, bool drawdown, bool drawup) // I don't like parts of this
         {
-            float[] highest_data = drawdown && drawup ? // Ugly, but compact
-                ((down.Max() > up.Max()) ? down : up) :
-                drawdown ? down : up;
-            float[] lowest_data = drawdown && drawup ? // same
-                ((down.Min() < up.Min()) ? down : up) :
-                drawdown ? down : up;
+            double highest = up.Max(); //this handles (drawup == false) the same way as the previous implementation - but i'm not sure wether that's a good thing.
+            double lowest = down.Min();//
+            if(drawdown) {
+                highest = Math.Max(highest, up.Max());
+                lowest = Math.Min(lowest, down.Min());
+            }
+  
             double width = graph.ActualWidth;
             double height = graph.ActualHeight;
-            double highest = highest_data.Max();
-            double lowest = lowest_data.Min();
+
             double spp = height / (highest - lowest); // The number of vertical pixels to increase per graph unit
             if (highest == 0) // this prevents spp from going NaN
             {
@@ -152,7 +152,7 @@ namespace ByteFlood
             graph.Children.Add(l_mid);
             graph.Children.Add(l_low);
         }
-        public void DrawData(float[] data, double xpp, double spp, double h_margin, double height, Brush color)
+        private void DrawData(float[] data, double xpp, double spp, double h_margin, double height, Brush color)
         {
             double xprev = 0;
             double yprev = height;
