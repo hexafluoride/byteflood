@@ -51,6 +51,7 @@ namespace ByteFlood
         bool updategraph = false;
         SynchronizationContext uiContext = SynchronizationContext.Current;
         GraphDrawer graph;
+        public DhtListener dhtl;
         public MainWindow()
         {
             InitializeComponent();
@@ -58,9 +59,9 @@ namespace ByteFlood
             ce = new ClientEngine(new EngineSettings());
             thr = new Thread(new ThreadStart(Update));
             thr.Start();
-            DhtListener dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, 22239)); // TODO: Implement global settings, so this can(along with other options) can be changed
+            dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, App.Settings.ListeningPort));
             DhtEngine dht = new DhtEngine(dhtl);
-            
+
             ce.RegisterDht(dht);
             ce.DhtEngine.Start();
 
@@ -114,7 +115,8 @@ namespace ByteFlood
             }
             graph.Draw(ti.DownSpeeds.ToArray(), ti.UpSpeeds.ToArray(), drawdown, drawup);
             Thickness size = Utility.SizeToMargin(graph.GetSize());
-            graph.DrawGrid(size.Left, size.Top, size.Right, size.Bottom);
+            if(App.Settings.DrawGrid)
+                graph.DrawGrid(size.Left, size.Top, size.Right, size.Bottom);
         }
 
         public void AddTorrentByPath(string path)
@@ -289,6 +291,12 @@ namespace ByteFlood
         private void OpenPreferences(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            Preferences pref = new Preferences();
+            pref.Show();
         }
     }
 }

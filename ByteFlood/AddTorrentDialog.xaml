@@ -18,7 +18,7 @@
     <Window x:Class="ByteFlood.AddTorrentDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AddTorrent" Height="352" Width="723">
+        Title="AddTorrent" Height="352" Width="723" Loaded="Window_Loaded">
     <Grid>
         <GroupBox Header="Save in" Height="73" HorizontalAlignment="Left" Margin="13,0,0,0" Name="gb1" VerticalAlignment="Top" Width="324">
             <Grid Margin="2,0,-2,0">

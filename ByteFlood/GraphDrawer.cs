@@ -128,9 +128,9 @@ namespace ByteFlood
             double xpp = (width - 60) / down.Length;
             double h_margin = Utility.CalculateLocation(spp, lowest); // we subtract the lowest point of the graph from all points so the lowest point corresponds to 0
             if (drawdown)
-                DrawData(down, xpp, spp, h_margin, height, Brushes.Green); // download data
+                DrawData(down, xpp, spp, h_margin, height, App.Settings.DownloadBrush); // download data
             if (drawup)
-                DrawData(up, xpp, spp, h_margin, height, Brushes.Red); // upload data
+                DrawData(up, xpp, spp, h_margin, height, App.Settings.UploadBrush); // upload data
             Thickness size = GetSize();
             double left_margin = size.Right + 2;
             double right_margin = 10;

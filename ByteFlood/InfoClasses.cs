@@ -266,10 +266,10 @@ namespace ByteFlood
     }
     public class Utility
     {
-        static const ulong K = 1024;
-        static const ulong M = 1024 * 1024;
-        static const ulong G = 1024 * 1024 * 1024;
-        static const ulong T = 1024L * 1024L * 1024L * 1024L;
+        static ulong K = 1024;
+        static ulong M = 1024 * 1024;
+        static ulong G = 1024 * 1024 * 1024;
+        static ulong T = 1024L * 1024L * 1024L * 1024L;
         public static string PrettifyAmount(ulong amount)
         {
             if (amount > T)
@@ -301,6 +301,17 @@ namespace ByteFlood
             l.Margin = margin;
             return l;
         }
+
+        public static Color WindowsColorToWPFColor(System.Drawing.Color color)
+        {
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+
+        public static System.Drawing.Color WPFColorToWindowsColor(Color color)
+        {
+            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+
         public static Line GenerateLine(double x1, double y1, double x2, double y2, Brush color, int thickness = 2, int zindex = 1)
         {
             Line line = new Line();
