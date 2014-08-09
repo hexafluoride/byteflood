@@ -38,9 +38,26 @@ namespace ByteFlood
             Settings = Settings.Load("./config.xml");
 
             var themerd = new ResourceDictionary();
+
+            if (Utility.IsWindows8OrNewer)
+            {
+                themerd.Source = new Uri(string.Format(@"PresentationFramework.{0};V3.0.0.0;31bf3856ad364e35;component\themes/{0}.normalcolor.xaml", Settings.Theme.ToString()), UriKind.Relative);
+            }
+            else
+            {
+                if (Settings.Theme == Theme.Aero2)
+                {
+                    //Aero2 is for windows 8 and newer
+                    themerd.Source = new Uri(string.Format(@"PresentationFramework.{0};V3.0.0.0;31bf3856ad364e35;component\themes/{0}.normalcolor.xaml", Theme.Aero.ToString()), UriKind.Relative);
+                }
+                else
+                {
+                    themerd.Source = new Uri(string.Format(@"PresentationFramework.{0};V3.0.0.0;31bf3856ad364e35;component\themes/{0}.normalcolor.xaml", Settings.Theme.ToString()), UriKind.Relative);
+                }
+            } 
             
-            themerd.Source = new Uri(string.Format(@"PresentationFramework.{0};V3.0.0.0;31bf3856ad364e35;component\themes/{0}.normalcolor.xaml", Settings.Theme.ToString()), UriKind.Relative);
             Resources.MergedDictionaries.Add(themerd);
+
         }
     }
 }
