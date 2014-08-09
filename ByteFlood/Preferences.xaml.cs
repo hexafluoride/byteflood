@@ -51,5 +51,14 @@ namespace ByteFlood
             App.Settings.UploadColor = GetNewColor(App.Settings.UploadColor);
             upcolor.GetBindingExpression(Button.BackgroundProperty).UpdateTarget();
         }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            var fd = new System.Windows.Forms.FolderBrowserDialog();
+            fd.ShowNewFolderButton = true;
+            fd.ShowDialog();
+            App.Settings.DefaultDownloadPath = fd.SelectedPath;
+            downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+        }
     }
 }
