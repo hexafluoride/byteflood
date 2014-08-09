@@ -113,8 +113,8 @@ namespace ByteFlood
             double highest = up.Max(); //this handles (drawup == false) the same way as the previous implementation - but i'm not sure wether that's a good thing.
             double lowest = down.Min();//
             if(drawdown) {
-                highest = Math.Max(highest, up.Max());
-                lowest = Math.Min(lowest, down.Min());
+                highest = Math.Max(highest, down.Max());
+                lowest = Math.Min(lowest, up.Min());
             }
   
             double width = graph.ActualWidth;
