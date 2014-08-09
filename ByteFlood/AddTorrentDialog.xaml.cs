@@ -55,7 +55,7 @@ namespace ByteFlood
         public AddTorrentDialog(string path)
         {
             InitializeComponent();
-            tm = new TorrentManager(Torrent.Load(path), System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"), new TorrentSettings());
+            tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
             this.DataContext = tm;
             foreach (TorrentFile file in tm.Torrent.Files)
             {
@@ -124,6 +124,11 @@ namespace ByteFlood
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
