@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Windows.Shapes;
 
@@ -11,6 +12,9 @@ namespace ByteFlood
 {
     public static class Utility
     {
+
+        public static Dictionary<string, BitmapImage> IconCache = new Dictionary<string, BitmapImage>();
+
         const double K = 1024;
         const double M = 1048576;
         const double G = 1073741824;
