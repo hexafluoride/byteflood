@@ -19,7 +19,7 @@ namespace ByteFlood
 {
     public enum Theme
     {
-        Aero2, Aero, Classic, Luna
+        Aero2, Aero, Classic, Luna, Royale
     }
     public class Settings
     {
