@@ -61,11 +61,19 @@ namespace ByteFlood
 
         public static Settings Load(string path)
         {
-            if (!File.Exists(path))
+            try
+            {
+                if (!File.Exists(path))
+                    return Settings.DefaultSettings;
+                string s = File.ReadAllText(path);
+                XmlReader x = XmlReader.Create(new StringReader(s));
+                return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(x);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while loading configuration file. Falling back to default settings.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return Settings.DefaultSettings;
-            string s = File.ReadAllText(path);
-            XmlReader x = XmlReader.Create(new StringReader(s));
-            return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(x);
+            }
         }
     }
 }
