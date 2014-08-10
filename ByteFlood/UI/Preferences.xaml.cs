@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ColorDialog = System.Windows.Forms.ColorDialog;
+using System.Collections.ObjectModel;
 
 namespace ByteFlood
 {
@@ -19,6 +20,16 @@ namespace ByteFlood
     /// </summary>
     public partial class Preferences : Window
     {
+
+        public Theme[] theme_list = new Theme[] 
+        {
+            Theme.Aero,
+            Theme.Aero2,
+            Theme.Classic,
+            Theme.Luna,
+            Theme.Royale
+        };
+
         public Preferences()
         {
             InitializeComponent();
@@ -27,6 +38,8 @@ namespace ByteFlood
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.DataContext = App.Settings;
+            this.themeCombox.ItemsSource = theme_list;
+            this.themeCombox.SelectedItem = App.Settings.Theme;
         }
 
         private void SelectDownloadColor(object sender, RoutedEventArgs e)
@@ -60,5 +73,13 @@ namespace ByteFlood
             App.Settings.DefaultDownloadPath = fd.SelectedPath;
             downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
         }
+
+        private void ReloadTheme(object sender, SelectionChangedEventArgs e)
+        {
+            var t = (Theme)themeCombox.SelectedItem;
+            var app = (ByteFlood.App)App.Current;
+            app.LoadTheme(t);
+        }
+
     }
 }
