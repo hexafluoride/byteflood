@@ -28,6 +28,7 @@
         <formatters:SizeToString x:Key="SizeToString" />
         <formatters:TimeSpanToString x:Key="TimeSpanToString" />
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
+        <formatters:FileNameToIcon x:Key="FileNameToIcon" />
     </Window.Resources>
     <Grid>
         <Canvas Height="150" HorizontalAlignment="Stretch" Name="canvas1" VerticalAlignment="Bottom" Width="Auto">
@@ -86,7 +87,18 @@
                         </ListView.ItemContainerStyle>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Width="170" Header="Path" DisplayMemberBinding="{Binding Name}" />
+                                
+                                <GridViewColumn Width="170" Header="Path">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}"/>
+                                                <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                
                                 <GridViewColumn Width="140" Header="Progress">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
