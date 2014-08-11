@@ -72,7 +72,7 @@
                 <CheckBox Content="Initial seeding" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="212,40,0,0" Name="initial" VerticalAlignment="Top" />
             </Grid>
         </GroupBox>
-        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="614,280,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click_1" />
-        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="533,280,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="533,280,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click_1" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="614,280,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
     </Grid>
 </Window>
