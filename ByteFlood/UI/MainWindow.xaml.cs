@@ -29,16 +29,18 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
-        ClientEngine ce;
+        public ClientEngine ce;
         Thread thr;
         bool updategraph = false;
-        SynchronizationContext uiContext = SynchronizationContext.Current;
+        public SynchronizationContext uiContext = SynchronizationContext.Current;
         GraphDrawer graph;
         public DhtListener dhtl;
+        public State state;
         public MainWindow()
         {
             InitializeComponent();
-            mainlist.ItemsSource = list_data;
+            state = State.Load("./state.xml");
+            mainlist.ItemsSource = state.Torrents;
             ce = new ClientEngine(new EngineSettings());
             thr = new Thread(new ThreadStart(Update));
             thr.Start();
@@ -50,7 +52,6 @@ namespace ByteFlood
 
             graph = new GraphDrawer(graph_canvas);
         }
-        public ObservableCollection<TorrentInfo> list_data = new ObservableCollection<TorrentInfo>();
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -69,6 +70,7 @@ namespace ByteFlood
         public void SaveSettings()
         {
             Settings.Save(App.Settings, "./config.xml");
+            State.Save(state, "./state.xml");
         }
         public void ReDrawGraph()
         {
@@ -114,7 +116,7 @@ namespace ByteFlood
                     ti.Stop();
                 ti.RatioLimit = atd.limit;
                 ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
-                list_data.Add(ti);
+                state.Torrents.Add(ti);
             }
         }
 
@@ -133,7 +135,7 @@ namespace ByteFlood
             {
                 try
                 {
-                    foreach (TorrentInfo ti in list_data)
+                    foreach (TorrentInfo ti in state.Torrents)
                         ti.Update();
                     uiContext.Send(x =>
                     {
@@ -141,7 +143,7 @@ namespace ByteFlood
                         {
                             if (updategraph)
                                 ReDrawGraph();
-                            foreach (TorrentInfo ti in list_data)
+                            foreach (TorrentInfo ti in state.Torrents)
                                 if (ti.Torrent.State != TorrentState.Paused)
                                     ti.UpdateGraphData();
                         }
@@ -235,7 +237,7 @@ namespace ByteFlood
             t.Torrent.Stop();
             while (t.Torrent.State != TorrentState.Stopped) ;
             ce.Unregister(t.Torrent);
-            list_data.Remove(t);
+            state.Torrents.Remove(t);
         }
         public void LowPriority(object sender, RoutedEventArgs e)
         {
@@ -256,7 +258,7 @@ namespace ByteFlood
             ti = null;
             if (mainlist.SelectedIndex == -1)
                 return false;
-            ti = list_data[mainlist.SelectedIndex];
+            ti = state.Torrents[mainlist.SelectedIndex];
             return true;
         }
         #endregion

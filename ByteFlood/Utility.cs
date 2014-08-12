@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.IO;
+using System.Xml.Serialization;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 namespace ByteFlood
 {
     public static class Utility
@@ -104,6 +112,23 @@ namespace ByteFlood
                 return os.Platform == PlatformID.Win32NT &&
                        (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 2));
             }
+        }
+
+        public static void Serialize<T>(T t, string path)
+        {
+            XmlWriter xw = XmlWriter.Create(path, new XmlWriterSettings()
+            {
+                Indent = true
+            });
+            new XmlSerializer(typeof(T)).Serialize(xw, t);
+            xw.Flush();
+        }
+
+        public static T Deserialize<T>(string path)
+        {
+            string s = File.ReadAllText(path);
+            XmlReader x = XmlReader.Create(new StringReader(s));
+            return (T)new XmlSerializer(typeof(T)).Deserialize(x);
         }
     }
 }
