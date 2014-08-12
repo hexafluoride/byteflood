@@ -52,11 +52,7 @@ namespace ByteFlood
         }
         public static void Save(Settings s, string path)
         {
-            XmlWriter xw = XmlWriter.Create(path, new XmlWriterSettings() {
-                Indent = true
-            });
-            new XmlSerializer(typeof(Settings)).Serialize(xw, s);
-            xw.Flush();
+            Utility.Serialize<Settings>(s, path);
         }
 
         public static Settings Load(string path)
@@ -65,13 +61,11 @@ namespace ByteFlood
             {
                 if (!File.Exists(path))
                     return Settings.DefaultSettings;
-                string s = File.ReadAllText(path);
-                XmlReader x = XmlReader.Create(new StringReader(s));
-                return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(x);
+                return Utility.Deserialize<Settings>(path);
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show("Error while loading configuration file. Falling back to default settings.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("An error occurred while loading configuration file. Falling back to default settings.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return Settings.DefaultSettings;
             }
         }

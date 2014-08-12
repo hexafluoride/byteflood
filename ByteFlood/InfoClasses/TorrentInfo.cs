@@ -12,13 +12,19 @@ using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace ByteFlood
 {
     public class TorrentInfo : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        [XmlIgnore]
         public TorrentManager Torrent { get; set; }
+        public string Path = "";
+        public string SavePath = "";
+        public TorrentSettings TorrentSettings = new TorrentSettings();
         public string Name { get; set; }
         public int Progress { get; set; }
         public long Size { get; set; }
@@ -34,18 +40,23 @@ namespace ByteFlood
 
         public int PeerCount { get; set; }
 
+        [XmlIgnore]
         public string Ratio { get { return RawRatio.ToString("0.000"); } }
 
         public float RawRatio { get; set; }
 
         public float RatioLimit { get; set; }
 
+        [XmlIgnore]
         public TimeSpan ETA { get; private set; }
 
+        [XmlIgnore]
         public ObservableCollection<PeerInfo> Peers = new ObservableCollection<PeerInfo>();
         public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
+        [XmlIgnore]
         public ObservableCollection<PieceInfo> Pieces = new ObservableCollection<PieceInfo>();
         public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
+        [XmlIgnore]
         private bool hooked_pieces = false;
         private SynchronizationContext context;
         public List<float> DownSpeeds
@@ -78,6 +89,11 @@ namespace ByteFlood
             }
         }
         private List<float> downspeeds = new List<float>();
+
+        public TorrentInfo() // this is reserved for the XML deserializer.
+        {
+        }
+
         public TorrentInfo(SynchronizationContext c)
         {
             context = c;
@@ -118,13 +134,17 @@ namespace ByteFlood
         {
             if (e.HashPassed)
             {
-                var results = Pieces.Where(t => t.ID == e.PieceIndex);
-                if (results.Count() != 0)
+                try
                 {
-                    int index = Pieces.IndexOf(results.ToList()[0]);
-                    context.Send(x => Pieces[index].Finished = true, null);
-                    return;
+                    var results = Pieces.Where(t => t.ID == e.PieceIndex);
+                    if (results.Count() != 0)
+                    {
+                        int index = Pieces.IndexOf(results.ToList()[0]);
+                        context.Send(x => Pieces[index].Finished = true, null);
+                        return;
+                    }
                 }
+                catch (InvalidOperationException) { }
             }
             PieceInfo pi = new PieceInfo();
             pi.ID = e.PieceIndex;
@@ -150,10 +170,27 @@ namespace ByteFlood
 
         public void Update()
         {
+            if (this.Torrent == null)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() => {
+                    MainWindow mw = Application.Current.MainWindow as MainWindow;
+                    this.context = mw.uiContext;
+                    this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings);
+                    mw.ce.Register(this.Torrent);
+                    this.Start();
+                }));
+            }
+
             // TODO: Break this up into small pieces
             TryHookPieceHandler();
             try // I hate having to do this
             {
+                this.Path = Torrent.Torrent.TorrentPath;
+
+                this.SavePath = Torrent.SavePath;
+
+                this.TorrentSettings = Torrent.Settings;
+
                 this.Status = Torrent.State.ToString();
                 
                 this.Size = this.Torrent.Torrent.Size;
