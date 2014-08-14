@@ -170,10 +170,7 @@ namespace ByteFlood
         {
             if (e.AddedItems.Count == 0)
                 return;
-            peers_list.ItemsSource = ((TorrentInfo)e.AddedItems[0]).Peers;
-            files_list.ItemsSource = ((TorrentInfo)e.AddedItems[0]).Files;
-            pieces_list.ItemsSource = ((TorrentInfo)e.AddedItems[0]).Pieces;
-            trackers_list.ItemsSource = ((TorrentInfo)e.AddedItems[0]).Trackers;
+            SetDataContext((TorrentInfo)e.AddedItems[0]);
         }
 
         private void Window_Drop(object sender, DragEventArgs e)
@@ -282,6 +279,30 @@ namespace ByteFlood
         {
             Preferences pref = new Preferences();
             pref.Show();
+        }
+
+        private void SetDataContext(TorrentInfo ti)
+        {
+            peers_list.ItemsSource = ti.Peers;
+            files_list.ItemsSource = ti.Files;
+            pieces_list.ItemsSource = ti.Pieces;
+            trackers_list.ItemsSource = ti.Trackers;
+            overview_canvas.DataContext = ti;
+        }
+
+        private void ResetDataContext()
+        {
+            peers_list.ItemsSource = null;
+            files_list.ItemsSource = null;
+            pieces_list.ItemsSource = null;
+            trackers_list.ItemsSource = null;
+            overview_canvas.DataContext = null;
+        }
+
+        private void mainlist_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            mainlist.UnselectAll();
+            ResetDataContext();
         }
     }
 }
