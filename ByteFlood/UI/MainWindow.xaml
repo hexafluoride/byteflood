@@ -29,6 +29,7 @@
         <formatters:TimeSpanToString x:Key="TimeSpanToString" />
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
+        <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
     </Window.Resources>
     <Grid>
         <Canvas Height="150" HorizontalAlignment="Stretch" Name="canvas1" VerticalAlignment="Bottom" Width="Auto">
@@ -36,7 +37,7 @@
             <TabControl Name="tabControl1" Margin="0,0,0,0" Width="{Binding ElementName=canvas1, Path=ActualWidth}" Height="{Binding ElementName=canvas1, Path=ActualHeight}">
                 <TabItem Header="Overview" Name="overview">
                     <ScrollViewer>
-                        <Canvas Name="overview_canvas" Height="1500">
+                        <Canvas Name="overview_canvas" Height="200">
                             <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
                             <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Name="textBlock1" Text="Time elapsed:" />
                             <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Name="textBlock2" Text="Downloaded:" />
@@ -45,7 +46,14 @@
                             <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Name="textBlock5" Text="Status:" />
                             <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Name="elapsed" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" />
                             <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Name="data_down" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
-                            <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23" Name="down_speed" Text="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                            <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23" Name="down_speed">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} (avg. {1})">
+                                        <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                        <Binding Path="AverageDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                             <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
                             <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Name="status" Text="{Binding Status}" />
                             <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Name="textBlock6" Text="ETA:" />
@@ -54,9 +62,30 @@
                             <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Name="textBlock9" Text="Upload speed limit:" />
                             <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Name="eta" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
                             <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Name="data_up" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" />
-                            <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" Name="up_speed" Text="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                            <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" Name="up_speed">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} (avg. {1})">
+                                        <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                        <Binding Path="AverageUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                             <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                            
+                            <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Name="textBlock10" Text="Wasted:" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Name="textBlock11" Text="Seeds:" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Name="textBlock12" Text="Peers:" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" Name="textBlock13" Text="Ratio:" />
+                            <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" >
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1} hashfails)">
+                                        <Binding Path="WastedBytes" Converter="{StaticResource SizeToString}" />
+                                        <Binding Path="HashFails" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Height="23" Name="textBlock15" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" />
+                            <TextBlock Height="23" Name="textBlock16" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" />
+                            <TextBlock Height="23" Name="textBlock17" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" />
                         </Canvas>
                     </ScrollViewer>
                 </TabItem>
@@ -114,10 +143,10 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 
-                                <GridViewColumn Width="140" Header="Progress">
+                                <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ProgressBar Maximum="100" Value="{Binding Progress}" Width="140" />
+                                            <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=file_progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -171,10 +200,10 @@
                 <GridView>
                     <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
 
-                    <GridViewColumn Width="100" Header="Progress">
+                    <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="140" />
+                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -185,8 +214,8 @@
                     <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
                     
                     <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
-                    <GridViewColumn Width="50" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                    <GridViewColumn Width="100" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                    <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                    <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
                     <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
                     <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
                     <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
