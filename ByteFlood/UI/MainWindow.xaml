@@ -22,7 +22,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen" 
         Left="0" Top="0"
-        Title="MainWindow" Height="425" Width="Auto" SizeToContent="Width" mc:Ignorable="d" 
+        Title="ByteFlood" Height="425" Width="Auto" SizeToContent="Width" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="968" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop">
     <Window.Resources>
         <formatters:SizeToString x:Key="SizeToString" />
