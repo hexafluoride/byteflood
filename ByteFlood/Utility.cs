@@ -31,14 +31,14 @@ namespace ByteFlood
         public static string PrettifyAmount(double amount)
         {
             if (amount > T)
-                return (amount / T) + " TB";
+                return (amount / T).ToString("0.00") + " TB";
             if (amount > G)
                 return (amount / G).ToString("0.00") + " GB";
             if (amount > M)
                 return (amount / M).ToString("0.00") + " MB";
             if (amount > K)
                 return (amount / K).ToString("0.00") + " KB";
-            return amount.ToString() + " B";
+            return amount.ToString("0.00") + " B";
         }
 
         //public static string PrettifyAmount(long amount)
