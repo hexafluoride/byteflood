@@ -31,9 +31,10 @@ namespace ByteFlood
         public bool PreferEncryption { get; set; }
         public int ListeningPort { get; set; }
         public string FileRegex { get; set; }
+        public bool EnableFileRegex { get; set; }
         public bool DownloadAllRSS { get; set; }
         public string RSSRegex { get; set; }
-        public bool RSSDuplicates { get; set; }
+        public bool RSSCheckForDuplicates { get; set; }
         public string Path;
 
         [XmlIgnore]

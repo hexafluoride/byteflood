@@ -21,7 +21,8 @@
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,56,0,0" Name="textBlock2" Text="DHT listening port" VerticalAlignment="Top"  />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="305,56,0,0" Name="textBox2" VerticalAlignment="Top" Width="120" Text="{Binding ListeningPort}" />
                     
-                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:"></CheckBox>
+                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="87" />
+                    <TextBox Canvas.Left="305" Canvas.Top="85" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
                 </Canvas>
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">
@@ -41,10 +42,10 @@
             </TabItem>
             <TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
                 <Canvas>
-                    <RadioButton Content="Download all new content" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="rss_all_selector" VerticalAlignment="Top" IsChecked="True" />
-                    <RadioButton Content="Download content matching regex: " Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="rss_regex_selector" VerticalAlignment="Top" />
+                    <RadioButton Content="Download all new content" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="rss_all_selector" VerticalAlignment="Top" IsChecked="{Binding DownloadAllRSS}" GroupName="rss_content_selectors" />
+                    <RadioButton Content="Download content matching regex: " Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="rss_regex_selector" VerticalAlignment="Top" GroupName="rss_content_selectors" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="220,26,0,0" Name="rss_regex" VerticalAlignment="Top" Width="205" Text="{Binding RSSRegex}" IsEnabled="{Binding ElementName=rss_regex_selector, Path=IsChecked}"/>
-                    <CheckBox Content="Check for duplicates" Height="16" HorizontalAlignment="Left" Margin="6,50,0,0" Name="dupes" VerticalAlignment="Top" />
+                    <CheckBox Content="Check for duplicates" Height="16" HorizontalAlignment="Left" Margin="6,50,0,0" Name="dupes" IsChecked="{Binding RSSCheckForDuplicates}" VerticalAlignment="Top" />
                 </Canvas>
             </TabItem>
         </TabControl>

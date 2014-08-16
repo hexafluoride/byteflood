@@ -19,7 +19,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
-        Title="Add torrent..." Height="352" Width="723" Loaded="Window_Loaded">
+        Title="Add torrent..." Height="352" Width="723">
 
     <Window.Resources>
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
@@ -50,7 +50,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}"/>
-                                            <CheckBox IsChecked="True" Checked="CheckBox_Checked" Width="Auto" Click="CheckBox_Click" Height="Auto" />
+                                            <CheckBox IsChecked="{Binding DownloadFile}" Checked="CheckBox_Checked" Width="Auto" Click="CheckBox_Click" Height="Auto" />
                                             <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
                                         </StackPanel>
                                     </DataTemplate>
