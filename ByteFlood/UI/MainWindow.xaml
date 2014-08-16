@@ -22,8 +22,8 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen" 
         Left="0" Top="0"
-        Title="ByteFlood" Height="425" Width="Auto" SizeToContent="Width" mc:Ignorable="d" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="968" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop">
+        Title="ByteFlood" Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" SizeChanged="Window_SizeChanged">
     <Window.Resources>
         <formatters:SizeToString x:Key="SizeToString" />
         <formatters:TimeSpanToString x:Key="TimeSpanToString" />
@@ -32,21 +32,69 @@
         <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
     </Window.Resources>
     <Grid>
-        <Canvas Height="150" HorizontalAlignment="Stretch" Name="canvas1" VerticalAlignment="Bottom" Width="Auto">
+        <Grid>
+        <ListView Margin="150,40,0,0" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" ItemsSource="{Binding Path=list_data, RelativeSource={RelativeSource Self}}" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown" BorderThickness="1,1,1,0">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="Start" Click="StartSelectedTorrent" Background="WhiteSmoke" />
+                    <MenuItem Header="Pause" Click="PauseSelectedTorrent" Background="WhiteSmoke" />
+                    <MenuItem Header="Stop" Click="StopSelectedTorrent" Background="WhiteSmoke" />
+                    <Separator />
+                    <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" Background="WhiteSmoke" />
+                    <MenuItem Header="Remove from list" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
+                </ContextMenu>
+            </ListView.Resources>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
+
+                    <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
+
+                    <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
+                    <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
+
+                    <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
+                    <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                    <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                    <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
+                    <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
+                    <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
+
+                    <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Canvas Height="197" HorizontalAlignment="Stretch" Name="info_canvas" VerticalAlignment="Bottom" Margin="150,0,0,0" Grid.Row="1">
+            <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="1" Panel.ZIndex="99" />
+            <Border BorderBrush="Transparent" BorderThickness="4" Name="grip" MouseDown="ResizeInfoAreaStart" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="4" Cursor="SizeNS" Panel.ZIndex="99" />
             <Grid Canvas.Left="219" Canvas.Top="72" />
-            <TabControl Name="tabControl1" Margin="0,0,0,0" Width="{Binding ElementName=canvas1, Path=ActualWidth}" Height="{Binding ElementName=canvas1, Path=ActualHeight}">
+            <TabControl Name="tabControl1" Margin="0,0,0,0" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="{Binding ElementName=info_canvas, Path=ActualHeight}">
                 <TabItem Header="Overview" Name="overview">
                     <ScrollViewer>
-                        <Canvas Name="overview_canvas" Height="200">
+                        <Canvas Name="overview_canvas" Height="200" VerticalAlignment="Top">
                             <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
-                            <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Name="textBlock1" Text="Time elapsed:" />
-                            <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Name="textBlock2" Text="Downloaded:" />
-                            <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23" Name="textBlock3" Text="Download speed:" />
-                            <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" Name="textBlock4" Text="Download speed limit:" />
-                            <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Name="textBlock5" Text="Status:" />
-                            <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Name="elapsed" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" />
-                            <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Name="data_down" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
-                            <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23" Name="down_speed">
+                            <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Name="textBlock1" Text="Time elapsed:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Name="textBlock2" Text="Downloaded:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23" Name="textBlock3" Text="Download speed:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" Name="textBlock4" Text="Download speed limit:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Name="textBlock5" Text="Status:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Name="elapsed" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Name="data_down" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23" Name="down_speed" HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} (avg. {1})">
                                         <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -54,15 +102,15 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                            <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Name="status" Text="{Binding Status}" />
-                            <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Name="textBlock6" Text="ETA:" />
-                            <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Name="textBlock7" Text="Uploaded:" />
-                            <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23" Name="textBlock8" Text="Upload speed:" />
-                            <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Name="textBlock9" Text="Upload speed limit:" />
-                            <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Name="eta" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
-                            <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Name="data_up" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" />
-                            <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" Name="up_speed">
+                            <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Name="status" Text="{Binding Status}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Name="textBlock6" Text="ETA:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Name="textBlock7" Text="Uploaded:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23" Name="textBlock8" Text="Upload speed:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Name="textBlock9" Text="Upload speed limit:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Name="eta" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Name="data_up" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" Name="up_speed" HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} (avg. {1})">
                                         <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -70,12 +118,12 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                            <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Name="textBlock10" Text="Wasted:" />
-                            <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Name="textBlock11" Text="Seeds:" />
-                            <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Name="textBlock12" Text="Peers:" />
-                            <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" Name="textBlock13" Text="Ratio:" />
-                            <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" >
+                            <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Name="textBlock10" Text="Wasted:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Name="textBlock11" Text="Seeds:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Name="textBlock12" Text="Peers:" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" Name="textBlock13" Text="Ratio:" HorizontalAlignment="Right" />
+                            <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} ({1} hashfails)">
                                         <Binding Path="WastedBytes" Converter="{StaticResource SizeToString}" />
@@ -83,9 +131,9 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Height="23" Name="textBlock15" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" />
-                            <TextBlock Height="23" Name="textBlock16" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" />
-                            <TextBlock Height="23" Name="textBlock17" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" />
+                            <TextBlock Height="23" Name="textBlock15" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" HorizontalAlignment="Right" />
+                            <TextBlock Height="23" Name="textBlock16" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" HorizontalAlignment="Right" />
+                            <TextBlock Height="23" Name="textBlock17" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" HorizontalAlignment="Right" />
                         </Canvas>
                     </ScrollViewer>
                 </TabItem>
@@ -178,52 +226,19 @@
                 </TabItem>
             </TabControl>
         </Canvas>
-        <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="10,7,0,0" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
-        <ListView Height="Auto" HorizontalAlignment="Stretch" Margin="0,40,0,150" Name="mainlist" VerticalAlignment="Stretch" ItemsSource="{Binding Path=list_data, RelativeSource={RelativeSource Self}}" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
-            <ListView.Resources>
-                <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Header="Start" Click="StartSelectedTorrent" Background="WhiteSmoke" />
-                    <MenuItem Header="Pause" Click="PauseSelectedTorrent" Background="WhiteSmoke" />
-                    <MenuItem Header="Stop" Click="StopSelectedTorrent" Background="WhiteSmoke" />
-                    <Separator />
-                    <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" Background="WhiteSmoke" />
-                    <MenuItem Header="Remove from list" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
-                </ContextMenu>
-            </ListView.Resources>
-
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}" >
-                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
-
-                    <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
-                    
-                    <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
-                    <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
-                    
-                    <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
-                    <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                    <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                    <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
-                    <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
-                    <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
-                   
-                    <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="110,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+        </Grid>
+        <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="157,7,0,0" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
+        
+        <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="357,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+        <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="257,7,0,0" Name="button3" VerticalAlignment="Top" Width="94" Click="button3_Click" />
+        <TreeView Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" Name="treeView1" Width="151">
+            <TreeViewItem Header="Torrents">
+                <TreeViewItem Header="Downloading" />
+                <TreeViewItem Header="Seeding" />
+                <TreeViewItem Header="Inactive" />
+                <TreeViewItem Header="Active" />
+            </TreeViewItem>
+            <TreeViewItem Header="Feeds" />
+        </TreeView>
     </Grid>
 </Window>

@@ -27,7 +27,7 @@
         
     <Grid>
         <GroupBox Header="Save in" Height="73" HorizontalAlignment="Left" Margin="13,0,0,0" Name="gb1" VerticalAlignment="Top" Width="324">
-            <Grid Margin="2,0,-2,0">
+            <Grid Margin="2,0,-2,0" Width="309">
                 <TextBox Height="23" Text="" HorizontalAlignment="Left" Margin="6,14,0,0" Name="pathbox" VerticalAlignment="Top" Width="251" />
                 <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="263,14,0,0" Name="select" VerticalAlignment="Top" Width="43" Click="button1_Click" />
             </Grid>
