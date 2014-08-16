@@ -39,6 +39,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Net;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace ByteFlood
 {
@@ -61,8 +62,15 @@ namespace ByteFlood
             {
                 FileInfo fi = new FileInfo();
                 fi.Name = file.Path;
+                fi.DownloadFile = true;
+                if (App.Settings.EnableFileRegex && Regex.IsMatch(fi.Name, App.Settings.FileRegex))
+                {
+                    fi.DownloadFile = false;
+                    UpdateFile(fi.Name, fi.DownloadFile);
+                }
                 fi.RawSize = file.Length;
                 files.Add(fi);
+                fi.SetSelf(fi);
             }
             torrentname = tm.Torrent.Name;
             name.Text = torrentname;
@@ -101,7 +109,12 @@ namespace ByteFlood
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             string path = ((FileInfo)filelist.SelectedItem).Name;
-            if (((CheckBox)e.Source).IsChecked == true) // have to do this, sorry guys
+            UpdateFile(path, ((CheckBox)e.Source).IsChecked == true);
+        }
+
+        private void UpdateFile(string path, bool download)
+        {
+            if (download)
                 tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.Normal;
             else
                 tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.DoNotDownload;
@@ -124,11 +137,6 @@ namespace ByteFlood
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }
