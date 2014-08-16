@@ -29,6 +29,7 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
+        bool gripped = false;
         public ClientEngine ce;
         Thread thr;
         bool updategraph = false;
@@ -303,6 +304,60 @@ namespace ByteFlood
         {
             mainlist.UnselectAll();
             ResetDataContext();
+        }
+
+        private void button3_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
+        {
+            gripped = true;
+        }
+        private void ResizeInfoAreaEnd(object sender, MouseButtonEventArgs e)
+        {
+            gripped = false;
+        }
+
+        private void ResizeInfoAreaMove(object sender, MouseEventArgs e)
+        {
+            if (gripped)
+            {
+                Point p = e.MouseDevice.GetPosition(this);
+                Point position = info_canvas.TransformToAncestor(this).Transform(new Point(0, 0));
+                double ypos = position.Y;
+                double left = info_canvas.Margin.Left;
+                if (p.Y > this.ActualHeight - 120 || p.Y < 90)
+                    return;
+                info_canvas.Margin = new Thickness { Left = left, Top = p.Y };
+                info_canvas.Height += ypos - info_canvas.Margin.Top;
+                double mainlist_top = mainlist.Margin.Top;
+                double mainlist_left = mainlist.Margin.Left;
+                mainlist.Height = mainlist.ActualHeight - (ypos - info_canvas.Margin.Top);
+                mainlist.Margin = new Thickness() { Left = mainlist_left, Top=mainlist_top };
+            }
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            mainlist.Height = this.Height - info_canvas.ActualHeight - mainlist.Margin.Top;
+        }
+
+        private void grip_MouseEnter(object sender, MouseEventArgs e)
+        {
+            //this.Cursor = Cursors.SizeNS;
+        }
+
+        private void grip_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //if(!gripped)
+            //    this.Cursor = Cursors.Arrow;
         }
     }
 }
