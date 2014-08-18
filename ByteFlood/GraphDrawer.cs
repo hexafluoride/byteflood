@@ -165,9 +165,9 @@ namespace ByteFlood
                 double h_loc = Utility.CalculateLocation(spp, d);
                 h_loc -= h_margin;
                 h_loc = height - h_loc;
-                graph.Children.Add(Utility.GenerateLine(xprev, yprev, w_loc, h_loc, color));
-                if (yprev == height)
+                if (yprev == height && data.Min() != 0)
                     yprev = h_loc;
+                graph.Children.Add(Utility.GenerateLine(xprev, yprev, w_loc, h_loc, color));
                 xprev = w_loc;
                 yprev = h_loc;
             }
