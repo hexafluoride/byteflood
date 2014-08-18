@@ -30,7 +30,6 @@
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
         <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
-        <formatters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
         <Grid>

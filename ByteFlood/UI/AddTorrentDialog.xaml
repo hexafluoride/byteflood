@@ -43,6 +43,15 @@
                 <Label Height="28" HorizontalAlignment="Left" Margin="76,52,0,0" Name="size" VerticalAlignment="Top" />
                 <Label Content="{Binding Torrent.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" Name="label8" VerticalAlignment="Top" />
                 <ListView HorizontalAlignment="Left" Margin="6,108,0,6" Name="filelist" Width="323" SelectionMode="Single" SelectedIndex="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="IsSelected" Value="True"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="230" Header="Name" >
@@ -50,7 +59,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}"/>
-                                            <CheckBox IsChecked="{Binding DownloadFile}" Checked="CheckBox_Checked" Width="Auto" Click="CheckBox_Click" Height="Auto" />
+                                            <CheckBox IsChecked="{Binding DownloadFile}" Width="Auto" Click="CheckBox_Click" Height="Auto" />
                                             <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
                                         </StackPanel>
                                     </DataTemplate>
