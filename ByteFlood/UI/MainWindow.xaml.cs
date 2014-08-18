@@ -34,6 +34,13 @@ namespace ByteFlood
         Thread thr;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
+        public Func<TorrentInfo, bool> itemselector;
+        public Func<TorrentInfo, bool> ShowAll = new Func<TorrentInfo, bool>((t) => { return true; });
+        public Func<TorrentInfo, bool> Downloading = new Func<TorrentInfo, bool>((t) => { return t.Torrent.State == TorrentState.Downloading; });
+        public Func<TorrentInfo, bool> Seeding = new Func<TorrentInfo, bool>((t) => { return t.Torrent.State == TorrentState.Seeding; });
+        public Func<TorrentInfo, bool> Active = new Func<TorrentInfo, bool>((t) => { return (t.Torrent.State == TorrentState.Seeding || t.Torrent.State == TorrentState.Downloading) || t.Torrent.State == TorrentState.Hashing; });
+        public Func<TorrentInfo, bool> Inactive = new Func<TorrentInfo, bool>((t) => { return (t.Torrent.State != TorrentState.Seeding && t.Torrent.State != TorrentState.Downloading) && t.Torrent.State != TorrentState.Hashing; });
+        public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent.Progress == 100; });
         GraphDrawer graph;
         public DhtListener dhtl;
         public State state;
@@ -42,6 +49,7 @@ namespace ByteFlood
             InitializeComponent();
             state = State.Load("./state.xml");
             mainlist.ItemsSource = state.Torrents;
+            itemselector = ShowAll;
             ce = new ClientEngine(new EngineSettings());
             thr = new Thread(new ThreadStart(Update));
             thr.Start();
@@ -50,6 +58,7 @@ namespace ByteFlood
 
             ce.RegisterDht(dht);
             ce.DhtEngine.Start();
+            torrents_treeview.DataContext = state;
 
             graph = new GraphDrawer(graph_canvas);
         }
@@ -138,6 +147,7 @@ namespace ByteFlood
                 {
                     foreach (TorrentInfo ti in state.Torrents)
                         ti.Update();
+
                     uiContext.Send(x =>
                     {
                         if (updategraph)
@@ -150,9 +160,20 @@ namespace ByteFlood
                         }
                         updategraph = !updategraph;
                     }, null);
-                    GC.Collect();
+
+                    string[] torrentstates = new string[] { 
+                        "Downloading",
+                        "Seeding",
+                        "Inactive",
+                        "Active",
+                        "Finished"
+                    };
+                    foreach (string str in torrentstates)
+                    {
+                        state.NotifyChanged(str + "Torrents", str + "TorrentCount");
+                    }
                 }
-                catch (Exception ex)
+                catch
                 {
                 }
                 System.Threading.Thread.Sleep(500);
@@ -358,6 +379,39 @@ namespace ByteFlood
         {
             //if(!gripped)
             //    this.Cursor = Cursors.Arrow;
+        }
+
+        private void SwitchTorrentDisplay(object sender, RoutedEventArgs e)
+        {
+            string tag = (string)((TreeViewItem)e.Source).Tag;
+            switch (tag)
+            {
+                case "downloading":
+                    itemselector = Downloading;
+                    break;
+                case "seeding":
+                    itemselector = Seeding;
+                    break;
+                case "active":
+                    itemselector = Active;
+                    break;
+                case "inactive":
+                    itemselector = Inactive;
+                    break;
+                case "finished":
+                    itemselector = Finished;
+                    break;
+                case "showall":
+                    itemselector = ShowAll;
+                    break;
+                default:
+                    itemselector = ShowAll;
+                    break;
+            }
+            foreach (TorrentInfo ti in state.Torrents)
+            {
+                ti.UpdateList("ShowOnList");
+            }
         }
     }
 }
