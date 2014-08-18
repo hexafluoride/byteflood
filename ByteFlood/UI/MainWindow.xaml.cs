@@ -172,6 +172,7 @@ namespace ByteFlood
                     {
                         state.NotifyChanged(str + "Torrents", str + "TorrentCount");
                     }
+                    state.NotifyChanged("TorrentCount");
                 }
                 catch
                 {

@@ -63,7 +63,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Formatters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
     <Compile Include="Formatters\Subtract5Formatter.cs" />
     <Compile Include="InfoClasses\FileInfo.cs" />
