@@ -34,6 +34,8 @@ namespace ByteFlood
         public int Progress { get { return (int)Torrent.Progress; } set { } }
         public long Size { get { return Torrent.Torrent.Size; }  }
         public int DownloadSpeed { get { return Torrent.Monitor.DownloadSpeed; }  }
+        public int MaxDownloadSpeed { get { return Torrent.Settings.MaxDownloadSpeed; } }
+        public int MaxUploadSpeed { get { return Torrent.Settings.MaxUploadSpeed; } }
         public int UploadSpeed { get { return Torrent.Monitor.UploadSpeed; }  }
         public TimeSpan Elapsed { get { return DateTime.Now.Subtract(StartTime); }  }
         public DateTime StartTime { get; set; }
@@ -46,6 +48,16 @@ namespace ByteFlood
         public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
         public string Status { get { return Torrent.State.ToString() == "DontDownload" ? "Don't download" : Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
+        public bool ShowOnList
+        {
+            get
+            {
+                
+                if (Torrent == null)
+                    return false;
+                return ((MainWindow)App.Current.MainWindow).itemselector(this);
+            }
+        }
         public float RawRatio { get; set; }
         public float RatioLimit { get; set; }
         [XmlIgnore]
@@ -270,7 +282,10 @@ namespace ByteFlood
                         "WastedBytes",
                         "HashFails",
                         "AverageDownloadSpeed",
-                        "AverageUploadSpeed");
+                        "AverageUploadSpeed",
+                        "MaxDownloadSpeed",
+                        "MaxUploadSpeed",
+                        "ShowOnList");
                 }
             }
             catch (Exception ex)

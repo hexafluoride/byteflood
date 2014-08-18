@@ -30,10 +30,11 @@
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
         <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
+        <formatters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
         <Grid>
-        <ListView Margin="150,40,0,0" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" ItemsSource="{Binding Path=list_data, RelativeSource={RelativeSource Self}}" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown" BorderThickness="1,1,1,0">
+        <ListView Margin="150,40,0,0" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown" BorderThickness="1,1,1,0">
             <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">
                     <MenuItem Header="Start" Click="StartSelectedTorrent" Background="WhiteSmoke" />
@@ -42,14 +43,19 @@
                     <Separator />
                     <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" Background="WhiteSmoke" />
                     <MenuItem Header="Remove from list" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
-                </ContextMenu>
-            </ListView.Resources>
+                    </ContextMenu>
+                </ListView.Resources>
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}" >
                     <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                </Style>
-            </ListView.ItemContainerStyle>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
@@ -102,7 +108,7 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
                             <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Name="status" Text="{Binding Status}" HorizontalAlignment="Right" />
                             <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Name="textBlock6" Text="ETA:" HorizontalAlignment="Right" />
                             <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Name="textBlock7" Text="Uploaded:" HorizontalAlignment="Right" />
@@ -118,7 +124,7 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
-                            <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" DataContext="{Binding TorrentSettings}" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                            <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
                             <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Name="textBlock10" Text="Wasted:" HorizontalAlignment="Right" />
                             <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Name="textBlock11" Text="Seeds:" HorizontalAlignment="Right" />
                             <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Name="textBlock12" Text="Peers:" HorizontalAlignment="Right" />
@@ -232,11 +238,12 @@
         <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="357,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
         <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="257,7,0,0" Name="button3" VerticalAlignment="Top" Width="94" Click="button3_Click" />
         <TreeView Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" Name="treeView1" Width="151">
-            <TreeViewItem Header="Torrents">
-                <TreeViewItem Header="Downloading" />
-                <TreeViewItem Header="Seeding" />
-                <TreeViewItem Header="Inactive" />
-                <TreeViewItem Header="Active" />
+            <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
+                <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
+                <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
+                <TreeViewItem Header="{Binding InactiveTorrentCount}" Tag="inactive" HeaderStringFormat="Inactive ({0})" Selected="SwitchTorrentDisplay" />
+                <TreeViewItem Header="{Binding ActiveTorrentCount}" Tag="active" HeaderStringFormat="Active ({0})" Selected="SwitchTorrentDisplay" />
+                <TreeViewItem Header="{Binding FinishedTorrentCount}" Tag="finished" HeaderStringFormat="Finished ({0})" Selected="SwitchTorrentDisplay" />
             </TreeViewItem>
             <TreeViewItem Header="Feeds" />
         </TreeView>

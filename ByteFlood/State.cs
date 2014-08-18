@@ -16,12 +16,25 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using MonoTorrent.Common;
 
 namespace ByteFlood
 {
-    public class State
+    public class State : INotifyPropertyChanged
     {
         public ObservableCollection<TorrentInfo> Torrents = new ObservableCollection<TorrentInfo>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        [XmlIgnore]
+        public MainWindow window = (MainWindow)App.Current.MainWindow;
+
+        public int DownloadingTorrentCount { get { return Torrents.Count(window.Downloading); } set { } }
+        public int SeedingTorrentCount { get { return Torrents.Count(window.Seeding); } set { } }
+        public int ActiveTorrentCount { get { return Torrents.Count(window.Active); } set { } }
+        public int InactiveTorrentCount { get { return TorrentCount - ActiveTorrentCount; } set { } }
+        public int FinishedTorrentCount { get { return Torrents.Count(window.Finished); } set { } }
+        public int TorrentCount { get { return Torrents.Count; } set { } }
+
         public State()
         {
 
@@ -45,6 +58,14 @@ namespace ByteFlood
                 MessageBox.Show("An error occurred while loading the program state. You may need to re-add your torrents.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new State();
             }
+        }
+
+        public void NotifyChanged(params string[] props)
+        {
+            if (PropertyChanged == null)
+                return;
+            foreach (string str in props)
+                PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
     }
 }
