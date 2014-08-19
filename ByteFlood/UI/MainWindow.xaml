@@ -55,13 +55,6 @@
 
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
-                        <Style.Resources>
-                            <SolidColorBrush Color="#70c0e7" x:Key="border_hover" />
-                            <Style TargetType="{x:Type ListViewItem}" x:Key="hover_style" >
-                                <Setter Property="BorderThickness" Value="5" />
-                                <Setter Property="BorderBrush" Value="{StaticResource border_hover}" />
-                            </Style>
-                        </Style.Resources>
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
                         
                         <Style.Triggers>
