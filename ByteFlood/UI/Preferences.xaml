@@ -1,15 +1,15 @@
 ﻿<Window x:Class="ByteFlood.Preferences"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Preferences" Height="484" Width="629" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="Preferences" Height="521" Width="629" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Grid>
-        <TreeView Height="420" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
+        <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
             <TreeViewItem Header="General" Name="general_tree" IsSelected="True" />
             <TreeViewItem Header="RSS" Name="rss_tree" />
             <TreeViewItem Header="UI" Name="ui_tree" >
             </TreeViewItem>
         </TreeView>
-        <TabControl HorizontalAlignment="Left" Margin="158,10,0,13" Name="tabControl1" Width="437">
+        <TabControl HorizontalAlignment="Left" Margin="158,10,0,0" Name="tabControl1" Width="437" Height="431" VerticalAlignment="Top">
             <TabItem Name="general" IsSelected="{Binding IsSelected, ElementName=general_tree}" Height="0">
                 <Canvas>
                     <CheckBox Content="Prefer encryption" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="checkBox1" VerticalAlignment="Top" IsChecked="{Binding PreferEncryption}" />
@@ -50,5 +50,8 @@
                 </Canvas>
             </TabItem>
         </TabControl>
+        <Button Content="Save changes" Height="23" HorizontalAlignment="Left" Margin="501,447,0,0" Name="button2" VerticalAlignment="Top" Width="94" Click="button2_Click" />
+        <Button Content="Discard changes" Height="23" HorizontalAlignment="Left" Margin="391,447,0,0" Name="button4" VerticalAlignment="Top" Width="104" Click="button4_Click" />
+        <Button Content="Reset to default settings" Height="23" HorizontalAlignment="Left" Margin="243,447,0,0" Name="button3" VerticalAlignment="Top" Width="142" Click="button3_Click" />
     </Grid>
 </Window>

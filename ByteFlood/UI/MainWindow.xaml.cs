@@ -305,6 +305,7 @@ namespace ByteFlood
         {
             Preferences pref = new Preferences();
             pref.Show();
+            SaveSettings();
         }
 
         private void SetDataContext(TorrentInfo ti)
