@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Runtime.Serialization;
 
 namespace ByteFlood
 {
@@ -45,22 +46,29 @@ namespace ByteFlood
         [XmlIgnore]
         public Brush UploadBrush { get { return new SolidColorBrush(UploadColor); } }
 
-        public static Settings DefaultSettings = new Settings() { 
-            Theme = Theme.Aero2,
-            DrawGrid = true,
-            DownloadColor = Colors.Green,
-            UploadColor = Colors.Red,
-            DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
-            PreferEncryption = true,
-            ListeningPort = 1025,
-            FileRegex = "",
-            EnableFileRegex = false,
-            DownloadAllRSS = false,
-            RSSRegex = "",
-            RSSCheckForDuplicates = false,
-            MetroStyleHover = false,
-            DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
-        };
+        public static Settings DefaultSettings
+        {
+            get
+            {
+                return new Settings()
+                {
+                    Theme = Theme.Aero2,
+                    DrawGrid = true,
+                    DownloadColor = Colors.Green,
+                    UploadColor = Colors.Red,
+                    DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
+                    PreferEncryption = true,
+                    ListeningPort = 1025,
+                    FileRegex = "",
+                    EnableFileRegex = false,
+                    DownloadAllRSS = false,
+                    RSSRegex = "",
+                    RSSCheckForDuplicates = false,
+                    MetroStyleHover = false,
+                    DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
+                };
+            }
+        }
 
         public Settings()
         {

@@ -16,6 +16,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
+
 namespace ByteFlood
 {
     public static class Utility
@@ -122,6 +125,42 @@ namespace ByteFlood
             });
             new XmlSerializer(typeof(T)).Serialize(xw, t);
             xw.Flush();
+        }
+
+        public static object CloneObject(object source)
+        {
+            Type type = source.GetType();
+            object target;
+            if (type == Settings.DefaultSettings.GetType())
+                target = Settings.DefaultSettings;
+            else
+                target = Activator.CreateInstance(type);
+
+            PropertyInfo[] prop_info = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            foreach (PropertyInfo item in prop_info)
+            {
+                if (item.CanWrite)
+                {
+                    if (item.PropertyType.IsValueType || item.PropertyType.IsEnum || item.PropertyType.Equals(typeof(System.String)))
+                    {
+                        item.SetValue(target, item.GetValue(source, null), null);
+                    }
+                    else
+                    {
+                        object prop_val = item.GetValue(source, null);
+                        if (prop_val == null)
+                        {
+                            item.SetValue(target, null, null);
+                        }
+                        else
+                        {
+                            item.SetValue(target, CloneObject(prop_val), null);
+                        }
+                    }
+                }
+            }
+            return target;
         }
 
         public static T Deserialize<T>(string path)

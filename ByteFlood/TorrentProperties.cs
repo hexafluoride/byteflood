@@ -18,12 +18,12 @@ namespace ByteFlood
 {
     public class TorrentProperties
     {
-        public int MaxConnections;
-        public int MaxDownloadSpeed;
-        public int MaxUploadSpeed;
-        public int UploadSlots;
-        public bool UseDHT;
-        public bool EnablePeerExchange;
+        public int MaxConnections { get; set; }
+        public int MaxDownloadSpeed { get; set; }
+        public int MaxUploadSpeed { get; set; }
+        public int UploadSlots { get; set; }
+        public bool UseDHT { get; set; }
+        public bool EnablePeerExchange { get; set; }
 
         public static TorrentProperties DefaultTorrentProperties = new TorrentProperties()
         {

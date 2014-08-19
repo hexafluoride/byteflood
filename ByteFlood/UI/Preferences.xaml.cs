@@ -20,6 +20,7 @@ namespace ByteFlood
     /// </summary>
     public partial class Preferences : Window
     {
+        Settings local;
 
         public Theme[] theme_list = new Theme[] 
         {
@@ -37,14 +38,21 @@ namespace ByteFlood
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = App.Settings;
+            local = (Settings)Utility.CloneObject(App.Settings);
+            this.DataContext = local;
             this.themeCombox.ItemsSource = theme_list;
-            this.themeCombox.SelectedItem = App.Settings.Theme;
+            this.themeCombox.SelectedItem = local.Theme;
+        }
+
+        private void UpdateDataContext(Settings s)
+        {
+            this.DataContext = s;
+            this.themeCombox.SelectedItem = s == null ? Theme.Aero2 : s.Theme;
         }
 
         private void SelectDownloadColor(object sender, RoutedEventArgs e)
         {
-            App.Settings.DownloadColor = GetNewColor(App.Settings.DownloadColor);
+            local.DownloadColor = GetNewColor(local.DownloadColor);
             downcolor.GetBindingExpression(Button.BackgroundProperty).UpdateTarget();
         }
 
@@ -61,7 +69,7 @@ namespace ByteFlood
 
         private void SelectUploadColor(object sender, RoutedEventArgs e)
         {
-            App.Settings.UploadColor = GetNewColor(App.Settings.UploadColor);
+            local.UploadColor = GetNewColor(local.UploadColor);
             upcolor.GetBindingExpression(Button.BackgroundProperty).UpdateTarget();
         }
 
@@ -70,7 +78,7 @@ namespace ByteFlood
             var fd = new System.Windows.Forms.FolderBrowserDialog();
             fd.ShowNewFolderButton = true;
             fd.ShowDialog();
-            App.Settings.DefaultDownloadPath = fd.SelectedPath;
+            local.DefaultDownloadPath = fd.SelectedPath;
             downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
         }
 
@@ -83,10 +91,28 @@ namespace ByteFlood
 
         private void ChangeDefaultSettings(object sender, RoutedEventArgs e)
         {
-            TorrentPropertiesForm tpf = new TorrentPropertiesForm(App.Settings.DefaultTorrentProperties);
+            TorrentPropertiesForm tpf = new TorrentPropertiesForm(local.DefaultTorrentProperties);
             tpf.ShowDialog();
             if (tpf.success)
-                App.Settings.DefaultTorrentProperties = tpf.tp;
+                local.DefaultTorrentProperties = tpf.tp;
+        }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            App.Settings = (Settings)Utility.CloneObject(local);
+            this.Close();
+        }
+
+        private void button4_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void button3_Click(object sender, RoutedEventArgs e)
+        {
+            local = (Settings)Utility.CloneObject(Settings.DefaultSettings);
+            UpdateDataContext(null);
+            UpdateDataContext(local);
         }
 
     }
