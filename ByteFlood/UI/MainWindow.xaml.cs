@@ -125,6 +125,7 @@ namespace ByteFlood
                 if (!atd.start)
                     ti.Stop();
                 ti.RatioLimit = atd.limit;
+                TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
                 ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
                 state.Torrents.Add(ti);
             }
@@ -150,6 +151,8 @@ namespace ByteFlood
 
                     uiContext.Send(x =>
                     {
+                        if (mainlist.SelectedIndex == -1)
+                            ResetDataContext();
                         if (updategraph)
                         {
                             if (updategraph)
@@ -231,7 +234,7 @@ namespace ByteFlood
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            TorrentProperties tp = new TorrentProperties(t.Torrent);
+            TorrentPropertiesForm tp = new TorrentPropertiesForm(t.Torrent);
             tp.Show();
         }
 

@@ -34,12 +34,23 @@ using System.Text.RegularExpressions;
 namespace ByteFlood
 {
     /// <summary>
-    /// Interaction logic for TorrentProperties.xaml
+    /// Interaction logic for TorrentPropertiesForm.xaml
     /// </summary>
-    public partial class TorrentProperties : Window
+    public partial class TorrentPropertiesForm : Window
     {
         public TorrentManager torrent;
-        public TorrentProperties(TorrentManager tm)
+        public TorrentProperties tp;
+        public bool fake = false;
+        public bool success = false;
+
+        public TorrentPropertiesForm(TorrentProperties trp)
+        {
+            InitializeComponent();
+            fake = true;
+            tp = trp;
+        }
+
+        public TorrentPropertiesForm(TorrentManager tm)
         {
             InitializeComponent();
             torrent = tm;
@@ -50,12 +61,14 @@ namespace ByteFlood
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            maxcons.Text = torrent.Settings.MaxConnections.ToString();
-            maxdown.Text = (torrent.Settings.MaxDownloadSpeed / 1024).ToString();
-            maxup.Text = (torrent.Settings.MaxUploadSpeed / 1024).ToString();
-            dht.IsChecked = torrent.Settings.UseDht;
-            peerex.IsChecked = torrent.Settings.EnablePeerExchange;
-            uploadslots.Text = torrent.Settings.UploadSlots.ToString();
+            if(!fake)
+                tp = TorrentProperties.FromTorrentSettings(torrent.Settings);
+            maxcons.Text = tp.MaxConnections.ToString();
+            maxdown.Text = (tp.MaxDownloadSpeed / 1024).ToString();
+            maxup.Text = (tp.MaxUploadSpeed / 1024).ToString();
+            dht.IsChecked = tp.UseDHT;
+            peerex.IsChecked = tp.EnablePeerExchange;
+            uploadslots.Text = tp.UploadSlots.ToString();
         }
         private static bool IsTextAllowed(string text)
         {
@@ -65,12 +78,15 @@ namespace ByteFlood
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            torrent.Settings.MaxConnections = int.Parse(maxcons.Text);
-            torrent.Settings.MaxDownloadSpeed = int.Parse(maxdown.Text) * 1024;
-            torrent.Settings.MaxUploadSpeed = int.Parse(maxup.Text) * 1024;
-            torrent.Settings.UseDht = (bool)dht.IsChecked;
-            torrent.Settings.EnablePeerExchange = (bool)peerex.IsChecked;
-            torrent.Settings.UploadSlots = int.Parse(uploadslots.Text);
+            tp.MaxConnections = int.Parse(maxcons.Text);
+            tp.MaxDownloadSpeed = int.Parse(maxdown.Text) * 1024;
+            tp.MaxUploadSpeed = int.Parse(maxup.Text) * 1024;
+            tp.UseDHT = (bool)dht.IsChecked;
+            tp.EnablePeerExchange = (bool)peerex.IsChecked;
+            tp.UploadSlots = int.Parse(uploadslots.Text);
+            if(!fake)
+                TorrentProperties.Apply(torrent, tp);
+            success = true;
             this.Close();
         }
 
