@@ -36,7 +36,9 @@ namespace ByteFlood
         public string RSSRegex { get; set; }
         public bool RSSCheckForDuplicates { get; set; }
         public bool MetroStyleHover { get; set; }
+        public TorrentProperties DefaultTorrentProperties { get; set; }
         public string Path;
+        
 
         [XmlIgnore]
         public Brush DownloadBrush { get { return new SolidColorBrush(DownloadColor); } }
@@ -56,7 +58,8 @@ namespace ByteFlood
             DownloadAllRSS = false,
             RSSRegex = "",
             RSSCheckForDuplicates = false,
-            MetroStyleHover = false
+            MetroStyleHover = false,
+            DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
         };
 
         public Settings()

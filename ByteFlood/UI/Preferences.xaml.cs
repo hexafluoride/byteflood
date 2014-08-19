@@ -81,5 +81,13 @@ namespace ByteFlood
             app.LoadTheme(t);
         }
 
+        private void ChangeDefaultSettings(object sender, RoutedEventArgs e)
+        {
+            TorrentPropertiesForm tpf = new TorrentPropertiesForm(App.Settings.DefaultTorrentProperties);
+            tpf.ShowDialog();
+            if (tpf.success)
+                App.Settings.DefaultTorrentProperties = tpf.tp;
+        }
+
     }
 }

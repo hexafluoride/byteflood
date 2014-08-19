@@ -25,14 +25,6 @@
         Title="ByteFlood" Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" SizeChanged="Window_SizeChanged">
     <Window.Resources>
-        <Style TargetType="ListViewItem" x:Name="metro_hover">
-            <Setter Property="Background" Value="Blue"/>
-            <Style.Triggers>
-                <Trigger Property="Border.IsMouseOver" Value="True">
-                    <Setter Property="Border.Background" Value="Green" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
         <formatters:SizeToString x:Key="SizeToString" />
         <formatters:TimeSpanToString x:Key="TimeSpanToString" />
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
