@@ -57,7 +57,7 @@ namespace ByteFlood
             double xmin = 0;
             double ymin = 0;
             double xmax = 0;
-            double ymax = 0;
+            double ymax = graph.ActualHeight;
             bool first = true;
             foreach (UIElement element in graph.Children)
             {
@@ -77,8 +77,6 @@ namespace ByteFlood
                     Utility.SetIfHigherThan(ref xmax, line.X2);
                     Utility.SetIfLowerThan(ref xmin, line.X1);
                     Utility.SetIfLowerThan(ref xmin, line.X2);
-                    Utility.SetIfHigherThan(ref ymax, line.Y1);
-                    Utility.SetIfHigherThan(ref ymax, line.Y2);
                     Utility.SetIfLowerThan(ref ymin, line.Y1);
                     Utility.SetIfLowerThan(ref ymin, line.Y2);
                 }
@@ -165,9 +163,12 @@ namespace ByteFlood
                 double h_loc = Utility.CalculateLocation(spp, d);
                 h_loc -= h_margin;
                 h_loc = height - h_loc;
-                if (yprev == height && data.Min() != 0)
+                Line line = Utility.GenerateLine(xprev, yprev, w_loc, h_loc, color);
+                if (yprev == height)
                     yprev = h_loc;
-                graph.Children.Add(Utility.GenerateLine(xprev, yprev, w_loc, h_loc, color));
+                if (xprev == w_loc)
+                    line.Visibility = Visibility.Hidden;
+                graph.Children.Add(line);
                 xprev = w_loc;
                 yprev = h_loc;
             }

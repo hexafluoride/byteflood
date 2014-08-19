@@ -333,6 +333,12 @@ namespace MonoTorrent.Client
 
         #region Constructors
 
+        public TorrentManager(Torrent torrent, string savePath, TorrentSettings settings, bool rootDirIsTorrentName)
+            : this(torrent, savePath, settings, !rootDirIsTorrentName ? "" : (torrent.Files.Length == 1 ? "" : torrent.Name))
+        {
+
+        }
+
         /// <summary>
         /// Creates a new TorrentManager instance.
         /// </summary>
