@@ -31,8 +31,8 @@ namespace ByteFlood
         public string SavePath = "";
         public TorrentSettings TorrentSettings { get; set; }
         public string Name { get; set; }
-        public int Progress { get { return (int)Math.Min(((GetDownloadedBytes() / SizeToBeDownloaded) * 100), 100); } set { } } // some clever tricks to make sure it never exceeds 100
-        public long Size { get { return Torrent.Torrent.Size; }  }                                                              // disclaimer: may not be actually clever
+        public double Progress { get { return Torrent.Progress; } set { } } 
+        public long Size { get { return Torrent.Torrent.Size; }  }
         public int DownloadSpeed { get { return Torrent.Monitor.DownloadSpeed; }  }
         public int MaxDownloadSpeed { get { return Torrent.Settings.MaxDownloadSpeed; } }
         public int MaxUploadSpeed { get { return Torrent.Settings.MaxUploadSpeed; } }
