@@ -35,6 +35,7 @@ namespace ByteFlood
         public bool DownloadAllRSS { get; set; }
         public string RSSRegex { get; set; }
         public bool RSSCheckForDuplicates { get; set; }
+        public bool MetroStyleHover { get; set; }
         public string Path;
 
         [XmlIgnore]
@@ -49,7 +50,13 @@ namespace ByteFlood
             UploadColor = Colors.Red,
             DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
             PreferEncryption = true,
-            ListeningPort = 1025
+            ListeningPort = 1025,
+            FileRegex = "",
+            EnableFileRegex = false,
+            DownloadAllRSS = false,
+            RSSRegex = "",
+            RSSCheckForDuplicates = false,
+            MetroStyleHover = false
         };
 
         public Settings()

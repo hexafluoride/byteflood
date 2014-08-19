@@ -31,8 +31,8 @@ namespace ByteFlood
         public string SavePath = "";
         public TorrentSettings TorrentSettings { get; set; }
         public string Name { get; set; }
-        public int Progress { get { return (int)Torrent.Progress; } set { } }
-        public long Size { get { return Torrent.Torrent.Size; }  }
+        public int Progress { get { return (int)Math.Min(((GetDownloadedBytes() / SizeToBeDownloaded) * 100), 100); } set { } } // some clever tricks to make sure it never exceeds 100
+        public long Size { get { return Torrent.Torrent.Size; }  }                                                              // disclaimer: may not be actually clever
         public int DownloadSpeed { get { return Torrent.Monitor.DownloadSpeed; }  }
         public int MaxDownloadSpeed { get { return Torrent.Settings.MaxDownloadSpeed; } }
         public int MaxUploadSpeed { get { return Torrent.Settings.MaxUploadSpeed; } }
@@ -48,6 +48,7 @@ namespace ByteFlood
         public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
         public string Status { get { return Torrent.State.ToString() == "DontDownload" ? "Don't download" : Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
+        public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.DoNotDownload ? t.Length : 0).Sum(); } }
         public bool ShowOnList
         {
             get
@@ -144,6 +145,7 @@ namespace ByteFlood
             downspeeds.Add(Torrent.Monitor.DownloadSpeed);
             upspeeds.Add(Torrent.Monitor.UploadSpeed);
         }
+        
         public void Pause()
         {
             // TorrentSettings ts = new TorrentSettings();
@@ -195,7 +197,8 @@ namespace ByteFlood
                 Application.Current.Dispatcher.Invoke(new Action(() => {
                     MainWindow mw = Application.Current.MainWindow as MainWindow;
                     this.context = mw.uiContext;
-                    this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings);
+                    
+                    this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
                     mw.ce.Register(this.Torrent);
                     this.Start();
                 }));

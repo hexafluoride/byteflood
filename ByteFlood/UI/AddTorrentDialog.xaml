@@ -54,7 +54,7 @@
                     </ListBox.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Width="230" Header="Name" >
+                            <GridViewColumn Width="230" Header="Name">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
@@ -72,7 +72,7 @@
             </Grid>
         </GroupBox>
         <GroupBox Header="Torrent options" Height="196" HorizontalAlignment="Left" Margin="13,78,0,0" Name="groupBox3" VerticalAlignment="Top" Width="324">
-            <Grid>
+            <Grid>                                                    
                 <Label Content="Name: " Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label7" VerticalAlignment="Top" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="60,10,0,0" Name="name" VerticalAlignment="Top" Width="246" />
                 <CheckBox Content="Start immediately" Height="16" HorizontalAlignment="Left" Margin="6,40,0,0" Name="start_torrent" IsChecked="True" VerticalAlignment="Top" />
