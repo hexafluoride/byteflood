@@ -67,9 +67,7 @@ namespace ByteFlood
                     if (first)
                     {
                         xmin = line.X1;
-                        ymin = line.Y1;
                         xmax = line.X2;
-                        ymax = line.Y2;
                         first = false;
                         continue;
                     }
@@ -77,8 +75,6 @@ namespace ByteFlood
                     Utility.SetIfHigherThan(ref xmax, line.X2);
                     Utility.SetIfLowerThan(ref xmin, line.X1);
                     Utility.SetIfLowerThan(ref xmin, line.X2);
-                    Utility.SetIfLowerThan(ref ymin, line.Y1);
-                    Utility.SetIfLowerThan(ref ymin, line.Y2);
                 }
             }
             return new Thickness(xmin, ymin, xmax, ymax);
@@ -108,11 +104,17 @@ namespace ByteFlood
         }
         public void Draw(float[] down, float[] up, bool drawdown, bool drawup) // I don't like parts of this
         {
-            double highest = up.Max(); //this handles (drawup == false) the same way as the previous implementation - but i'm not sure wether that's a good thing.
-            double lowest = down.Min();//
-            if(drawdown) {
-                highest = Math.Max(highest, down.Max());
-                lowest = Math.Min(lowest, up.Min());
+            double highest = Math.Max(down.Max(), up.Max());
+            double lowest = Math.Min(down.Min(), up.Min());
+            if (!drawup)
+            {
+                highest = down.Max();
+                lowest = down.Min();
+            }
+            if (!drawdown)
+            {
+                highest = up.Max();
+                lowest = up.Min();
             }
   
             double width = graph.ActualWidth;

@@ -275,6 +275,7 @@ namespace ByteFlood
                         "Seeders",
                         "Leechers",
                         "Downloaded",
+                        "Uploaded",
                         "Progress",
                         "Status",
                         "Ratio", 
