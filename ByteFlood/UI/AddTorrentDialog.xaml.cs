@@ -141,5 +141,23 @@ namespace ByteFlood
             this.Close();
         }
 
+        private void SelectAll(object sender, RoutedEventArgs e)
+        {
+            foreach (FileInfo file in filelist.Items)
+            {
+                file.DownloadFile = true;
+                file.UpdateList("DownloadFile");
+                UpdateFile(file.Name, file.DownloadFile);
+            }
+        }
+        private void DeselectAll(object sender, RoutedEventArgs e)
+        {
+            foreach (FileInfo file in filelist.Items)
+            {
+                file.DownloadFile = false;
+                file.UpdateList("DownloadFile");
+                UpdateFile(file.Name, file.DownloadFile);
+            }
+        }
     }
 }
