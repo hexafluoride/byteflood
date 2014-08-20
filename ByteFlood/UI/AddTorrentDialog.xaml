@@ -19,6 +19,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
+        TextOptions.TextFormattingMode="Display"
         Title="Add torrent..." Height="352" Width="723">
 
     <Window.Resources>

@@ -1,7 +1,12 @@
 ﻿<Window x:Class="ByteFlood.Preferences"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Preferences" Height="521" Width="629" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        TextOptions.TextFormattingMode="Display"
+        Title="Preferences" 
+        Height="521" 
+        Width="629" 
+        Loaded="Window_Loaded" 
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
             <TreeViewItem Header="General" Name="general_tree" IsSelected="True" />
