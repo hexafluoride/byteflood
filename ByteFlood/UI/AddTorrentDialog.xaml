@@ -43,7 +43,7 @@
                 <Label Content="{Binding Torrent.Comment}" Height="28" HorizontalAlignment="Left" Margin="76,29,0,0" Name="label6" VerticalAlignment="Top" />
                 <Label Height="28" HorizontalAlignment="Left" Margin="76,52,0,0" Name="size" VerticalAlignment="Top" />
                 <Label Content="{Binding Torrent.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" Name="label8" VerticalAlignment="Top" />
-                <ListView HorizontalAlignment="Left" Margin="6,140,0,6" Name="filelist" Width="323" SelectionMode="Single" SelectedIndex="0">
+                <ListView HorizontalAlignment="Left" Margin="6,133,0,6" Name="filelist" Width="323" SelectionMode="Single" SelectedIndex="0">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Style.Triggers>
@@ -70,8 +70,8 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <Button Content="Select all" Height="23" HorizontalAlignment="Left" Margin="254,111,0,0" Name="button3" VerticalAlignment="Top" Width="75" Click="SelectAll" />
-                <Button Content="Deselect all" Height="23" HorizontalAlignment="Left" Margin="173,111,0,0" Name="button4" VerticalAlignment="Top" Width="75" Click="DeselectAll" />
+                <Button Content="Select all" Height="23" HorizontalAlignment="Left" Margin="6,102,0,0" Name="button3" VerticalAlignment="Top" Width="75" Click="SelectAll" />
+                <Button Content="Deselect all" Height="23" HorizontalAlignment="Left" Margin="87,102,0,0" Name="button4" VerticalAlignment="Top" Width="75" Click="DeselectAll" />
             </Grid>
         </GroupBox>
         <GroupBox Header="Torrent options" Height="236" HorizontalAlignment="Left" Margin="13,78,0,0" Name="groupBox3" VerticalAlignment="Top" Width="324">
