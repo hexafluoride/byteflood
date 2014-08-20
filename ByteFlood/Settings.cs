@@ -5,6 +5,8 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Xml.Serialization;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,8 +24,9 @@ namespace ByteFlood
     {
         Aero2, Aero, Classic, Luna, Royale
     }
-    public class Settings
+    public class Settings : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         public Theme Theme { get; set; }
         public bool DrawGrid { get; set; }
         public Color DownloadColor { get; set; }
@@ -38,6 +41,13 @@ namespace ByteFlood
         public bool RSSCheckForDuplicates { get; set; }
         public bool MetroStyleHover { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
+        [XmlIgnore]
+        public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
+        [XmlIgnore]
+        public Visibility BottomCanvasVisibility { get { return BottomCanvasVisible ? Visibility.Visible : Visibility.Collapsed; } }
+        public bool TreeViewVisible { get; set; }
+        public bool BottomCanvasVisible { get; set; }
+
         public string Path;
         
 
@@ -65,6 +75,8 @@ namespace ByteFlood
                     RSSRegex = "",
                     RSSCheckForDuplicates = false,
                     MetroStyleHover = false,
+                    BottomCanvasVisible = true,
+                    TreeViewVisible = true,
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
                 };
             }
@@ -91,6 +103,13 @@ namespace ByteFlood
                 MessageBox.Show("An error occurred while loading configuration file. Falling back to default settings.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return Settings.DefaultSettings;
             }
+        }
+        public void NotifyChanged(params string[] props)
+        {
+            if (PropertyChanged == null)
+                return;
+            foreach (string str in props)
+                PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
     }
 }

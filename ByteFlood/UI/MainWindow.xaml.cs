@@ -30,6 +30,7 @@ namespace ByteFlood
     public partial class MainWindow : Window
     {
         bool gripped = false;
+        bool subtract = true;
         Thread thr;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
@@ -200,26 +201,34 @@ namespace ByteFlood
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            t.Torrent.Stop();
-            while (t.Torrent.State != TorrentState.Stopped) ;
-            state.ce.Unregister(t.Torrent);
-            state.Torrents.Remove(t);
-            string tag = ((MenuItem)e.Source).Tag.ToString();
-            switch (tag)
-            {
-                case "torrentonly":
-                    DeleteTorrent(t);
-                    break;
-                case "dataonly":
-                    DeleteData(t);
-                    break;
-                case "both":
-                    DeleteData(t);
-                    DeleteTorrent(t);
-                    break;
-                default:
-                    break;
-            }
+            t.Invisible = true;
+            t.UpdateList("Invisible", "ShowOnList");
+            ThreadPool.QueueUserWorkItem(delegate {
+                t.Torrent.Stop();
+                while (t.Torrent.State != TorrentState.Stopped) ;
+                state.ce.Unregister(t.Torrent);
+                string tag = "";
+                uiContext.Send(x =>
+                {
+                    state.Torrents.Remove(t);
+                    tag = ((MenuItem)e.Source).Tag.ToString();
+                }, null);
+                switch (tag)
+                {
+                    case "torrentonly":
+                        DeleteTorrent(t);
+                        break;
+                    case "dataonly":
+                        DeleteData(t);
+                        break;
+                    case "both":
+                        DeleteData(t);
+                        DeleteTorrent(t);
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
 
         public void DeleteTorrent(TorrentInfo t)
@@ -283,8 +292,9 @@ namespace ByteFlood
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             Preferences pref = new Preferences();
-            pref.Show();
+            pref.ShowDialog();
             state.SaveSettings();
+            UpdateVisibility();
         }
 
         private void SetDataContext(TorrentInfo ti)
@@ -334,6 +344,19 @@ namespace ByteFlood
             }
 
             this.DataContext = state.ce;
+            left_treeview.DataContext = App.Settings;
+            info_canvas.DataContext = App.Settings;
+        }
+
+        public void UpdateVisibility()
+        {
+            //App.Settings.NotifyChanged("TreeViewVisibility", "BottomCanvasVisibility");
+            BindingExpression exp1 = left_treeview.GetBindingExpression(TreeView.VisibilityProperty);
+            BindingExpression exp2 = info_canvas.GetBindingExpression(Canvas.VisibilityProperty);
+            exp1.UpdateTarget();
+            exp1.UpdateSource();
+            exp2.UpdateTarget();
+            exp2.UpdateSource();
         }
 
         private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
@@ -353,20 +376,39 @@ namespace ByteFlood
                 Point position = info_canvas.TransformToAncestor(this).Transform(new Point(0, 0));
                 double ypos = position.Y;
                 double left = info_canvas.Margin.Left;
-                if (p.Y > this.ActualHeight - 120 || p.Y < 90)
+                if (p.Y > ActualSize.ActualHeight - 120 || p.Y < 90)
                     return;
-                info_canvas.Margin = new Thickness { Left = left, Top = p.Y };
-                info_canvas.Height += ypos - info_canvas.Margin.Top;
-                double mainlist_top = mainlist.Margin.Top;
-                double mainlist_left = mainlist.Margin.Left;
-                mainlist.Height = mainlist.ActualHeight - (ypos - info_canvas.Margin.Top);
-                mainlist.Margin = new Thickness() { Left = mainlist_left, Top=mainlist_top };
+                //info_canvas.Margin = new Thickness { Left = left, Top = p.Y };
+                //info_canvas.Height += ypos - info_canvas.Margin.Top;
+                //double mainlist_top = mainlist.Margin.Top;
+                ////double mainlist_left = mainlist.Margin.Left;
+                Point listpos = mainlist.TransformToAncestor(this).Transform(new Point(0, 0));
+                //double oldheight = mainlist.Height;
+                //mainlist.Height = (p.Y - listpos.Y);
+                //double diff = mainlist.Height - oldheight;
+                //info_canvas.Height -= diff;
+                double totalsize = mainlist.ActualHeight + info_canvas.ActualHeight; // I have no idea why this works
+                //if (subtract)
+                //{
+                //    totalsize -= 70;
+                //    subtract = false;
+                //}
+                double mouse_relative_to_list = p.Y - listpos.Y;
+                double listsize = mouse_relative_to_list;
+                double canvassize = totalsize - mouse_relative_to_list;
+                mainlist.Height = listsize;
+                info_canvas.Height = canvassize;
+                //mainlist.Margin = new Thickness() { Left = mainlist_left, Top=mainlist_top };
             }
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            mainlist.Height = this.Height - info_canvas.ActualHeight - mainlist.Margin.Top;
+            subtract = true;
+            Point listpos = mainlist.TransformToAncestor(this).Transform(new Point(0, 0));
+            double newheight = ActualSize.ActualHeight - info_canvas.ActualHeight - listpos.Y;
+            if (newheight > 20)
+                mainlist.Height = newheight;
         }
 
         private void grip_MouseEnter(object sender, MouseEventArgs e)

@@ -56,9 +56,10 @@ namespace ByteFlood
                 
                 if (Torrent == null)
                     return false;
-                return ((MainWindow)App.Current.MainWindow).itemselector(this);
+                return Invisible || ((MainWindow)App.Current.MainWindow).itemselector(this);
             }
         }
+        public bool Invisible { get; set; }
         public float RawRatio { get; set; }
         public float RatioLimit { get; set; }
         [XmlIgnore]
