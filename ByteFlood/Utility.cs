@@ -18,6 +18,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace ByteFlood
 {
@@ -30,6 +32,10 @@ namespace ByteFlood
         const double M = 1048576;
         const double G = 1073741824;
         const double T = 1099511627776;
+
+        static string Extension = ".torrent";
+        static string OpenWith = Assembly.GetCallingAssembly().Location;
+        static string KeyName = "ByteFlood";
 
         public static string PrettifyAmount(double amount)
         {
@@ -162,7 +168,57 @@ namespace ByteFlood
             }
             return target;
         }
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+        public static void SetAssociation()
+        {
+            RegistryKey BaseKey;
+            RegistryKey OpenMethod;
+            RegistryKey Shell;
+            RegistryKey CurrentUser;
 
+            BaseKey = Registry.CurrentUser.OpenSubKey("Software\\Classes", true).CreateSubKey(Extension);
+            BaseKey.SetValue("", KeyName);
+
+            OpenMethod = Registry.CurrentUser.OpenSubKey("Software\\Classes", true).CreateSubKey(KeyName);
+            OpenMethod.SetValue("", "TORRENT File");
+            OpenMethod.CreateSubKey("DefaultIcon").SetValue("", "\"" + OpenWith + "\",0");
+            Shell = OpenMethod.CreateSubKey("Shell");
+            Shell.CreateSubKey("open").CreateSubKey("command").SetValue("", "\"" + OpenWith + "\"" + " \"%1\"");
+            BaseKey.Close();
+            OpenMethod.Close();
+            Shell.Close();
+
+            CurrentUser = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.torrent", true);
+            CurrentUser.DeleteSubKey("UserChoice", false);
+            CurrentUser.Close();
+
+            SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        public static bool Associated()
+        {
+            RegistryKey BaseKey;
+            RegistryKey OpenMethod;
+            RegistryKey Shell;
+
+            BaseKey = Registry.CurrentUser.OpenSubKey("Software", true).OpenSubKey("Classes", true);
+            if (!BaseKey.GetSubKeyNames().Contains(Extension))
+                return false;
+            BaseKey = BaseKey.OpenSubKey(Extension);
+
+            OpenMethod = Registry.CurrentUser.OpenSubKey("Software", true).OpenSubKey("Classes", true);
+            if (!OpenMethod.GetSubKeyNames().Contains(KeyName))
+                return false;
+            OpenMethod = OpenMethod.OpenSubKey(KeyName);
+            Shell = OpenMethod.OpenSubKey("Shell");
+            if (!Shell.GetSubKeyNames().Contains("open"))
+                return false;
+            BaseKey.Close();
+            OpenMethod.Close();
+            Shell.Close();
+            return true;
+        }
         public static T Deserialize<T>(string path)
         {
             string s = File.ReadAllText(path);
