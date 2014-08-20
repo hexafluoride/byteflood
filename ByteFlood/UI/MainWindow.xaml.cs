@@ -191,20 +191,6 @@ namespace ByteFlood
             tp.Show();
         }
 
-        public void HighPriority(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = Priority.High;
-        }
-        public void NormalPriority(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = Priority.Normal;
-        }
         public void RemoveSelectedTorrent(object sender, RoutedEventArgs e)
         {
             TorrentInfo t;
@@ -256,19 +242,14 @@ namespace ByteFlood
                     dir.Delete();
             }
         }
-        public void LowPriority(object sender, RoutedEventArgs e)
+        public void ChangePriority(object sender, RoutedEventArgs e)
         {
+            string tag = ((MenuItem)e.Source).Tag.ToString();
+            
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = Priority.Low;
-        }
-        public void NoPriority(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = Priority.DoNotDownload;
+            t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = (Priority)Enum.Parse(typeof(Priority), tag);
         }
         public bool GetSelectedTorrent(out TorrentInfo ti)
         {

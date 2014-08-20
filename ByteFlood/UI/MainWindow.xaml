@@ -36,12 +36,12 @@
             <ListView Margin="150,40,0,0" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown" BorderThickness="1,1,1,0">
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem Header="Start" Click="StartSelectedTorrent" Background="WhiteSmoke" />
-                        <MenuItem Header="Pause" Click="PauseSelectedTorrent" Background="WhiteSmoke" />
-                        <MenuItem Header="Stop" Click="StopSelectedTorrent" Background="WhiteSmoke" />
+                        <MenuItem Header="Start" Click="StartSelectedTorrent" />
+                        <MenuItem Header="Pause" Click="PauseSelectedTorrent" />
+                        <MenuItem Header="Stop" Click="StopSelectedTorrent" />
                         <Separator />
-                        <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" Background="WhiteSmoke" />
-                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
+                        <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
+                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrent" />
                         <MenuItem Header="Remove and" Background="WhiteSmoke">
                             <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrent" />
                             <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrent" />
@@ -175,10 +175,13 @@
                             <ListView.Resources>
                                 <ContextMenu x:Key="ItemContextMenu">
                                     <MenuItem Header="Set file priority" Background="WhiteSmoke">
-                                        <MenuItem Header="High" Click="HighPriority" Background="WhiteSmoke" />
-                                        <MenuItem Header="Normal" Click="NormalPriority" Background="WhiteSmoke" />
-                                        <MenuItem Header="Low" Click="LowPriority" Background="WhiteSmoke" />
-                                        <MenuItem Header="Don't download" Click="NoPriority" Background="WhiteSmoke" />
+                                        <MenuItem Header="Immediate" Tag="Immediate" Click="ChangePriority" />
+                                        <MenuItem Header="Highest" Tag="Highest" Click="ChangePriority" />
+                                        <MenuItem Header="High" Tag="High" Click="ChangePriority" />
+                                        <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
+                                        <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
+                                        <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
+                                        <MenuItem Header="Don't download" Tag="DoNotDownload" Click="ChangePriority" />
                                     </MenuItem>
                                 </ContextMenu>
                             </ListView.Resources>
