@@ -301,6 +301,11 @@ namespace ByteFlood
             torrents_treeview.DataContext = state;
             itemselector = ShowAll;
             graph = new GraphDrawer(graph_canvas);
+            
+            foreach (string str in App.to_add)
+            {
+                state.AddTorrentByPath(str);
+            }
         }
 
         private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)

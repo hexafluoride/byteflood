@@ -37,6 +37,8 @@ namespace ByteFlood
 
         ResourceDictionary themerd = new ResourceDictionary();
 
+        public static string[] to_add;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             Environment.CurrentDirectory =
@@ -45,27 +47,29 @@ namespace ByteFlood
             {
                 try
                 {
-                    TcpClient tcp = new TcpClient();
-                    tcp.Connect("127.0.0.1", 65432);
-                    NetworkStream ns = tcp.GetStream();
-                    StreamWriter sw = new StreamWriter(ns);
-                    sw.WriteLine(e.Args[0]);
-                    sw.Flush();
-                    tcp.Close();
+                    foreach (string str in e.Args)
+                    {
+                        TcpClient tcp = new TcpClient();
+                        tcp.Connect("127.0.0.1", 65432);
+                        NetworkStream ns = tcp.GetStream();
+                        StreamWriter sw = new StreamWriter(ns);
+                        sw.WriteLine(str);
+                        sw.Flush();
+                        tcp.Close();
+                    }
                     Environment.Exit(0);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    to_add = e.Args;
                 }
             }
+            else
+                to_add = new string[0];
 
             base.OnStartup(e);
 
-            if (e.Args.Length != 0)
-            {
-                ((MainWindow)MainWindow).state.AddTorrentByPath(e.Args[0]);
-            }
             Settings = Settings.Load("./config.xml");
 
             LoadTheme(Settings.Theme);
