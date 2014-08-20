@@ -62,9 +62,9 @@ namespace ByteFlood
         public float RawRatio { get; set; }
         public float RatioLimit { get; set; }
         [XmlIgnore]
-        public float AverageDownloadSpeed { get { return downspeeds.Average(); } set { } }
+        public float AverageDownloadSpeed { get { return downspeeds.Count == 0 ? 0 : downspeeds.Average(); } set { } }
         [XmlIgnore]
-        public float AverageUploadSpeed { get { return upspeeds.Average(); } set { } }
+        public float AverageUploadSpeed { get { return upspeeds.Count == 0 ? 0 : upspeeds.Average(); } set { } }
         [XmlIgnore]
         public ObservableCollection<PeerInfo> Peers = new ObservableCollection<PeerInfo>();
         [XmlIgnore]
