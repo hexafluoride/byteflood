@@ -3,6 +3,8 @@ byteflood
 
 A free as in freedom BitTorrent client, designed for everyone.
 
+If you're looking to contribute, see [this](https://github.com/hexafluoride/byteflood/wiki/Priority-list).
+
 [Binaries](https://github.com/hexafluoride/byteflood/releases)
 
 ![Screenshot 1](http://i.imgur.com/FEd7NNf.png)
