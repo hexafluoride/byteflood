@@ -117,6 +117,7 @@ namespace ByteFlood
 
         public TorrentInfo CreateTorrentInfo(TorrentManager tm)
         {
+            
             ce.Register(tm);
             tm.Start();
             TorrentInfo t = new TorrentInfo(uiContext);
@@ -137,6 +138,7 @@ namespace ByteFlood
             {
                 MessageBox.Show("An error occurred while loading the program state. You may need to re-add your torrents.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new State();
+                
             }
         }
 

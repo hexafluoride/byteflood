@@ -42,6 +42,7 @@ namespace ByteFlood
         public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.Progress == 100; });
         GraphDrawer graph;
         public State state;
+        public Formatters.SpeedFormatter speedformatter = new Formatters.SpeedFormatter();
         public MainWindow()
         {
             InitializeComponent();
@@ -118,6 +119,9 @@ namespace ByteFlood
                                     ti.UpdateGraphData();
                         }
                         updategraph = !updategraph;
+
+                        MultiBindingExpression exp = BindingOperations.GetMultiBindingExpression(this, MainWindow.TitleProperty);
+                        exp.UpdateTarget();
                     }, null);
 
                     string[] torrentstates = new string[] { 
@@ -328,6 +332,8 @@ namespace ByteFlood
             {
                 state.AddTorrentByPath(str);
             }
+
+            this.DataContext = state.ce;
         }
 
         private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
