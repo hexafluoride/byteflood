@@ -30,7 +30,6 @@ namespace ByteFlood
     public partial class MainWindow : Window
     {
         bool gripped = false;
-        public ClientEngine ce;
         Thread thr;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
@@ -42,25 +41,10 @@ namespace ByteFlood
         public Func<TorrentInfo, bool> Inactive = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : (t.Torrent.State != TorrentState.Seeding && t.Torrent.State != TorrentState.Downloading) && t.Torrent.State != TorrentState.Hashing; });
         public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.Progress == 100; });
         GraphDrawer graph;
-        public DhtListener dhtl;
         public State state;
         public MainWindow()
         {
             InitializeComponent();
-            state = State.Load("./state.xml");
-            mainlist.ItemsSource = state.Torrents;
-            itemselector = ShowAll;
-            ce = new ClientEngine(new EngineSettings());
-            thr = new Thread(new ThreadStart(Update));
-            thr.Start();
-            dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, App.Settings.ListeningPort));
-            DhtEngine dht = new DhtEngine(dhtl);
-
-            ce.RegisterDht(dht);
-            ce.DhtEngine.Start();
-            torrents_treeview.DataContext = state;
-
-            graph = new GraphDrawer(graph_canvas);
         }
         private void button1_Click(object sender, RoutedEventArgs e)
         {
@@ -74,13 +58,8 @@ namespace ByteFlood
             ofd.ShowDialog();
             foreach (string str in ofd.FileNames)
             {
-                AddTorrentByPath(str);
+                state.AddTorrentByPath(str);
             }
-        }
-        public void SaveSettings()
-        {
-            Settings.Save(App.Settings, "./config.xml");
-            State.Save(state, "./state.xml");
         }
         public void ReDrawGraph()
         {
@@ -114,32 +93,9 @@ namespace ByteFlood
                 graph.DrawGrid(size.Left, size.Top, size.Right, size.Bottom);
         }
 
-        public void AddTorrentByPath(string path)
-        {
-            AddTorrentDialog atd = new AddTorrentDialog(path);
-            atd.ShowDialog();
-            if (atd.userselected)
-            {
-                TorrentInfo ti = CreateTorrentInfo(atd.tm);
-                ti.Name = atd.torrentname;
-                if (!atd.start)
-                    ti.Stop();
-                ti.RatioLimit = atd.limit;
-                TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
-                ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
-                state.Torrents.Add(ti);
-            }
-        }
+        
 
-        public TorrentInfo CreateTorrentInfo(TorrentManager tm)
-        {
-            ce.Register(tm);
-            tm.Start();
-            TorrentInfo t = new TorrentInfo(uiContext);
-            t.Torrent = tm;
-            t.Update();
-            return t;
-        }
+        
         public void Update()
         {
             while (true)
@@ -186,10 +142,7 @@ namespace ByteFlood
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            SaveSettings();
-            thr.Abort();
-            ce.DiskManager.Flush();
-            ce.PauseAll();
+            state.Shutdown();
         }
 
         private void mainlist_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -202,7 +155,7 @@ namespace ByteFlood
         private void Window_Drop(object sender, DragEventArgs e)
         {
             string toppest = (string)((DataObject)e.Data).GetFileDropList()[0];
-            AddTorrentByPath(toppest);
+            state.AddTorrentByPath(toppest);
         }
         #endregion
 
@@ -259,7 +212,7 @@ namespace ByteFlood
                 return;
             t.Torrent.Stop();
             while (t.Torrent.State != TorrentState.Stopped) ;
-            ce.Unregister(t.Torrent);
+            state.ce.Unregister(t.Torrent);
             state.Torrents.Remove(t);
         }
         public void LowPriority(object sender, RoutedEventArgs e)
@@ -305,7 +258,7 @@ namespace ByteFlood
         {
             Preferences pref = new Preferences();
             pref.Show();
-            SaveSettings();
+            state.SaveSettings();
         }
 
         private void SetDataContext(TorrentInfo ti)
@@ -339,7 +292,15 @@ namespace ByteFlood
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            thr = new Thread(new ThreadStart(Update));
+            state = State.Load("./state.xml");
+            state.uiContext = uiContext;
+            state.mainthread = thr;
+            thr.Start();
+            mainlist.ItemsSource = state.Torrents;
+            torrents_treeview.DataContext = state;
+            itemselector = ShowAll;
+            graph = new GraphDrawer(graph_canvas);
         }
 
         private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
@@ -418,5 +379,6 @@ namespace ByteFlood
                 ti.UpdateList("ShowOnList");
             }
         }
+
     }
 }

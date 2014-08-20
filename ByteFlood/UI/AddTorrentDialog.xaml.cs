@@ -78,6 +78,8 @@ namespace ByteFlood
             UpdateTextBox();
 
             UpdateSize();
+
+            this.Activate();
         }
         public void UpdateSize()
         {

@@ -199,7 +199,7 @@ namespace ByteFlood
                     this.context = mw.uiContext;
                     
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
-                    mw.ce.Register(this.Torrent);
+                    mw.state.ce.Register(this.Torrent);
                     this.Start();
                 }));
             }

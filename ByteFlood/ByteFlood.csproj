@@ -69,6 +69,7 @@
     <Compile Include="InfoClasses\PeerInfo.cs" />
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
+    <Compile Include="Listener.cs" />
     <Compile Include="State.cs" />
     <Compile Include="TorrentProperties.cs" />
     <Compile Include="UI\AddTorrentDialog.xaml.cs">

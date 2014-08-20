@@ -22,6 +22,9 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.IO;
+using System.Net.Sockets;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace ByteFlood
 {
@@ -36,8 +39,33 @@ namespace ByteFlood
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            Environment.CurrentDirectory =
+                new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.FullName;
+            if (e.Args.Length != 0)
+            {
+                try
+                {
+                    TcpClient tcp = new TcpClient();
+                    tcp.Connect("127.0.0.1", 65432);
+                    NetworkStream ns = tcp.GetStream();
+                    StreamWriter sw = new StreamWriter(ns);
+                    sw.WriteLine(e.Args[0]);
+                    sw.Flush();
+                    tcp.Close();
+                    Environment.Exit(0);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
             base.OnStartup(e);
 
+            if (e.Args.Length != 0)
+            {
+                ((MainWindow)MainWindow).state.AddTorrentByPath(e.Args[0]);
+            }
             Settings = Settings.Load("./config.xml");
 
             LoadTheme(Settings.Theme);
