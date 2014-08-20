@@ -41,7 +41,12 @@
                         <MenuItem Header="Stop" Click="StopSelectedTorrent" Background="WhiteSmoke" />
                         <Separator />
                         <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" Background="WhiteSmoke" />
-                        <MenuItem Header="Remove from list" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
+                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
+                        <MenuItem Header="Remove and" Background="WhiteSmoke">
+                            <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrent" />
+                            <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrent" />
+                            <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrent" />
+                        </MenuItem>
                     </ContextMenu>
                 </ListView.Resources>
 

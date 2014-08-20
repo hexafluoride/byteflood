@@ -214,6 +214,47 @@ namespace ByteFlood
             while (t.Torrent.State != TorrentState.Stopped) ;
             state.ce.Unregister(t.Torrent);
             state.Torrents.Remove(t);
+            string tag = ((MenuItem)e.Source).Tag.ToString();
+            switch (tag)
+            {
+                case "torrentonly":
+                    DeleteTorrent(t);
+                    break;
+                case "dataonly":
+                    DeleteData(t);
+                    break;
+                case "both":
+                    DeleteData(t);
+                    DeleteTorrent(t);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void DeleteTorrent(TorrentInfo t)
+        {
+            System.IO.File.Delete(t.Torrent.Torrent.TorrentPath);
+        }
+
+        public void DeleteData(TorrentInfo t)
+        {
+            List<string> directories = new List<string>();
+            foreach (TorrentFile file in t.Torrent.Torrent.Files)
+            {
+                if (System.IO.File.Exists(file.FullPath))
+                {
+                    directories.Add(new System.IO.FileInfo(file.FullPath).Directory.FullName);
+                    System.IO.File.Delete(file.FullPath);
+                }
+            }
+            directories = directories.Distinct().ToList();
+            foreach (string str in directories)
+            {
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(str);
+                if (dir.GetFiles().Length == 0)
+                    dir.Delete();
+            }
         }
         public void LowPriority(object sender, RoutedEventArgs e)
         {
