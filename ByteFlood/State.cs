@@ -82,6 +82,7 @@ namespace ByteFlood
         public void Shutdown()
         {
             SaveSettings();
+            SaveState();
             mainthread.Abort();
             ce.DiskManager.Flush();
             ce.PauseAll();
@@ -91,6 +92,10 @@ namespace ByteFlood
         public void SaveSettings()
         {
             Settings.Save(App.Settings, "./config.xml");
+        }
+
+        public void SaveState()
+        {
             State.Save(this, "./state.xml");
         }
 

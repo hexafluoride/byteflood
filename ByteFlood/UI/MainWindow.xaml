@@ -23,6 +23,8 @@
         WindowStartupLocation="CenterScreen"
         TextOptions.TextFormattingMode="Display"
         Left="0" Top="0"
+        MinHeight="100"
+        MinWidth="100"
         Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded">
     <Window.Resources>
@@ -38,9 +40,26 @@
             <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
         </MultiBinding>
     </Window.Title>
-    <Grid>
-        <Grid>
-            <ListView Margin="150,40,0,0" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown" BorderThickness="1,1,1,0">
+    <Grid Name="ActualSize">
+        <DockPanel LastChildFill="False">
+            
+            <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="150">
+                <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
+                    <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding InactiveTorrentCount}" Tag="inactive" HeaderStringFormat="Inactive ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding ActiveTorrentCount}" Tag="active" HeaderStringFormat="Active ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding FinishedTorrentCount}" Tag="finished" HeaderStringFormat="Finished ({0})" Selected="SwitchTorrentDisplay" />
+                </TreeViewItem>
+                <TreeViewItem Header="Feeds" />
+            </TreeView>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,7" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
+                <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" Name="button3" VerticalAlignment="Top" Width="94" Click="button3_Click" />
+                <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+            </StackPanel>
+            <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Left" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem Header="Start" Click="StartSelectedTorrent" />
@@ -96,7 +115,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <Canvas Height="197" HorizontalAlignment="Stretch" Name="info_canvas" VerticalAlignment="Bottom" Margin="150,0,0,0" Grid.Row="1">
+            <Canvas Height="300" HorizontalAlignment="Stretch" Name="info_canvas" Visibility="{Binding BottomCanvasVisibility}" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Grid.Row="1">
                 <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="1" Panel.ZIndex="99" />
                 <Border BorderBrush="Transparent" BorderThickness="4" Name="grip" MouseDown="ResizeInfoAreaStart" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="4" Cursor="SizeNS" Panel.ZIndex="99" />
                 <Grid Canvas.Left="219" Canvas.Top="72" />
@@ -247,20 +266,7 @@
                     </TabItem>
                 </TabControl>
             </Canvas>
-        </Grid>
-        <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="157,7,0,0" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
+        </DockPanel>
 
-        <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="357,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
-        <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="257,7,0,0" Name="button3" VerticalAlignment="Top" Width="94" Click="button3_Click" />
-        <TreeView Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" Name="treeView1" Width="151">
-            <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
-                <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
-                <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
-                <TreeViewItem Header="{Binding InactiveTorrentCount}" Tag="inactive" HeaderStringFormat="Inactive ({0})" Selected="SwitchTorrentDisplay" />
-                <TreeViewItem Header="{Binding ActiveTorrentCount}" Tag="active" HeaderStringFormat="Active ({0})" Selected="SwitchTorrentDisplay" />
-                <TreeViewItem Header="{Binding FinishedTorrentCount}" Tag="finished" HeaderStringFormat="Finished ({0})" Selected="SwitchTorrentDisplay" />
-            </TreeViewItem>
-            <TreeViewItem Header="Feeds" />
-        </TreeView>
     </Grid>
 </Window>

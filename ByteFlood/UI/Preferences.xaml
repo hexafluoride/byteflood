@@ -44,6 +44,8 @@
                               SelectionChanged="ReloadTheme"
                               Name="themeCombox" Canvas.Right="5" />
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,83,0,0" Text="Theme" VerticalAlignment="Top" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="112" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="134" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
                 </Canvas>
             </TabItem>
             <TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
