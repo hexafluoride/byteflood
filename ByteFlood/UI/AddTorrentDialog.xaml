@@ -20,7 +20,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
         TextOptions.TextFormattingMode="Display"
-        Title="Add torrent..." Height="352" Width="723">
+        Title="Add torrent..." Height="394" Width="723">
 
     <Window.Resources>
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
@@ -33,7 +33,7 @@
                 <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="263,14,0,0" Name="select" VerticalAlignment="Top" Width="43" Click="button1_Click" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Contents" HorizontalAlignment="Left" Margin="342,0,0,0" Name="gb2" Width="347" VerticalAlignment="Top" Height="274">
+        <GroupBox Header="Contents" HorizontalAlignment="Left" Margin="342,0,0,0" Name="gb2" Width="347" VerticalAlignment="Top" Height="314">
             <Grid>
                 <Label Content="Name:" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" Margin="6,6,0,0" />
                 <Label Content="Comment:" Height="28" HorizontalAlignment="Left" Margin="6,29,0,0" Name="label2" VerticalAlignment="Top" />
@@ -43,7 +43,7 @@
                 <Label Content="{Binding Torrent.Comment}" Height="28" HorizontalAlignment="Left" Margin="76,29,0,0" Name="label6" VerticalAlignment="Top" />
                 <Label Height="28" HorizontalAlignment="Left" Margin="76,52,0,0" Name="size" VerticalAlignment="Top" />
                 <Label Content="{Binding Torrent.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" Name="label8" VerticalAlignment="Top" />
-                <ListView HorizontalAlignment="Left" Margin="6,108,0,6" Name="filelist" Width="323" SelectionMode="Single" SelectedIndex="0">
+                <ListView HorizontalAlignment="Left" Margin="6,140,0,6" Name="filelist" Width="323" SelectionMode="Single" SelectedIndex="0">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Style.Triggers>
@@ -70,9 +70,11 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
+                <Button Content="Select all" Height="23" HorizontalAlignment="Left" Margin="254,111,0,0" Name="button3" VerticalAlignment="Top" Width="75" Click="SelectAll" />
+                <Button Content="Deselect all" Height="23" HorizontalAlignment="Left" Margin="173,111,0,0" Name="button4" VerticalAlignment="Top" Width="75" Click="DeselectAll" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Torrent options" Height="196" HorizontalAlignment="Left" Margin="13,78,0,0" Name="groupBox3" VerticalAlignment="Top" Width="324">
+        <GroupBox Header="Torrent options" Height="236" HorizontalAlignment="Left" Margin="13,78,0,0" Name="groupBox3" VerticalAlignment="Top" Width="324">
             <Grid>                                                    
                 <Label Content="Name: " Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label7" VerticalAlignment="Top" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="60,10,0,0" Name="name" VerticalAlignment="Top" Width="246" />
@@ -82,7 +84,7 @@
                 <CheckBox Content="Initial seeding" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="212,40,0,0" Name="initial" VerticalAlignment="Top" />
             </Grid>
         </GroupBox>
-        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="533,280,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click_1" />
-        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="614,280,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="533,320,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click_1" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="614,320,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
     </Grid>
 </Window>
