@@ -20,7 +20,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        WindowStartupLocation="CenterScreen" 
+        WindowStartupLocation="CenterScreen"
+        TextOptions.TextFormattingMode="Display"
         Left="0" Top="0"
         Title="ByteFlood" Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded">
