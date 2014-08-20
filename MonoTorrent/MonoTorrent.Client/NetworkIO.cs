@@ -79,6 +79,10 @@ namespace MonoTorrent.Client
                     for (int i = 0; i < count; i++)
                          SendOrEnqueue (sendQueue.Dequeue ());
                 }
+                return true;
+            });
+            ClientEngine.MainLoop.QueueTimeout(TimeSpan.FromMilliseconds(100), delegate
+            {
                 lock (receiveQueue)
                 {
                     int count = receiveQueue.Count;
