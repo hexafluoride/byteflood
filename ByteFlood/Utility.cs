@@ -225,5 +225,17 @@ namespace ByteFlood
             XmlReader x = XmlReader.Create(new StringReader(s));
             return (T)new XmlSerializer(typeof(T)).Deserialize(x);
         }
+
+        public static byte[] DecompressGzip(byte[] gzip_data)
+        {
+            using (var stream = new System.IO.Compression.GZipStream(new MemoryStream(gzip_data), System.IO.Compression.CompressionMode.Decompress))
+            {
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    stream.CopyTo(memory);
+                    return memory.ToArray();
+                }
+            }
+        }
     }
 }

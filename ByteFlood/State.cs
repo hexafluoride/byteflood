@@ -120,6 +120,48 @@ namespace ByteFlood
             }, null);
         }
 
+        public void AddTorrentByMagnet(string magnet) 
+        {
+            MagnetLink mg = null;
+
+            try { mg = new MagnetLink(magnet); }
+            catch { MessageBox.Show("Invalid magnet link", "Error"); return; }
+
+            byte[] file_data = this.GetMagnetFromCache(mg);
+
+            if (file_data != null)
+            {
+                string path = System.IO.Path.Combine(App.Settings.DefaultDownloadPath, mg.InfoHash.ToHex() + ".torrent");
+                File.WriteAllBytes(path, file_data);
+                this.AddTorrentByPath(path);
+            }
+            else 
+            {
+                MessageBox.Show("Could not find a cached copy of this magnet link.", "Loading failed"); 
+                return;
+            }
+        }
+
+        [XmlIgnore]
+        private Services.TorrentCache.ITorrentCache[] TorrentCaches = new Services.TorrentCache.ITorrentCache[] 
+        {
+            new Services.TorrentCache.TorCache(),
+            new Services.TorrentCache.Torrage()
+        };
+
+        private byte[] GetMagnetFromCache(MagnetLink mg) 
+        {
+            for (int i = 0; i < TorrentCaches.Length; i++) 
+            {
+                byte[] res = TorrentCaches[i].Fetch(mg);
+
+                if (res != null)
+                    return res;
+            }
+
+            return null;
+        }
+       
         public TorrentInfo CreateTorrentInfo(TorrentManager tm)
         {
             
