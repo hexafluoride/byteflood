@@ -66,7 +66,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\PieceView.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
+    <Compile Include="Formatters\PeerSoftwareToIcon.cs" />
+    <Compile Include="Formatters\PieceViewConverter.cs" />
     <Compile Include="Formatters\Subtract5Formatter.cs" />
     <Compile Include="InfoClasses\FileInfo.cs" />
     <Compile Include="InfoClasses\PeerInfo.cs" />
@@ -97,6 +100,10 @@
       <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\AddTorrentDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -169,6 +176,43 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+<<<<<<< HEAD
+=======
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Graphics\ClientIcons\ABC.png" />
+    <Resource Include="Graphics\ClientIcons\Ares.png" />
+    <Resource Include="Graphics\ClientIcons\Artemis.png" />
+    <Resource Include="Graphics\ClientIcons\Artic.png" />
+    <Resource Include="Graphics\ClientIcons\Azureus.png" />
+    <Resource Include="Graphics\ClientIcons\BitBuddy.png" />
+    <Resource Include="Graphics\ClientIcons\BitComet.png" />
+    <Resource Include="Graphics\ClientIcons\BitPump.png" />
+    <Resource Include="Graphics\ClientIcons\BitRocket.png" />
+    <Resource Include="Graphics\ClientIcons\BitsOnWheels.png" />
+    <Resource Include="Graphics\ClientIcons\BitSpirit.png" />
+    <Resource Include="Graphics\ClientIcons\BitTornado.png" />
+    <Resource Include="Graphics\ClientIcons\BitTorrent.png" />
+    <Resource Include="Graphics\ClientIcons\BTG.png" />
+    <Resource Include="Graphics\ClientIcons\DelugeTorrent.png" />
+    <Resource Include="Graphics\ClientIcons\ElectricSheep.png" />
+    <Resource Include="Graphics\ClientIcons\KTorrent.png" />
+    <Resource Include="Graphics\ClientIcons\Lphant.png" />
+    <Resource Include="Graphics\ClientIcons\MLDonkey.png" />
+    <Resource Include="Graphics\ClientIcons\MoonlightTorrent.png" />
+    <Resource Include="Graphics\ClientIcons\MooPolice.png" />
+    <Resource Include="Graphics\ClientIcons\Opera.png" />
+    <Resource Include="Graphics\ClientIcons\qBittorrent.png" />
+    <Resource Include="Graphics\ClientIcons\Shareaza.png" />
+    <Resource Include="Graphics\ClientIcons\Transmission.png" />
+    <Resource Include="Graphics\ClientIcons\Tribler.png" />
+    <Resource Include="Graphics\ClientIcons\uTorrent.png" />
+    <Resource Include="Graphics\ClientIcons\Vuze.png" />
+    <Resource Include="Graphics\ClientIcons\XanTorrent.png" />
+    <Resource Include="Graphics\ClientIcons\XBTClient.png" />
+    <Resource Include="Graphics\ClientIcons\ZipTorrent.png" />
+  </ItemGroup>
+>>>>>>> ac722e2ac2fb3379ddef57d6f7b5e20985106450
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
