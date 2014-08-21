@@ -176,9 +176,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-<<<<<<< HEAD
-=======
-  <ItemGroup />
   <ItemGroup>
     <Resource Include="Graphics\ClientIcons\ABC.png" />
     <Resource Include="Graphics\ClientIcons\Ares.png" />
@@ -212,7 +209,6 @@
     <Resource Include="Graphics\ClientIcons\XBTClient.png" />
     <Resource Include="Graphics\ClientIcons\ZipTorrent.png" />
   </ItemGroup>
->>>>>>> ac722e2ac2fb3379ddef57d6f7b5e20985106450
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
