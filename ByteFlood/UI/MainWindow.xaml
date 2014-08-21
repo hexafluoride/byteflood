@@ -34,6 +34,7 @@
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
         <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
+        <formatters:PeerSoftwareToIcon x:Key="PeerSoftwareToIcon" />
     </Window.Resources>
     <Window.Title>
         <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
@@ -247,7 +248,17 @@
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="140" Header="IP" DisplayMemberBinding="{Binding IP}" />
-                                    <GridViewColumn Width="140" Header="Client" DisplayMemberBinding="{Binding Client}" />
+                                    <GridViewColumn Width="140" Header="Client">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Image Height="18" Width="18" ToolTip="{Binding Client}" Source="{Binding Client, Converter={StaticResource PeerSoftwareToIcon}}" />
+                                                    <Separator Visibility="Hidden" Width="4"/><!-- epic -->
+                                                    <TextBlock Text="{Binding Client}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
                                     <GridViewColumn Width="130" Header="Pieces Received/Sent" DisplayMemberBinding="{Binding PieceInfo}" />
                                 </GridView>
                             </ListView.View>
