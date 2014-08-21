@@ -72,6 +72,7 @@ namespace ByteFlood
                 files.Add(fi);
                 fi.SetSelf(fi);
             }
+            
             torrentname = tm.Torrent.Name;
             name.Text = torrentname;
             filelist.ItemsSource = files;

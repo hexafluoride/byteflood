@@ -24,6 +24,8 @@
 
     <Window.Resources>
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
+        <formatters:SettingsGetter x:Key="SettingsGetter" />
+        <Application x:Key="Application" />
     </Window.Resources>
         
     <Grid>
@@ -59,7 +61,7 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}"/>
+                                            <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}" />
                                             <CheckBox IsChecked="{Binding DownloadFile}" Width="Auto" Click="CheckBox_Click" Height="Auto" />
                                             <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
                                         </StackPanel>

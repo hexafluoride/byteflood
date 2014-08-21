@@ -46,6 +46,8 @@
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,83,0,0" Text="Theme" VerticalAlignment="Top" />
                     <CheckBox Canvas.Left="6" Canvas.Top="112" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
                     <CheckBox Canvas.Left="6" Canvas.Top="134" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="156" Content="Show file icons throughout the UI" Height="16" IsChecked="{Binding ShowFileIcons}" Name="checkBox5" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="178" Content="Show torrent client icons" Height="16" IsChecked="{Binding ShowClientIcons}" Name="checkBox6" />
                 </Canvas>
             </TabItem>
             <TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">

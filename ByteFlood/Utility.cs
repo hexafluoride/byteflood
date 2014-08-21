@@ -125,12 +125,19 @@ namespace ByteFlood
 
         public static void Serialize<T>(T t, string path)
         {
-            XmlWriter xw = XmlWriter.Create(path, new XmlWriterSettings()
+            try
             {
-                Indent = true
-            });
-            new XmlSerializer(typeof(T)).Serialize(xw, t);
-            xw.Flush();
+                XmlWriter xw = XmlWriter.Create(path, new XmlWriterSettings()
+                {
+                    Indent = true
+                });
+                new XmlSerializer(typeof(T)).Serialize(xw, t);
+                xw.Flush();
+            }
+            catch
+            {
+                // ignore silently
+            }
         }
 
         public static object CloneObject(object source)
