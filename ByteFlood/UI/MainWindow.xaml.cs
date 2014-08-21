@@ -159,8 +159,24 @@ namespace ByteFlood
 
         private void Window_Drop(object sender, DragEventArgs e)
         {
-            string toppest = (string)((DataObject)e.Data).GetFileDropList()[0];
-            state.AddTorrentByPath(toppest);
+            var data = ((DataObject)e.Data);
+
+            if (data.ContainsText())
+            {
+                string text = (string)data.GetData(typeof(string));
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    if (text.StartsWith("magnet:?")) 
+                    {
+                       state.AddTorrentByMagnet(text);
+                    }
+                }
+            }
+            else 
+            {
+                string toppest = (string)data.GetFileDropList()[0];
+                state.AddTorrentByPath(toppest);
+            }
         }
         #endregion
 
