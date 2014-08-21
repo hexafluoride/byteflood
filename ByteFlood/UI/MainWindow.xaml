@@ -19,6 +19,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
+        xmlns:controls="clr-namespace:ByteFlood.Controls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen"
         TextOptions.TextFormattingMode="Display"
@@ -189,10 +190,7 @@
                     <TabItem Header="Pieces" Name="pieces">
                         <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="ID" Width="60" DisplayMemberBinding="{Binding ID}"/>
-                                    <GridViewColumn Header="Finished" Width="100" DisplayMemberBinding="{Binding Finished}"/>
-                                </GridView>
+                                <controls:PieceView/>
                             </ListView.View>
                         </ListView>
                     </TabItem>

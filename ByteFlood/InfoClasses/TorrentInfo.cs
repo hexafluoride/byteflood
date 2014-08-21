@@ -244,7 +244,7 @@ namespace ByteFlood
                         index = Files.IndexOf(results.ToList()[0]);
                     FileInfo fi = new FileInfo();
                     fi.Name = file.FullPath;
-                    fi.Priority = (file.Priority.ToString() == "DoNotDownload" ? "Don't download" : file.Priority.ToString());
+                    fi.Priority = (file.Priority == Priority.DoNotDownload ? "Don't download" : file.Priority.ToString());
                     fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
                     fi.RawSize = (uint)file.Length;
                     if (index == -1)
