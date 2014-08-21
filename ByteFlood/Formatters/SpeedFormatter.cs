@@ -12,7 +12,7 @@ namespace ByteFlood.Formatters
         {
             double size = System.Convert.ToDouble(value);
 
-            if (size == 0) { return "-"; }
+            if (size == 0) { return "0 B/s"; }
 
             return string.Format("{0}/s", Utility.PrettifyAmount(size));
         }

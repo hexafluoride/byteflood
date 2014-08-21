@@ -1,38 +1,64 @@
 ﻿<Window x:Class="ByteFlood.Preferences"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Preferences" Height="484" Width="629" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        TextOptions.TextFormattingMode="Display"
+        Title="Preferences" 
+        Height="521" 
+        Width="629" 
+        Loaded="Window_Loaded" 
+        WindowStartupLocation="CenterScreen">
     <Grid>
-        <TreeView Height="420" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
+        <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
             <TreeViewItem Header="General" Name="general_tree" IsSelected="True" />
+            <TreeViewItem Header="RSS" Name="rss_tree" />
             <TreeViewItem Header="UI" Name="ui_tree" >
             </TreeViewItem>
         </TreeView>
-        <TabControl HorizontalAlignment="Left" Margin="158,10,0,13" Name="tabControl1" Width="437">
+        <TabControl HorizontalAlignment="Left" Margin="158,10,0,0" Name="tabControl1" Width="437" Height="431" VerticalAlignment="Top">
             <TabItem Name="general" IsSelected="{Binding IsSelected, ElementName=general_tree}" Height="0">
-                <Grid>
+                <Canvas>
                     <CheckBox Content="Prefer encryption" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="checkBox1" VerticalAlignment="Top" IsChecked="{Binding PreferEncryption}" />
+                    
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock1" Text="Default download path" VerticalAlignment="Top" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="134,27,0,0" Name="downpath" VerticalAlignment="Top" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" />
                     <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="385,27,0,0" Name="button1" VerticalAlignment="Top" Width="40" Click="button1_Click" />
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,56,0,0" Name="textBlock2" Text="DHT listening port" VerticalAlignment="Top"  />
+                    
+                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,56,0,0" Name="textBlock2" Text="DHT listening port" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="2" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="305,56,0,0" Name="textBox2" VerticalAlignment="Top" Width="120" Text="{Binding ListeningPort}" />
-                </Grid>
+                    
+                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="88" />
+                    <TextBox Canvas.Left="305" Canvas.Top="85" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
+                    <Button Canvas.Left="6" Canvas.Top="116" Content="Change default torrent settings..." Height="23" Name="default_settings" Width="198" Click="ChangeDefaultSettings" />
+                </Canvas>
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">
-                <Grid>
+                <Canvas>
                     <CheckBox Content="Draw graph grid" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="checkBox2" VerticalAlignment="Top" IsChecked="{Binding DrawGrid}" />
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock3" Text="Download color" VerticalAlignment="Top" />
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,55,0,0" Name="textBlock4" Text="Upload color" VerticalAlignment="Top" />
-                  
                     <Button Height="23" HorizontalAlignment="Left" Margin="350,24,0,0" Name="downcolor" VerticalAlignment="Top" Width="75" Click="SelectDownloadColor" Background="{Binding DownloadBrush}" />
+                    
+                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,55,0,0" Name="textBlock4" Text="Upload color" VerticalAlignment="Top" />
                     <Button Height="23" HorizontalAlignment="Left" Margin="350,53,0,0" Name="upcolor" VerticalAlignment="Top" Width="75" Click="SelectUploadColor" Background="{Binding UploadBrush}" />
-                    <ComboBox Height="23" HorizontalAlignment="Left" Width="150" VerticalAlignment="Top" Margin="101,83,0,0" 
+                    
+                    <ComboBox Height="23" HorizontalAlignment="Right" Width="150" VerticalAlignment="Top" Margin="1,83,0,100" 
                               SelectionChanged="ReloadTheme"
-                              Name="themeCombox"/>
+                              Name="themeCombox" Canvas.Right="5" />
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,83,0,0" Text="Theme" VerticalAlignment="Top" />
-                </Grid>
+                    <CheckBox Canvas.Left="6" Canvas.Top="112" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="134" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
+                </Canvas>
+            </TabItem>
+            <TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
+                <Canvas>
+                    <RadioButton Content="Download all new content" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="rss_all_selector" VerticalAlignment="Top" IsChecked="{Binding DownloadAllRSS}" GroupName="rss_content_selectors" />
+                    <RadioButton Content="Download content matching regex: " Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="rss_regex_selector" VerticalAlignment="Top" GroupName="rss_content_selectors" />
+                    <TextBox Height="23" HorizontalAlignment="Left" Margin="220,26,0,0" Name="rss_regex" VerticalAlignment="Top" Width="205" Text="{Binding RSSRegex}" IsEnabled="{Binding ElementName=rss_regex_selector, Path=IsChecked}"/>
+                    <CheckBox Content="Check for duplicates" Height="16" HorizontalAlignment="Left" Margin="6,50,0,0" Name="dupes" IsChecked="{Binding RSSCheckForDuplicates}" VerticalAlignment="Top" />
+                </Canvas>
             </TabItem>
         </TabControl>
+        <Button Content="Save changes" Height="23" HorizontalAlignment="Left" Margin="501,447,0,0" Name="button2" VerticalAlignment="Top" Width="94" Click="button2_Click" />
+        <Button Content="Discard changes" Height="23" HorizontalAlignment="Left" Margin="391,447,0,0" Name="button4" VerticalAlignment="Top" Width="104" Click="button4_Click" />
+        <Button Content="Reset to default settings" Height="23" HorizontalAlignment="Left" Margin="243,447,0,0" Name="button3" VerticalAlignment="Top" Width="142" Click="button3_Click" />
     </Grid>
 </Window>

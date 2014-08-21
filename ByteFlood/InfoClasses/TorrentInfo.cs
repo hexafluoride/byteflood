@@ -12,42 +12,70 @@ using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace ByteFlood
 {
     public class TorrentInfo : INotifyPropertyChanged
     {
+        #region Properties and variables
         public event PropertyChangedEventHandler PropertyChanged;
+        [XmlIgnore]
         public TorrentManager Torrent { get; set; }
-        public string Name { get; set; }
-        public int Progress { get; set; }
-        public long Size { get; set; }
-        public int DownloadSpeed { get; set; }
-        public int UploadSpeed { get; set; }
-
-        public int Seeders { get; set; }
-        public int Leechers { get; set; }
-
-        public long Downloaded { get; set; }
-
-        public string Status { get; set; }
-
-        public int PeerCount { get; set; }
-
+        [XmlIgnore]
         public string Ratio { get { return RawRatio.ToString("0.000"); } }
-
-        public float RawRatio { get; set; }
-
-        public float RatioLimit { get; set; }
-
+        [XmlIgnore]
         public TimeSpan ETA { get; private set; }
-
+        public string Path = "";
+        public string SavePath = "";
+        public TorrentSettings TorrentSettings { get; set; }
+        public string Name { get; set; }
+        public double Progress { get { return Torrent.Progress; } set { } } 
+        public long Size { get { return Torrent.Torrent.Size; }  }
+        public int DownloadSpeed { get { return Torrent.Monitor.DownloadSpeed; }  }
+        public int MaxDownloadSpeed { get { return Torrent.Settings.MaxDownloadSpeed; } }
+        public int MaxUploadSpeed { get { return Torrent.Settings.MaxUploadSpeed; } }
+        public int UploadSpeed { get { return Torrent.Monitor.UploadSpeed; }  }
+        public TimeSpan Elapsed { get { return DateTime.Now.Subtract(StartTime); }  }
+        public DateTime StartTime { get; set; }
+        public long PieceLength { get { return Torrent.Torrent.PieceLength; }  }
+        public int HashFails { get { return Torrent.HashFails; }  }
+        public long WastedBytes { get { return PieceLength * HashFails; }  }
+        public int Seeders { get { return Torrent.Peers.Seeds; }  }
+        public int Leechers { get { return Torrent.Peers.Leechs; }  }
+        public long Downloaded { get { return Torrent.Monitor.DataBytesDownloaded; }  }
+        public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
+        public string Status { get { return Torrent.State.ToString() == "DontDownload" ? "Don't download" : Torrent.State.ToString(); } }
+        public int PeerCount { get { return Seeders + Leechers; }  }
+        public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.DoNotDownload ? t.Length : 0).Sum(); } }
+        public bool ShowOnList
+        {
+            get
+            {
+                
+                if (Torrent == null)
+                    return false;
+                return Invisible || ((MainWindow)App.Current.MainWindow).itemselector(this);
+            }
+        }
+        public bool Invisible { get; set; }
+        public float RawRatio { get; set; }
+        public float RatioLimit { get; set; }
+        [XmlIgnore]
+        public float AverageDownloadSpeed { get { return downspeeds.Count == 0 ? 0 : downspeeds.Average(); } set { } }
+        [XmlIgnore]
+        public float AverageUploadSpeed { get { return upspeeds.Count == 0 ? 0 : upspeeds.Average(); } set { } }
+        [XmlIgnore]
         public ObservableCollection<PeerInfo> Peers = new ObservableCollection<PeerInfo>();
-        public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
+        [XmlIgnore]
         public ObservableCollection<PieceInfo> Pieces = new ObservableCollection<PieceInfo>();
+        public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
         public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
+        [XmlIgnore]
         private bool hooked_pieces = false;
         private SynchronizationContext context;
+        [XmlIgnore]
         public List<float> DownSpeeds
         {
             get
@@ -62,7 +90,9 @@ namespace ByteFlood
                 return t.ToList();
             }
         }
-        private List<float> upspeeds = new List<float>();
+        [XmlIgnore]
+        public List<float> upspeeds = new List<float>();
+        [XmlIgnore]
         public List<float> UpSpeeds
         {
             get
@@ -77,11 +107,19 @@ namespace ByteFlood
                 return t.ToList();
             }
         }
-        private List<float> downspeeds = new List<float>();
+        [XmlIgnore]
+        public List<float> downspeeds = new List<float>();
+        #endregion 
+
+        public TorrentInfo() // this is reserved for the XML deserializer.
+        {
+        }
+
         public TorrentInfo(SynchronizationContext c)
         {
             context = c;
             Name = "";
+            StartTime = DateTime.Now;
         }
 
         private void TryHookPieceHandler()
@@ -108,6 +146,7 @@ namespace ByteFlood
             downspeeds.Add(Torrent.Monitor.DownloadSpeed);
             upspeeds.Add(Torrent.Monitor.UploadSpeed);
         }
+        
         public void Pause()
         {
             // TorrentSettings ts = new TorrentSettings();
@@ -118,13 +157,17 @@ namespace ByteFlood
         {
             if (e.HashPassed)
             {
-                var results = Pieces.Where(t => t.ID == e.PieceIndex);
-                if (results.Count() != 0)
+                try
                 {
-                    int index = Pieces.IndexOf(results.ToList()[0]);
-                    context.Send(x => Pieces[index].Finished = true, null);
-                    return;
+                    var results = Pieces.Where(t => t.ID == e.PieceIndex);
+                    if (results.Count() != 0)
+                    {
+                        int index = Pieces.IndexOf(results.ToList()[0]);
+                        context.Send(x => Pieces[index].Finished = true, null);
+                        return;
+                    }
                 }
+                catch (InvalidOperationException) { }
             }
             PieceInfo pi = new PieceInfo();
             pi.ID = e.PieceIndex;
@@ -150,43 +193,23 @@ namespace ByteFlood
 
         public void Update()
         {
+            if (this.Torrent == null)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() => {
+                    MainWindow mw = Application.Current.MainWindow as MainWindow;
+                    this.context = mw.uiContext;
+                    
+                    this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
+                    mw.state.ce.Register(this.Torrent);
+                    this.Start();
+                }));
+            }
+
             // TODO: Break this up into small pieces
             TryHookPieceHandler();
             try // I hate having to do this
             {
-                this.Status = Torrent.State.ToString();
-                
-                this.Size = this.Torrent.Torrent.Size;
-
-                this.Progress = Convert.ToInt32(Torrent.Progress);
-
-                this.DownloadSpeed = Torrent.Monitor.DownloadSpeed;
-
-                var seconds = 0;
-                if (this.DownloadSpeed > 0)
-                {
-                    seconds = Convert.ToInt32(this.Size / this.DownloadSpeed);
-                }
-                this.ETA = new TimeSpan(0, 0, seconds);
-
-                this.UploadSpeed = Torrent.Monitor.UploadSpeed;
-                this.Seeders = Torrent.Peers.Seeds;
-                this.Leechers = Torrent.Peers.Leechs;
-
-                this.Downloaded = Torrent.Monitor.DataBytesDownloaded;
-
-                this.PeerCount = Seeders + Leechers;
-                if (!this.Torrent.Complete)
-                    this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)Torrent.Monitor.DataBytesDownloaded);
-                else
-                    this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)GetDownloadedBytes()); // sad :(
-                if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
-                {
-                    this.Torrent.Settings.UploadSlots = 0;
-                }
-
-
-
+                UpdateProperties();
                 //context.Send(x => Peers.Clear(), null);
                 var peerlist = Torrent.GetPeers();
                 foreach (PeerId peer in this.Torrent.GetPeers())
@@ -253,9 +276,21 @@ namespace ByteFlood
                         "Seeders",
                         "Leechers",
                         "Downloaded",
+                        "Uploaded",
                         "Progress",
                         "Status",
-                        "Ratio", "ETA", "Size");
+                        "Ratio", 
+                        "ETA", 
+                        "Size", 
+                        "Elapsed", 
+                        "TorrentSettings",
+                        "WastedBytes",
+                        "HashFails",
+                        "AverageDownloadSpeed",
+                        "AverageUploadSpeed",
+                        "MaxDownloadSpeed",
+                        "MaxUploadSpeed",
+                        "ShowOnList");
                 }
             }
             catch (Exception ex)
@@ -268,6 +303,27 @@ namespace ByteFlood
         {
             foreach (string str in columns)
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
+        }
+
+        private void UpdateProperties()
+        {
+            this.Path = Torrent.Torrent.TorrentPath;
+            this.SavePath = Torrent.SavePath;
+            this.TorrentSettings = Torrent.Settings;
+            var seconds = 0;
+            if (this.DownloadSpeed > 0)
+            {
+                seconds = Convert.ToInt32(this.Size / this.DownloadSpeed);
+            }
+            this.ETA = new TimeSpan(0, 0, seconds);
+            if (!this.Torrent.Complete)
+                this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)Torrent.Monitor.DataBytesDownloaded);
+            else
+                this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)GetDownloadedBytes()); // sad :(
+            if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
+            {
+                this.Torrent.Settings.UploadSlots = 0;
+            }
         }
     }
 }

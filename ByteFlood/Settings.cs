@@ -5,6 +5,8 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Xml.Serialization;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Runtime.Serialization;
 
 namespace ByteFlood
 {
@@ -21,8 +24,9 @@ namespace ByteFlood
     {
         Aero2, Aero, Classic, Luna, Royale
     }
-    public class Settings
+    public class Settings : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         public Theme Theme { get; set; }
         public bool DrawGrid { get; set; }
         public Color DownloadColor { get; set; }
@@ -30,33 +34,60 @@ namespace ByteFlood
         public string DefaultDownloadPath { get; set; }
         public bool PreferEncryption { get; set; }
         public int ListeningPort { get; set; }
+        public string FileRegex { get; set; }
+        public bool EnableFileRegex { get; set; }
+        public bool DownloadAllRSS { get; set; }
+        public string RSSRegex { get; set; }
+        public bool RSSCheckForDuplicates { get; set; }
+        public bool MetroStyleHover { get; set; }
+        public TorrentProperties DefaultTorrentProperties { get; set; }
+        [XmlIgnore]
+        public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
+        [XmlIgnore]
+        public Visibility BottomCanvasVisibility { get { return BottomCanvasVisible ? Visibility.Visible : Visibility.Collapsed; } }
+        public bool TreeViewVisible { get; set; }
+        public bool BottomCanvasVisible { get; set; }
+
         public string Path;
+        
 
         [XmlIgnore]
         public Brush DownloadBrush { get { return new SolidColorBrush(DownloadColor); } }
         [XmlIgnore]
         public Brush UploadBrush { get { return new SolidColorBrush(UploadColor); } }
 
-        public static Settings DefaultSettings = new Settings() { 
-            Theme = Theme.Aero2,
-            DrawGrid = true,
-            DownloadColor = Colors.Green,
-            UploadColor = Colors.Red,
-            DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
-            PreferEncryption = true,
-            ListeningPort = 1025
-        };
+        public static Settings DefaultSettings
+        {
+            get
+            {
+                return new Settings()
+                {
+                    Theme = Theme.Aero2,
+                    DrawGrid = true,
+                    DownloadColor = Colors.Green,
+                    UploadColor = Colors.Red,
+                    DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
+                    PreferEncryption = true,
+                    ListeningPort = 1025,
+                    FileRegex = "",
+                    EnableFileRegex = false,
+                    DownloadAllRSS = false,
+                    RSSRegex = "",
+                    RSSCheckForDuplicates = false,
+                    MetroStyleHover = false,
+                    BottomCanvasVisible = true,
+                    TreeViewVisible = true,
+                    DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
+                };
+            }
+        }
 
         public Settings()
         {
         }
         public static void Save(Settings s, string path)
         {
-            XmlWriter xw = XmlWriter.Create(path, new XmlWriterSettings() {
-                Indent = true
-            });
-            new XmlSerializer(typeof(Settings)).Serialize(xw, s);
-            xw.Flush();
+            Utility.Serialize<Settings>(s, path);
         }
 
         public static Settings Load(string path)
@@ -65,15 +96,20 @@ namespace ByteFlood
             {
                 if (!File.Exists(path))
                     return Settings.DefaultSettings;
-                string s = File.ReadAllText(path);
-                XmlReader x = XmlReader.Create(new StringReader(s));
-                return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(x);
+                return Utility.Deserialize<Settings>(path);
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show("Error while loading configuration file. Falling back to default settings.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("An error occurred while loading configuration file. Falling back to default settings.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return Settings.DefaultSettings;
             }
+        }
+        public void NotifyChanged(params string[] props)
+        {
+            if (PropertyChanged == null)
+                return;
+            foreach (string str in props)
+                PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
     }
 }

@@ -15,171 +15,258 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-    <Window x:Class="ByteFlood.MainWindow"
+<Window x:Class="ByteFlood.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        WindowStartupLocation="CenterScreen" 
+        WindowStartupLocation="CenterScreen"
+        TextOptions.TextFormattingMode="Display"
         Left="0" Top="0"
-        Title="MainWindow" Height="425" Width="Auto" SizeToContent="Width" mc:Ignorable="d" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="968" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop">
+        MinHeight="100"
+        MinWidth="100"
+        Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded">
     <Window.Resources>
         <formatters:SizeToString x:Key="SizeToString" />
         <formatters:TimeSpanToString x:Key="TimeSpanToString" />
         <formatters:SpeedFormatter x:Key="SpeedFormatter" />
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
+        <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
     </Window.Resources>
-    <Grid>
-        <Canvas Height="150" HorizontalAlignment="Stretch" Name="canvas1" VerticalAlignment="Bottom" Width="Auto">
-            <Grid Canvas.Left="219" Canvas.Top="72" />
-            <TabControl Name="tabControl1" Margin="0,0,0,0" Width="{Binding ElementName=canvas1, Path=ActualWidth}" Height="{Binding ElementName=canvas1, Path=ActualHeight}">
-                <TabItem Header="Overview" Name="overview">
-                    <ScrollViewer
-                        HorizontalScrollBarVisibility="Auto"
-                        VerticalScrollBarVisibility="Disabled"
-                        Height="Auto"
-                        Width="Auto">
-                        <Canvas Name="overview_canvas" Height="1500">
-                            <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Visibility="Collapsed" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
+    <Window.Title>
+        <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
+            <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+            <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+        </MultiBinding>
+    </Window.Title>
+    <Grid Name="ActualSize">
+        <DockPanel LastChildFill="False">
+            
+            <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="150">
+                <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
+                    <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding InactiveTorrentCount}" Tag="inactive" HeaderStringFormat="Inactive ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding ActiveTorrentCount}" Tag="active" HeaderStringFormat="Active ({0})" Selected="SwitchTorrentDisplay" />
+                    <TreeViewItem Header="{Binding FinishedTorrentCount}" Tag="finished" HeaderStringFormat="Finished ({0})" Selected="SwitchTorrentDisplay" />
+                </TreeViewItem>
+                <TreeViewItem Header="Feeds" />
+            </TreeView>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,7" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
+                <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" Name="button3" VerticalAlignment="Top" Width="94" Click="button3_Click" />
+                <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+            </StackPanel>
+            <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Left" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
+                <ListView.Resources>
+                    <ContextMenu x:Key="ItemContextMenu">
+                        <MenuItem Header="Start" Click="StartSelectedTorrent" />
+                        <MenuItem Header="Pause" Click="PauseSelectedTorrent" />
+                        <MenuItem Header="Stop" Click="StopSelectedTorrent" />
+                        <Separator />
+                        <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
+                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrent" />
+                        <MenuItem Header="Remove and" Background="WhiteSmoke">
+                            <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrent" />
+                            <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrent" />
+                            <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrent" />
+                        </MenuItem>
+                    </ContextMenu>
+                </ListView.Resources>
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                        
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
+
+                        <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
+
+                        <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
+                        <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
+
+                        <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
+                        <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                        <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                        <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
+                        <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
+                        <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
+
+                        <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <Canvas Height="300" HorizontalAlignment="Stretch" Name="info_canvas" Visibility="{Binding BottomCanvasVisibility}" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Grid.Row="1">
+                <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="1" Panel.ZIndex="99" />
+                <Border BorderBrush="Transparent" BorderThickness="4" Name="grip" MouseDown="ResizeInfoAreaStart" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="4" Cursor="SizeNS" Panel.ZIndex="99" />
+                <Grid Canvas.Left="219" Canvas.Top="72" />
+                <TabControl Name="tabControl1" Margin="0,0,0,0" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="{Binding ElementName=info_canvas, Path=ActualHeight}">
+                    <TabItem Header="Overview" Name="overview">
+                        <ScrollViewer>
+                            <Canvas Name="overview_canvas" Height="200" VerticalAlignment="Top">
+                                <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Name="textBlock1" Text="Time elapsed:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Name="textBlock2" Text="Downloaded:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23" Name="textBlock3" Text="Download speed:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" Name="textBlock4" Text="Download speed limit:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Name="textBlock5" Text="Status:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Name="elapsed" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Name="data_down" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23" Name="down_speed" HorizontalAlignment="Right">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} (avg. {1})">
+                                        <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                        <Binding Path="AverageDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Name="status" Text="{Binding Status}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Name="textBlock6" Text="ETA:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Name="textBlock7" Text="Uploaded:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23" Name="textBlock8" Text="Upload speed:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Name="textBlock9" Text="Upload speed limit:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Name="eta" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Name="data_up" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" Name="up_speed" HorizontalAlignment="Right">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} (avg. {1})">
+                                        <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                        <Binding Path="AverageUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Name="textBlock10" Text="Wasted:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Name="textBlock11" Text="Seeds:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Name="textBlock12" Text="Peers:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" Name="textBlock13" Text="Ratio:" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" HorizontalAlignment="Right">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1} hashfails)">
+                                        <Binding Path="WastedBytes" Converter="{StaticResource SizeToString}" />
+                                        <Binding Path="HashFails" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock Height="23" Name="textBlock15" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Name="textBlock16" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Name="textBlock17" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" HorizontalAlignment="Right" />
+                            </Canvas>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Header="Speed" Name="graphtab" MouseUp="graphtab_MouseUp">
+                        <Canvas Name="parent_canvas">
+                            <Canvas SnapsToDevicePixels="True" Width="{Binding ActualWidth, ElementName=parent_canvas}" Height="{Binding ActualHeight, ElementName=parent_canvas}" Name="graph_canvas" Background="AliceBlue">
+                            </Canvas>
+
+                            <ComboBox Canvas.Left="7" Canvas.Top="6" Height="23" Name="graph_selector" Width="146" IsEditable="False">
+                                <ComboBoxItem Content="Download &amp; Upload" IsSelected="True" />
+                                <ComboBoxItem Content="Download" />
+                                <ComboBoxItem Content="Upload" />
+                            </ComboBox>
                         </Canvas>
-                    </ScrollViewer>
-                </TabItem>
-                <TabItem Header="Speed" Name="graphtab" MouseUp="graphtab_MouseUp">
-                    <Canvas Name="parent_canvas">
-                        <Canvas SnapsToDevicePixels="True" Width="{Binding ActualWidth, ElementName=parent_canvas}" Height="{Binding ActualHeight, ElementName=parent_canvas}" Name="graph_canvas" Background="AliceBlue">
-                        </Canvas>
+                    </TabItem>
+                    <TabItem Header="Pieces" Name="pieces">
+                        <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="ID" Width="60" DisplayMemberBinding="{Binding ID}"/>
+                                    <GridViewColumn Header="Finished" Width="100" DisplayMemberBinding="{Binding Finished}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Files" Name="files">
+                        <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single">
+                            <ListView.Resources>
+                                <ContextMenu x:Key="ItemContextMenu">
+                                    <MenuItem Header="Set file priority" Background="WhiteSmoke">
+                                        <MenuItem Header="Immediate" Tag="Immediate" Click="ChangePriority" />
+                                        <MenuItem Header="Highest" Tag="Highest" Click="ChangePriority" />
+                                        <MenuItem Header="High" Tag="High" Click="ChangePriority" />
+                                        <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
+                                        <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
+                                        <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
+                                        <MenuItem Header="Don't download" Tag="DoNotDownload" Click="ChangePriority" />
+                                    </MenuItem>
+                                </ContextMenu>
+                            </ListView.Resources>
 
-                        <ComboBox Canvas.Left="7" Canvas.Top="6" Height="23" Name="graph_selector" Width="146" IsEditable="False">
-                            <ComboBoxItem Content="Download &amp; Upload" IsSelected="True" />
-                            <ComboBoxItem Content="Download" />
-                            <ComboBoxItem Content="Upload" />
-                        </ComboBox>
-                    </Canvas>
-                </TabItem>
-                <TabItem Header="Pieces" Name="pieces">
-                    <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="ID" Width="60" DisplayMemberBinding="{Binding ID}"/>
-                                <GridViewColumn Header="Finished" Width="100" DisplayMemberBinding="{Binding Finished}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </TabItem>
-                <TabItem Header="Files" Name="files">
-                    <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single">
-                        <ListView.Resources>
-                            <ContextMenu x:Key="ItemContextMenu">
-                                <MenuItem Header="Set file priority" Background="WhiteSmoke">
-                                    <MenuItem Header="High" Click="HighPriority" Background="WhiteSmoke" />
-                                    <MenuItem Header="Normal" Click="NormalPriority" Background="WhiteSmoke" />
-                                    <MenuItem Header="Low" Click="LowPriority" Background="WhiteSmoke" />
-                                    <MenuItem Header="Don't download" Click="NoPriority" Background="WhiteSmoke" />
-                                </MenuItem>
-                            </ContextMenu>
-                        </ListView.Resources>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}" >
+                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.View>
+                                <GridView>
 
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="{x:Type ListViewItem}" >
-                                <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.View>
-                            <GridView>
-                                
-                                <GridViewColumn Width="170" Header="Path">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}"/>
-                                                <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                
-                                <GridViewColumn Width="140" Header="Progress">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ProgressBar Maximum="100" Value="{Binding Progress}" Width="140" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Width="130" Header="Priority" DisplayMemberBinding="{Binding Priority}" />
-                                <GridViewColumn Width="50" Header="Size" DisplayMemberBinding="{Binding Size}" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </TabItem>
-                <TabItem Header="Peers" Name="peers">
-                    <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="140" Header="IP" DisplayMemberBinding="{Binding IP}" />
-                                <GridViewColumn Width="140" Header="Client" DisplayMemberBinding="{Binding Client}" />
-                                <GridViewColumn Width="130" Header="Pieces Received/Sent" DisplayMemberBinding="{Binding PieceInfo}" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </TabItem>
-                <TabItem Header="Trackers" Name="trackers" >
-                    <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </TabItem>
-            </TabControl>
-        </Canvas>
-        <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="10,7,0,0" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
-        <ListView Height="Auto" HorizontalAlignment="Stretch" Margin="0,40,0,150" Name="mainlist" VerticalAlignment="Stretch" ItemsSource="{Binding Path=list_data, RelativeSource={RelativeSource Self}}" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged">
-            <ListView.Resources>
-                <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Header="Start" Click="StartSelectedTorrent" Background="WhiteSmoke" />
-                    <MenuItem Header="Pause" Click="PauseSelectedTorrent" Background="WhiteSmoke" />
-                    <MenuItem Header="Stop" Click="StopSelectedTorrent" Background="WhiteSmoke" />
-                    <Separator />
-                    <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" Background="WhiteSmoke" />
-                    <MenuItem Header="Remove from list" Click="RemoveSelectedTorrent" Background="WhiteSmoke" />
-                </ContextMenu>
-            </ListView.Resources>
+                                    <GridViewColumn Width="170" Header="Path">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}"/>
+                                                    <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
 
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}" >
-                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                                    <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=file_progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="130" Header="Priority" DisplayMemberBinding="{Binding Priority}" />
+                                    <GridViewColumn Width="50" Header="Size" DisplayMemberBinding="{Binding Size}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Peers" Name="peers">
+                        <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="140" Header="IP" DisplayMemberBinding="{Binding IP}" />
+                                    <GridViewColumn Width="140" Header="Client" DisplayMemberBinding="{Binding Client}" />
+                                    <GridViewColumn Width="130" Header="Pieces Received/Sent" DisplayMemberBinding="{Binding PieceInfo}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Trackers" Name="trackers" >
+                        <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                </TabControl>
+            </Canvas>
+        </DockPanel>
 
-                    <GridViewColumn Width="100" Header="Progress">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="140" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
-                    
-                    <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
-                    <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
-                    
-                    <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
-                    <GridViewColumn Width="50" Header="Dow Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                    <GridViewColumn Width="100" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                    <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
-                    <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
-                    <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
-                   
-                    <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="110,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
     </Grid>
 </Window>
