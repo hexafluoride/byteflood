@@ -12,6 +12,7 @@ namespace ByteFlood
         public string Name { get; set; }
         public int Progress { get; set; }
         public string Priority { get; set; }
+        public bool DownloadFile { get; set; }
 
         public string Size { get { return Utility.PrettifyAmount(RawSize); } }
 
@@ -23,7 +24,8 @@ namespace ByteFlood
             this.Name = pi.Name;
             this.Progress = pi.Progress;
             this.Priority = pi.Priority;
-            UpdateList("Name", "Progress", "Priority");
+            this.DownloadFile = pi.DownloadFile;
+            UpdateList("Name", "Progress", "Priority", "DownloadFile");
         }
         public void UpdateList(params string[] columns)
         {

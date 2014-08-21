@@ -370,7 +370,5 @@
     </MonoDevelop>
     <VisualStudio />
   </ProjectExtensions>
-  <ItemGroup>
-    <Folder Include="MonoTorrent.Client\NetworkIO\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

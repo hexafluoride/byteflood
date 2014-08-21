@@ -22,6 +22,9 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.IO;
+using System.Net.Sockets;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace ByteFlood
 {
@@ -34,8 +37,37 @@ namespace ByteFlood
 
         ResourceDictionary themerd = new ResourceDictionary();
 
+        public static string[] to_add;
+
         protected override void OnStartup(StartupEventArgs e)
         {
+            Environment.CurrentDirectory =
+                new DirectoryInfo(Assembly.GetExecutingAssembly().Location).Parent.FullName;
+            if (e.Args.Length != 0)
+            {
+                try
+                {
+                    foreach (string str in e.Args)
+                    {
+                        TcpClient tcp = new TcpClient();
+                        tcp.Connect("127.0.0.1", 65432);
+                        NetworkStream ns = tcp.GetStream();
+                        StreamWriter sw = new StreamWriter(ns);
+                        sw.WriteLine(str);
+                        sw.Flush();
+                        tcp.Close();
+                    }
+                    Environment.Exit(0);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    to_add = e.Args;
+                }
+            }
+            else
+                to_add = new string[0];
+
             base.OnStartup(e);
 
             Settings = Settings.Load("./config.xml");
