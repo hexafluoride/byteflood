@@ -31,6 +31,9 @@ namespace ByteFlood.Formatters
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (!App.Settings.ShowClientIcons)
+                return null;
+
             string ClientName = value.ToString();
 
             string url = string.Format("Graphics/ClientIcons/{0}.png", ClientName);

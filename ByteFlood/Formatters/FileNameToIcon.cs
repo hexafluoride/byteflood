@@ -13,6 +13,9 @@ namespace ByteFlood.Formatters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (!App.Settings.ShowFileIcons)
+                return null;
+
             string path = value.ToString();
 
             var fi = new System.IO.FileInfo(path);

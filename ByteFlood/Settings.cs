@@ -47,10 +47,13 @@ namespace ByteFlood
         public Visibility BottomCanvasVisibility { get { return BottomCanvasVisible ? Visibility.Visible : Visibility.Collapsed; } }
         public bool TreeViewVisible { get; set; }
         public bool BottomCanvasVisible { get; set; }
-
+        public bool ShowFileIcons { get; set; }
+        public bool ShowClientIcons { get; set; }
+        [XmlIgnore]
+        public Visibility FileIconVisibility { get { return ShowFileIcons ? Visibility.Visible : Visibility.Collapsed; } }
+        [XmlIgnore]
+        public Visibility ClientIconVisibility { get { return ShowClientIcons ? Visibility.Visible : Visibility.Collapsed; } }
         public string Path;
-        
-
         [XmlIgnore]
         public Brush DownloadBrush { get { return new SolidColorBrush(DownloadColor); } }
         [XmlIgnore]
@@ -77,6 +80,8 @@ namespace ByteFlood
                     MetroStyleHover = false,
                     BottomCanvasVisible = true,
                     TreeViewVisible = true,
+                    ShowClientIcons = true,
+                    ShowFileIcons = true,
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
                 };
             }

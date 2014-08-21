@@ -382,7 +382,25 @@ namespace ByteFlood
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
         }
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
 
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
+        }
         public void UpdateVisibility()
         {
             //App.Settings.NotifyChanged("TreeViewVisibility", "BottomCanvasVisibility");
@@ -392,6 +410,10 @@ namespace ByteFlood
             exp1.UpdateSource();
             exp2.UpdateTarget();
             exp2.UpdateSource();
+            foreach (Image img in FindVisualChildren<Image>(this))
+            {
+                img.GetBindingExpression(Image.VisibilityProperty).UpdateTarget();
+            }
         }
 
         private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
