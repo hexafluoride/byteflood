@@ -36,6 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Assets\icon-allsizes.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="PresentationFramework.Aero" />
@@ -151,8 +154,21 @@
       <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
       <Name>MonoTorrent</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NotifyIconWpf\NotifyIconWpf.csproj">
+      <Project>{7AC63864-7638-41C4-969C-D3197EF2BED9}</Project>
+      <Name>NotifyIconWpf</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Assets\icon-16.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\icon-allsizes.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

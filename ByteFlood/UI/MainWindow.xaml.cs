@@ -159,8 +159,11 @@ namespace ByteFlood
 
         private void Window_Drop(object sender, DragEventArgs e)
         {
-            string toppest = (string)((DataObject)e.Data).GetFileDropList()[0];
-            state.AddTorrentByPath(toppest);
+            DataObject data = (DataObject)e.Data;
+            if (!data.ContainsFileDropList())
+                return;
+            string filename = (string)data.GetFileDropList()[0];
+            state.AddTorrentByPath(filename);
         }
         #endregion
 
@@ -194,6 +197,23 @@ namespace ByteFlood
                 return;
             TorrentPropertiesForm tp = new TorrentPropertiesForm(t.Torrent);
             tp.Show();
+        }
+
+        public void ActionOnAllTorrents(object sender, RoutedEventArgs e)
+        {
+            string tag = ((MenuItem)e.Source).Tag.ToString();
+            switch (tag)
+            {
+                case "pause":
+                    foreach (TorrentInfo ti in state.Torrents)
+                        ti.Pause();
+                    break;
+                case "resume":
+                    foreach (TorrentInfo ti in state.Torrents)
+                        ti.Start();
+                    break;
+            }
+
         }
 
         public void RemoveSelectedTorrent(object sender, RoutedEventArgs e)
@@ -328,6 +348,8 @@ namespace ByteFlood
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            NotifyIcon.Icon = new System.Drawing.Icon("Assets/icon-16.ico");
+            this.Icon = new BitmapImage(new Uri("Assets/icon-allsizes.ico", UriKind.Relative));
             thr = new Thread(new ThreadStart(Update));
             state = State.Load("./state.xml");
             state.uiContext = uiContext;
@@ -453,6 +475,22 @@ namespace ByteFlood
             {
                 ti.UpdateList("ShowOnList");
             }
+        }
+
+        private void ShowHide(object sender, RoutedEventArgs e)
+        {
+            if (this.WindowState == System.Windows.WindowState.Minimized)
+                this.WindowState = System.Windows.WindowState.Normal;
+            else
+                this.WindowState = System.Windows.WindowState.Minimized;
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == System.Windows.WindowState.Minimized)
+                this.ShowInTaskbar = false;
+            else
+                this.ShowInTaskbar = true;
         }
 
     }
