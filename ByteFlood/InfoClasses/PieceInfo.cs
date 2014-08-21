@@ -9,7 +9,21 @@ namespace ByteFlood
     public class PieceInfo : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public bool Finished { get; set; }
+
+        private bool f = false;
+        public bool Finished 
+        {
+            get { return f; }
+            set 
+            {
+                if (value != f) 
+                {
+                    f = value;
+                    if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs("Finished")); }
+                }
+            }
+        }
+       
         public int ID { get; set; }
         public PieceInfo() { }
         public void SetSelf(PieceInfo pi)
