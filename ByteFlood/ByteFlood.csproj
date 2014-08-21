@@ -63,7 +63,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\PieceView.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
+    <Compile Include="Formatters\PieceViewConverter.cs" />
     <Compile Include="Formatters\Subtract5Formatter.cs" />
     <Compile Include="InfoClasses\FileInfo.cs" />
     <Compile Include="InfoClasses\PeerInfo.cs" />
@@ -94,6 +96,10 @@
       <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\AddTorrentDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
