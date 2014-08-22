@@ -37,9 +37,24 @@ namespace Hardcodet.Wpf.TaskbarNotification
     /// <summary>
     /// Util and extension methods.
     /// </summary>
-    internal static class Util
+    public static class Util
     {
         public static readonly object SyncRoot = new object();
+        public static Interop.Point GetMousePosition(TaskbarIcon icon)
+        {
+            Interop.Point cursorPosition = new Interop.Point();
+            if (icon.MessageSink.Version == NotifyIconVersion.Vista)
+            {
+                //physical cursor position is supported for Vista and above
+                WinApi.GetPhysicalCursorPos(ref cursorPosition);
+            }
+            else
+            {
+                WinApi.GetCursorPos(ref cursorPosition);
+            }
+
+            return icon.GetDeviceCoordinates(cursorPosition);
+        }
 
         #region IsDesignMode
 
@@ -224,6 +239,8 @@ namespace Hardcodet.Wpf.TaskbarNotification
         {
             switch (activationMode)
             {
+                case PopupActivationMode.None:
+                    return false;
                 case PopupActivationMode.LeftClick:
                     return me == MouseEvent.IconLeftMouseUp;
                 case PopupActivationMode.RightClick:

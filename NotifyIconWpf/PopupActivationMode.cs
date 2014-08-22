@@ -70,6 +70,11 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// <summary>
         /// The item is displayed whenever a click occurs.
         /// </summary>
-        All
+        All,
+
+        /// <summary>
+        /// The item is never displayed.
+        /// </summary>
+        None
     }
 }

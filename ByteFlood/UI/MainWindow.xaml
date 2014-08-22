@@ -282,13 +282,17 @@
         <tb:TaskbarIcon x:Name="NotifyIcon"
                     Visibility="Visible"
                     ToolTipText="ByteFlood"
-                    MenuActivation="LeftOrRightClick"
-                    PopupActivation="DoubleClick">
+                    TrayLeftMouseUp="NotifyIcon_TrayLeftMouseUp"
+                    TrayMouseDoubleClick="NotifyIcon_TrayMouseDoubleClick"
+                    TrayRightMouseUp="NotifyIcon_TrayRightMouseUp"
+                    PopupActivation="None"
+                    MenuActivation="None">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Resume all torrents" Click="ActionOnAllTorrents" Tag="resume" />
                     <MenuItem Header="Pause all torrents" Click="ActionOnAllTorrents" Tag="pause" />
                     <MenuItem Header="Show/Hide ByteFlood" Click="ShowHide" />
+                    <MenuItem Header="Quit ByteFlood" Click="Exit" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
