@@ -59,15 +59,5 @@ namespace ByteFlood.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] GeoIP {
-            get {
-                object obj = ResourceManager.GetObject("GeoIP", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }
