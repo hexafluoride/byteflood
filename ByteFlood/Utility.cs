@@ -20,6 +20,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace ByteFlood
 {
@@ -82,6 +83,20 @@ namespace ByteFlood
         {
             foreach (T element in elements)
                 element.ItemsSource = itemssource;
+        }
+
+        public static int QuickFind(ObservableCollection<FileInfo> list, string path)
+        {
+            int ret = -1;
+            Parallel.For(0, list.Count, i =>
+            {
+                if (list[i].Name == path)
+                {
+                    ret = i;
+                    return;
+                }
+            });
+            return ret;
         }
 
         public static Color ToWPFColor(this System.Drawing.Color color)
