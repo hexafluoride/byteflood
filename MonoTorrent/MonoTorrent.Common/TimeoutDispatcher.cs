@@ -136,6 +136,8 @@ namespace Mono.Ssdp.Internal
 
         private void TimerThread (object state)
         {
+            Thread.CurrentThread.IsBackground = true;
+
             bool hasItem;
             TimeoutItem item = default (TimeoutItem);
             

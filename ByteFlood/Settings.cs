@@ -24,6 +24,15 @@ namespace ByteFlood
     {
         Aero2, Aero, Classic, Luna, Royale
     }
+    // a better name for these new enums would be great
+    public enum TrayIconBehavior
+    {
+        ShowHide, ContextMenu, None
+    }
+    public enum WindowBehavior
+    {
+        MinimizeToTray, MinimizeToTaskbar, Exit
+    }
     public class Settings : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -40,6 +49,11 @@ namespace ByteFlood
         public string RSSRegex { get; set; }
         public bool RSSCheckForDuplicates { get; set; }
         public bool MetroStyleHover { get; set; }
+        public WindowBehavior MinimizeBehavior { get; set; }
+        public WindowBehavior ExitBehavior { get; set; }
+        public TrayIconBehavior TrayIconDoubleClickBehavior { get; set; }
+        public TrayIconBehavior TrayIconRightClickBehavior { get; set; }
+        public TrayIconBehavior TrayIconClickBehavior { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
         [XmlIgnore]
         public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
@@ -82,6 +96,11 @@ namespace ByteFlood
                     TreeViewVisible = true,
                     ShowClientIcons = true,
                     ShowFileIcons = true,
+                    MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
+                    ExitBehavior = WindowBehavior.MinimizeToTray,
+                    TrayIconClickBehavior = TrayIconBehavior.ContextMenu,
+                    TrayIconDoubleClickBehavior = TrayIconBehavior.ShowHide,
+                    TrayIconRightClickBehavior = TrayIconBehavior.ContextMenu,
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
                 };
             }

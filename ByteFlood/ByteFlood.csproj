@@ -67,6 +67,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\PieceView.cs" />
+    <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
     <Compile Include="Formatters\PeerCountryToIcon.cs" />
     <Compile Include="Formatters\PeerSoftwareToIcon.cs" />

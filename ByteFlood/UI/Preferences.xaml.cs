@@ -31,6 +31,27 @@ namespace ByteFlood
             Theme.Royale
         };
 
+        public string[] TrayIconBehaviorsReadable = new string[] 
+        { 
+            "Show/Hide ByteFlood",
+            "Show context menu",
+            "Do nothing"
+        };
+
+        public TrayIconBehavior[] TrayIconBehaviors = (TrayIconBehavior[])Enum.GetValues(typeof(TrayIconBehavior));
+
+        public string[] WindowBehaviorsReadable = new string[]
+        {
+            "Minimize to tray",
+            "Minimize to taskbar",
+            "Exit"
+        };
+
+        public WindowBehavior[] WindowBehaviors = (WindowBehavior[])Enum.GetValues(typeof(WindowBehavior));
+
+        public ComboBox[] TrayIconComboBoxes;
+        public ComboBox[] WindowComboBoxes;
+
         public Preferences()
         {
             InitializeComponent();
@@ -42,6 +63,11 @@ namespace ByteFlood
             this.DataContext = local;
             this.themeCombox.ItemsSource = theme_list;
             this.themeCombox.SelectedItem = local.Theme;
+            TrayIconComboBoxes = new ComboBox[] { tcb, tdcb, trcb };
+            WindowComboBoxes = new ComboBox[] { mb, cb };
+            Utility.SetItemsSource<ComboBox>(TrayIconComboBoxes, TrayIconBehaviorsReadable);
+            Utility.SetItemsSource<ComboBox>(WindowComboBoxes, WindowBehaviorsReadable);
+            
         }
 
         private void UpdateDataContext(Settings s)
@@ -73,7 +99,7 @@ namespace ByteFlood
             upcolor.GetBindingExpression(Button.BackgroundProperty).UpdateTarget();
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void PickPath(object sender, RoutedEventArgs e)
         {
             var fd = new System.Windows.Forms.FolderBrowserDialog();
             fd.ShowNewFolderButton = true;
@@ -97,18 +123,23 @@ namespace ByteFlood
                 local.DefaultTorrentProperties = tpf.tp;
         }
 
-        private void button2_Click(object sender, RoutedEventArgs e)
+        private void SaveSettings(object sender, RoutedEventArgs e)
         {
+            local.TrayIconClickBehavior = TrayIconBehaviors[tcb.SelectedIndex];
+            local.TrayIconRightClickBehavior = TrayIconBehaviors[trcb.SelectedIndex];
+            local.TrayIconDoubleClickBehavior = TrayIconBehaviors[tdcb.SelectedIndex];
+            local.MinimizeBehavior = WindowBehaviors[mb.SelectedIndex];
+            local.ExitBehavior = WindowBehaviors[cb.SelectedIndex];
             App.Settings = (Settings)Utility.CloneObject(local);
             this.Close();
         }
 
-        private void button4_Click(object sender, RoutedEventArgs e)
+        private void DiscardSettings(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
+        private void ResetToDefaultSettings(object sender, RoutedEventArgs e)
         {
             local = (Settings)Utility.CloneObject(Settings.DefaultSettings);
             UpdateDataContext(null);

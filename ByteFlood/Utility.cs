@@ -72,6 +72,18 @@ namespace ByteFlood
             return l;
         }
 
+        public static void SetDataContext<T>(T[] elements, object datacontext) where T : FrameworkElement
+        {
+            foreach (T element in elements)
+                element.DataContext = datacontext;
+        }
+
+        public static void SetItemsSource<T>(T[] elements, object[] itemssource) where T : ItemsControl
+        {
+            foreach (T element in elements)
+                element.ItemsSource = itemssource;
+        }
+
         public static Color ToWPFColor(this System.Drawing.Color color)
         {
             return Color.FromArgb(color.A, color.R, color.G, color.B);
