@@ -220,6 +220,7 @@ namespace ByteFlood
                         index = Peers.IndexOf(results.ToList()[0]);
                     PeerInfo pi = new PeerInfo();
                     pi.IP = peer.Uri.ToString();
+                    pi.AddressBytes = peer.AddressBytes;
                     pi.PieceInfo = peer.PiecesReceived + "/" + peer.PiecesSent;
                     pi.Client = peer.ClientApp.Client.ToString();
                     if (index == -1)
