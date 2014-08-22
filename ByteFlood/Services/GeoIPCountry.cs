@@ -114,11 +114,6 @@ namespace ByteFlood.Services
             }
         }
 
-        public GeoIPCountry()
-        {
-            this.GeoData = new MemoryStream(Properties.Resources.GeoIP);
-        }
-
         public string GetCountryCode(byte[] ip)
         {
             return CountryCodes[this.FindIndex(ip)];
