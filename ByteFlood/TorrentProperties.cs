@@ -53,6 +53,7 @@ namespace ByteFlood
 
         public static void Apply(TorrentManager tm, TorrentProperties tp)
         {
+            if (tp == null) { return; }
             tm.Settings.MaxConnections = tp.MaxConnections;
             tm.Settings.MaxDownloadSpeed = tp.MaxDownloadSpeed;
             tm.Settings.MaxUploadSpeed = tp.MaxUploadSpeed;

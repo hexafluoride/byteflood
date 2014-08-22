@@ -40,14 +40,14 @@ namespace ByteFlood.Formatters
 
             if (Resources.Contains(url.ToLower()))
             {
-                return "/ByteFlood;component/" + url;
+                return new BitmapImage(new Uri("/ByteFlood;component/" + url, UriKind.Relative));
             }
             else { return null; }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return (int)value + 5;
+            return null;
         }
     }
 }

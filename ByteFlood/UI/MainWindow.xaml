@@ -37,6 +37,7 @@
         <formatters:Subtract5Formatter x:Key="Subtract5Formatter" />
         <formatters:PeerSoftwareToIcon x:Key="PeerSoftwareToIcon" />
         <formatters:SettingsGetter x:Key="SettingsGetter" />
+        <formatters:PeerCountryToIcon x:Key="PeerCountryToIcon" />
     </Window.Resources>
     <Window.Title>
         <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
@@ -249,7 +250,17 @@
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Width="140" Header="IP" DisplayMemberBinding="{Binding IP}" />
+                                    <GridViewColumn Width="160" Header="IP">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Image Height="11" Width="16" Source="{Binding AddressBytes, Converter={StaticResource PeerCountryToIcon}}" />
+                                                    <Separator Width="4" Visibility="Hidden" />
+                                                    <TextBlock Text="{Binding IP}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
                                     <GridViewColumn Width="140" Header="Client">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
