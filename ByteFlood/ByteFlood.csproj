@@ -83,6 +83,7 @@
     <Compile Include="Services\TorrentCache\ITorrentCache.cs" />
     <Compile Include="Services\TorrentCache\TorCache.cs" />
     <Compile Include="Services\TorrentCache\Torrage.cs" />
+    <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
     <Compile Include="State.cs" />
     <Compile Include="TorrentProperties.cs" />
     <Compile Include="UI\AddTorrentDialog.xaml.cs">
