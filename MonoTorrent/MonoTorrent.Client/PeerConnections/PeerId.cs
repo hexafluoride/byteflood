@@ -148,7 +148,7 @@ namespace MonoTorrent.Client
 
         #region Properties
 
-        internal byte[] AddressBytes
+        public byte[] AddressBytes
         {
             get { return Connection.AddressBytes; }
         }

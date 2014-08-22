@@ -10,6 +10,7 @@ namespace ByteFlood
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public string IP { get; set; }
+        public byte[] AddressBytes { get; set; }
         public string Client { get; set; }
         public string PieceInfo { get; set; }
         public PeerInfo() { }
@@ -18,7 +19,7 @@ namespace ByteFlood
             this.IP = pi.IP;
             this.Client = pi.Client;
             this.PieceInfo = pi.PieceInfo;
-            UpdateList("IP", "Client", "PieceInfo");
+            UpdateList("IP", "Client", "PieceInfo", "AddressBytes");
         }
         public void UpdateList(params string[] columns)
         {
