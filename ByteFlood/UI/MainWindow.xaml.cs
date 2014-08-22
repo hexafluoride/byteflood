@@ -30,8 +30,10 @@ namespace ByteFlood
     public partial class MainWindow : Window
     {
         bool gripped = false;
-        bool subtract = true;
+        bool ignoreclose = true;
+        bool closing = false;
         Thread thr;
+        bool bound = false;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
@@ -48,6 +50,7 @@ namespace ByteFlood
         {
             InitializeComponent();
         }
+
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -106,7 +109,6 @@ namespace ByteFlood
                 {
                     foreach (TorrentInfo ti in state.Torrents)
                         ti.Update();
-
                     uiContext.Send(x =>
                     {
                         if (mainlist.SelectedIndex == -1)
@@ -147,7 +149,14 @@ namespace ByteFlood
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            state.Shutdown();
+            ExecuteWindowBehavior(App.Settings.ExitBehavior);
+            if (ignoreclose)
+                e.Cancel = true;
+            else
+            {
+                state.Shutdown();
+                Environment.Exit(0);
+            }
         }
 
         private void mainlist_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -312,11 +321,6 @@ namespace ByteFlood
             ReDrawGraph();
         }
 
-        private void Exit(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
         private void OpenPreferences(object sender, RoutedEventArgs e)
         {
 
@@ -435,48 +439,22 @@ namespace ByteFlood
                 double left = info_canvas.Margin.Left;
                 if (p.Y > ActualSize.ActualHeight - 120 || p.Y < 90)
                     return;
-                //info_canvas.Margin = new Thickness { Left = left, Top = p.Y };
-                //info_canvas.Height += ypos - info_canvas.Margin.Top;
-                //double mainlist_top = mainlist.Margin.Top;
-                ////double mainlist_left = mainlist.Margin.Left;
                 Point listpos = mainlist.TransformToAncestor(this).Transform(new Point(0, 0));
-                //double oldheight = mainlist.Height;
-                //mainlist.Height = (p.Y - listpos.Y);
-                //double diff = mainlist.Height - oldheight;
-                //info_canvas.Height -= diff;
-                double totalsize = mainlist.ActualHeight + info_canvas.ActualHeight; // I have no idea why this works
-                //if (subtract)
-                //{
-                //    totalsize -= 70;
-                //    subtract = false;
-                //}
+                double totalsize = mainlist.ActualHeight + info_canvas.ActualHeight;
                 double mouse_relative_to_list = p.Y - listpos.Y;
                 double listsize = mouse_relative_to_list;
                 double canvassize = totalsize - mouse_relative_to_list;
                 mainlist.Height = listsize;
                 info_canvas.Height = canvassize;
-                //mainlist.Margin = new Thickness() { Left = mainlist_left, Top=mainlist_top };
             }
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            subtract = true;
             Point listpos = mainlist.TransformToAncestor(this).Transform(new Point(0, 0));
             double newheight = ActualSize.ActualHeight - info_canvas.ActualHeight - listpos.Y;
             if (newheight > 20)
                 mainlist.Height = newheight;
-        }
-
-        private void grip_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //this.Cursor = Cursors.SizeNS;
-        }
-
-        private void grip_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //if(!gripped)
-            //    this.Cursor = Cursors.Arrow;
         }
 
         private void SwitchTorrentDisplay(object sender, RoutedEventArgs e)
@@ -520,13 +498,62 @@ namespace ByteFlood
                 this.WindowState = System.Windows.WindowState.Minimized;
         }
 
+        public void Exit(object sender, RoutedEventArgs e)
+        {
+            ignoreclose = false;
+            this.Close();
+        }
+
+        private void ExecuteTrayBehavior(TrayIconBehavior behavior)
+        {
+            switch (behavior)
+            {
+                case TrayIconBehavior.ContextMenu:
+                    NotifyIcon.ShowContextMenu(Hardcodet.Wpf.TaskbarNotification.Util.GetMousePosition(NotifyIcon));
+                    break;
+                case TrayIconBehavior.ShowHide:
+                    ShowHide(null, null);
+                    break;
+            }
+        }
+
+        private void ExecuteWindowBehavior(WindowBehavior behavior)
+        {
+            switch (behavior)
+            {
+                case WindowBehavior.MinimizeToTaskbar:
+                    this.WindowState = System.Windows.WindowState.Minimized;
+                    this.ShowInTaskbar = true;
+                    break;
+                case WindowBehavior.MinimizeToTray:
+                    this.WindowState = System.Windows.WindowState.Minimized;
+                    this.ShowInTaskbar = false;
+                    break;
+                case WindowBehavior.Exit:
+                    ignoreclose = false;
+                    break;
+            }
+        }
+
+        private void NotifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
+        {
+            ExecuteTrayBehavior(App.Settings.TrayIconClickBehavior);
+        }
+
+        private void NotifyIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            ExecuteTrayBehavior(App.Settings.TrayIconDoubleClickBehavior);
+        }
+
+        private void NotifyIcon_TrayRightMouseUp(object sender, RoutedEventArgs e)
+        {
+            ExecuteTrayBehavior(App.Settings.TrayIconRightClickBehavior);
+        }
+
         private void Window_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == System.Windows.WindowState.Minimized)
-                this.ShowInTaskbar = false;
-            else
-                this.ShowInTaskbar = true;
+                ExecuteWindowBehavior(App.Settings.MinimizeBehavior);
         }
-
     }
 }

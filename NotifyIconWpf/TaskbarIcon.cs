@@ -53,7 +53,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// <summary>
         /// Receives messages from the taskbar icon.
         /// </summary>
-        private readonly WindowMessageSink messageSink;
+        public readonly WindowMessageSink MessageSink;
 
         /// <summary>
         /// An action that is being invoked if the
@@ -84,7 +84,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// </summary>
         public bool SupportsCustomToolTips
         {
-            get { return messageSink.Version == NotifyIconVersion.Vista; }
+            get { return MessageSink.Version == NotifyIconVersion.Vista; }
         }
 
 
@@ -118,21 +118,21 @@ namespace Hardcodet.Wpf.TaskbarNotification
         public TaskbarIcon()
         {
             //using dummy sink in design mode
-            messageSink = Util.IsDesignMode
+            MessageSink = Util.IsDesignMode
                 ? WindowMessageSink.CreateEmpty()
                 : new WindowMessageSink(NotifyIconVersion.Win95);
 
             //init icon data structure
-            iconData = NotifyIconData.CreateDefault(messageSink.MessageWindowHandle);
+            iconData = NotifyIconData.CreateDefault(MessageSink.MessageWindowHandle);
 
             //create the taskbar icon
             CreateTaskbarIcon();
 
             //register event listeners
-            messageSink.MouseEventReceived += OnMouseEvent;
-            messageSink.TaskbarCreated += OnTaskbarCreated;
-            messageSink.ChangeToolTipStateRequest += OnToolTipChange;
-            messageSink.BalloonToolTipChanged += OnBalloonToolTipChanged;
+            MessageSink.MouseEventReceived += OnMouseEvent;
+            MessageSink.TaskbarCreated += OnTaskbarCreated;
+            MessageSink.ChangeToolTipStateRequest += OnToolTipChange;
+            MessageSink.BalloonToolTipChanged += OnBalloonToolTipChanged;
 
             //init single click / balloon timers
             singleClickTimer = new Timer(DoSingleClickAction);
@@ -384,7 +384,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
             //get mouse coordinates
             Point cursorPosition = new Point();
-            if (messageSink.Version == NotifyIconVersion.Vista)
+            if (MessageSink.Version == NotifyIconVersion.Vista)
             {
                 //physical cursor position is supported for Vista and above
                 WinApi.GetPhysicalCursorPos(ref cursorPosition);
@@ -569,7 +569,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
             const IconDataMembers flags = IconDataMembers.Tip;
             iconData.ToolTipText = ToolTipText;
 
-            if (messageSink.Version == NotifyIconVersion.Vista)
+            if (MessageSink.Version == NotifyIconVersion.Vista)
             {
                 //we need to set a tooltip text to get tooltip events from the
                 //taskbar icon
@@ -675,7 +675,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
                 }
 
                 //if we don't have a handle for the popup, fall back to the message sink
-                if (handle == IntPtr.Zero) handle = messageSink.MessageWindowHandle;
+                if (handle == IntPtr.Zero) handle = MessageSink.MessageWindowHandle;
 
                 //activate either popup or message sink to track deactivation.
                 //otherwise, the popup does not close if the user clicks somewhere else
@@ -698,7 +698,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// Displays the <see cref="ContextMenu"/> if
         /// it was set.
         /// </summary>
-        private void ShowContextMenu(Point cursorPosition)
+        public void ShowContextMenu(Point cursorPosition)
         {
             if (IsDisposed) return;
 
@@ -727,7 +727,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
                 }
 
                 //if we don't have a handle for the popup, fall back to the message sink
-                if (handle == IntPtr.Zero) handle = messageSink.MessageWindowHandle;
+                if (handle == IntPtr.Zero) handle = MessageSink.MessageWindowHandle;
 
                 //activate the context menu or the message window to track deactivation - otherwise, the context menu
                 //does not close if the user clicks somewhere else. With the message window
@@ -928,7 +928,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
                     //set to most recent version
                     SetVersion();
-                    messageSink.Version = (NotifyIconVersion) iconData.VersionOrTimeout;
+                    MessageSink.Version = (NotifyIconVersion) iconData.VersionOrTimeout;
 
                     IsTaskbarIconCreated = true;
                 }
@@ -960,7 +960,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        private Point GetDeviceCoordinates(Point point)
+        public Point GetDeviceCoordinates(Point point)
         {
             if (double.IsNaN(scalingFactor))
             {
@@ -1080,7 +1080,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
                 balloonCloseTimer.Dispose();
 
                 //dispose message sink
-                messageSink.Dispose();
+                MessageSink.Dispose();
 
                 //remove icon
                 RemoveTaskbarIcon();
