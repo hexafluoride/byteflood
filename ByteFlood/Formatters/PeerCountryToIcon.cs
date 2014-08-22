@@ -14,10 +14,16 @@ namespace ByteFlood.Formatters
     {
         string[] Resources = null;
 
-        Services.GeoIPCountry goe = new Services.GeoIPCountry();
+        Services.GeoIPCountry goe = null;
 
         public PeerCountryToIcon()
         {
+            try
+            {
+                this.goe = new Services.GeoIPCountry(System.IO.Path.Combine("Assets", "GeoIP.dat"));
+            }
+            catch { }
+
             //http://stackoverflow.com/questions/16870698/how-to-check-if-a-wpf-resource-exists/16870970#16870970
             var assembly = Assembly.GetExecutingAssembly();
             string resName = assembly.GetName().Name + ".g.resources";
@@ -32,6 +38,7 @@ namespace ByteFlood.Formatters
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (this.goe == null) { return null; }
             byte[] ip = (byte[])value;
 
             string CountryCode = this.goe.GetCountryCode(ip).ToLower();
