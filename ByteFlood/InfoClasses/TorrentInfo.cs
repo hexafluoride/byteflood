@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace ByteFlood
 {
@@ -107,6 +108,10 @@ namespace ByteFlood
                 return t.ToList();
             }
         }
+
+        private ParallelOptions parallel = new ParallelOptions() {
+            MaxDegreeOfParallelism = 8 // 8 seems like a good ground, even for single core machines.
+        };
         [XmlIgnore]
         public List<float> downspeeds = new List<float>();
         #endregion 
@@ -205,69 +210,14 @@ namespace ByteFlood
                 }));
             }
 
-            // TODO: Break this up into small pieces
             TryHookPieceHandler();
             try // I hate having to do this
             {
                 UpdateProperties();
                 //context.Send(x => Peers.Clear(), null);
-                var peerlist = Torrent.GetPeers();
-                foreach (PeerId peer in this.Torrent.GetPeers())
-                {
-                    var results = Peers.Where(t => t.IP == peer.Uri.ToString());
-                    int index = -1;
-                    if (results.Count() != 0)
-                        index = Peers.IndexOf(results.ToList()[0]);
-                    PeerInfo pi = new PeerInfo();
-                    pi.IP = peer.Uri.ToString();
-                    pi.PieceInfo = peer.PiecesReceived + "/" + peer.PiecesSent;
-                    pi.Client = peer.ClientApp.Client.ToString();
-                    if (index == -1)
-                        context.Send(x => Peers.Add(pi), null);
-                    else
-                        context.Send(x => Peers[index].SetSelf(pi), null);
-                }
-                for (int i = 0; i < peerlist.Count; i++)
-                {
-                    PeerInfo peer = Peers[i];
-                    var results = peerlist.Where(t => t.Uri.ToString() == peer.IP);
-                    if (results.Count() == 0)
-                    {
-                        context.Send(x => Peers.Remove(peer), null);
-                    }
-                }
-                foreach (TorrentFile file in Torrent.Torrent.Files)
-                {
-                    var results = Files.Where(t => t.Name == file.FullPath);
-                    int index = -1;
-                    if (results.Count() != 0)
-                        index = Files.IndexOf(results.ToList()[0]);
-                    FileInfo fi = new FileInfo();
-                    fi.Name = file.FullPath;
-                    fi.Priority = (file.Priority == Priority.DoNotDownload ? "Don't download" : file.Priority.ToString());
-                    fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
-                    fi.RawSize = (uint)file.Length;
-                    if (index == -1)
-                        context.Send(x => Files.Add(fi), null);
-                    else
-                        context.Send(x => Files[index].SetSelf(fi), null);
-                }
-                foreach (var tracker in Torrent.Torrent.AnnounceUrls)
-                {
-                    foreach (string str in tracker)
-                    {
-                        var results = Trackers.Where(t => t.URL == str);
-                        int index = -1;
-                        if (results.Count() != 0)
-                            index = Trackers.IndexOf(results.ToList()[0]);
-                        TrackerInfo ti = new TrackerInfo();
-                        ti.URL = str;
-                        if (index == -1)
-                            context.Send(x => Trackers.Add(ti), null);
-                        else
-                            context.Send(x => Trackers[index].SetSelf(ti), null);
-                    }
-                }
+                ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
+                ThreadPool.QueueUserWorkItem(new WaitCallback(UpdatePeerList));
+                ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateTrackerList));
                 if (PropertyChanged != null)
                 {
                     UpdateList("DownloadSpeed",
@@ -298,6 +248,76 @@ namespace ByteFlood
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(ex.StackTrace);
             }
+        }
+        private void UpdateTrackerList(object obj)
+        {
+            foreach (var tracker in Torrent.Torrent.AnnounceUrls)
+            {
+                foreach (string str in tracker)
+                {
+                    var results = Trackers.Where(t => t.URL == str);
+                    int index = -1;
+                    if (results.Count() != 0)
+                        index = Trackers.IndexOf(results.ToList()[0]);
+                    TrackerInfo ti = new TrackerInfo();
+                    ti.URL = str;
+                    if (index == -1)
+                        context.Send(x => Trackers.Add(ti), null);
+                    else
+                        context.Send(x => Trackers[index].SetSelf(ti), null);
+                }
+            }
+        }
+        private void UpdatePeerList(object obj)
+        {
+            var peerlist = Torrent.GetPeers();
+            Parallel.ForEach(peerlist, parallel, peer =>
+            {
+                var results = Peers.Where(t => t.IP == peer.Uri.ToString());
+                int index = -1;
+                if (results.Count() != 0)
+                    index = Peers.IndexOf(results.ToList()[0]);
+                PeerInfo pi = new PeerInfo();
+                pi.IP = peer.Uri.ToString();
+                pi.PieceInfo = peer.PiecesReceived + "/" + peer.PiecesSent;
+                pi.Client = peer.ClientApp.Client.ToString();
+                if (index == -1)
+                    context.Send(x => Peers.Add(pi), null);
+                else
+                    context.Send(x => Peers[index].SetSelf(pi), null);
+            });
+            Parallel.For(0, peerlist.Count, parallel, i =>
+            {
+                try
+                {
+                    PeerInfo peer = Peers[i];
+                    var results = peerlist.Where(t => t.Uri.ToString() == peer.IP);
+                    if (results.Count() == 0)
+                    {
+                        context.Send(x => Peers.Remove(peer), null);
+                    }
+                }
+                catch
+                {
+
+                }
+            });
+        }
+        private void UpdateFileList(object obj)
+        {
+            Parallel.ForEach(Torrent.Torrent.Files, parallel, file =>
+            {
+                int index = Utility.QuickFind(Files, file.FullPath);
+                FileInfo fi = new FileInfo();
+                fi.Name = file.FullPath;
+                fi.Priority = (file.Priority == Priority.DoNotDownload ? "Don't download" : file.Priority.ToString());
+                fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
+                fi.RawSize = (uint)file.Length;
+                if (index == -1)
+                    context.Send(x => Files.Add(fi), null);
+                else
+                    context.Send(x => Files[index].SetSelf(fi), null);
+            });
         }
         public void UpdateList(params string[] columns)
         {
