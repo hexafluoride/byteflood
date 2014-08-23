@@ -79,12 +79,12 @@
                 <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="94" Command="{StaticResource Commands.AddRssFeed}" />
                 <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="75" Command="{StaticResource Commands.OpenPreferences}" />
             </StackPanel>
-            <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Stretch" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
+            <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Stretch" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Extended" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem Header="Start" Click="StartSelectedTorrent" />
-                        <MenuItem Header="Pause" Click="PauseSelectedTorrent" />
-                        <MenuItem Header="Stop" Click="StopSelectedTorrent" />
+                        <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
+                        <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
+                        <MenuItem Header="Stop" Tag="Stop" Click="OperationOnSelectedTorrents" />
                         <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
                         <Separator />
                         <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
