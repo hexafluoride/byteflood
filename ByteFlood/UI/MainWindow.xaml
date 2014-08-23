@@ -38,7 +38,21 @@
         <formatters:PeerSoftwareToIcon x:Key="PeerSoftwareToIcon" />
         <formatters:SettingsGetter x:Key="SettingsGetter" />
         <formatters:PeerCountryToIcon x:Key="PeerCountryToIcon" />
+
+        <RoutedUICommand x:Key="Commands.AddTorrent" />
+        <RoutedUICommand x:Key="Commands.AddMagnet" />
+        <RoutedUICommand x:Key="Commands.AddRssFeed" />
+        <RoutedUICommand x:Key="Commands.OpenPreferences" />
+        
     </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource Commands.AddTorrent}" Executed="Commands_AddTorrent" />
+        <CommandBinding Command="{StaticResource Commands.AddMagnet}" Executed="Commands_AddMagnet" />
+        <CommandBinding Command="{StaticResource Commands.AddRssFeed}" Executed="Commands_AddRssFeed" />
+        <CommandBinding Command="{StaticResource Commands.OpenPreferences}" Executed="Commands_OpenPreferences" />
+    </Window.CommandBindings>
+    
     <Window.Title>
         <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
             <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -60,9 +74,10 @@
             </TreeView>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,7" Name="button1" VerticalAlignment="Top" Width="94" Click="button1_Click" />
-                <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" Name="button3" VerticalAlignment="Top" Width="94" Click="button3_Click" />
-                <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+                <Button Content="Add torrent..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,7" VerticalAlignment="Top" Width="94" Command="{StaticResource Commands.AddTorrent}" />
+                <Button Content="Add magnet..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="94" Command="{StaticResource Commands.AddMagnet}" />
+                <Button Content="Add RSS feed..." Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="94" Command="{StaticResource Commands.AddRssFeed}" />
+                <Button Content="Preferences" Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="75" Command="{StaticResource Commands.OpenPreferences}" />
             </StackPanel>
             <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Stretch" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Single" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
                 <ListView.Resources>
