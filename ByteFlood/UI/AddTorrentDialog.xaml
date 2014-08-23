@@ -20,6 +20,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
         TextOptions.TextFormattingMode="Display"
+        WindowStartupLocation="CenterScreen"
         Title="Add torrent..." Height="394" Width="723">
 
     <Window.Resources>

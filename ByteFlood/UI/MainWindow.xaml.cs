@@ -218,7 +218,7 @@ namespace ByteFlood
             if (!GetSelectedTorrent(out t))
                 return;
             TorrentPropertiesForm tp = new TorrentPropertiesForm(t.Torrent);
-            tp.Show();
+            tp.ShowDialog();
         }
 
         public void ActionOnAllTorrents(object sender, RoutedEventArgs e)
