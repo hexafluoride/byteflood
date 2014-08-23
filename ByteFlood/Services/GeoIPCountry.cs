@@ -25,7 +25,7 @@ namespace ByteFlood.Services
     // This code is based on MaxMind's original C# code, which was ported from Java.
     // This version is very simplified and does not support a majority of features for speed.
 
-    public sealed class GeoIPCountry
+    public sealed class GeoIPCountry : IDisposable
     {
         private MemoryStream GeoData;
 
@@ -183,6 +183,11 @@ namespace ByteFlood.Services
                     return FindCountryCode(x[0], ipnum, depth - 1);
                 }
             }
+        }
+
+        public void Dispose() 
+        {
+            if (this.GeoData != null) { this.GeoData.Dispose(); }
         }
     }
 

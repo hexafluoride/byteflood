@@ -146,7 +146,8 @@ namespace ByteFlood
         private Services.TorrentCache.ITorrentCache[] TorrentCaches = new Services.TorrentCache.ITorrentCache[] 
         {
             new Services.TorrentCache.TorCache(),
-            new Services.TorrentCache.Torrage()
+            new Services.TorrentCache.Torrage(),
+            new Services.TorrentCache.ZoinkIT()
         };
 
         private byte[] GetMagnetFromCache(MagnetLink mg) 

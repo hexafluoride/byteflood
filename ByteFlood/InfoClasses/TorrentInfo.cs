@@ -68,13 +68,15 @@ namespace ByteFlood
         [XmlIgnore]
         public float AverageUploadSpeed { get { return upspeeds.Count == 0 ? 0 : upspeeds.Average(); } set { } }
         [XmlIgnore]
-        public ObservableCollection<PeerInfo> Peers = new ObservableCollection<PeerInfo>();
+        public ObservableDictionary<string, PeerInfo> Peers = new ObservableDictionary<string, PeerInfo>();
         [XmlIgnore]
         public ObservableCollection<PieceInfo> Pieces = new ObservableCollection<PieceInfo>();
         public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
         public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
         [XmlIgnore]
         private bool hooked_pieces = false;
+        [XmlIgnore]
+        private bool hooked_peers = false;
         private SynchronizationContext context;
         [XmlIgnore]
         public List<float> DownSpeeds
@@ -138,9 +140,48 @@ namespace ByteFlood
             }
             catch { }
         }
+
+        private void TryHookPeersHandler()
+        {
+            if (hooked_peers)
+                return;
+            try
+            {
+                Torrent.PeerConnected += new EventHandler<PeerConnectionEventArgs>(Torrent_PeerConnected);
+                Torrent.PeerDisconnected += new EventHandler<PeerConnectionEventArgs>(Torrent_PeerDisconnected);
+                hooked_peers = true;
+            }
+            catch { }
+        }
+        
+        private void Torrent_PeerConnected(object sender, PeerConnectionEventArgs e)
+        {
+            PeerInfo pi = new PeerInfo() 
+            {
+                AddressBytes = e.PeerID.AddressBytes,
+                Client = e.PeerID.ClientApp.Client == Client.Unknown ? e.PeerID.ClientApp.ShortId : e.PeerID.ClientApp.Client.ToString(),
+                IP = e.PeerID.Uri.ToString(),
+                PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent)
+            };
+            this.context.Send(x => Peers.Add(e.PeerID.PeerID, pi), null);
+        }
+
+        private void Torrent_PeerDisconnected(object sender, PeerConnectionEventArgs e)
+        {
+            this.context.Send(x => 
+            {
+                if (this.Peers.ContainsKey(e.PeerID.PeerID)) 
+                {
+                    this.Peers.Remove(e.PeerID.PeerID);
+                }
+            }, null);
+        }
+
+
         public void Stop()
         {
             Torrent.Stop();
+            this.Peers.Clear();
         }
         public void Start()
         {
@@ -211,6 +252,7 @@ namespace ByteFlood
             }
 
             TryHookPieceHandler();
+            TryHookPeersHandler();
             try // I hate having to do this
             {
                 UpdateProperties();
@@ -273,36 +315,42 @@ namespace ByteFlood
             var peerlist = Torrent.GetPeers();
             Parallel.ForEach(peerlist, parallel, peer =>
             {
-                var results = Peers.Where(t => t.IP == peer.Uri.ToString());
-                int index = -1;
-                if (results.Count() != 0)
-                    index = Peers.IndexOf(results.ToList()[0]);
-                PeerInfo pi = new PeerInfo();
-                pi.IP = peer.Uri.ToString();
-				pi.AddressBytes = peer.AddressBytes;
-                pi.PieceInfo = peer.PiecesReceived + "/" + peer.PiecesSent;
-                pi.Client = peer.ClientApp.Client.ToString();
-                if (index == -1)
-                    context.Send(x => Peers.Add(pi), null);
-                else
-                    context.Send(x => Peers[index].SetSelf(pi), null);
-            });
-            Parallel.For(0, peerlist.Count, parallel, i =>
-            {
-                try
+                //var results = Peers.Where(t => t.IP == peer.Uri.ToString());
+                //int index = -1;
+                //if (results.Count() != 0)
+                //    index = Peers.IndexOf(results.ToList()[0]);
+                //PeerInfo pi = new PeerInfo();
+                //pi.IP = peer.Uri.ToString();
+                //pi.AddressBytes = peer.AddressBytes;
+                //pi.PieceInfo = peer.PiecesReceived + "/" + peer.PiecesSent;
+                //pi.Client = peer.ClientApp.Client.ToString();
+                //if (index == -1)
+                //    context.Send(x => Peers.Add(pi), null);
+                //else
+                //    context.Send(x => Peers[index].SetSelf(pi), null);
+                if (this.Peers.ContainsKey(peer.PeerID)) 
                 {
-                    PeerInfo peer = Peers[i];
-                    var results = peerlist.Where(t => t.Uri.ToString() == peer.IP);
-                    if (results.Count() == 0)
-                    {
-                        context.Send(x => Peers.Remove(peer), null);
-                    }
+                    PeerInfo pi = this.Peers[peer.PeerID];
+                    pi.PieceInfo = string.Format("{0}/{1}", peer.PiecesReceived, peer.PiecesSent);
+                    pi.Client = peer.ClientApp.Client == Client.Unknown ? peer.ClientApp.ShortId : peer.ClientApp.Client.ToString();
                 }
-                catch
-                {
+            });
+            //Parallel.For(0, peerlist.Count, parallel, i =>
+            //{
+            //    try
+            //    {
+            //        PeerInfo peer = Peers[i];
+            //        var results = peerlist.Where(t => t.Uri.ToString() == peer.IP);
+            //        if (results.Count() == 0)
+            //        {
+            //            context.Send(x => Peers.Remove(peer), null);
+            //        }
+            //    }
+            //    catch
+            //    {
 
-                }
-            });
+            //    }
+            //});
         }
         private void UpdateFileList(object obj)
         {
