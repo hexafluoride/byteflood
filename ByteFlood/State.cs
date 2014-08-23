@@ -101,6 +101,21 @@ namespace ByteFlood
 
         public void AddTorrentByPath(string path)
         {
+            try
+            {
+                Torrent.Load(path);
+            }
+            catch (TorrentException)
+            {
+                MessageBox.Show("Invalid torrent file", "Error");
+                return;
+            }
+            catch (Exception) 
+            {
+                MessageBox.Show("Could not load torrent", "Error");
+                return;
+            }
+
             uiContext.Send(x =>
             {
                 App.Current.MainWindow.Activate();
