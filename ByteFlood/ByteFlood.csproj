@@ -87,6 +87,9 @@
     <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
     <Compile Include="State.cs" />
     <Compile Include="TorrentProperties.cs" />
+    <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
+      <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AddTorrentDialog.xaml.cs">
       <DependentUpon>AddTorrentDialog.xaml</DependentUpon>
     </Compile>
@@ -110,6 +113,10 @@
     </Compile>
     <Compile Include="Utility.cs" />
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\AddMagnetTextInputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
