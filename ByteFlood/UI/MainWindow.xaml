@@ -85,6 +85,7 @@
                         <MenuItem Header="Start" Click="StartSelectedTorrent" />
                         <MenuItem Header="Pause" Click="PauseSelectedTorrent" />
                         <MenuItem Header="Stop" Click="StopSelectedTorrent" />
+                        <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
                         <Separator />
                         <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
                         <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrent" />
