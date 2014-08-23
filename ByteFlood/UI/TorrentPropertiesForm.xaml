@@ -19,6 +19,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         TextOptions.TextFormattingMode="Display"
+        WindowStartupLocation="CenterOwner"
         Title="Torrent options" Height="292" Width="355" Loaded="Window_Loaded">
     <Grid>
         <GroupBox Header="General" Height="213" HorizontalAlignment="Left" Name="groupBox1" VerticalAlignment="Top" Width="310" Margin="12,0,0,0">
