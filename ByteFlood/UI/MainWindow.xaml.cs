@@ -310,6 +310,13 @@ namespace ByteFlood
             string dir = new System.IO.FileInfo(filepath).Directory.FullName;
             Process.Start("explorer.exe", dir);
         }
+        public void OpenSelectedTorrentLocation(object sender, RoutedEventArgs e)
+        {
+            TorrentInfo t;
+            if (!GetSelectedTorrent(out t))
+                return;
+            Process.Start("explorer.exe", t.SavePath);
+        }
         public bool GetSelectedTorrent(out TorrentInfo ti)
         {
             ti = null;
