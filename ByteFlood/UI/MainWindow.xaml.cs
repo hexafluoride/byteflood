@@ -20,6 +20,7 @@ using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
+using System.Diagnostics;
 using System.Net;
 
 namespace ByteFlood
@@ -290,6 +291,24 @@ namespace ByteFlood
             if (!GetSelectedTorrent(out t))
                 return;
             t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = (Priority)Enum.Parse(typeof(Priority), tag);
+        }
+        public void OpenSelectedFile(object sender, RoutedEventArgs e)
+        {
+            TorrentInfo t;
+            if (!GetSelectedTorrent(out t))
+                return;
+            string path = t.Torrent.Torrent.Files[files_list.SelectedIndex].FullPath;
+            if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data. Are you sure that you want to open {0}?", path), "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                Process.Start(path);
+        }
+        public void OpenSelectedFileLocation(object sender, RoutedEventArgs e)
+        {
+            TorrentInfo t;
+            if (!GetSelectedTorrent(out t))
+                return;
+            string filepath = t.Torrent.Torrent.Files[files_list.SelectedIndex].FullPath;
+            string dir = new System.IO.FileInfo(filepath).Directory.FullName;
+            Process.Start("explorer.exe", dir);
         }
         public bool GetSelectedTorrent(out TorrentInfo ti)
         {

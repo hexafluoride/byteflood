@@ -140,7 +140,7 @@ namespace ByteFlood
             MagnetLink mg = null;
 
             try { mg = new MagnetLink(magnet); }
-            catch { MessageBox.Show("Invalid magnet link", "Error"); return; }
+            catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
 
             byte[] file_data = this.GetMagnetFromCache(mg);
 
@@ -152,7 +152,7 @@ namespace ByteFlood
             }
             else 
             {
-                MessageBox.Show("Could not find a cached copy of this magnet link.", "Loading failed"); 
+                MessageBox.Show("Could not find a cached copy of this magnet link.", "Loading failed", MessageBoxButton.OK, MessageBoxImage.Error); 
                 return;
             }
         }
