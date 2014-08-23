@@ -54,5 +54,10 @@ namespace ByteFlood.UI
         }
 
         #endregion
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Commands_PasteFromClipboard(null, null);
+        }
     }
 }

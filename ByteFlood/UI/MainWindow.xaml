@@ -135,7 +135,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <Canvas Height="300" HorizontalAlignment="Stretch" Name="info_canvas"  Visibility="{Binding BottomCanvasVisibility}" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Grid.Row="1">
+            <Canvas Height="200" HorizontalAlignment="Stretch" Name="info_canvas"  Visibility="{Binding BottomCanvasVisibility}" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Grid.Row="1">
                 <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="1" Panel.ZIndex="99" />
                 <Border BorderBrush="Transparent" BorderThickness="4" Name="grip" MouseDown="ResizeInfoAreaStart" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="4" Cursor="SizeNS" Panel.ZIndex="99" />
                 <Grid Canvas.Left="219" Canvas.Top="72" />
@@ -217,6 +217,8 @@
                         <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single">
                             <ListView.Resources>
                                 <ContextMenu x:Key="ItemContextMenu">
+                                    <MenuItem Header="Open" Click="OpenSelectedFile" />
+                                    <MenuItem Header="Open file location" Click="OpenSelectedFileLocation" />
                                     <MenuItem Header="Set file priority" Background="WhiteSmoke">
                                         <MenuItem Header="Immediate" Tag="Immediate" Click="ChangePriority" />
                                         <MenuItem Header="Highest" Tag="Highest" Click="ChangePriority" />
