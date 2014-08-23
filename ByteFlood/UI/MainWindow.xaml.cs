@@ -308,14 +308,14 @@ namespace ByteFlood
                 return;
             string filepath = t.Torrent.Torrent.Files[files_list.SelectedIndex].FullPath;
             string dir = new System.IO.FileInfo(filepath).Directory.FullName;
-            Process.Start("explorer.exe", dir);
+            Process.Start("explorer.exe", "\"" + dir + "\"");
         }
         public void OpenSelectedTorrentLocation(object sender, RoutedEventArgs e)
         {
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            Process.Start("explorer.exe", t.SavePath);
+            Process.Start("explorer.exe", "\"" + t.SavePath + "\"");
         }
         public bool GetSelectedTorrent(out TorrentInfo ti)
         {
@@ -325,6 +325,7 @@ namespace ByteFlood
             ti = state.Torrents[mainlist.SelectedIndex];
             return true;
         }
+
         #endregion
 
         #region Commands
@@ -591,6 +592,32 @@ namespace ByteFlood
         {
             if (this.WindowState == System.Windows.WindowState.Minimized)
                 ExecuteWindowBehavior(App.Settings.MinimizeBehavior);
+        }
+
+        private void OperationOnSelectedTorrents(object sender, RoutedEventArgs e)
+        {
+            TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
+            mainlist.SelectedItems.CopyTo(arr, 0);
+            if (arr.Length == 0)
+                return;
+            string tag = ((MenuItem)e.Source).Tag.ToString();
+            Action<TorrentInfo> f = new Action<TorrentInfo>(t => {});
+            switch (tag)
+            {
+                case "Start":
+                    f = new Action<TorrentInfo>(t => t.Start());
+                    break;
+                case "Pause":
+                    f = new Action<TorrentInfo>(t => t.Pause());
+                    break;
+                case "Stop":
+                    f = new Action<TorrentInfo>(t => t.Stop());
+                    break;
+            }
+            foreach (TorrentInfo ti in arr)
+            {
+                f(ti);
+            }
         }
 
     }
