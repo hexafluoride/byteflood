@@ -1,0 +1,34 @@
+﻿<Window x:Class="ByteFlood.UI.AddMagnetTextInputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="Add Magnet..." Height="120" Width="360" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" >
+    <Window.Resources>
+        <RoutedUICommand x:Key="Commands.PasteFromClipboard"/>
+        <RoutedUICommand x:Key="Commands.OK"/>
+        <RoutedUICommand x:Key="Commands.Cancel"/>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource Commands.PasteFromClipboard}" Executed="Commands_PasteFromClipboard" />
+        <CommandBinding Command="{StaticResource Commands.OK}" Executed="Commands_OK" />
+        <CommandBinding Command="{StaticResource Commands.Cancel}" Executed="Commands_Cancel" />
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition MinHeight="20"/>
+            <RowDefinition MinHeight="30"/>
+            <RowDefinition MinHeight="30"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Text="Enter the magnet URL:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        
+        <TextBox Grid.Row="1" Text="{Binding Path=Input}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Height="30" Width="50" Content="Paste" Command="{StaticResource Commands.PasteFromClipboard}"/>
+            <Button Height="30" Width="50" Content="OK" Command="{StaticResource Commands.OK}"/>
+            <Button Height="30" Width="50" Content="Cancel" Command="{StaticResource Commands.Cancel}"/>
+        </StackPanel>
+        
+    </Grid>
+</Window>

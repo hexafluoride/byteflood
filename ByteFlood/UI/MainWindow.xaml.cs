@@ -31,9 +31,9 @@ namespace ByteFlood
     {
         bool gripped = false;
         bool ignoreclose = true;
-        bool closing = false;
+        //bool closing = false;
         Thread thr;
-        bool bound = false;
+        //bool bound = false;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
@@ -45,27 +45,12 @@ namespace ByteFlood
         public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.Progress == 100; });
         GraphDrawer graph;
         public State state;
-        public Formatters.SpeedFormatter speedformatter = new Formatters.SpeedFormatter();
+        //public Formatters.SpeedFormatter speedformatter = new Formatters.SpeedFormatter();
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Title = "Open a torrent...";
-            ofd.Filter = "Torrent files|*.torrent";
-            ofd.DefaultExt = "*.torrent";
-            ofd.InitialDirectory = Environment.CurrentDirectory;
-            ofd.CheckFileExists = true;
-            ofd.Multiselect = true;
-            ofd.ShowDialog();
-            foreach (string str in ofd.FileNames)
-            {
-                state.AddTorrentByPath(str);
-            }
-        }
         public void ReDrawGraph()
         {
             if (mainlist.SelectedIndex == -1)
@@ -316,22 +301,52 @@ namespace ByteFlood
         }
         #endregion
 
-        private void graphtab_MouseUp(object sender, MouseButtonEventArgs e)
+        #region Commands
+
+        private void Commands_AddTorrent(object sender, ExecutedRoutedEventArgs e)
         {
-            ReDrawGraph();
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Open a torrent...";
+            ofd.Filter = "Torrent files|*.torrent";
+            ofd.DefaultExt = "*.torrent";
+            ofd.InitialDirectory = Environment.CurrentDirectory;
+            ofd.CheckFileExists = true;
+            ofd.Multiselect = true;
+            ofd.ShowDialog();
+            foreach (string str in ofd.FileNames)
+            {
+                state.AddTorrentByPath(str);
+            }
         }
 
-        private void OpenPreferences(object sender, RoutedEventArgs e)
+        private void Commands_AddMagnet(object sender, ExecutedRoutedEventArgs e)
         {
+            var dialog = new UI.AddMagnetTextInputDialog() { Owner = this, Icon = this.Icon };
 
+            if (dialog.ShowDialog().Value == true) 
+            {
+                this.state.AddTorrentByMagnet(dialog.Input);
+            }
         }
 
-        private void button2_Click(object sender, RoutedEventArgs e)
+        private void Commands_AddRssFeed(object sender, ExecutedRoutedEventArgs e)
+        {
+            return;
+        }
+
+        private void Commands_OpenPreferences(object sender, ExecutedRoutedEventArgs e)
         {
             Preferences pref = new Preferences();
             pref.ShowDialog();
             state.SaveSettings();
             UpdateVisibility();
+        }
+
+        #endregion
+
+        private void graphtab_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            ReDrawGraph();
         }
 
         private void SetDataContext(TorrentInfo ti)
@@ -356,11 +371,6 @@ namespace ByteFlood
         {
             mainlist.UnselectAll();
             ResetDataContext();
-        }
-
-        private void button3_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -556,5 +566,6 @@ namespace ByteFlood
             if (this.WindowState == System.Windows.WindowState.Minimized)
                 ExecuteWindowBehavior(App.Settings.MinimizeBehavior);
         }
+
     }
 }
