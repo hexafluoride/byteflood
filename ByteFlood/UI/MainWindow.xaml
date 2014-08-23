@@ -254,9 +254,9 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Image Height="11" Width="16" Source="{Binding AddressBytes, Converter={StaticResource PeerCountryToIcon}}" />
+                                                    <Image Height="11" Width="16" Source="{Binding Value.AddressBytes, Converter={StaticResource PeerCountryToIcon}}" />
                                                     <Separator Width="4" Visibility="Hidden" />
-                                                    <TextBlock Text="{Binding IP}" />
+                                                    <TextBlock Text="{Binding Value.IP}" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -265,14 +265,14 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Image Height="18" Width="18" ToolTip="{Binding Client}" Source="{Binding Client, Converter={StaticResource PeerSoftwareToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='ClientIconVisibility'}" />
+                                                    <Image Height="18" Width="18" ToolTip="{Binding Value.Client}" Source="{Binding Value.Client, Converter={StaticResource PeerSoftwareToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='ClientIconVisibility'}" />
                                                     <Separator Visibility="Hidden" Width="4"/><!-- epic -->
-                                                    <TextBlock Text="{Binding Client}"/>
+                                                    <TextBlock Text="{Binding Value.Client}"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Width="130" Header="Pieces Received/Sent" DisplayMemberBinding="{Binding PieceInfo}" />
+                                    <GridViewColumn Width="130" Header="Pieces Received/Sent" DisplayMemberBinding="{Binding Value.PieceInfo}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

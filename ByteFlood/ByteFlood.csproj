@@ -79,6 +79,7 @@
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
     <Compile Include="Listener.cs" />
+    <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
     <Compile Include="Services\TorrentCache\ITorrentCache.cs" />
     <Compile Include="Services\TorrentCache\TorCache.cs" />
