@@ -24,17 +24,11 @@ namespace MonoTorrent.Client.Tracker
         public UdpTracker(Uri announceUrl)
             : base(announceUrl)
         {
-            //try
-            //{
-                CanScrape = true;
-                CanAnnounce = true;
-                RetryDelay = TimeSpan.FromSeconds(15);
-                tracker = new UdpClient(announceUrl.Host, announceUrl.Port);
-                endpoint = (IPEndPoint)tracker.Client.RemoteEndPoint;
-            //}
-            //catch
-            //{
-            //}
+            CanScrape = true;
+            CanAnnounce = true;
+            RetryDelay = TimeSpan.FromSeconds(15);
+            tracker = new UdpClient(announceUrl.Host, announceUrl.Port);
+            endpoint = (IPEndPoint)tracker.Client.RemoteEndPoint;
         }
 
         #region announce
