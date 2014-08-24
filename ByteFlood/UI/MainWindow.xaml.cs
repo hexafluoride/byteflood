@@ -220,7 +220,7 @@ namespace ByteFlood
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            TorrentPropertiesForm tp = new TorrentPropertiesForm(t.Torrent);
+            TorrentPropertiesForm tp = new TorrentPropertiesForm(t.Torrent) { Owner = this, Icon = this.Icon };
             tp.ShowDialog();
         }
 
@@ -380,7 +380,7 @@ namespace ByteFlood
 
         private void Commands_OpenPreferences(object sender, ExecutedRoutedEventArgs e)
         {
-            Preferences pref = new Preferences();
+            Preferences pref = new Preferences() { Owner = this, Icon = this.Icon };
             pref.ShowDialog();
             state.SaveSettings();
             UpdateVisibility();
