@@ -511,10 +511,11 @@ namespace MonoTorrent.Client
             return infohash.GetHashCode();
         }
 
-        public List<PeerId> GetPeers()
+        public PeerId[] GetPeers()
         {
-            return (List<PeerId>)ClientEngine.MainLoop.QueueWait((MainLoopJob)delegate {
-                return new List<PeerId>(peers.ConnectedPeers);
+            return (PeerId[])ClientEngine.MainLoop.QueueWait((MainLoopJob)delegate
+            {
+                return peers.ConnectedPeers.ToArray();
             });
         }
 
