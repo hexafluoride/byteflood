@@ -268,7 +268,7 @@
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Width="160" Header="IP">
+                                    <GridViewColumn Width="180" Header="IP">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
