@@ -86,6 +86,9 @@
     <Compile Include="Services\TorrentCache\Torrage.cs" />
     <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
     <Compile Include="State.cs" />
+    <Compile Include="StateRpcHandler.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="TorrentProperties.cs" />
     <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
       <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
@@ -172,6 +175,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Jayrock.Json\Jayrock.Json.csproj">
+      <Project>{F10A6A7D-B8E4-4F8B-8BD9-5B42ACE5520E}</Project>
+      <Name>Jayrock.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jayrock\Jayrock.csproj">
+      <Project>{A178A4BB-CE12-4BF3-8B17-6DF0D82120C8}</Project>
+      <Name>Jayrock</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MonoTorrent.Dht\MonoTorrent.Dht.csproj">
       <Project>{7A2A7E73-FD43-4171-AA34-DA413D35459E}</Project>
       <Name>MonoTorrent.Dht</Name>

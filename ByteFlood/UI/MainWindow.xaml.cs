@@ -1,4 +1,21 @@
-﻿using System;
+﻿/* 
+    ByteFlood - A BitTorrent client.
+    Copyright (C) 2014 ***REMOVED***
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -135,7 +152,7 @@ namespace ByteFlood
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            ExecuteWindowBehavior(App.Settings.ExitBehavior);
+            ExecuteWindowBehavior(WindowBehavior.Exit);
             if (ignoreclose)
                 e.Cancel = true;
             else
@@ -416,7 +433,10 @@ namespace ByteFlood
             
             foreach (string str in App.to_add)
             {
-                state.AddTorrentByPath(str);
+                if (Utility.IsMagnetLink(str))
+                    state.AddTorrentByPath(str);
+                else
+                    state.AddTorrentByMagnet(str);
             }
 
             this.DataContext = state.ce;

@@ -1,4 +1,21 @@
-﻿using System;
+﻿/* 
+    ByteFlood - A BitTorrent client.
+    Copyright (C) 2014 ***REMOVED***
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,9 +51,7 @@ namespace ByteFlood
         const double G = 1073741824;
         const double T = 1099511627776;
 
-        static string Extension = ".torrent";
         static string OpenWith = Assembly.GetCallingAssembly().Location;
-        static string KeyName = "ByteFlood";
 
         public static string PrettifyAmount(double amount)
         {
@@ -59,6 +74,11 @@ namespace ByteFlood
         public static string PrettifySpeed(long speed)
         {
             return PrettifyAmount((ulong)speed) + "/s";
+        }
+
+        public static bool IsMagnetLink(string path)
+        {
+            return path.StartsWith("magnet:"); // not a good criteria but it works
         }
 
         public static Label GenerateLabel(string text, Thickness margin)
@@ -204,7 +224,7 @@ namespace ByteFlood
         }
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
-        public static void SetAssociation()
+        public static void SetAssociation(string KeyName = "ByteFlood", string Description = "TORRENT File", string Extension = ".torrent")
         {
             RegistryKey BaseKey;
             RegistryKey OpenMethod;
@@ -215,7 +235,7 @@ namespace ByteFlood
             BaseKey.SetValue("", KeyName);
 
             OpenMethod = Registry.CurrentUser.OpenSubKey("Software\\Classes", true).CreateSubKey(KeyName);
-            OpenMethod.SetValue("", "TORRENT File");
+            OpenMethod.SetValue("", Description);
             OpenMethod.CreateSubKey("DefaultIcon").SetValue("", "\"" + OpenWith + "\",0");
             Shell = OpenMethod.CreateSubKey("Shell");
             Shell.CreateSubKey("open").CreateSubKey("command").SetValue("", "\"" + OpenWith + "\"" + " \"%1\"");
@@ -230,7 +250,7 @@ namespace ByteFlood
             SHChangeNotify(0x08000000, 0x0000, IntPtr.Zero, IntPtr.Zero);
         }
 
-        public static bool Associated()
+        public static bool Associated(string KeyName = "ByteFlood", string Description = "TORRENT File", string Extension = ".torrent")
         {
             RegistryKey BaseKey;
             RegistryKey OpenMethod;
@@ -253,6 +273,27 @@ namespace ByteFlood
             Shell.Close();
             return true;
         }
+
+        public static bool FileAssociated()
+        {
+            return Associated();
+        }
+
+        public static bool MagnetAssociated()
+        {
+            return Associated("ByteFlood", "Magnet link", "magnet");
+        }
+
+        public static void FileAssociate()
+        {
+            SetAssociation();
+        }
+
+        public static void MagnetAssociate()
+        {
+            SetAssociation("ByteFlood", "Magnet link", "magnet");
+        }
+
         public static T Deserialize<T>(string path)
         {
             string s = File.ReadAllText(path);
