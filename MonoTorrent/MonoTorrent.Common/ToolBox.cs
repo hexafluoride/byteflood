@@ -34,6 +34,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using MonoTorrent.Client.Encryption;
+using System.Net;
+using System.Net.NetworkInformation;
 
 namespace MonoTorrent.Common
 {
@@ -160,16 +162,21 @@ namespace MonoTorrent.Common
 
         public static bool CheckInternetConnection() 
         {
-            try
+            // http://stackoverflow.com/a/24473982/3188175
+            if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
             {
-                // Google.com is HIGHLY UNLICKLY to go down, except when there is no [or extremly unreliable] internet connection.
-                // However, in filtered environements, this might throw an error.
-                // Well, if this environement block Google.com, it's unlikely to allow torrent clients as well.
-                // So this should be enough.
-                System.Net.Dns.GetHostAddresses("www.google.com");
-                return true;
+                NetworkInterface[] interfaces = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+                foreach(var face in interfaces)
+                {
+                    if (face.OperationalStatus == OperationalStatus.Up &&
+                        face.NetworkInterfaceType != NetworkInterfaceType.Tunnel &&
+                        face.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                        face.GetIPv4Statistics().BytesReceived > 0 &&
+                        face.GetIPv4Statistics().BytesSent > 0)
+                        return true;
+                }
             }
-            catch (Exception) { return false; }
+            return false;
         }
     }
 }
