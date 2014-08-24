@@ -45,7 +45,7 @@ namespace ByteFlood
         public long WastedBytes { get { return PieceLength * HashFails; }  }
         public int Seeders { get { return Torrent.Peers.Seeds; }  }
         public int Leechers { get { return Torrent.Peers.Leechs; }  }
-        public long Downloaded { get { return Torrent.Monitor.DataBytesDownloaded; }  }
+        public long Downloaded { get { return GetDownloadedBytes(); }  }
         public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
         public string Status { get { return Torrent.State.ToString() == "DontDownload" ? "Don't download" : Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
@@ -232,8 +232,9 @@ namespace ByteFlood
             long ret = 0;
             foreach (TorrentFile file in Torrent.Torrent.Files)
             {
-                ret += file.BytesDownloaded;
+                ret += file.CheckedBytes;
             }
+            ret += Torrent.Monitor.DataBytesDownloaded;
             return ret;
         }
 

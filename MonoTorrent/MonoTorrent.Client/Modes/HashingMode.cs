@@ -46,8 +46,19 @@ namespace MonoTorrent.Client
 			}
 			else
 			{
-				Manager.Bitfield[index] = hash == null ? false : Manager.Torrent.Pieces.IsValid((byte[])hash, index);
+                bool valid = false;
+                if (hash != null)
+                    valid = Manager.Torrent.Pieces.IsValid((byte[])hash, index);
+                Manager.Bitfield[index] = valid;
 				Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, index, Manager.Bitfield[index]));
+                if (valid)
+                {
+                    foreach (TorrentFile file in Manager.Torrent.Files)
+                    {
+                        if (index > file.StartPieceIndex && index < file.EndPieceIndex)
+                            file.CheckedBytes += Manager.Torrent.PieceLength;
+                    }
+                }
 				index++;
 				QueueNextHash();
 			}
