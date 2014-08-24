@@ -21,21 +21,57 @@ namespace MonoTorrent.Client.Tracker
         int timeout;
         IAsyncResult ReceiveAsyncResult;
 
+        public bool InvalidTracker { get; private set; }
+
+        private Uri AnnounceUrl;
+
         public UdpTracker(Uri announceUrl)
             : base(announceUrl)
         {
-            CanScrape = true;
-            CanAnnounce = true;
-            RetryDelay = TimeSpan.FromSeconds(15);
-            tracker = new UdpClient(announceUrl.Host, announceUrl.Port);
-            endpoint = (IPEndPoint)tracker.Client.RemoteEndPoint;
+            this.AnnounceUrl = announceUrl;
+            Init();
+        }
+
+        private void Init() 
+        {
+            try
+            {
+                CanScrape = true;
+                CanAnnounce = true;
+                RetryDelay = TimeSpan.FromSeconds(15);
+                Dns.GetHostEntry(this.AnnounceUrl.Host);
+                tracker = new UdpClient(this.AnnounceUrl.Host, this.AnnounceUrl.Port);
+                endpoint = (IPEndPoint)tracker.Client.RemoteEndPoint;
+            }
+            catch (SocketException se)
+            {
+                if (se.SocketErrorCode == SocketError.HostNotFound)
+                {
+                    if (Toolbox.CheckInternetConnection())
+                    {
+                        this.InvalidTracker = true;
+                        this.Status = TrackerState.Offline;
+                        return;
+                    }
+                    else
+                    {
+                        this.Status = TrackerState.Offline;
+                        this.CanAnnounce = false;
+                        this.CanScrape = false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         #region announce
 
         public override void Announce(AnnounceParameters parameters, object state)
         {
-
+            if (this.InvalidTracker) { return; }
             //LastUpdated = DateTime.Now;
             if (!hasConnected && amConnecting)
             {
@@ -156,9 +192,17 @@ namespace MonoTorrent.Client.Tracker
 
         private void Connect(UdpTrackerAsyncState connectState)
         {
-            connectState.Message = new ConnectMessage();
-            tracker.Connect(Uri.Host, Uri.Port);
-            SendAndReceive(connectState);
+            if (!this.InvalidTracker)
+            {
+                connectState.Message = new ConnectMessage();
+                tracker.Connect(Uri.Host, Uri.Port);
+                SendAndReceive(connectState);
+            }
+            else
+            {
+                return;
+            }
+
         }
 
         private bool ConnectCallback(IAsyncResult ar)
@@ -330,6 +374,11 @@ namespace MonoTorrent.Client.Tracker
         private void SendRequest(UdpTrackerAsyncState requestState)
         {
             //TODO BeginSend
+            if (this.InvalidTracker) 
+            {
+                return; 
+            }
+
             byte[] buffer = requestState.Message.Encode();
             tracker.Send(buffer, buffer.Length);
 

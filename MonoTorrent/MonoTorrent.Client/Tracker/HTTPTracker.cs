@@ -63,6 +63,12 @@ namespace MonoTorrent.Client.Tracker
         public HTTPTracker(Uri announceUrl)
             : base(announceUrl)
         {
+            if (Toolbox.CheckInternetConnection()) 
+            {
+                // If there was a working internet connection, I want this following statement to throw exceptions
+                // if it's an invalid tracker host. This way, the tracker factory won't load it.
+                Dns.GetHostAddresses(announceUrl.Host);
+            }
             CanAnnounce = true;
             int index = announceUrl.OriginalString.LastIndexOf('/');
             string part = (index + 9 <= announceUrl.OriginalString.Length) ? announceUrl.OriginalString.Substring(index + 1, 8) : "";
@@ -182,7 +188,12 @@ namespace MonoTorrent.Client.Tracker
             int totalRead = 0;
             byte[] buffer = new byte[2048];
 
-            WebResponse response = request.EndGetResponse(result);
+            WebResponse response = null;
+            try { response = request.EndGetResponse(result); }
+            catch 
+            {
+                return null;
+            }
             using (MemoryStream dataStream = new MemoryStream(response.ContentLength > 0 ? (int)response.ContentLength : 256))
             {
 
