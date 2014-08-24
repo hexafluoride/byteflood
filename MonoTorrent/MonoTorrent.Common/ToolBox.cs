@@ -157,5 +157,19 @@ namespace MonoTorrent.Common
         {
             return (available & check) == check;
         }
+
+        public static bool CheckInternetConnection() 
+        {
+            try
+            {
+                // Google.com is HIGHLY UNLICKLY to go down, except when there is no [or extremly unreliable] internet connection.
+                // However, in filtered environements, this might throw an error.
+                // Well, if this environement block Google.com, it's unlikely to allow torrent clients as well.
+                // So this should be enough.
+                System.Net.Dns.GetHostAddresses("www.google.com");
+                return true;
+            }
+            catch (Exception) { return false; }
+        }
     }
 }
