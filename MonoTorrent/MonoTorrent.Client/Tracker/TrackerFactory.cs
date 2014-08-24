@@ -62,13 +62,29 @@ namespace MonoTorrent.Client.Tracker
         {
             Check.Uri(uri);
 
-            if (!trackerTypes.ContainsKey(uri.Scheme))
-                return null;
-
             try
             {
-                Dns.GetHostEntry(uri.Host);
-                return (Tracker)Activator.CreateInstance(trackerTypes[uri.Scheme], uri);
+                switch (uri.Scheme)
+                {
+                    case "http":
+                    case "https":
+                        return new HTTPTracker(uri);
+                    case "udp":
+                        if (uri.Port <= 0) // Happens when the port is not specified. Port 80 is assumed.
+                        {
+                            uri = new Uri(string.Format("udp://{0}:80{1}", uri.Host, uri.AbsolutePath));
+                        }
+                        return new UdpTracker(uri);
+                    default:
+                        if (trackerTypes.ContainsKey(uri.Scheme))
+                        {
+                            return (Tracker)Activator.CreateInstance(trackerTypes[uri.Scheme], uri);
+                        }
+                        else 
+                        {
+                            return null;
+                        }
+                }
             }
             catch
             {
