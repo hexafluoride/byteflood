@@ -64,9 +64,10 @@ namespace MonoTorrent.Client.Tracker
 
             if (!trackerTypes.ContainsKey(uri.Scheme))
                 return null;
-			
+
             try
             {
+                Dns.GetHostEntry(uri.Host);
                 return (Tracker)Activator.CreateInstance(trackerTypes[uri.Scheme], uri);
             }
             catch
