@@ -70,12 +70,10 @@ namespace ByteFlood
         public void HandleConnection(TcpClient tcp)
         {
             NetworkStream ns = tcp.GetStream();
-            StreamWriter sw = new StreamWriter(ns);
+            StreamWriter sw = new StreamWriter(ns) { AutoFlush = true };
             StreamReader sr = new StreamReader(ns);
             LogMessage(string.Format("Incoming connection from {0}", tcp.Client.RemoteEndPoint.ToString()));
             JsonRpcDispatcherFactory.CreateDispatcher(Handler).Process(sr, sw);
-            while (tcp.Connected)
-                Thread.Sleep(50);
             LogMessage("Closed connection");
         }
 
