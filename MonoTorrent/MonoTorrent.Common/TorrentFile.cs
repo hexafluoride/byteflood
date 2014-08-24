@@ -67,9 +67,14 @@ namespace MonoTorrent.Common
             get { return this.bitfield; }
         }
 
+        public long CheckedBytes;
+
         public long BytesDownloaded
-        {
-            get { return (long)(BitField.PercentComplete * Length / 100.0); }
+        { 
+            get 
+            {
+                return (long)(BitField.PercentComplete * Length / 100.0) + CheckedBytes; 
+            }
         }
 
         /// <summary>
