@@ -25,6 +25,8 @@ using System.IO;
 using System.Net.Sockets;
 using System.Diagnostics;
 using System.Reflection;
+using Jayrock;
+using Jayrock.Json;
 
 namespace ByteFlood
 {
@@ -53,7 +55,12 @@ namespace ByteFlood
                         tcp.Connect("127.0.0.1", 65432);
                         NetworkStream ns = tcp.GetStream();
                         StreamWriter sw = new StreamWriter(ns);
-                        sw.WriteLine(str);
+                        JsonObject jo = new JsonObject();
+                        Random rnd = new Random();
+                        jo.Add("id", rnd.Next());
+                        jo.Add("method", "addtorrentbypath");
+                        jo.Add("params", new JsonArray() { str });
+                        sw.WriteLine(jo.ToString());
                         sw.Flush();
                         tcp.Close();
                     }

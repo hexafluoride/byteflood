@@ -24,6 +24,7 @@ using System.Net;
 using System.IO;
 using System.Net.Sockets;
 using System.Xml;
+using Jayrock.JsonRpc;
 
 namespace ByteFlood
 {
@@ -37,11 +38,14 @@ namespace ByteFlood
         public Thread Thread;
         public bool Running = true;
         public TcpListener TcpListener;
-        public Listener()
+        public StateRpcHandler Handler;
+        public Listener(State state)
         {
             Thread = new Thread(new ThreadStart(MainLoop));
             Thread.SetApartmentState(ApartmentState.STA);
             Thread.Start();
+            State = state;
+            Handler = new StateRpcHandler(State);
         }
 
         public void MainLoop()
@@ -69,10 +73,9 @@ namespace ByteFlood
             StreamWriter sw = new StreamWriter(ns);
             StreamReader sr = new StreamReader(ns);
             LogMessage(string.Format("Incoming connection from {0}", tcp.Client.RemoteEndPoint.ToString()));
-            string filename = sr.ReadLine();
-            State.AddTorrentByPath(filename);
-            LogMessage(string.Format("Adding torrent file {0}", filename));
-            tcp.Close();
+            JsonRpcDispatcherFactory.CreateDispatcher(Handler).Process(sr, sw);
+            while (tcp.Connected)
+                Thread.Sleep(50);
             LogMessage("Closed connection");
         }
 

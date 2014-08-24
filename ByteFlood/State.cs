@@ -24,6 +24,8 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Net;
 using System.IO;
+using Jayrock;
+using Jayrock.JsonRpc;
 
 namespace ByteFlood
 {
@@ -70,7 +72,7 @@ namespace ByteFlood
                 MessageBox.Show("Do you want to associate ByteFlood with .torrent files?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 Utility.SetAssociation();
             //MessageBox.Show(assoc.ToString());
-            listener = new Listener();
+            listener = new Listener(this);
             listener.State = this;
         }
 
