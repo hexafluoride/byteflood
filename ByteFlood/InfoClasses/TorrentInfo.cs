@@ -386,7 +386,7 @@ namespace ByteFlood
             var seconds = 0;
             if (this.DownloadSpeed > 0)
             {
-                seconds = Convert.ToInt32(this.Size / this.DownloadSpeed);
+                seconds = Convert.ToInt32((this.Size - this.Downloaded) / this.DownloadSpeed);
             }
             this.ETA = new TimeSpan(0, 0, seconds);
             if (!this.Torrent.Complete)
