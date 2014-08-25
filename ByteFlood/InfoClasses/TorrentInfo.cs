@@ -47,7 +47,7 @@ namespace ByteFlood
         public int Leechers { get { return Torrent.Peers.Leechs; }  }
         public long Downloaded { get { return GetDownloadedBytes(); }  }
         public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
-        public string Status { get { return Torrent.State.ToString() == "DontDownload" ? "Don't download" : Torrent.State.ToString(); } }
+        public string Status { get { return Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
         public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.DoNotDownload ? t.Length : 0).Sum(); } }
         public bool ShowOnList
