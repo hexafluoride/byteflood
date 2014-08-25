@@ -193,11 +193,9 @@ namespace ByteFlood
        
         public TorrentInfo CreateTorrentInfo(TorrentManager tm)
         {
-            
             ce.Register(tm);
             tm.Start();
-            TorrentInfo t = new TorrentInfo(uiContext);
-            t.Torrent = tm;
+            TorrentInfo t = new TorrentInfo(uiContext, tm);
             t.Update();
             return t;
         }
