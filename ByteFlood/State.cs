@@ -154,6 +154,12 @@ namespace ByteFlood
             if (file_data != null)
             {
                 string path = System.IO.Path.Combine(App.Settings.DefaultDownloadPath, mg.InfoHash.ToHex() + ".torrent");
+
+                if (!Directory.Exists(App.Settings.DefaultDownloadPath)) 
+                {
+                    Directory.CreateDirectory(App.Settings.DefaultDownloadPath);
+                }
+
                 File.WriteAllBytes(path, file_data);
                 this.AddTorrentByPath(path);
             }
