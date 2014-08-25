@@ -73,6 +73,8 @@ namespace ByteFlood
         [XmlIgnore]
         public Brush UploadBrush { get { return new SolidColorBrush(UploadColor); } }
 
+        public bool AssociationAsked { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -101,7 +103,8 @@ namespace ByteFlood
                     TrayIconClickBehavior = TrayIconBehavior.ContextMenu,
                     TrayIconDoubleClickBehavior = TrayIconBehavior.ShowHide,
                     TrayIconRightClickBehavior = TrayIconBehavior.ContextMenu,
-                    DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties
+                    DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties,
+                    AssociationAsked = false
                 };
             }
         }

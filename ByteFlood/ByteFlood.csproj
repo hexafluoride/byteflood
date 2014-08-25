@@ -102,6 +102,9 @@
     <Compile Include="Formatters\TimeSpanToString.cs" />
     <Compile Include="GraphDrawer.cs" />
     <Compile Include="InfoClasses\TorrentInfo.cs" />
+    <Compile Include="UI\ApplicationError.xaml.cs">
+      <DependentUpon>ApplicationError.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Preferences.xaml.cs">
       <DependentUpon>Preferences.xaml</DependentUpon>
     </Compile>
@@ -126,6 +129,10 @@
     <Page Include="UI\AddTorrentDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ApplicationError.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

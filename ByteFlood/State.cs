@@ -67,10 +67,15 @@ namespace ByteFlood
             ce.RegisterDht(dht);
             ce.DhtEngine.Start();
 
-            bool assoc = Utility.Associated();
-            if (!assoc &&
-                MessageBox.Show("Do you want to associate ByteFlood with .torrent files?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                Utility.SetAssociation();
+            if (!App.Settings.AssociationAsked) 
+            { 
+                bool assoc = Utility.Associated();
+                if (!assoc &&
+                         MessageBox.Show("Do you want to associate ByteFlood with .torrent files?", 
+                         "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    Utility.SetAssociation();
+                App.Settings.AssociationAsked = true;
+            }
             //MessageBox.Show(assoc.ToString());
             listener = new Listener(this);
             listener.State = this;
