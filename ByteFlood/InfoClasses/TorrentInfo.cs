@@ -156,14 +156,17 @@ namespace ByteFlood
         
         private void Torrent_PeerConnected(object sender, PeerConnectionEventArgs e)
         {
-            PeerInfo pi = new PeerInfo() 
+            if (!Peers.ContainsKey(e.PeerID.PeerID))
             {
-                AddressBytes = e.PeerID.AddressBytes,
-                Client = e.PeerID.ClientApp.Client == Client.Unknown ? e.PeerID.ClientApp.ShortId : e.PeerID.ClientApp.Client.ToString(),
-                IP = e.PeerID.Uri.ToString(),
-                PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent)
-            };
-            this.context.Send(x => Peers.Add(e.PeerID.PeerID, pi), null);
+                PeerInfo pi = new PeerInfo()
+                {
+                    AddressBytes = e.PeerID.AddressBytes,
+                    Client = e.PeerID.ClientApp.Client == Client.Unknown ? e.PeerID.ClientApp.ShortId : e.PeerID.ClientApp.Client.ToString(),
+                    IP = e.PeerID.Uri.ToString(),
+                    PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent)
+                };
+                this.context.Send(x => { Peers.Add(e.PeerID.PeerID, pi); }, null);
+            }
         }
 
         private void Torrent_PeerDisconnected(object sender, PeerConnectionEventArgs e)

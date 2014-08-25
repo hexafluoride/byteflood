@@ -172,18 +172,32 @@ namespace ByteFlood
 
         public static void Serialize<T>(T t, string path)
         {
+            string temp_file = path + ".b";
             try
             {
-                XmlWriter xw = XmlWriter.Create(path, new XmlWriterSettings()
+                using (XmlWriter xw = XmlWriter.Create(temp_file, new XmlWriterSettings()
                 {
                     Indent = true
-                });
-                new XmlSerializer(typeof(T)).Serialize(xw, t);
-                xw.Flush();
+                }))
+                {
+                    new XmlSerializer(typeof(T)).Serialize(xw, t);
+                    xw.Flush();
+                }
+                // Check if the new generated file is not corrupted.
+                // The XML Serializer can file and destroy old data (such as state data)
+                System.IO.FileInfo fi = new System.IO.FileInfo(temp_file);
+
+                if (fi.Exists && fi.Length > 0) 
+                {
+                    //Delete old file and replace with new one
+                    File.Delete(path);
+                    File.Move(temp_file, path);
+                }
             }
-            catch
+            catch 
             {
-                // ignore silently
+                if (File.Exists(temp_file)) { File.Delete(temp_file); }
+                return;
             }
         }
 
