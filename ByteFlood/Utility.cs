@@ -187,14 +187,14 @@ namespace ByteFlood
                 // The XML Serializer can file and destroy old data (such as state data)
                 System.IO.FileInfo fi = new System.IO.FileInfo(temp_file);
 
-                if (fi.Exists && fi.Length > 0) 
+                if (fi.Exists && fi.Length > 0)
                 {
                     //Delete old file and replace with new one
                     File.Delete(path);
                     File.Move(temp_file, path);
                 }
             }
-            catch 
+            catch
             {
                 if (File.Exists(temp_file)) { File.Delete(temp_file); }
                 return;
@@ -325,6 +325,32 @@ namespace ByteFlood
                     return memory.ToArray();
                 }
             }
+        }
+
+        public static string CleanFileName(string name)
+        {
+            StringBuilder n = new StringBuilder();
+            foreach (char c in name)
+            {
+                if (c == '/' ||
+                    c == '\\' ||
+                    c == ':' ||
+                     c == '*' ||
+                     c == '?' ||
+                     c == '"' ||
+                     c == '<' ||
+                     c == '>' ||
+                     c == '|')
+                {
+                    continue;
+                }
+                else
+                {
+                    n.Append(c);
+                }
+
+            }
+            return n.ToString();
         }
     }
 }
