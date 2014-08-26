@@ -277,6 +277,7 @@ namespace ByteFlood
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
                     mw.state.ce.Register(this.Torrent);
                     //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
+
                     this.Start();
                 }));
             }

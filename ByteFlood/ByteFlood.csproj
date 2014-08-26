@@ -49,6 +49,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -84,6 +85,9 @@
     <Compile Include="Listener.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
+    <Compile Include="Services\RSS\FeedsManager.cs" />
+    <Compile Include="Services\RSS\RssTorrent.cs" />
+    <Compile Include="Services\RSS\RssUrlEntry.cs" />
     <Compile Include="Services\TorrentCache\ITorrentCache.cs" />
     <Compile Include="Services\TorrentCache\TorCache.cs" />
     <Compile Include="Services\TorrentCache\Torrage.cs" />

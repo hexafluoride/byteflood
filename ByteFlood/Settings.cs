@@ -75,6 +75,8 @@ namespace ByteFlood
 
         public bool AssociationAsked { get; set; }
 
+        public string RssTorrentsStorageDirectory { get; set; }
+
         public static Settings DefaultSettings
         {
             get
