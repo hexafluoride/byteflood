@@ -49,6 +49,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,6 +67,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\PieceBar.xaml.cs">
+      <DependentUpon>PieceBar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PieceView.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
@@ -81,6 +85,9 @@
     <Compile Include="Listener.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
+    <Compile Include="Services\RSS\FeedsManager.cs" />
+    <Compile Include="Services\RSS\RssTorrent.cs" />
+    <Compile Include="Services\RSS\RssUrlEntry.cs" />
     <Compile Include="Services\TorrentCache\ITorrentCache.cs" />
     <Compile Include="Services\TorrentCache\TorCache.cs" />
     <Compile Include="Services\TorrentCache\Torrage.cs" />
@@ -102,6 +109,9 @@
     <Compile Include="Formatters\TimeSpanToString.cs" />
     <Compile Include="GraphDrawer.cs" />
     <Compile Include="InfoClasses\TorrentInfo.cs" />
+    <Compile Include="UI\ApplicationError.xaml.cs">
+      <DependentUpon>ApplicationError.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Preferences.xaml.cs">
       <DependentUpon>Preferences.xaml</DependentUpon>
     </Compile>
@@ -115,6 +125,10 @@
       <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
+    <Page Include="Controls\PieceBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -126,6 +140,10 @@
     <Page Include="UI\AddTorrentDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ApplicationError.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -67,10 +67,15 @@ namespace ByteFlood
             ce.RegisterDht(dht);
             ce.DhtEngine.Start();
 
-            bool assoc = Utility.Associated();
-            if (!assoc &&
-                MessageBox.Show("Do you want to associate ByteFlood with .torrent files?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                Utility.SetAssociation();
+            if (!App.Settings.AssociationAsked) 
+            { 
+                bool assoc = Utility.Associated();
+                if (!assoc &&
+                         MessageBox.Show("Do you want to associate ByteFlood with .torrent files?", 
+                         "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    Utility.SetAssociation();
+                App.Settings.AssociationAsked = true;
+            }
             //MessageBox.Show(assoc.ToString());
             listener = new Listener(this);
             listener.State = this;
@@ -149,6 +154,12 @@ namespace ByteFlood
             if (file_data != null)
             {
                 string path = System.IO.Path.Combine(App.Settings.DefaultDownloadPath, mg.InfoHash.ToHex() + ".torrent");
+
+                if (!Directory.Exists(App.Settings.DefaultDownloadPath)) 
+                {
+                    Directory.CreateDirectory(App.Settings.DefaultDownloadPath);
+                }
+
                 File.WriteAllBytes(path, file_data);
                 this.AddTorrentByPath(path);
             }
@@ -182,11 +193,9 @@ namespace ByteFlood
        
         public TorrentInfo CreateTorrentInfo(TorrentManager tm)
         {
-            
             ce.Register(tm);
             tm.Start();
-            TorrentInfo t = new TorrentInfo(uiContext);
-            t.Torrent = tm;
+            TorrentInfo t = new TorrentInfo(uiContext, tm);
             t.Update();
             return t;
         }

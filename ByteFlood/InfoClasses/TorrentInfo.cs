@@ -23,7 +23,7 @@ namespace ByteFlood
         #region Properties and variables
         public event PropertyChangedEventHandler PropertyChanged;
         [XmlIgnore]
-        public TorrentManager Torrent { get; set; }
+        public TorrentManager Torrent { get; private set; }
         [XmlIgnore]
         public string Ratio { get { return RawRatio.ToString("0.000"); } }
         [XmlIgnore]
@@ -47,14 +47,13 @@ namespace ByteFlood
         public int Leechers { get { return Torrent.Peers.Leechs; }  }
         public long Downloaded { get { return GetDownloadedBytes(); }  }
         public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
-        public string Status { get { return Torrent.State.ToString() == "DontDownload" ? "Don't download" : Torrent.State.ToString(); } }
+        public string Status { get { return Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
         public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.DoNotDownload ? t.Length : 0).Sum(); } }
         public bool ShowOnList
         {
             get
             {
-                
                 if (Torrent == null)
                     return false;
                 return Invisible || ((MainWindow)App.Current.MainWindow).itemselector(this);
@@ -70,13 +69,11 @@ namespace ByteFlood
         [XmlIgnore]
         public ObservableDictionary<string, PeerInfo> Peers = new ObservableDictionary<string, PeerInfo>();
         [XmlIgnore]
+        //public PieceInfo[] Pieces { get; set; }
         public ObservableCollection<PieceInfo> Pieces = new ObservableCollection<PieceInfo>();
         public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
         public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
-        [XmlIgnore]
-        private bool hooked_pieces = false;
-        [XmlIgnore]
-        private bool hooked_peers = false;
+
         private SynchronizationContext context;
         [XmlIgnore]
         public List<float> DownSpeeds
@@ -122,48 +119,68 @@ namespace ByteFlood
         {
         }
 
-        public TorrentInfo(SynchronizationContext c)
+        public TorrentInfo(SynchronizationContext c, TorrentManager tm)
         {
             context = c;
             Name = "";
             StartTime = DateTime.Now;
+            this.Torrent = tm;
+            //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
         }
 
-        private void TryHookPieceHandler()
+        #region Event Handling
+
+        [XmlIgnore]
+        private bool events_hooked = false;
+
+        private void TryHookEvents() 
         {
-            if (hooked_pieces)
+            if (events_hooked)
                 return;
             try
             {
+                if (this.Torrent == null) { return; }
+
                 Torrent.PieceHashed += new EventHandler<PieceHashedEventArgs>(PieceHashed);
-                hooked_pieces = true;
-            }
-            catch { }
-        }
 
-        private void TryHookPeersHandler()
-        {
-            if (hooked_peers)
-                return;
-            try
-            {
                 Torrent.PeerConnected += new EventHandler<PeerConnectionEventArgs>(Torrent_PeerConnected);
                 Torrent.PeerDisconnected += new EventHandler<PeerConnectionEventArgs>(Torrent_PeerDisconnected);
-                hooked_peers = true;
+
+                Torrent.TorrentStateChanged += new EventHandler<TorrentStateChangedEventArgs>(Torrent_TorrentStateChanged);
+
+                events_hooked = true;
             }
             catch { }
+        }
+
+        private void Torrent_TorrentStateChanged(object sender, TorrentStateChangedEventArgs e)
+        {
+           App.Current.Dispatcher.Invoke(new Action(() =>
+           {
+               if (e.NewState != TorrentState.Downloading)
+               {
+                   this.ETA = new TimeSpan(0, 0, 0);
+               }
+               if (PropertyChanged != null)
+               {
+                   UpdateList("ETA", "Status");
+               }
+         }));
         }
         
         private void Torrent_PeerConnected(object sender, PeerConnectionEventArgs e)
         {
-            PeerInfo pi = new PeerInfo() 
+            if (!Peers.ContainsKey(e.PeerID.PeerID))
             {
-                AddressBytes = e.PeerID.AddressBytes,
-                Client = e.PeerID.ClientApp.Client == Client.Unknown ? e.PeerID.ClientApp.ShortId : e.PeerID.ClientApp.Client.ToString(),
-                IP = e.PeerID.Uri.ToString(),
-                PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent)
-            };
-            this.context.Send(x => Peers.Add(e.PeerID.PeerID, pi), null);
+                PeerInfo pi = new PeerInfo()
+                {
+                    AddressBytes = e.PeerID.AddressBytes,
+                    Client = e.PeerID.ClientApp.Client == Client.Unknown ? e.PeerID.ClientApp.ShortId : e.PeerID.ClientApp.Client.ToString(),
+                    IP = e.PeerID.Uri.ToString(),
+                    PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent)
+                };
+                this.context.Send(x => { Peers.Add(e.PeerID.PeerID, pi); }, null);
+            }
         }
 
         private void Torrent_PeerDisconnected(object sender, PeerConnectionEventArgs e)
@@ -177,30 +194,17 @@ namespace ByteFlood
             }, null);
         }
 
-
-        public void Stop()
+        private void PieceHashed(object sender, PieceHashedEventArgs e)
         {
-            Torrent.Stop();
-            this.Peers.Clear();
-        }
-        public void Start()
-        {
-            Torrent.Start();
-        }
-        public void UpdateGraphData()
-        {
-            downspeeds.Add(Torrent.Monitor.DownloadSpeed);
-            upspeeds.Add(Torrent.Monitor.UploadSpeed);
-        }
-        
-        public void Pause()
-        {
-            // TorrentSettings ts = new TorrentSettings();
-
-            Torrent.Pause();
-        }
-        void PieceHashed(object sender, PieceHashedEventArgs e)
-        {
+            //if (this.Pieces[e.PieceIndex] != null)
+            //{
+            //    PieceInfo p = this.Pieces[e.PieceIndex];
+            //    p.Finished = e.HashPassed;
+            //}
+            //else 
+            //{
+            //    this.Pieces[e.PieceIndex] = new PieceInfo() { Finished = e.HashPassed, ID = e.PieceIndex };
+            //}
             if (e.HashPassed)
             {
                 try
@@ -220,6 +224,30 @@ namespace ByteFlood
             pi.Finished = e.HashPassed;
             context.Send(x => Pieces.Add(pi), null);
         }
+       
+        #endregion
+
+        public void Stop()
+        {
+            Torrent.Stop();
+            this.Peers.Clear();
+        }
+        public void Start()
+        {
+            Torrent.Start();
+        }
+        public void UpdateGraphData()
+        {
+            downspeeds.Add(Torrent.Monitor.DownloadSpeed);
+            upspeeds.Add(Torrent.Monitor.UploadSpeed);
+        }
+        
+        public void Pause()
+        {
+            Torrent.Pause();
+        }
+
+
         public void OffMyself() // Dispose
         {
             if (Torrent.State != TorrentState.Stopped)
@@ -248,12 +276,13 @@ namespace ByteFlood
                     
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
                     mw.state.ce.Register(this.Torrent);
+                    //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
+
                     this.Start();
                 }));
             }
 
-            TryHookPieceHandler();
-            TryHookPeersHandler();
+            TryHookEvents();
             try // I hate having to do this
             {
                 UpdateProperties();
@@ -271,7 +300,6 @@ namespace ByteFlood
                         "Downloaded",
                         "Uploaded",
                         "Progress",
-                        "Status",
                         "Ratio", 
                         "ETA", 
                         "Size", 
@@ -380,12 +408,17 @@ namespace ByteFlood
             this.Path = Torrent.Torrent.TorrentPath;
             this.SavePath = Torrent.SavePath;
             this.TorrentSettings = Torrent.Settings;
-            var seconds = 0;
-            if (this.DownloadSpeed > 0)
+            
+            if (this.Torrent.State == TorrentState.Downloading) 
             {
-                seconds = Convert.ToInt32((this.Size - this.Downloaded) / this.DownloadSpeed);
-            }
-            this.ETA = new TimeSpan(0, 0, seconds);
+                var seconds = 0;
+                if (this.DownloadSpeed > 0)
+                {
+                    seconds = Convert.ToInt32((this.Size - this.Downloaded) / this.DownloadSpeed);
+                }
+                this.ETA = new TimeSpan(0, 0, seconds);
+            } 
+
             if (!this.Torrent.Complete)
                 this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)Torrent.Monitor.DataBytesDownloaded);
             else
