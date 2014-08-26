@@ -101,11 +101,13 @@ namespace ByteFlood
 
         private void PickPath(object sender, RoutedEventArgs e)
         {
-            var fd = new System.Windows.Forms.FolderBrowserDialog();
-            fd.ShowNewFolderButton = true;
-            fd.ShowDialog();
-            local.DefaultDownloadPath = fd.SelectedPath;
-            downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+            using (var fd = new System.Windows.Forms.FolderBrowserDialog()) 
+            { 
+                fd.ShowNewFolderButton = true;
+                fd.ShowDialog();
+                local.DefaultDownloadPath = fd.SelectedPath;
+                downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+            }
         }
 
         private void ReloadTheme(object sender, SelectionChangedEventArgs e)

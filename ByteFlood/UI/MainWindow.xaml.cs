@@ -375,7 +375,10 @@ namespace ByteFlood
 
         private void Commands_AddRssFeed(object sender, ExecutedRoutedEventArgs e)
         {
-            return;
+            //Services.RSS.FeedsManager.Add(new Services.RSS.RssUrlEntry() 
+            //{
+            //    Url = "http://www.nyaa.se/?page=rss"
+            //});
         }
 
         private void Commands_OpenPreferences(object sender, ExecutedRoutedEventArgs e)

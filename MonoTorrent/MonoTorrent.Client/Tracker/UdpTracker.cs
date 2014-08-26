@@ -88,7 +88,7 @@ namespace MonoTorrent.Client.Tracker
                 {
                     Connect(new ConnectAnnounceState(parameters, ConnectAnnounceCallback, state));
                 }
-                catch (SocketException)
+                catch (Exception)
                 {
                     DoAnnounceComplete(false, state, new List<Peer>());
                     return;
@@ -192,7 +192,7 @@ namespace MonoTorrent.Client.Tracker
 
         private void Connect(UdpTrackerAsyncState connectState)
         {
-            if (!this.InvalidTracker)
+            if (!this.InvalidTracker && tracker != null)
             {
                 connectState.Message = new ConnectMessage();
                 tracker.Connect(Uri.Host, Uri.Port);
@@ -200,9 +200,10 @@ namespace MonoTorrent.Client.Tracker
             }
             else
             {
+                amConnecting = false;
+                throw new Exception();
                 return;
             }
-
         }
 
         private bool ConnectCallback(IAsyncResult ar)
