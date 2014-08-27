@@ -256,7 +256,7 @@ namespace ByteFlood
                 uiContext.Send(x =>
                 {
                     state.Torrents.Remove(t);
-                    tag = ((MenuItem)e.Source).Tag.ToString();
+                    tag = ((FrameworkElement)e.Source).Tag.ToString();
                 }, null);
                 switch (tag)
                 {
@@ -483,7 +483,13 @@ namespace ByteFlood
             exp2.UpdateSource();
             foreach (Image img in FindVisualChildren<Image>(this))
             {
-                img.GetBindingExpression(Image.VisibilityProperty).UpdateTarget();
+                try
+                {
+                    img.GetBindingExpression(Image.VisibilityProperty).UpdateTarget();
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -630,7 +636,7 @@ namespace ByteFlood
             mainlist.SelectedItems.CopyTo(arr, 0);
             if (arr.Length == 0)
                 return;
-            string tag = ((MenuItem)e.Source).Tag.ToString();
+            string tag = ((FrameworkElement)e.Source).Tag.ToString();
             Action<TorrentInfo> f = new Action<TorrentInfo>(t => {});
             switch (tag)
             {
