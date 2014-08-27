@@ -46,7 +46,7 @@ namespace ByteFlood
         public int Seeders { get { return Torrent.Peers.Seeds; }  }
         public int Leechers { get { return Torrent.Peers.Leechs; }  }
         public long Downloaded { get { return GetDownloadedBytes(); }  }
-        public long Uploaded { get { return Torrent.Monitor.DataBytesUploaded; }  }
+        public long Uploaded { get; set; }
         public string Status { get { return Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
         public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.DoNotDownload ? t.Length : 0).Sum(); } }
@@ -113,6 +113,7 @@ namespace ByteFlood
         };
         [XmlIgnore]
         public List<float> downspeeds = new List<float>();
+        private long up_previous = 0;
         #endregion 
 
         public TorrentInfo() // this is reserved for the XML deserializer.
@@ -386,9 +387,9 @@ namespace ByteFlood
             Parallel.ForEach(Torrent.Torrent.Files, parallel, file =>
             {
                 int index = Utility.QuickFind(Files, file.FullPath);
-                FileInfo fi = new FileInfo();
+                FileInfo fi = new FileInfo(this);
                 fi.Name = file.FullPath;
-                fi.Priority = (file.Priority == Priority.DoNotDownload ? "Don't download" : file.Priority.ToString());
+                fi.ActualPriority = file.Priority;
                 fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
                 fi.RawSize = (uint)file.Length;
                 if (index == -1)
@@ -396,6 +397,7 @@ namespace ByteFlood
                 else
                     context.Send(x => Files[index].SetSelf(fi), null);
             });
+            context.Send(x => Files.OrderBy(t => t.Name), null);
         }
         public void UpdateList(params string[] columns)
         {
@@ -417,12 +419,16 @@ namespace ByteFlood
                     seconds = Convert.ToInt32((this.Size - this.Downloaded) / this.DownloadSpeed);
                 }
                 this.ETA = new TimeSpan(0, 0, seconds);
-            } 
+            }
 
-            if (!this.Torrent.Complete)
-                this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)Torrent.Monitor.DataBytesDownloaded);
-            else
-                this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)GetDownloadedBytes()); // sad :(
+            Uploaded += Torrent.Monitor.DataBytesUploaded - up_previous;
+            up_previous = Torrent.Monitor.DataBytesUploaded;
+            this.RawRatio = ((float)Uploaded / (float)Downloaded);
+
+            //if (!this.Torrent.Complete)
+            //    this.RawRatio = ((float)Uploaded / (float)Torrent.Monitor.DataBytesDownloaded);
+            //else
+            //    this.RawRatio = ((float)Torrent.Monitor.DataBytesUploaded / (float)GetDownloadedBytes()); // sad :(
             if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
             {
                 this.Torrent.Settings.UploadSlots = 0;
