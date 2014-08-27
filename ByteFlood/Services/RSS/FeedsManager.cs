@@ -6,9 +6,13 @@ using System.ServiceModel.Syndication;
 using System.Threading;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace ByteFlood.Services.RSS
 {
+    /// <summary>
+    /// This class handles all RSS-related activities and logic.
+    /// </summary>
     public static class FeedsManager
     {
         private static Dictionary<string, RssUrlEntry> entries = new Dictionary<string, RssUrlEntry>();
