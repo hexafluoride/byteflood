@@ -303,27 +303,34 @@ namespace ByteFlood
         public void ChangePriority(object sender, RoutedEventArgs e)
         {
             string tag = ((MenuItem)e.Source).Tag.ToString();
-            
+            Priority p = (Priority)Enum.Parse(typeof(Priority), tag);
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = (Priority)Enum.Parse(typeof(Priority), tag);
+            foreach (FileInfo fi in files_list.SelectedItems)
+                t.Torrent.Torrent.Files.FirstOrDefault(ti => ti.FullPath == fi.Name).Priority = p;
+            //TorrentInfo t;
+            //if (!GetSelectedTorrent(out t))
+            //    return;
+            //t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = (Priority)Enum.Parse(typeof(Priority), tag);
         }
         public void OpenSelectedFile(object sender, RoutedEventArgs e)
         {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
+            FileInfo fi;
+            if (files_list.SelectedItem == null)
                 return;
-            string path = t.Torrent.Torrent.Files[files_list.SelectedIndex].FullPath;
+            fi = (FileInfo)files_list.SelectedItem;
+            string path = fi.Name;
             if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data. Are you sure that you want to open {0}?", path), "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 Process.Start(path);
         }
         public void OpenSelectedFileLocation(object sender, RoutedEventArgs e)
         {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
+            FileInfo fi;
+            if (files_list.SelectedItem == null)
                 return;
-            string filepath = t.Torrent.Torrent.Files[files_list.SelectedIndex].FullPath;
+            fi = (FileInfo)files_list.SelectedItem;
+            string filepath = fi.Name;
             string dir = new System.IO.FileInfo(filepath).Directory.FullName;
             Process.Start("explorer.exe", "\"" + dir + "\"");
         }

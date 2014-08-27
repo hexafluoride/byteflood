@@ -215,7 +215,7 @@
                         </ListView>
                     </TabItem>
                     <TabItem Header="Files" Name="files">
-                        <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Single">
+                        <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Extended">
                             <ListView.Resources>
                                 <ContextMenu x:Key="ItemContextMenu">
                                     <MenuItem Header="Open" Click="OpenSelectedFile" />
