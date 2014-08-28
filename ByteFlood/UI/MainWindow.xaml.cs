@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,19 +25,14 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using MonoTorrent;
 using MonoTorrent.Client;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
 using System.Diagnostics;
-using System.Net;
+using ByteFlood.Services.RSS;
+using System.Threading.Tasks;
 
 namespace ByteFlood
 {
@@ -382,6 +376,46 @@ namespace ByteFlood
 
         private void Commands_AddRssFeed(object sender, ExecutedRoutedEventArgs e)
         {
+            var query = new UI.AddRSSFeed() { Icon = this.Icon, Owner = this };
+            if (query.ShowDialog() == true) 
+            {
+                if (string.IsNullOrWhiteSpace(query.Url)) 
+                {
+                    MessageBox.Show(this, "Url cannot be empty.", "Error",  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var rss_entry = new RssUrlEntry() 
+                {
+                    Url = query.Url,
+                    Alias = query.CustomAlias,
+                    AutoDownload = query.AutoDownload == true,
+                    FilterExpression = query.FilterExpression,
+                    FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip,
+                    DefaultSettings = new TorrentSettings()
+                };
+
+                Task.Factory.StartNew(new Action(() => 
+                {
+                    if (rss_entry.Test())
+                    {
+                        App.Current.Dispatcher.Invoke(new Action(() => 
+                        {
+                            FeedsManager.Add(rss_entry);
+                        }));
+                    }
+                    else
+                    {
+                       App.Current.Dispatcher.Invoke(new Action(() => {
+                           MessageBox.Show(this,
+                            "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
+                            "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                       }));
+                    }
+
+                }));
+            }
             //Services.RSS.FeedsManager.Add(new Services.RSS.RssUrlEntry() 
             //{
             //    Url = "http://www.nyaa.se/?page=rss"
