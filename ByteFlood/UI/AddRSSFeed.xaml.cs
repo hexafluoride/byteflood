@@ -66,6 +66,15 @@ namespace ByteFlood.UI
         public static readonly DependencyProperty FilterActionProperty =
             DependencyProperty.Register("FilterAction", typeof(int), typeof(AddRSSFeed), new PropertyMetadata(1));
 
+        public bool AllowUrlChange
+        {
+            get { return (bool)GetValue(AllowUrlChangeProperty); }
+            set { SetValue(AllowUrlChangeProperty, value); }
+        }
+
+        public static readonly DependencyProperty AllowUrlChangeProperty =
+            DependencyProperty.Register("AllowUrlChange", typeof(bool), typeof(AddRSSFeed), new PropertyMetadata(true));
+
         #endregion
 
         public AddRSSFeed()

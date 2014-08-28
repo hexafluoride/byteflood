@@ -51,7 +51,7 @@
                     <Setter Property="Image.Opacity" Value="0.5" />
                 </DataTrigger>
             </Style.Triggers>
-            
+
         </Style>
 
         <Path x:Key="Appbar.Rss" Stretch="Uniform" Fill="#FF000000" Data="F1 M 19,19C 39.9868,19 57,36.0132 57,57L 49.0833,57C 49.0833,40.3854 35.969,26.9167 19.7917,26.9167L 19,26.9274L 19,19 Z M 19,31.6667C 32.9912,31.6667 44.3333,43.0088 44.3333,57L 36.4167,57C 36.4167,47.3811 28.619,39.5834 19,39.5834L 19,31.6667 Z M 24.5417,45.9167C 27.6022,45.9167 30.0833,48.3978 30.0833,51.4583C 30.0833,54.5189 27.6022,57 24.5417,57C 21.4811,57 19,54.5189 19,51.4583C 19,48.3978 21.4811,45.9167 24.5417,45.9167 Z "/>
@@ -63,7 +63,7 @@
         <CommandBinding Command="{StaticResource Commands.AddRssFeed}" Executed="Commands_AddRssFeed" />
         <CommandBinding Command="{StaticResource Commands.OpenPreferences}" Executed="Commands_OpenPreferences" />
     </Window.CommandBindings>
-    
+
     <Window.Title>
         <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
             <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -72,7 +72,7 @@
     </Window.Title>
     <Grid Name="ActualSize">
         <DockPanel LastChildFill="False">
-            
+
             <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="150">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
@@ -81,7 +81,28 @@
                     <TreeViewItem Header="{Binding ActiveTorrentCount}" Tag="active" HeaderStringFormat="Active ({0})" Selected="SwitchTorrentDisplay" />
                     <TreeViewItem Header="{Binding FinishedTorrentCount}" Tag="finished" HeaderStringFormat="Finished ({0})" Selected="SwitchTorrentDisplay" />
                 </TreeViewItem>
-                <TreeViewItem Header="Feeds" />
+                <TreeViewItem Header="{Binding ElementName=feeds_tree_item, Path=ItemsSource.Count}"
+                              HeaderStringFormat="Feeds ({0})" Name="feeds_tree_item" Selected="SwitchTorrentDisplay">
+                    <TreeViewItem.Resources>
+                        <ContextMenu x:Key="RssItemContextMenu">
+                            <MenuItem Header="Refresh" Tag="Refresh" DataContext="{Binding}" Click="OperationOnRssItem" />
+                            <MenuItem Header="Remove" Tag="Remove" DataContext="{Binding}" Click="OperationOnRssItem" />
+                            <MenuItem Header="Edit" Tag="Edit"  DataContext="{Binding}" Click="OperationOnRssItem" />
+                        </ContextMenu>
+                    </TreeViewItem.Resources>
+                    <TreeViewItem.ItemTemplate>
+                        <HierarchicalDataTemplate>
+                            <TextBlock Tag="{Binding}" ContextMenu="{StaticResource RssItemContextMenu}">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1})">
+                                        <Binding Path="Name"/>
+                                        <Binding Path="Count"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </HierarchicalDataTemplate>
+                    </TreeViewItem.ItemTemplate>
+                </TreeViewItem>
             </TreeView>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -91,9 +112,9 @@
                 <Button Height="26" HorizontalAlignment="Left" Margin="7,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
                     <Image Source="pack://siteoforigin:,,,/Assets/magnet.png" />
                 </Button>
-                
+
                 <Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" Content="{StaticResource Appbar.Rss}" />
-                
+
                 <Button Height="26" HorizontalAlignment="Left" Margin="7,7,7,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
                     <Image Source="pack://siteoforigin:,,,/Assets/settings.png" />
                 </Button>
@@ -132,7 +153,7 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                        
+
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -185,12 +206,12 @@
                                 <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23"  HorizontalAlignment="Right">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} (avg. {1})">
-                                        <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                        <Binding Path="AverageDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} (avg. {1})">
+                                            <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                            <Binding Path="AverageDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
                                 </TextBlock>
                                 <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Text="{Binding Status}" HorizontalAlignment="Right" />
@@ -201,12 +222,12 @@
                                 <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" HorizontalAlignment="Right">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} (avg. {1})">
-                                        <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                        <Binding Path="AverageUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} (avg. {1})">
+                                            <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                            <Binding Path="AverageUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
                                 </TextBlock>
                                 <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Text="Wasted:" HorizontalAlignment="Right" />
@@ -214,12 +235,12 @@
                                 <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Text="Peers:" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23"  Text="Ratio:" HorizontalAlignment="Right" />
                                 <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" HorizontalAlignment="Right">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} ({1} hashfails)">
-                                        <Binding Path="WastedBytes" Converter="{StaticResource SizeToString}" />
-                                        <Binding Path="HashFails" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1} hashfails)">
+                                            <Binding Path="WastedBytes" Converter="{StaticResource SizeToString}" />
+                                            <Binding Path="HashFails" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
                                 </TextBlock>
                                 <TextBlock Height="23" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" HorizontalAlignment="Right" />
                                 <TextBlock Height="23" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" HorizontalAlignment="Right" />
@@ -316,7 +337,8 @@
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                                     <Image Height="18" Width="18" ToolTip="{Binding Value.Client}" Source="{Binding Value.Client, Converter={StaticResource PeerSoftwareToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='ClientIconVisibility'}" />
-                                                    <Separator Visibility="Hidden" Width="4"/><!-- epic -->
+                                                    <Separator Visibility="Hidden" Width="4"/>
+                                                    <!-- epic -->
                                                     <TextBlock Text="{Binding Value.Client}"/>
                                                 </StackPanel>
                                             </DataTemplate>

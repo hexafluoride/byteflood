@@ -16,7 +16,7 @@
     <Canvas>
 
         <TextBlock Text="Feed url:" FontSize="16" Canvas.Left="10" Canvas.Top="20" />
-        <TextBox Text="{Binding Url}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="16"/>
+        <TextBox Text="{Binding Url}" IsEnabled="{Binding AllowUrlChange}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="16"/>
 
         <TextBlock Text="Custom Alias:" FontSize="16" Canvas.Left="10" Canvas.Top="59" />
         <TextBox Text="{Binding CustomAlias}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="55"/>

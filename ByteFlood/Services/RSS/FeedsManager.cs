@@ -8,7 +8,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-
+using System.Collections.ObjectModel;
 namespace ByteFlood.Services.RSS
 {
     /// <summary>
@@ -16,7 +16,19 @@ namespace ByteFlood.Services.RSS
     /// </summary>
     public static class FeedsManager
     {
-        private static ObservableDictionary<string, RssUrlEntry> entries = new ObservableDictionary<string, RssUrlEntry>();
+        private static Dictionary<string, RssUrlEntry> entries = new Dictionary<string, RssUrlEntry>();
+
+        public static ObservableCollection<RssUrlEntry> EntriesList { get; set; }
+
+        private static List<string> url_404 = new List<string>();
+
+        private static State AppState
+        {
+            get
+            {
+                return ((MainWindow)App.Current.MainWindow).state;
+            }
+        }
 
         public static string RssTorrentsStorageDirectory
         {
@@ -33,12 +45,20 @@ namespace ByteFlood.Services.RSS
             }
         }
 
+        private static string EntriesSavePath
+        {
+            get { return "./rss-items.xml"; }
+        }
+
         static FeedsManager()
         {
             if (!Directory.Exists(RssTorrentsStorageDirectory))
             {
                 Directory.CreateDirectory(RssTorrentsStorageDirectory);
             }
+            EntriesList = new ObservableCollection<RssUrlEntry>();
+
+            Load();
 
             Thread work = new Thread(loop);
             work.IsBackground = true;
@@ -54,11 +74,11 @@ namespace ByteFlood.Services.RSS
                     RssUrlEntry[] v = entries.Values.ToArray();
                     foreach (var a in v)
                     {
-                       RssTorrent[] rt = a.Update();
-                       if (rt != null) 
-                       {
-                           Process_NewRssItems(a, rt);
-                       }
+                        RssTorrent[] rt = a.Update();
+                        if (rt != null)
+                        {
+                            Process_NewRssItems(a, rt);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -78,17 +98,39 @@ namespace ByteFlood.Services.RSS
                 if (!entries.ContainsKey(entry.Url))
                 {
                     entries.Add(entry.Url, entry);
+                    EntriesList.Add(entry);
+                    Save();
                 }
             }
         }
 
-        private static List<string> url_404 = new List<string>();
-
-        private static State AppState
+        public static void Remove(RssUrlEntry entry)
         {
-            get
+            if (entries.ContainsKey(entry.Url))
             {
-                return ((MainWindow)App.Current.MainWindow).state;
+                entries.Remove(entry.Url);
+                EntriesList.Remove(entry);
+                Save();
+            }
+        }
+
+        public static void ForceUpdate(RssUrlEntry entry)
+        {
+            entry.ForceUpdate();
+        }
+
+        public static void Save()
+        {
+            RssUrlEntry[] items = entries.Values.ToArray();
+            Utility.Serialize<RssUrlEntry[]>(items, EntriesSavePath);
+        }
+
+        public static void Load()
+        {
+            if (File.Exists(EntriesSavePath))
+            {
+                RssUrlEntry[] it = Utility.Deserialize<RssUrlEntry[]>(EntriesSavePath);
+                foreach (var i in it) { Add(i); }
             }
         }
 
@@ -100,7 +142,7 @@ namespace ByteFlood.Services.RSS
 
                 string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name) + ".torrent");
 
-                if (File.Exists(save_path)) 
+                if (File.Exists(save_path))
                 {
                     //re-load from cache
                     App.Current.Dispatcher.Invoke(new Action(() =>
@@ -119,8 +161,8 @@ namespace ByteFlood.Services.RSS
                     {
                         File.WriteAllBytes(save_path, data);
                         App.Current.Dispatcher.Invoke(new Action(() =>
-                        { 
-                             AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                        {
+                            AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
                         }));
                     }
                     else
