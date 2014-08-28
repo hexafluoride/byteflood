@@ -35,6 +35,9 @@ namespace ByteFlood.Services.TorrentCache
                 }
                 catch (Exception) { return null; }
 
+                if (gzip_data == null || gzip_data.Length == 0)
+                    return null;
+
                 byte[] data = Utility.DecompressGzip(gzip_data);
 
                 return data;
