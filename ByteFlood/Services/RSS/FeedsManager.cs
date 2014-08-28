@@ -7,6 +7,7 @@ using System.Threading;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace ByteFlood.Services.RSS
 {
@@ -73,53 +74,95 @@ namespace ByteFlood.Services.RSS
             }
         }
 
+        private static List<string> url_404 = new List<string>();
+
+        private static State AppState
+        {
+            get
+            {
+                return ((MainWindow)App.Current.MainWindow).state;
+            }
+        }
+
         static void entry_NewItems(RssUrlEntry entry, RssTorrent[] new_items)
         {
             foreach (var nitem in new_items)
             {
+                if (url_404.Contains(nitem.TorrentFileUrl)) { continue; }
+
                 string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name));
 
-                byte[] data = download(nitem.TorrentFileUrl);
+                var res = download(nitem.TorrentFileUrl);
 
-                if (data != null && data.Length > 0)
+                if (res.Type == DownloadRssResponse.ResonseType.OK)
                 {
-                    File.WriteAllBytes(save_path, data);
-                    if (entry.AutoDownload)
+                    byte[] data = res.Data;
+                    if (data.Length > 0)
                     {
-                        //((MainWindow)App.Current.MainWindow).state.AddTorrentByPath(save_path);
+                        File.WriteAllBytes(save_path, data);
+                        AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                    }
+                    else
+                    {
+                        //What should we do?
+                        continue;
                     }
                 }
-                else 
+                if (res.Type == DownloadRssResponse.ResonseType.NotFound)
                 {
-                    // TODO: Check why this failed, and retry later except when the error is 
-                    // 404 not found
+                    if (!url_404.Contains(nitem.TorrentFileUrl))
+                    {
+                        url_404.Add(nitem.TorrentFileUrl);
+                        Debug.WriteLine("[Rssdownloader]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl);
+                    }
+                }
+                else
+                {
+                    //breakpoint time
+                    continue;
                 }
             }
         }
 
-        static byte[] download(string url)
+        private static DownloadRssResponse download(string url)
         {
             try
             {
                 using (WebClient nc = new WebClient())
                 {
-                    return nc.DownloadData(url);
+                    byte[] data = nc.DownloadData(url);
+                    return new DownloadRssResponse()
+                    {
+                        Data = data,
+                        Type = DownloadRssResponse.ResonseType.OK
+                    };
                 }
             }
             catch (WebException wex)
             {
                 if (wex.Message.Contains("404"))
                 {
-                    return null;
+                    return new DownloadRssResponse()
+                    {
+                        Type = DownloadRssResponse.ResonseType.NotFound
+                    };
                 }
                 else
                 {
-                    return null;
+                    return new DownloadRssResponse()
+                    {
+                        Type = DownloadRssResponse.ResonseType.NetFail,
+                        Error = wex
+                    };
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                return new DownloadRssResponse()
+                {
+                    Type = DownloadRssResponse.ResonseType.Fail,
+                    Error = ex
+                };
             }
         }
 
@@ -140,5 +183,15 @@ namespace ByteFlood.Services.RSS
 
             return rt;
         }
+
+        private struct DownloadRssResponse
+        {
+            public ResonseType Type;
+            public byte[] Data;
+            public Exception Error;
+            public enum ResonseType { Fail, NetFail, NotFound, OK }
+        }
+
+
     }
 }
