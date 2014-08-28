@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using System.ServiceModel.Syndication;
 using System.Net;
 using System.Diagnostics;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
+
 namespace ByteFlood.Services.RSS
 {
-    public class RssUrlEntry
+    public class RssUrlEntry : INotifyPropertyChanged
     {
         public string Url { get; set; }
 
@@ -34,6 +36,38 @@ namespace ByteFlood.Services.RSS
         private int tick = 1000;
 
         private Dictionary<string, RssTorrent> items = new Dictionary<string, RssTorrent>();
+
+        [XmlIgnore]
+        public string Name
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(this.Alias))
+                {
+                    try
+                    {
+                        return (new Uri(this.Url)).Host;
+                    }
+                    catch
+                    {
+                        return this.Url;
+                    }
+                }
+                else
+                {
+                    return this.Alias;
+                }
+            }
+        }
+
+        [XmlIgnore]
+        public int Count
+        {
+            get
+            {
+                return items.Count;
+            }
+        }
 
         /// <summary>
         /// Return an array of RssTorrent when new items are found, otherwise return null 
@@ -62,8 +96,11 @@ namespace ByteFlood.Services.RSS
                         {
                             RssTorrent rt = item.ToTorrent();
                             time_diff_sum += (start - rt.TimePublished).TotalSeconds;
-                            items.Add(item.Id, rt);
-                            new_item_list.Add(rt);
+                            if (IsAllowed(rt))
+                            {
+                                items.Add(item.Id, rt);
+                                new_item_list.Add(rt);
+                            }
                         }
                         else
                         {
@@ -81,11 +118,17 @@ namespace ByteFlood.Services.RSS
                 if (new_item_list.Count > 0)
                 {
                     Debug.WriteLine("[Feed '{0}']: {1} new item found.", this.Url, new_item_list.Count);
+                    NotifyPropertyChanged("Count");
                     return new_item_list.ToArray();
                 }
             }
 
             return null;
+        }
+
+        public void ForceUpdate()
+        {
+            tick = Convert.ToInt32(this.UpdateInterval.TotalSeconds + 1);
         }
 
         public bool Test()
@@ -118,11 +161,57 @@ namespace ByteFlood.Services.RSS
                     return true;
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return false;
             }
         }
 
+        [XmlIgnore]
+        Regex m = null;
+
+        private bool IsAllowed(RssTorrent t)
+        {
+            if (!string.IsNullOrWhiteSpace(this.FilterExpression))
+            {
+                if (m == null)
+                {
+                    m = new Regex(this.FilterExpression, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                }
+
+                bool regex_match = m.IsMatch(t.Name);
+
+                if (this.FilterAction == FilterActionEnum.Download)
+                {
+                    return regex_match;
+                }
+                else //In Skip action, we don't want stuffs that match the filter
+                {
+                    return !regex_match;
+                }
+            }
+
+            return true;
+        }
+
+        public void NotifyUpdate() 
+        {
+            this.m = null;
+            NotifyPropertyChanged("Name");
+        }
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string propname)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propname));
+            }
+        }
+
+        #endregion
     }
 }
