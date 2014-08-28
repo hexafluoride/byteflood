@@ -105,7 +105,7 @@
                 <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{StaticResource SelectedItemChecker}" VerticalAlignment="Top" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents">
                     <Image Source="pack://siteoforigin:,,,/Assets/pause.png" />
                 </Button>
-                <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{StaticResource SelectedItemChecker}" VerticalAlignment="Top" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrent">
+                <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{StaticResource SelectedItemChecker}" VerticalAlignment="Top" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents">
                     <Image Source="pack://siteoforigin:,,,/Assets/remove.png" />
                 </Button>
             </StackPanel>
@@ -118,11 +118,11 @@
                         <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
                         <Separator />
                         <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
-                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrent" />
+                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrents" />
                         <MenuItem Header="Remove and" Background="WhiteSmoke">
-                            <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrent" />
-                            <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrent" />
-                            <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrent" />
+                            <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrents" />
+                            <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrents" />
+                            <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrents" />
                         </MenuItem>
                     </ContextMenu>
                 </ListView.Resources>
