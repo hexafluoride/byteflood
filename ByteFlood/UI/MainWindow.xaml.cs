@@ -444,9 +444,9 @@ namespace ByteFlood
             foreach (string str in App.to_add)
             {
                 if (Utility.IsMagnetLink(str))
-                    state.AddTorrentByPath(str);
-                else
                     state.AddTorrentByMagnet(str);
+                else
+                    state.AddTorrentByPath(str);
             }
 
             this.DataContext = state.ce;
