@@ -241,24 +241,31 @@ namespace ByteFlood
 
         }
 
-        public void RemoveSelectedTorrent(object sender, RoutedEventArgs e)
+        public void RemoveSelectedTorrents(object sender, RoutedEventArgs e)
         {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
+            if (mainlist.SelectedIndex == -1)
                 return;
+            string tag = ((FrameworkElement)e.Source).Tag.ToString();
+            TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
+            mainlist.SelectedItems.CopyTo(arr, 0);
+            foreach (TorrentInfo ti in arr)
+                RemoveTorrent(ti, tag);
+        }
+
+        public void RemoveTorrent(TorrentInfo t, string action)
+        {
             t.Invisible = true;
             t.UpdateList("Invisible", "ShowOnList");
-            ThreadPool.QueueUserWorkItem(delegate {
+            ThreadPool.QueueUserWorkItem(delegate
+            {
                 t.Torrent.Stop();
                 while (t.Torrent.State != TorrentState.Stopped) ;
                 state.ce.Unregister(t.Torrent);
-                string tag = "";
                 uiContext.Send(x =>
                 {
                     state.Torrents.Remove(t);
-                    tag = ((FrameworkElement)e.Source).Tag.ToString();
                 }, null);
-                switch (tag)
+                switch (action)
                 {
                     case "torrentonly":
                         DeleteTorrent(t);
@@ -475,6 +482,8 @@ namespace ByteFlood
         public void UpdateVisibility()
         {
             //App.Settings.NotifyChanged("TreeViewVisibility", "BottomCanvasVisibility");
+            left_treeview.DataContext = App.Settings;
+            info_canvas.DataContext = App.Settings;
             BindingExpression exp1 = left_treeview.GetBindingExpression(TreeView.VisibilityProperty);
             BindingExpression exp2 = info_canvas.GetBindingExpression(Canvas.VisibilityProperty);
             exp1.UpdateTarget();
