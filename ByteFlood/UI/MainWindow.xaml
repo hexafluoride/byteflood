@@ -175,14 +175,14 @@
                         <ScrollViewer>
                             <Canvas Name="overview_canvas" Height="200" VerticalAlignment="Top">
                                 <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Name="textBlock1" Text="Time elapsed:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Name="textBlock2" Text="Downloaded:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23" Name="textBlock3" Text="Download speed:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" Name="textBlock4" Text="Download speed limit:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Name="textBlock5" Text="Status:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Name="elapsed" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Name="data_down" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23" Name="down_speed" HorizontalAlignment="Right">
+                                <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Text="Time elapsed:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Text="Downloaded:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23" Text="Download speed:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" Text="Download speed limit:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Text="Status:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23"  HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} (avg. {1})">
                                         <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -190,15 +190,15 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Name="down_limit" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Name="status" Text="{Binding Status}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Name="textBlock6" Text="ETA:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Name="textBlock7" Text="Uploaded:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23" Name="textBlock8" Text="Upload speed:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Name="textBlock9" Text="Upload speed limit:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Name="eta" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Name="data_up" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" Name="up_speed" HorizontalAlignment="Right">
+                                <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Text="{Binding Status}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Text="ETA:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Text="Uploaded:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23" Text="Upload speed:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Text="Upload speed limit:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} (avg. {1})">
                                         <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -206,11 +206,11 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Name="up_limit" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Name="textBlock10" Text="Wasted:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Name="textBlock11" Text="Seeds:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Name="textBlock12" Text="Peers:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" Name="textBlock13" Text="Ratio:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Text="Wasted:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Text="Seeds:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Text="Peers:" HorizontalAlignment="Right" />
+                                <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23"  Text="Ratio:" HorizontalAlignment="Right" />
                                 <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} ({1} hashfails)">
@@ -219,9 +219,9 @@
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Height="23" Name="textBlock15" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" HorizontalAlignment="Right" />
-                                <TextBlock Height="23" Name="textBlock16" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" HorizontalAlignment="Right" />
-                                <TextBlock Height="23" Name="textBlock17" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" HorizontalAlignment="Right" />
                             </Canvas>
                         </ScrollViewer>
                     </TabItem>
