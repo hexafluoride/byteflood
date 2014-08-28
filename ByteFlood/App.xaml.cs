@@ -76,21 +76,21 @@ namespace ByteFlood
             {
                 try
                 {
+                    TcpClient tcp = new TcpClient();
+                    tcp.Connect("127.0.0.1", 65432);
+                    NetworkStream ns = tcp.GetStream(); 
+                    Random rnd = new Random();
+                    StreamWriter sw = new StreamWriter(ns);
                     foreach (string str in e.Args)
                     {
-                        TcpClient tcp = new TcpClient();
-                        tcp.Connect("127.0.0.1", 65432);
-                        NetworkStream ns = tcp.GetStream();
-                        StreamWriter sw = new StreamWriter(ns);
                         JsonObject jo = new JsonObject();
-                        Random rnd = new Random();
                         jo.Add("id", rnd.Next());
                         jo.Add("method", "addtorrentbypath");
                         jo.Add("params", new JsonArray() { str });
                         sw.WriteLine(jo.ToString());
                         sw.Flush();
-                        tcp.Close();
-                    }
+                    } 
+                    tcp.Close();
                     Environment.Exit(0);
                 }
                 catch (Exception ex)
