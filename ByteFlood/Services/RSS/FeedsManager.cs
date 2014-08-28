@@ -16,7 +16,7 @@ namespace ByteFlood.Services.RSS
     /// </summary>
     public static class FeedsManager
     {
-        private static Dictionary<string, RssUrlEntry> entries = new Dictionary<string, RssUrlEntry>();
+        private static ObservableDictionary<string, RssUrlEntry> entries = new ObservableDictionary<string, RssUrlEntry>();
 
         public static string RssTorrentsStorageDirectory
         {
@@ -24,7 +24,7 @@ namespace ByteFlood.Services.RSS
             {
                 if (string.IsNullOrEmpty(App.Settings.RssTorrentsStorageDirectory))
                 {
-                    return System.IO.Path.Combine(App.Settings.DefaultDownloadPath, "rss");
+                    return System.IO.Path.Combine(App.Settings.DefaultDownloadPath, "RSS");
                 }
                 else
                 {
@@ -54,10 +54,19 @@ namespace ByteFlood.Services.RSS
                     RssUrlEntry[] v = entries.Values.ToArray();
                     foreach (var a in v)
                     {
-                        a.Update();
+                       RssTorrent[] rt = a.Update();
+                       if (rt != null) 
+                       {
+                           Process_NewRssItems(a, rt);
+                       }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+#if DEBUG
+                    throw;
+#endif
+                }
                 Thread.Sleep(1000);
             }
         }
@@ -69,7 +78,6 @@ namespace ByteFlood.Services.RSS
                 if (!entries.ContainsKey(entry.Url))
                 {
                     entries.Add(entry.Url, entry);
-                    entry.NewItems += entry_NewItems;
                 }
             }
         }
@@ -84,13 +92,23 @@ namespace ByteFlood.Services.RSS
             }
         }
 
-        static void entry_NewItems(RssUrlEntry entry, RssTorrent[] new_items)
+        private static void Process_NewRssItems(RssUrlEntry entry, RssTorrent[] new_items)
         {
             foreach (var nitem in new_items)
             {
                 if (url_404.Contains(nitem.TorrentFileUrl)) { continue; }
 
-                string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name));
+                string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name) + ".torrent");
+
+                if (File.Exists(save_path)) 
+                {
+                    //re-load from cache
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                    }));
+                    continue;
+                }
 
                 var res = download(nitem.TorrentFileUrl);
 
@@ -100,7 +118,10 @@ namespace ByteFlood.Services.RSS
                     if (data.Length > 0)
                     {
                         File.WriteAllBytes(save_path, data);
-                        AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        { 
+                             AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                        }));
                     }
                     else
                     {
@@ -108,12 +129,12 @@ namespace ByteFlood.Services.RSS
                         continue;
                     }
                 }
-                if (res.Type == DownloadRssResponse.ResonseType.NotFound)
+                else if (res.Type == DownloadRssResponse.ResonseType.NotFound)
                 {
                     if (!url_404.Contains(nitem.TorrentFileUrl))
                     {
                         url_404.Add(nitem.TorrentFileUrl);
-                        Debug.WriteLine("[Rssdownloader]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl);
+                        Debug.WriteLine("[Rssdownloader]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl, "");
                     }
                 }
                 else
@@ -165,8 +186,6 @@ namespace ByteFlood.Services.RSS
                 };
             }
         }
-
-        public delegate void NewItemsEvent(RssUrlEntry entry, RssTorrent[] new_items);
 
         public static RssTorrent ToTorrent(this SyndicationItem i)
         {

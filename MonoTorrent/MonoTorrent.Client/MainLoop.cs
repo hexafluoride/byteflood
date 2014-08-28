@@ -117,6 +117,12 @@ namespace MonoTorrent.Client
                 }
                 catch (Exception ex)
                 {
+                    if (ex.GetType() == typeof(System.ObjectDisposedException)) 
+                    {
+                        handle.Set();
+                        return;
+                    }
+
                     storedException = ex;
 
                     // FIXME: I assume this case can't happen. The only user interaction

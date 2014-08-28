@@ -53,6 +53,8 @@
             </Style.Triggers>
             
         </Style>
+
+        <Path x:Key="Appbar.Rss" Stretch="Uniform" Fill="#FF000000" Data="F1 M 19,19C 39.9868,19 57,36.0132 57,57L 49.0833,57C 49.0833,40.3854 35.969,26.9167 19.7917,26.9167L 19,26.9274L 19,19 Z M 19,31.6667C 32.9912,31.6667 44.3333,43.0088 44.3333,57L 36.4167,57C 36.4167,47.3811 28.619,39.5834 19,39.5834L 19,31.6667 Z M 24.5417,45.9167C 27.6022,45.9167 30.0833,48.3978 30.0833,51.4583C 30.0833,54.5189 27.6022,57 24.5417,57C 21.4811,57 19,54.5189 19,51.4583C 19,48.3978 21.4811,45.9167 24.5417,45.9167 Z "/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -89,9 +91,9 @@
                 <Button Height="26" HorizontalAlignment="Left" Margin="7,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
                     <Image Source="pack://siteoforigin:,,,/Assets/magnet.png" />
                 </Button>
-                <!--<Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" >
-                    <Image Source="pack://siteoforigin:,,,/Assets/rss.png" />
-                </Button>-->
+                
+                <Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" Content="{StaticResource Appbar.Rss}" />
+                
                 <Button Height="26" HorizontalAlignment="Left" Margin="7,7,7,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
                     <Image Source="pack://siteoforigin:,,,/Assets/settings.png" />
                 </Button>
