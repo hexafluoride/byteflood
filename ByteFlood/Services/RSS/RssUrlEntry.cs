@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.ServiceModel.Syndication;
 using System.Net;
-
+using System.Diagnostics;
 namespace ByteFlood.Services.RSS
 {
     public class RssUrlEntry
@@ -20,6 +20,8 @@ namespace ByteFlood.Services.RSS
         public string FilterExpression { get; set; }
 
         public bool AutoDownload { get; set; }
+
+        public MonoTorrent.Client.TorrentSettings DefaultSettings { get; set; }
 
         [XmlIgnore]
         private TimeSpan UpdateInterval = new TimeSpan(0, 15, 0);
@@ -36,6 +38,8 @@ namespace ByteFlood.Services.RSS
 
             if (tick >= UpdateInterval.TotalSeconds)
             {
+                Debug.WriteLine("[Feed '{0}']: update started.", this.Url);
+
                 DateTime start = DateTime.Now;
 
                 List<RssTorrent> new_item_list = new List<RssTorrent>();
@@ -54,23 +58,26 @@ namespace ByteFlood.Services.RSS
                             items.Add(item.Id, rt);
                             new_item_list.Add(rt);
                         }
-                        else 
+                        else
                         {
                             time_diff_sum += (start - items[item.Id].TimePublished).TotalSeconds;
                         }
                     }
                 }
 
-                if (new_item_list.Count > 0 && this.NewItems != null) 
+                if (new_item_list.Count > 0 && this.NewItems != null)
                 {
+                    Debug.WriteLine("[Feed '{0}']: {1} new item found.", this.Url, new_item_list.Count);
                     NewItems(this, new_item_list.ToArray());
                 }
 
                 this.UpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(time_diff_sum / items.Count()));
+                Debug.WriteLine("[Feed '{0}']: Calculated update interval: {1} sec", this.Url, this.UpdateInterval.TotalSeconds);
                 tick = 0;
+
+                Debug.WriteLine("[Feed '{0}']: update terminated.", this.Url);
             }
         }
-
 
         public event FeedsManager.NewItemsEvent NewItems;
     }
