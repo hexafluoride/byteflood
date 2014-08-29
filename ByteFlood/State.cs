@@ -182,7 +182,7 @@ namespace ByteFlood
             try { mg = new MagnetLink(magnet); }
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
 
-            byte[] file_data = this.GetMagnetFromCache(mg);
+            byte[] file_data = GetMagnetFromCache(mg);
 
             if (file_data != null)
             {
@@ -204,14 +204,14 @@ namespace ByteFlood
         }
 
         [XmlIgnore]
-        private Services.TorrentCache.ITorrentCache[] TorrentCaches = new Services.TorrentCache.ITorrentCache[] 
+        private static Services.TorrentCache.ITorrentCache[] TorrentCaches = new Services.TorrentCache.ITorrentCache[] 
         {
             new Services.TorrentCache.TorCache(),
             new Services.TorrentCache.Torrage(),
             new Services.TorrentCache.ZoinkIT()
         };
 
-        private byte[] GetMagnetFromCache(MagnetLink mg) 
+        public static byte[] GetMagnetFromCache(MagnetLink mg) 
         {
             for (int i = 0; i < TorrentCaches.Length; i++) 
             {
@@ -223,7 +223,17 @@ namespace ByteFlood
 
             return null;
         }
-       
+
+        public static byte[] GetMagnetFromCache(string uri) 
+        {
+            MagnetLink mg = null;
+
+            try { mg = new MagnetLink(uri); }
+            catch { return null; }
+
+            return GetMagnetFromCache(mg);
+        }
+
         public TorrentInfo CreateTorrentInfo(TorrentManager tm)
         {
             ce.Register(tm);
