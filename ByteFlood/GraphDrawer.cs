@@ -165,6 +165,8 @@ namespace ByteFlood
                 double h_loc = Utility.CalculateLocation(spp, d);
                 h_loc -= h_margin;
                 h_loc = height - h_loc;
+                h_loc = Math.Round(h_loc, 0, MidpointRounding.ToEven);
+                w_loc = Math.Round(w_loc, 0, MidpointRounding.ToEven);
                 Line line = Utility.GenerateLine(xprev, yprev, w_loc, h_loc, color);
                 if (yprev == height)
                     yprev = h_loc;
