@@ -153,6 +153,8 @@ namespace ByteFlood
 
             uiContext.Send(x =>
             {
+                if (Torrents.Any(tinf => tinf.Torrent.Torrent.InfoHash == t.InfoHash))
+                    return;
                 TorrentManager tm = new TorrentManager(t, App.Settings.DefaultDownloadPath, ts);
                 TorrentInfo ti = CreateTorrentInfo(tm);
                 ti.Name = t.Name;
