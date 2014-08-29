@@ -194,6 +194,12 @@ namespace ByteFlood.Services.RSS
                 using (WebClient nc = new WebClient())
                 {
                     byte[] data = nc.DownloadData(url);
+                    foreach (string header in nc.ResponseHeaders.AllKeys)
+                    {
+                        if (header == "Content-Encoding")
+                            if (nc.ResponseHeaders[header] == "gzip")
+                                data = Utility.DecompressGzip(data);
+                    }
                     return new DownloadRssResponse()
                     {
                         Data = data,
@@ -232,17 +238,26 @@ namespace ByteFlood.Services.RSS
         public static RssTorrent ToTorrent(this SyndicationItem i)
         {
             var rt = new RssTorrent();
-            rt.Name = i.Title.Text;
-            if (i.Links.Count > 0)
+            try
             {
-                rt.TorrentFileUrl = i.Links[0].Uri.ToString();
+                rt.Name = i.Title.Text;
+                if (i.Links.Count > 0)
+                {
+                    rt.TorrentFileUrl = i.Links.FirstOrDefault(t => t.RelationshipType == "enclosure").Uri.ToString();
+                }
+
+                rt.TimePublished = i.PublishDate.DateTime;
+
+                rt.Summary = i.Summary.Text;
+
+                return rt;
             }
-
-            rt.TimePublished = i.PublishDate.DateTime;
-
-            rt.Summary = i.Summary.Text;
-
-            return rt;
+            catch (NullReferenceException ex)
+            {
+                if (rt != null) // try to recover as much info as we can
+                    return rt;
+                throw;
+            }
         }
 
         private struct DownloadRssResponse
