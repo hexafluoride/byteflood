@@ -29,14 +29,6 @@ namespace ByteFlood.Services.RSS
 
         public MonoTorrent.Client.TorrentSettings DefaultSettings { get; set; }
 
-        private static State AppState
-        {
-            get
-            {
-                return ((MainWindow)App.Current.MainWindow).state;
-            }
-        }
-
         [XmlIgnore]
         private TimeSpan UpdateInterval = new TimeSpan(0, 15, 0);
 
@@ -73,7 +65,7 @@ namespace ByteFlood.Services.RSS
         {
             get
             {
-                return items.Count(rt => AppState.Torrents.Any(ti => ti.Path == rt.Value.TorrentFilePath));
+                return items.Count(rt => FeedsManager.AppState.Torrents.Any(ti => ti.Path == rt.Value.TorrentFilePath));
             }
         }
 
@@ -95,11 +87,13 @@ namespace ByteFlood.Services.RSS
 
                 double time_diff_sum = 0;
 
-                using (XmlReader r = XmlReader.Create(this.Url))
+                using (XmlReader r = XmlReader.Create(this.Url, 
+                    new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
                 {
                     SyndicationFeed feed = SyndicationFeed.Load(r);
                     foreach (SyndicationItem item in feed.Items)
                     {
+                        
                         if (!items.ContainsKey(item.Id))
                         {
                             RssTorrent rt = item.ToTorrent();
@@ -149,7 +143,8 @@ namespace ByteFlood.Services.RSS
                     byte[] data = nc.DownloadData(this.Url);
                     // Test1 passed: valid URL and server response
 
-                    using (XmlReader r = XmlReader.Create(new System.IO.MemoryStream(data)))
+                    using (XmlReader r = XmlReader.Create(new System.IO.MemoryStream(data), 
+                        new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
                     {
                         SyndicationFeed feed = SyndicationFeed.Load(r);
                     }

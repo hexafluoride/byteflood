@@ -734,6 +734,7 @@ namespace ByteFlood
                         entry.FilterExpression = query.FilterExpression;
                         entry.AutoDownload = query.AutoDownload == true;
                         entry.NotifyUpdate();
+                        FeedsManager.Save();
                     }
                     break;
             }
