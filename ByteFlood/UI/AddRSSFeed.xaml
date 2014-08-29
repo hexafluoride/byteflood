@@ -26,8 +26,8 @@
             <Canvas>
                 <CheckBox IsChecked="{Binding AutoDownload}" Content="Automatically download new items" FontSize="13" Canvas.Left="10" Canvas.Top="10" Width="442"/>
                 <TextBlock Text="Filter expression:" FontSize="13" Canvas.Left="9" Canvas.Top="42" Height="22" Width="97" />
-                <TextBox Text="{Binding FilterExpression}" Height="25" Width="341" Canvas.Left="111" Canvas.Top="39"/>
-                <TextBlock Text="(filter expression will run on torrent names)" FontSize="10" Canvas.Left="10" Canvas.Top="64" />
+                <TextBox Text="{Binding FilterExpression}" FontSize="14" Height="25" Width="341" Canvas.Left="111" Canvas.Top="39"/>
+                <TextBlock Text="(filter expression will run on torrent names, expression is case-insensitive)" FontSize="10" Canvas.Left="10" Canvas.Top="64" />
 
                 <TextBlock Text="Filter action:" FontSize="13" Canvas.Left="10" Canvas.Top="93" Height="22" Width="97" />
                 <ComboBox SelectedIndex="{Binding FilterAction}" Height="27" Width="154" Canvas.Left="112" Canvas.Top="88"

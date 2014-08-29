@@ -176,7 +176,7 @@ namespace ByteFlood.Services.RSS
             {
                 if (m == null)
                 {
-                    m = new Regex(this.FilterExpression, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    m = new Regex(Regex.Escape(this.FilterExpression), RegexOptions.Compiled | RegexOptions.IgnoreCase);
                 }
 
                 bool regex_match = m.IsMatch(t.Name);
