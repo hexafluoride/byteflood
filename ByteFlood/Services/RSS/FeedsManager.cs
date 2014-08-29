@@ -243,9 +243,14 @@ namespace ByteFlood.Services.RSS
             try
             {
                 rt.Name = i.Title.Text;
+
                 if (i.Links.Count > 0)
                 {
-                    rt.TorrentFileUrl = i.Links.FirstOrDefault(t => t.RelationshipType == "enclosure").Uri.ToString();
+                    var results = i.Links.Where(t => t.RelationshipType == "enclosure");
+                    if (results.Count() == 0)
+                        rt.TorrentFileUrl = i.Links[0].Uri.ToString();
+                    else
+                        rt.TorrentFileUrl = results.First().Uri.ToString();
                 }
 
                 rt.TimePublished = i.PublishDate.DateTime;
