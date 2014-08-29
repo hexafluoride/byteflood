@@ -142,6 +142,32 @@ namespace ByteFlood
             }, null);
         }
 
+        public void AddTorrentRss(string path, TorrentSettings ts, bool autostart) 
+        {
+            Torrent t = null;
+            try
+            {
+               t = Torrent.Load(path);
+            }
+            catch { return; }
+
+            uiContext.Send(x =>
+            {
+                TorrentManager tm = new TorrentManager(t, App.Settings.DefaultDownloadPath, ts);
+                TorrentInfo ti = CreateTorrentInfo(tm);
+                ti.Name = t.Name;
+                if (autostart) 
+                {
+                    ti.Start();
+                }
+                else
+                {
+                    ti.Stop();
+                }
+                Torrents.Add(ti);
+            }, null);
+        }
+
         public void AddTorrentByMagnet(string magnet) 
         {
             MagnetLink mg = null;

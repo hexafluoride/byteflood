@@ -7,7 +7,8 @@ using System.Threading;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
-
+using System.Diagnostics;
+using System.Collections.ObjectModel;
 namespace ByteFlood.Services.RSS
 {
     /// <summary>
@@ -17,13 +18,25 @@ namespace ByteFlood.Services.RSS
     {
         private static Dictionary<string, RssUrlEntry> entries = new Dictionary<string, RssUrlEntry>();
 
+        public static ObservableCollection<RssUrlEntry> EntriesList { get; set; }
+
+        private static List<string> url_404 = new List<string>();
+
+        private static State AppState
+        {
+            get
+            {
+                return ((MainWindow)App.Current.MainWindow).state;
+            }
+        }
+
         public static string RssTorrentsStorageDirectory
         {
             get
             {
                 if (string.IsNullOrEmpty(App.Settings.RssTorrentsStorageDirectory))
                 {
-                    return System.IO.Path.Combine(App.Settings.DefaultDownloadPath, "rss");
+                    return System.IO.Path.Combine(App.Settings.DefaultDownloadPath, "RSS");
                 }
                 else
                 {
@@ -32,12 +45,20 @@ namespace ByteFlood.Services.RSS
             }
         }
 
+        private static string EntriesSavePath
+        {
+            get { return "./rss-items.xml"; }
+        }
+
         static FeedsManager()
         {
             if (!Directory.Exists(RssTorrentsStorageDirectory))
             {
                 Directory.CreateDirectory(RssTorrentsStorageDirectory);
             }
+            EntriesList = new ObservableCollection<RssUrlEntry>();
+
+            Load();
 
             Thread work = new Thread(loop);
             work.IsBackground = true;
@@ -53,10 +74,19 @@ namespace ByteFlood.Services.RSS
                     RssUrlEntry[] v = entries.Values.ToArray();
                     foreach (var a in v)
                     {
-                        a.Update();
+                        RssTorrent[] rt = a.Update();
+                        if (rt != null)
+                        {
+                            Process_NewRssItems(a, rt);
+                        }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+#if DEBUG
+                    throw;
+#endif
+                }
                 Thread.Sleep(1000);
             }
         }
@@ -68,62 +98,136 @@ namespace ByteFlood.Services.RSS
                 if (!entries.ContainsKey(entry.Url))
                 {
                     entries.Add(entry.Url, entry);
-                    entry.NewItems += entry_NewItems;
+                    EntriesList.Add(entry);
+                    Save();
                 }
             }
         }
 
-        static void entry_NewItems(RssUrlEntry entry, RssTorrent[] new_items)
+        public static void Remove(RssUrlEntry entry)
+        {
+            if (entries.ContainsKey(entry.Url))
+            {
+                entries.Remove(entry.Url);
+                EntriesList.Remove(entry);
+                Save();
+            }
+        }
+
+        public static void ForceUpdate(RssUrlEntry entry)
+        {
+            entry.ForceUpdate();
+        }
+
+        public static void Save()
+        {
+            RssUrlEntry[] items = entries.Values.ToArray();
+            Utility.Serialize<RssUrlEntry[]>(items, EntriesSavePath);
+        }
+
+        public static void Load()
+        {
+            if (File.Exists(EntriesSavePath))
+            {
+                RssUrlEntry[] it = Utility.Deserialize<RssUrlEntry[]>(EntriesSavePath);
+                foreach (var i in it) { Add(i); }
+            }
+        }
+
+        private static void Process_NewRssItems(RssUrlEntry entry, RssTorrent[] new_items)
         {
             foreach (var nitem in new_items)
             {
-                string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name));
+                if (url_404.Contains(nitem.TorrentFileUrl)) { continue; }
 
-                byte[] data = download(nitem.TorrentFileUrl);
+                string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name) + ".torrent");
 
-                if (data != null && data.Length > 0)
+                if (File.Exists(save_path))
                 {
-                    File.WriteAllBytes(save_path, data);
-                    if (entry.AutoDownload)
+                    //re-load from cache
+                    App.Current.Dispatcher.Invoke(new Action(() =>
                     {
-                        //((MainWindow)App.Current.MainWindow).state.AddTorrentByPath(save_path);
+                        AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                    }));
+                    continue;
+                }
+
+                var res = download(nitem.TorrentFileUrl);
+
+                if (res.Type == DownloadRssResponse.ResonseType.OK)
+                {
+                    byte[] data = res.Data;
+                    if (data.Length > 0)
+                    {
+                        File.WriteAllBytes(save_path, data);
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                        }));
+                    }
+                    else
+                    {
+                        //What should we do?
+                        continue;
                     }
                 }
-                else 
+                else if (res.Type == DownloadRssResponse.ResonseType.NotFound)
                 {
-                    // TODO: Check why this failed, and retry later except when the error is 
-                    // 404 not found
+                    if (!url_404.Contains(nitem.TorrentFileUrl))
+                    {
+                        url_404.Add(nitem.TorrentFileUrl);
+                        Debug.WriteLine("[Rssdownloader]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl, "");
+                    }
+                }
+                else
+                {
+                    //breakpoint time
+                    continue;
                 }
             }
         }
 
-        static byte[] download(string url)
+        private static DownloadRssResponse download(string url)
         {
             try
             {
                 using (WebClient nc = new WebClient())
                 {
-                    return nc.DownloadData(url);
+                    byte[] data = nc.DownloadData(url);
+                    return new DownloadRssResponse()
+                    {
+                        Data = data,
+                        Type = DownloadRssResponse.ResonseType.OK
+                    };
                 }
             }
             catch (WebException wex)
             {
                 if (wex.Message.Contains("404"))
                 {
-                    return null;
+                    return new DownloadRssResponse()
+                    {
+                        Type = DownloadRssResponse.ResonseType.NotFound
+                    };
                 }
                 else
                 {
-                    return null;
+                    return new DownloadRssResponse()
+                    {
+                        Type = DownloadRssResponse.ResonseType.NetFail,
+                        Error = wex
+                    };
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                return new DownloadRssResponse()
+                {
+                    Type = DownloadRssResponse.ResonseType.Fail,
+                    Error = ex
+                };
             }
         }
-
-        public delegate void NewItemsEvent(RssUrlEntry entry, RssTorrent[] new_items);
 
         public static RssTorrent ToTorrent(this SyndicationItem i)
         {
@@ -140,5 +244,15 @@ namespace ByteFlood.Services.RSS
 
             return rt;
         }
+
+        private struct DownloadRssResponse
+        {
+            public ResonseType Type;
+            public byte[] Data;
+            public Exception Error;
+            public enum ResonseType { Fail, NetFail, NotFound, OK }
+        }
+
+
     }
 }

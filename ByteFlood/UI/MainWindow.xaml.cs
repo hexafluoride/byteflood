@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,19 +25,14 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using MonoTorrent;
 using MonoTorrent.Client;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
 using System.Diagnostics;
-using System.Net;
+using ByteFlood.Services.RSS;
+using System.Threading.Tasks;
 
 namespace ByteFlood
 {
@@ -47,6 +41,7 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
+        RssUrlEntry SelectedRssEntry = null;
         bool gripped = false;
         bool ignoreclose = true;
         //bool closing = false;
@@ -101,9 +96,9 @@ namespace ByteFlood
                 graph.DrawGrid(size.Left, size.Top, size.Right, size.Bottom);
         }
 
-        
 
-        
+
+
         public void Update()
         {
             while (true)
@@ -178,13 +173,13 @@ namespace ByteFlood
                 string text = (string)data.GetData(typeof(string));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    if (text.StartsWith("magnet:?")) 
+                    if (text.StartsWith("magnet:?"))
                     {
-                       state.AddTorrentByMagnet(text);
+                        state.AddTorrentByMagnet(text);
                     }
                 }
             }
-            else 
+            else
             {
                 string toppest = (string)data.GetFileDropList()[0];
                 state.AddTorrentByPath(toppest);
@@ -381,7 +376,7 @@ namespace ByteFlood
         {
             var dialog = new UI.AddMagnetTextInputDialog() { Owner = this, Icon = this.Icon };
 
-            if (dialog.ShowDialog().Value == true) 
+            if (dialog.ShowDialog().Value == true)
             {
                 this.state.AddTorrentByMagnet(dialog.Input);
             }
@@ -389,6 +384,47 @@ namespace ByteFlood
 
         private void Commands_AddRssFeed(object sender, ExecutedRoutedEventArgs e)
         {
+            var query = new UI.AddRSSFeed() { Icon = this.Icon, Owner = this };
+            if (query.ShowDialog() == true)
+            {
+                if (string.IsNullOrWhiteSpace(query.Url))
+                {
+                    MessageBox.Show(this, "Url cannot be empty.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var rss_entry = new RssUrlEntry()
+                {
+                    Url = query.Url,
+                    Alias = query.CustomAlias,
+                    AutoDownload = query.AutoDownload == true,
+                    FilterExpression = query.FilterExpression,
+                    FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip,
+                    DefaultSettings = new TorrentSettings()
+                };
+
+                Task.Factory.StartNew(new Action(() =>
+                {
+                    if (rss_entry.Test())
+                    {
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            FeedsManager.Add(rss_entry);
+                        }));
+                    }
+                    else
+                    {
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            MessageBox.Show(this,
+                             "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
+                             "Error",
+                             MessageBoxButton.OK, MessageBoxImage.Error);
+                        }));
+                    }
+
+                }));
+            }
             //Services.RSS.FeedsManager.Add(new Services.RSS.RssUrlEntry() 
             //{
             //    Url = "http://www.nyaa.se/?page=rss"
@@ -447,7 +483,7 @@ namespace ByteFlood
             torrents_treeview.DataContext = state;
             itemselector = ShowAll;
             graph = new GraphDrawer(graph_canvas);
-            
+
             foreach (string str in App.to_add)
             {
                 if (Utility.IsMagnetLink(str))
@@ -459,6 +495,7 @@ namespace ByteFlood
             this.DataContext = state.ce;
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
+            feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
         }
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
@@ -646,7 +683,7 @@ namespace ByteFlood
             if (arr.Length == 0)
                 return;
             string tag = ((FrameworkElement)e.Source).Tag.ToString();
-            Action<TorrentInfo> f = new Action<TorrentInfo>(t => {});
+            Action<TorrentInfo> f = new Action<TorrentInfo>(t => { });
             switch (tag)
             {
                 case "Start":
@@ -662,6 +699,43 @@ namespace ByteFlood
             foreach (TorrentInfo ti in arr)
             {
                 f(ti);
+            }
+        }
+
+        private void OperationOnRssItem(object sender, RoutedEventArgs e)
+        {
+            RssUrlEntry entry = null;
+
+            MenuItem source = (MenuItem)e.Source;
+
+            entry = (RssUrlEntry)source.DataContext;
+
+            switch (source.Tag.ToString())
+            {
+                case "Refresh":
+                    FeedsManager.ForceUpdate(entry);
+                    break;
+                case "Remove":
+                    FeedsManager.Remove(entry);
+                    break;
+                case "Edit":
+                    var query = new UI.AddRSSFeed() { Owner = this, Icon = this.Icon, Title = "Edit rss feed" };
+                    query.AllowUrlChange = false;
+                    query.Url = entry.Url;
+                    query.CustomAlias = entry.Alias;
+                    query.FilterExpression = entry.FilterExpression;
+                    query.FilterAction = entry.FilterAction == RssUrlEntry.FilterActionEnum.Download ? 0 : 1;
+                    query.AutoDownload = entry.AutoDownload;
+                    
+                    if (query.ShowDialog() == true)
+                    {
+                        entry.FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip;
+                        entry.Alias = query.CustomAlias;
+                        entry.FilterExpression = query.FilterExpression;
+                        entry.AutoDownload = query.AutoDownload == true;
+                        entry.NotifyUpdate();
+                    }
+                    break;
             }
         }
 
