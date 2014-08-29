@@ -29,6 +29,14 @@ namespace ByteFlood.Services.RSS
 
         public MonoTorrent.Client.TorrentSettings DefaultSettings { get; set; }
 
+        private static State AppState
+        {
+            get
+            {
+                return ((MainWindow)App.Current.MainWindow).state;
+            }
+        }
+
         [XmlIgnore]
         private TimeSpan UpdateInterval = new TimeSpan(0, 15, 0);
 
@@ -65,7 +73,7 @@ namespace ByteFlood.Services.RSS
         {
             get
             {
-                return items.Count;
+                return items.Count(rt => AppState.Torrents.Any(ti => ti.Path == rt.Value.TorrentFilePath));
             }
         }
 
@@ -197,18 +205,19 @@ namespace ByteFlood.Services.RSS
         public void NotifyUpdate() 
         {
             this.m = null;
-            NotifyPropertyChanged("Name");
+            NotifyPropertyChanged("Name", "Count");
         }
 
         #region INotifyPropertyChanged Implementation
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged(string propname)
+        private void NotifyPropertyChanged(params string[] propnames)
         {
             if (PropertyChanged != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propname));
+                foreach(string propname in propnames)
+                    PropertyChanged(this, new PropertyChangedEventArgs(propname));
             }
         }
 

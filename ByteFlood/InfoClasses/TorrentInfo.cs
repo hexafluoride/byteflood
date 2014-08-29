@@ -401,6 +401,8 @@ namespace ByteFlood
         }
         public void UpdateList(params string[] columns)
         {
+            if (PropertyChanged == null)
+                return;
             foreach (string str in columns)
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
