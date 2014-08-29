@@ -79,6 +79,7 @@ namespace ByteFlood.Services.RSS
                         {
                             Process_NewRssItems(a, rt);
                         }
+                        a.NotifyUpdate();
                     }
                 }
                 catch (Exception ex)
@@ -141,13 +142,14 @@ namespace ByteFlood.Services.RSS
                 if (url_404.Contains(nitem.TorrentFileUrl)) { continue; }
 
                 string save_path = Path.Combine(RssTorrentsStorageDirectory, Utility.CleanFileName(nitem.Name) + ".torrent");
+                nitem.TorrentFilePath = save_path;
 
                 if (File.Exists(save_path))
                 {
                     //re-load from cache
                     App.Current.Dispatcher.Invoke(new Action(() =>
                     {
-                        AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                        nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
                     }));
                     continue;
                 }
@@ -162,7 +164,7 @@ namespace ByteFlood.Services.RSS
                         File.WriteAllBytes(save_path, data);
                         App.Current.Dispatcher.Invoke(new Action(() =>
                         {
-                            AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                            nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
                         }));
                     }
                     else

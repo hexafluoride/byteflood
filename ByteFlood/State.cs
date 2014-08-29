@@ -142,19 +142,23 @@ namespace ByteFlood
             }, null);
         }
 
-        public void AddTorrentRss(string path, TorrentSettings ts, bool autostart) 
+        public bool AddTorrentRss(string path, TorrentSettings ts, bool autostart) 
         {
             Torrent t = null;
             try
             {
                t = Torrent.Load(path);
             }
-            catch { return; }
+            catch { return false; }
 
+            bool success = true;
             uiContext.Send(x =>
             {
                 if (Torrents.Any(tinf => tinf.Torrent.Torrent.InfoHash == t.InfoHash))
+                {
+                    success = false;
                     return;
+                }
                 TorrentManager tm = new TorrentManager(t, App.Settings.DefaultDownloadPath, ts);
                 TorrentInfo ti = CreateTorrentInfo(tm);
                 ti.Name = t.Name;
@@ -168,6 +172,7 @@ namespace ByteFlood
                 }
                 Torrents.Add(ti);
             }, null);
+            return success;
         }
 
         public void AddTorrentByMagnet(string magnet) 
