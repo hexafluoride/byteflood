@@ -388,7 +388,7 @@ namespace ByteFlood
             {
                 int index = Utility.QuickFind(Files, file.FullPath);
                 FileInfo fi = new FileInfo(this);
-                fi.Name = file.FullPath;
+                fi.Name = (App.Settings.ShowRelativePaths ? file.Path : file.FullPath);
                 fi.ActualPriority = file.Priority;
                 fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
                 fi.RawSize = (uint)file.Length;
