@@ -58,6 +58,7 @@ namespace ByteFlood
             InitializeComponent();
             tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
             this.DataContext = tm;
+            ratiolimit.Text = (0f).ToString("0.000");
             foreach (TorrentFile file in tm.Torrent.Files)
             {
                 FileInfo fi = new FileInfo();
