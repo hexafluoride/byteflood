@@ -44,6 +44,7 @@ namespace ByteFlood
         RssUrlEntry SelectedRssEntry = null;
         bool gripped = false;
         bool ignoreclose = true;
+        DateTime lastsave = DateTime.Now.Subtract(new TimeSpan(1, 0, 0));
         //bool closing = false;
         Thread thr;
         //bool bound = false;
@@ -137,6 +138,12 @@ namespace ByteFlood
                         state.NotifyChanged(str + "Torrents", str + "TorrentCount");
                     }
                     state.NotifyChanged("TorrentCount");
+
+                    if ((DateTime.Now - lastsave).TotalMinutes > 1)
+                    {
+                        state.SaveState();
+                        lastsave = DateTime.Now;
+                    }
                 }
                 catch
                 {
