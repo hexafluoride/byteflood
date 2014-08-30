@@ -215,7 +215,6 @@ namespace ByteFlood
             {
                 // when on Aero2, simply setting IsEnabled to false will result in an ugly background.
                 // Having ugly hacks instead of ugly UI is better IMO.
-                newstyle.Setters.Add(new Setter(Button.IsHitTestVisibleProperty, false));
                 Style newimagestyle = new Style(typeof(Image), null); // we have to create a style for the Image because the button is technically not disabled
                 DataTrigger trig = new DataTrigger();                 // so we have to dim the Image to make it look disabled and sleek.
                 Binding b = new Binding();
@@ -226,6 +225,22 @@ namespace ByteFlood
                 trig.Setters.Add(new Setter(Image.OpacityProperty, 0.5d));
                 newimagestyle.Triggers.Add(trig);
                 mw.Resources["SelectedItemCheckerImage"] = newimagestyle;
+
+                DataTrigger trig2 = new DataTrigger();
+                trig2.Binding = b;
+                trig2.Value = -1;
+                trig2.Setters.Add(new Setter(Button.IsHitTestVisibleProperty, false));
+                newstyle.Triggers.Add(trig2);
+
+                //Binding b2 = new Binding();
+                //b2.RelativeSource = new RelativeSource(RelativeSourceMode.Self);
+                //b2.Path = new PropertyPath(Button.IsMouseOverProperty);
+
+                //MultiDataTrigger mtrig = new MultiDataTrigger();
+                //mtrig.Conditions.Add(new Condition(b, -1));
+                //mtrig.Conditions.Add(new Condition(b2, true));
+                //mtrig.Setters.Add(new Setter(Button.BackgroundProperty, Brushes.Transparent));
+                //newstyle.Triggers.Add(mtrig);
             }
             else
             {

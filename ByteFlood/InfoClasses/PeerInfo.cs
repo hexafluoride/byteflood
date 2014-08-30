@@ -47,13 +47,7 @@ namespace ByteFlood
         }
 
         public PeerInfo() { }
-        //public void SetSelf(PeerInfo pi)
-        //{
-        //    this.IP = pi.IP;
-        //    this.Client = pi.Client;
-        //    this.PieceInfo = pi.PieceInfo;
-        //    UpdateList("IP", "Client", "PieceInfo", "AddressBytes");
-        //}
+
         public void UpdateList(params string[] columns)
         {
             if (PropertyChanged == null)
