@@ -110,16 +110,20 @@ namespace ByteFlood
         {
             try
             {
-                Torrent.Load(path);
+                Torrent t = Torrent.Load(path);
+                string newfile = t.InfoHash.ToHex() + ".torrent";
+                string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
+                File.Copy(path, newpath);
+                path = newpath;
             }
             catch (TorrentException)
             {
-                MessageBox.Show("Invalid torrent file", "Error");
+                MessageBox.Show(string.Format("Invalid torrent file {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             catch (Exception) 
             {
-                MessageBox.Show("Could not load torrent", "Error");
+                MessageBox.Show(string.Format("Could not load torrent {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
