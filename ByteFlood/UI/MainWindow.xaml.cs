@@ -173,7 +173,7 @@ namespace ByteFlood
                 string text = (string)data.GetData(typeof(string));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    if (text.StartsWith("magnet:?"))
+                    if (Utility.IsMagnetLink(text))
                     {
                         state.AddTorrentByMagnet(text);
                     }

@@ -196,7 +196,7 @@ namespace ByteFlood.Services.RSS
 
         private static DownloadRssResponse download(string url)
         {
-            if (url.StartsWith("magnet"))
+            if (Utility.IsMagnetLink(url))
             {
                 byte[] data = State.GetMagnetFromCache(url);
                 return new DownloadRssResponse()
