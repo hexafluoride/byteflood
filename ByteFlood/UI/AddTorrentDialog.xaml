@@ -83,7 +83,7 @@
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="60,10,0,0" Name="name" VerticalAlignment="Top" Width="246" />
                 <CheckBox Content="Start immediately" Height="16" HorizontalAlignment="Left" Margin="6,40,0,0" Name="start_torrent" IsChecked="True" VerticalAlignment="Top" />
                 <Label Content="Stop seeding when ratio exceeds" Height="28" HorizontalAlignment="Left" Margin="6,62,0,0" Name="label9" VerticalAlignment="Top" />
-                <TextBox Height="23" HorizontalAlignment="Left" Margin="192,65,0,0" Name="ratiolimit" Text="0.000" VerticalAlignment="Top" Width="114" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="192,65,0,0" Name="ratiolimit" VerticalAlignment="Top" Width="114" />
                 <CheckBox Content="Initial seeding" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="212,40,0,0" Name="initial" VerticalAlignment="Top" />
             </Grid>
         </GroupBox>
