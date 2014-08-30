@@ -25,6 +25,7 @@ namespace ByteFlood
         }
        
         public int ID { get; set; }
+
         public PieceInfo() { }
         public void SetSelf(PieceInfo pi)
         {
