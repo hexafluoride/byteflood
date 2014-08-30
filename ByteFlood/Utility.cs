@@ -201,6 +201,41 @@ namespace ByteFlood
             }
         }
 
+        public static void ReloadTheme(Theme t)
+        {
+            var app = (ByteFlood.App)App.Current;
+            app.LoadTheme(t);
+            MainWindow mw = app.MainWindow as MainWindow;
+
+            // I just hope I won't touch this code ever again.
+            Style oldstyle = mw.Resources["SelectedItemCheckerButton"] as Style;
+            Style newstyle = new System.Windows.Style(typeof(Button));
+
+            if (t == Theme.Aero2)
+            {
+                // when on Aero2, simply setting IsEnabled to false will result in an ugly background.
+                // Having ugly hacks instead of ugly UI is better IMO.
+                newstyle.Setters.Add(new Setter(Button.IsHitTestVisibleProperty, false));
+                Style newimagestyle = new Style(typeof(Image), null); // we have to create a style for the Image because the button is technically not disabled
+                DataTrigger trig = new DataTrigger();                 // so we have to dim the Image to make it look disabled and sleek.
+                Binding b = new Binding();
+                b.ElementName = "mainlist";
+                b.Path = new PropertyPath(ListView.SelectedIndexProperty); // checks if an item is selected
+                trig.Binding = b;
+                trig.Value = -1;
+                trig.Setters.Add(new Setter(Image.OpacityProperty, 0.5d));
+                newimagestyle.Triggers.Add(trig);
+                mw.Resources["SelectedItemCheckerImage"] = newimagestyle;
+            }
+            else
+            {
+                foreach (var trigger in oldstyle.Triggers)
+                    newstyle.Triggers.Add(trigger);
+                newstyle.BasedOn = Application.Current.TryFindResource(typeof(Button)) as Style;
+            }
+            mw.Resources["SelectedItemCheckerButton"] = newstyle;
+        }
+
         public static object CloneObject(object source)
         {
             Type type = source.GetType();
