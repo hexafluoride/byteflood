@@ -153,7 +153,7 @@ namespace ByteFlood
 
             foreach (PropertyInfo prop in props)
             {
-                if (prop.CanWrite)
+                if (prop.CanWrite && prop.GetValue(s, null) == null)
                 {
                     if (prop.PropertyType.IsValueType || prop.PropertyType.IsEnum || prop.PropertyType.Equals(typeof(System.String)))
                     {
