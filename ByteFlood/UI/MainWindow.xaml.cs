@@ -496,6 +496,7 @@ namespace ByteFlood
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
+            Utility.ReloadTheme(App.Settings.Theme);
         }
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
