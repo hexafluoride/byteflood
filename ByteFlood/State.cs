@@ -106,6 +106,14 @@ namespace ByteFlood
             State.Save(this, "./state.xml");
         }
 
+        public void AddTorrentsByPath(string[] paths)
+        {
+            foreach (string str in paths)
+            {
+                AddTorrentByPath(str);
+            }
+        }
+
         public void AddTorrentByPath(string path)
         {
             try
@@ -113,7 +121,7 @@ namespace ByteFlood
                 Torrent t = Torrent.Load(path);
                 string newfile = t.InfoHash.ToHex() + ".torrent";
                 string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
-                File.Copy(path, newpath);
+                File.Copy(path, newpath, true);
                 path = newpath;
             }
             catch (TorrentException)
