@@ -113,8 +113,7 @@ namespace ByteFlood
         private void ReloadTheme(object sender, SelectionChangedEventArgs e)
         {
             var t = (Theme)themeCombox.SelectedItem;
-            var app = (ByteFlood.App)App.Current;
-            app.LoadTheme(t);
+            Utility.ReloadTheme(t);
         }
 
         private void ChangeDefaultSettings(object sender, RoutedEventArgs e)
@@ -132,6 +131,7 @@ namespace ByteFlood
             local.TrayIconDoubleClickBehavior = TrayIconBehaviors[tdcb.SelectedIndex];
             local.MinimizeBehavior = WindowBehaviors[mb.SelectedIndex];
             local.ExitBehavior = WindowBehaviors[cb.SelectedIndex];
+            local.Theme = (Theme)themeCombox.SelectedItem;
             App.Settings = (Settings)Utility.CloneObject(local);
             this.Close();
         }

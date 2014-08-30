@@ -16,6 +16,5 @@ Windows XP or up(GNU/Linux will be supported soon!)
 Screenshots
 =========
 
-![Screenshot 1](http://i.imgur.com/FEd7NNf.png)
-![Screenshot 2](http://i.imgur.com/In8tvmo.png)
-![Screenshot 3](http://i.imgur.com/qUPRGEc.png)
+![Screenshot 1](http://i.imgur.com/pESz0NW.png)
+![Screenshot 2](http://i.imgur.com/t6uejeJ.png)

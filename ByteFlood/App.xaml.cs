@@ -106,6 +106,9 @@ namespace ByteFlood
 
             Settings = Settings.Load("./config.xml");
 
+            if (!Directory.Exists(Settings.TorrentFileSavePath))
+                Directory.CreateDirectory(Settings.TorrentFileSavePath);
+
             LoadTheme(Settings.Theme);
         }
 

@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.Serialization;
+using System.Reflection;
 
 namespace ByteFlood
 {
@@ -47,6 +48,7 @@ namespace ByteFlood
         public bool EnableFileRegex { get; set; }
         public bool DownloadAllRSS { get; set; }
         public string RSSRegex { get; set; }
+        public string TorrentFileSavePath { get; set; }
         public bool RSSCheckForDuplicates { get; set; }
         public bool MetroStyleHover { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
@@ -88,6 +90,7 @@ namespace ByteFlood
                     DownloadColor = Colors.Green,
                     UploadColor = Colors.Red,
                     DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
+                    TorrentFileSavePath = "./Torrents",
                     PreferEncryption = true,
                     ListeningPort = 1025,
                     FileRegex = "",
@@ -125,7 +128,7 @@ namespace ByteFlood
             {
                 if (!File.Exists(path))
                     return Settings.DefaultSettings;
-                return Utility.Deserialize<Settings>(path);
+                return Settings.CompleteNullProperties(Utility.Deserialize<Settings>(path));
             }
             catch
             {
@@ -139,6 +142,27 @@ namespace ByteFlood
                 return;
             foreach (string str in props)
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
+        }
+
+        public static Settings CompleteNullProperties(Settings s)
+        {
+            Type type = s.GetType();
+            PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Settings default_settings = Settings.DefaultSettings;
+
+            foreach (PropertyInfo prop in props)
+            {
+                if (prop.CanWrite && prop.GetValue(s, null) == null)
+                {
+                    if (prop.PropertyType.IsValueType || prop.PropertyType.IsEnum || prop.PropertyType.Equals(typeof(System.String)))
+                    {
+                        prop.SetValue(s, prop.GetValue(default_settings, null), null);
+                    }
+                }
+            }
+
+            return s;
         }
     }
 }
