@@ -31,21 +31,25 @@ namespace ByteFlood.UI
 
         public static readonly DependencyProperty InputProperty =
             DependencyProperty.Register("Input", typeof(string), typeof(AddMagnetTextInputDialog), null);
-        
+
 
         #region Commands
 
         private void Commands_PasteFromClipboard(object sender, ExecutedRoutedEventArgs e)
         {
-            if (Clipboard.ContainsText()) 
+            if (Clipboard.ContainsText())
             {
-                this.Input = Clipboard.GetText();
+                string text = Clipboard.GetText();
+                if (Utility.IsMagnetLink(text))
+                {
+                    this.Input = Clipboard.GetText();
+                }
             }
         }
 
         private void Commands_OK(object sender, ExecutedRoutedEventArgs e)
         {
-            this.DialogResult = true; this.Close(); 
+            this.DialogResult = true; this.Close();
         }
 
         private void Commands_Cancel(object sender, ExecutedRoutedEventArgs e)
