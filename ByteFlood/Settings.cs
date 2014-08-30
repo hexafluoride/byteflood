@@ -51,6 +51,7 @@ namespace ByteFlood
         public string TorrentFileSavePath { get; set; }
         public bool RSSCheckForDuplicates { get; set; }
         public bool MetroStyleHover { get; set; }
+        public bool ShowRelativePaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
         public WindowBehavior ExitBehavior { get; set; }
         public TrayIconBehavior TrayIconDoubleClickBehavior { get; set; }
@@ -103,6 +104,7 @@ namespace ByteFlood
                     TreeViewVisible = true,
                     ShowClientIcons = true,
                     ShowFileIcons = true,
+                    ShowRelativePaths = true,
                     MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
                     ExitBehavior = WindowBehavior.MinimizeToTray,
                     TrayIconClickBehavior = TrayIconBehavior.ContextMenu,

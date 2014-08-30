@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MonoTorrent.Common;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace ByteFlood
 {
@@ -19,6 +20,7 @@ namespace ByteFlood
         public string Size { get { return Utility.PrettifyAmount(RawSize); } }
 
         public long RawSize { get; set; }
+        [XmlIgnore]
         public TorrentInfo Parent { get; set; }
         public FileInfo()
         {
