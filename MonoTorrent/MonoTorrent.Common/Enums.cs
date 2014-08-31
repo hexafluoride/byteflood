@@ -77,7 +77,7 @@ namespace MonoTorrent.Common
 
     public enum Priority
     {
-        DoNotDownload = 0,
+        Skip = 0,
         Lowest = 1,
         Low = 2,
         Normal = 4,
