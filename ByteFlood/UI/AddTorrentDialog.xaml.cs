@@ -61,17 +61,14 @@ namespace ByteFlood
             ratiolimit.Text = (0f).ToString("0.000");
             foreach (TorrentFile file in tm.Torrent.Files)
             {
-                FileInfo fi = new FileInfo();
-                fi.Name = file.Path;
+                FileInfo fi = new FileInfo(null, file);
                 fi.DownloadFile = true;
                 if (App.Settings.EnableFileRegex && Regex.IsMatch(fi.Name, App.Settings.FileRegex))
                 {
                     fi.DownloadFile = false;
                     UpdateFile(fi.Name, fi.DownloadFile);
                 }
-                fi.RawSize = file.Length;
                 files.Add(fi);
-                fi.SetSelf(fi);
             }
             
             torrentname = tm.Torrent.Name;
@@ -121,7 +118,7 @@ namespace ByteFlood
             if (download)
                 tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.Normal;
             else
-                tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.DoNotDownload;
+                tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.Skip;
         }
 
         private void button1_Click_1(object sender, RoutedEventArgs e)

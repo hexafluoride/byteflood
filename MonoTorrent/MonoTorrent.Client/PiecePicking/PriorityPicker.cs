@@ -73,7 +73,7 @@ namespace MonoTorrent.Client
 
             if (files.Count == 1)
             {
-                if (files[0].File.Priority == Priority.DoNotDownload)
+                if (files[0].File.Priority == Priority.Skip)
                     return null;
                 else
                     return base.PickPiece(id, peerBitfield, otherPeers, count, startIndex, endIndex);
@@ -81,8 +81,8 @@ namespace MonoTorrent.Client
 
             files.Sort();
 
-            // Fast Path - all the files have been set to DoNotDownload
-            if (files[0].File.Priority == Priority.DoNotDownload)
+            // Fast Path - all the files have been set to Skip
+            if (files[0].File.Priority == Priority.Skip)
                 return null;
 
             // Fast Path - If all the files are the same priority, call straight into the base picker
@@ -90,7 +90,7 @@ namespace MonoTorrent.Client
                 return base.PickPiece(id, peerBitfield, otherPeers, count, startIndex, endIndex);
 
             temp.From(files[0].Selector);
-            for (int i = 1; i < files.Count && files[i].File.Priority != Priority.DoNotDownload; i++)
+            for (int i = 1; i < files.Count && files[i].File.Priority != Priority.Skip; i++)
             {
                 if (files[i].File.Priority != files[i - 1].File.Priority)
                 {
@@ -130,7 +130,7 @@ namespace MonoTorrent.Client
 
             // OR all the files together which we want to download
             for (int i = 0; i < files.Count; i++)
-                if (files[i].File.Priority != Priority.DoNotDownload)
+                if (files[i].File.Priority != Priority.Skip)
                     temp.Or(files[i].Selector);
 
             temp.And(bitfield);
