@@ -70,13 +70,21 @@ namespace ByteFlood
             if (!App.Settings.AssociationAsked) 
             { 
                 bool assoc = Utility.Associated();
-                if (!assoc &&
-                         MessageBox.Show("Do you want to associate ByteFlood with .torrent files?", 
-                         "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    Utility.SetAssociation();
-                App.Settings.AssociationAsked = true;
+                if (!assoc)
+                {
+                    if (MessageBox.Show("Do you want to associate ByteFlood with .torrent files?",
+                             "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        Utility.SetAssociation();
+                        App.Settings.AssociationAsked = true;
+                    }
+                    else if (MessageBox.Show("Do you want to be reminded about associations again?",
+                        "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                        App.Settings.AssociationAsked = true;
+                    else
+                        App.Settings.AssociationAsked = false;
+                }
             }
-            //MessageBox.Show(assoc.ToString());
             listener = new Listener(this);
             listener.State = this;
         }
