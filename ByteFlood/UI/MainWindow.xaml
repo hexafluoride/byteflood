@@ -19,6 +19,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
+        xmlns:bf="clr-namespace:ByteFlood"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:controls="clr-namespace:ByteFlood.Controls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -272,7 +273,7 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Files" Name="files">
+                    <!--<TabItem Header="Files" Name="files">
                         <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Extended">
                             <ListView.Resources>
                                 <ContextMenu x:Key="ItemContextMenu">
@@ -285,7 +286,7 @@
                                         <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
                                         <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
                                         <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
-                                        <MenuItem Header="Don't download" Tag="DoNotDownload" Click="ChangePriority" />
+                                        <MenuItem Header="Don't download" Tag="Skip" Click="ChangePriority" />
                                     </MenuItem>
                                 </ContextMenu>
                             </ListView.Resources>
@@ -321,6 +322,62 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
+                    </TabItem>-->
+                    <TabItem Header="Files">
+                        <TreeView Name="files_tree">
+
+                            <TreeView.Resources>
+
+                                <ContextMenu x:Key="FileItemContextMenu">
+                                    <MenuItem Header="Open" Click="OpenSelectedFile" />
+                                    <MenuItem Header="Open file location" Click="OpenSelectedFileLocation" />
+                                    <MenuItem Header="Set file priority" Background="WhiteSmoke">
+                                        <MenuItem Header="Immediate" Tag="Immediate" Click="ChangePriority" />
+                                        <MenuItem Header="Highest" Tag="Highest" Click="ChangePriority" />
+                                        <MenuItem Header="High" Tag="High" Click="ChangePriority" />
+                                        <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
+                                        <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
+                                        <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
+                                        <MenuItem Header="Skip" Tag="Skip" Click="ChangePriority" />
+                                    </MenuItem>
+                                </ContextMenu>
+
+                                <HierarchicalDataTemplate DataType="{x:Type bf:DirectoryKey}" ItemsSource="{Binding Values}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Height="16" Width="16" Source="pack://siteoforigin:,,,/Assets/folder.png" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
+                                        <Separator Width="3" Visibility="Hidden"/>
+                                        <TextBlock Text="{Binding Name}" FontStyle="Italic" />
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+
+                                <DataTemplate DataType="{x:Type bf:FileInfo}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
+                                        <Separator Width="3" Visibility="Hidden"/>
+                                        <TextBlock Text="{Binding FileName}" />
+                                        <Separator Width="3" Visibility="Hidden"/>
+
+                                        <TextBlock Text="(" />
+                                        <TextBlock Text="{Binding Size}" Foreground="Blue" />
+                                        <TextBlock Text=")" />
+
+                                        <Separator Width="3" Visibility="Hidden"/>
+                                        <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWay}" Height="10" Width="130" ToolTip="{Binding Progress}" />
+                                        <Separator Width="3" Visibility="Hidden"/>
+
+                                        <TextBlock Text="{Binding Priority}" Foreground="Red" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </TreeView.Resources>
+                            
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}" >
+                                    <Setter Property="ContextMenu" Value="{StaticResource FileItemContextMenu}" />
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            
+                        </TreeView>
                     </TabItem>
                     <TabItem Header="Peers" Name="peers">
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

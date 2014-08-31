@@ -162,7 +162,7 @@ namespace MonoTorrent.Client
             // set the high priority set start to the beginning of the first file that we have to download
             foreach (TorrentFile file in files)
             {
-                if (file.Priority == Priority.DoNotDownload)
+                if (file.Priority == Priority.Skip)
                     this.highPrioritySetStart = file.EndPieceIndex;
                 else
                     break;

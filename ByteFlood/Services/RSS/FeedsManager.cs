@@ -22,7 +22,7 @@ namespace ByteFlood.Services.RSS
 
         private static List<string> url_404 = new List<string>();
 
-        private static State AppState
+        public static State AppState
         {
             get
             {
@@ -154,9 +154,9 @@ namespace ByteFlood.Services.RSS
                     continue;
                 }
 
-                var res = download(nitem.TorrentFileUrl);
+                var res = download(nitem.IsMagnetOnly ? nitem.TorrentMagnetUrl : nitem.TorrentFileUrl);
 
-                if (res.Type == DownloadRssResponse.ResonseType.OK)
+                if (res.Type == DownloadRssResponse.ResonseType.OK || res.Type == DownloadRssResponse.ResonseType.MagnetLink)
                 {
                     byte[] data = res.Data;
                     if (data.Length > 0)
@@ -169,6 +169,11 @@ namespace ByteFlood.Services.RSS
                     }
                     else
                     {
+                        if (res.Type == DownloadRssResponse.ResonseType.MagnetLink) 
+                        {
+                            Debug.WriteLine("[Rssdownloader]: Cannot add torrent ({0}) magnet ('{1}') since magnet cache failed to load it.",
+                                nitem.Name, nitem.TorrentMagnetUrl);
+                        }
                         //What should we do?
                         continue;
                     }
@@ -191,6 +196,15 @@ namespace ByteFlood.Services.RSS
 
         private static DownloadRssResponse download(string url)
         {
+            if (Utility.IsMagnetLink(url))
+            {
+                byte[] data = State.GetMagnetFromCache(url);
+                return new DownloadRssResponse()
+                {
+                    Type = DownloadRssResponse.ResonseType.MagnetLink,
+                    Data = data == null ? new byte[0] : data
+                };
+            }
             try
             {
                 using (WebClient nc = new WebClient())
@@ -248,15 +262,31 @@ namespace ByteFlood.Services.RSS
                 {
                     var results = i.Links.Where(t => t.RelationshipType == "enclosure");
                     if (results.Count() == 0)
-                        rt.TorrentFileUrl = i.Links[0].Uri.ToString();
+                    {
+                        //check for magnets links
+                        results = i.Links.Where(t => t.RelationshipType == "alternate");
+                        if (results.Count() == 0)
+                        {
+                            //fallback to whatever link exists
+                            rt.TorrentFileUrl = i.Links[0].Uri.ToString();
+                        }
+                        else
+                        {
+                            rt.TorrentMagnetUrl = results.First().Uri.ToString();
+                        }
+                    }
                     else
+                    {
                         rt.TorrentFileUrl = results.First().Uri.ToString();
+                    }
                 }
 
                 rt.TimePublished = i.PublishDate.DateTime;
 
-                rt.Summary = i.Summary.Text;
-
+                if (i.Summary != null)
+                {
+                    rt.Summary = i.Summary.Text;
+                }
                 return rt;
             }
             catch (NullReferenceException ex)
@@ -272,7 +302,7 @@ namespace ByteFlood.Services.RSS
             public ResonseType Type;
             public byte[] Data;
             public Exception Error;
-            public enum ResonseType { Fail, NetFail, NotFound, OK }
+            public enum ResonseType { Fail, NetFail, NotFound, OK, MagnetLink }
         }
 
 
