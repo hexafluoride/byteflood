@@ -49,7 +49,7 @@ namespace ByteFlood
         public long Uploaded { get; set; }
         public string Status { get { return Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; }  }
-        public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.DoNotDownload ? t.Length : 0).Sum(); } }
+        public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.Skip ? t.Length : 0).Sum(); } }
         public bool ShowOnList
         {
             get
@@ -71,9 +71,10 @@ namespace ByteFlood
         [XmlIgnore]
         //public PieceInfo[] Pieces { get; set; }
         public ObservableCollection<PieceInfo> Pieces = new ObservableCollection<PieceInfo>();
-        public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
+        //public ObservableCollection<FileInfo> Files = new ObservableCollection<FileInfo>();
         public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
-
+        [XmlIgnore]
+        public DirectoryKey FilesTree { get; private set; }
         private SynchronizationContext context;
         [XmlIgnore]
         public List<float> DownSpeeds
@@ -287,12 +288,13 @@ namespace ByteFlood
             try // I hate having to do this
             {
                 UpdateProperties();
+                PopulateFileList();
+
                 //context.Send(x => Peers.Clear(), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
+
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdatePeerList));
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateTrackerList));
-                if (PropertyChanged != null)
-                {
                     UpdateList("DownloadSpeed",
                         "UploadSpeed",
                         "PeerCount",
@@ -313,7 +315,6 @@ namespace ByteFlood
                         "MaxDownloadSpeed",
                         "MaxUploadSpeed",
                         "ShowOnList");
-                }
             }
             catch (Exception ex)
             {
@@ -321,6 +322,28 @@ namespace ByteFlood
                 Console.Error.WriteLine(ex.StackTrace);
             }
         }
+
+        private void PopulateFileList() 
+        {
+            if (this.FilesTree == null) 
+            {
+                if (this.Torrent != null) 
+                {
+                    TorrentFile[] files = this.Torrent.Torrent.Files;
+
+                    DirectoryKey base_dir = new DirectoryKey("/");
+
+                    foreach (var file in files) 
+                    {
+                        DirectoryKey.ProcessFile(file.Path, base_dir,this, file);
+                    }
+
+                    this.FilesTree = base_dir;
+                    UpdateList("FilesTree");
+                }
+            }
+        }
+
         private void UpdateTrackerList(object obj)
         {
             foreach (var tracker in Torrent.Torrent.AnnounceUrls)
@@ -382,23 +405,23 @@ namespace ByteFlood
             //    }
             //});
         }
-        private void UpdateFileList(object obj)
-        {
-            Parallel.ForEach(Torrent.Torrent.Files, parallel, file =>
-            {
-                int index = Utility.QuickFind(Files, file.FullPath);
-                FileInfo fi = new FileInfo(this);
-                fi.Name = (App.Settings.ShowRelativePaths ? file.Path : file.FullPath);
-                fi.ActualPriority = file.Priority;
-                fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
-                fi.RawSize = (uint)file.Length;
-                if (index == -1)
-                    context.Send(x => Files.Add(fi), null);
-                else
-                    context.Send(x => Files[index].SetSelf(fi), null);
-            });
-            context.Send(x => Files.OrderBy(t => t.Name), null);
-        }
+        //private void UpdateFileList(object obj)
+        //{
+        //    Parallel.ForEach(Torrent.Torrent.Files, parallel, file =>
+        //    {
+        //        int index = Utility.QuickFind(Files, file.FullPath);
+        //        FileInfo fi = new FileInfo(this);
+        //        fi.Name = (App.Settings.ShowRelativePaths ? file.Path : file.FullPath);
+        //        fi.ActualPriority = file.Priority;
+        //        fi.Progress = (int)(((float)file.BytesDownloaded / (float)file.Length) * 100);
+        //        fi.RawSize = (uint)file.Length;
+        //        if (index == -1)
+        //            context.Send(x => Files.Add(fi), null);
+        //        else
+        //            context.Send(x => Files[index].SetSelf(fi), null);
+        //    });
+        //    context.Send(x => Files.OrderBy(t => t.Name), null);
+        //}
         public void UpdateList(params string[] columns)
         {
             if (PropertyChanged == null)

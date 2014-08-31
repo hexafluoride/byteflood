@@ -316,8 +316,17 @@ namespace ByteFlood
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            foreach (FileInfo fi in files_list.SelectedItems)
-                t.Torrent.Torrent.Files.FirstOrDefault(ti => ti.FullPath == fi.Name).Priority = p;
+
+            //foreach (FileInfo fi in files_list.SelectedItems)
+            //    t.Torrent.Torrent.Files.FirstOrDefault(ti => ti.FullPath == fi.Name).Priority = p;
+
+            if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
+            {
+                var fi = (FileInfo)files_tree.SelectedItem;
+                fi.ChangePriority(p);
+            }
+
+            return;
             //TorrentInfo t;
             //if (!GetSelectedTorrent(out t))
             //    return;
@@ -325,23 +334,31 @@ namespace ByteFlood
         }
         public void OpenSelectedFile(object sender, RoutedEventArgs e)
         {
-            FileInfo fi;
-            if (files_list.SelectedItem == null)
-                return;
-            fi = (FileInfo)files_list.SelectedItem;
-            string path = fi.Name;
-            if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data. Are you sure that you want to open {0}?", path), "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-                Process.Start(path);
+            if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
+            {
+                FileInfo fi = (FileInfo)files_tree.SelectedItem;
+                string path = fi.Name;
+                if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data. Are you sure that you want to open {0}?", path), "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    if (System.IO.File.Exists(path))
+                    {
+                        Process.Start(path);
+                    }
+                    else 
+                    {
+                        MessageBox.Show("File doesn't exist", "Error");
+                    }
+            }
         }
         public void OpenSelectedFileLocation(object sender, RoutedEventArgs e)
         {
-            FileInfo fi;
-            if (files_list.SelectedItem == null)
-                return;
-            fi = (FileInfo)files_list.SelectedItem;
-            string filepath = fi.Name;
-            string dir = new System.IO.FileInfo(filepath).Directory.FullName;
-            Process.Start("explorer.exe", "\"" + dir + "\"");
+            // TODO: Add support to open DirectoryKeys
+            if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
+            {
+                FileInfo fi = (FileInfo)files_tree.SelectedItem;
+                string filepath = fi.Name;
+                string dir = new System.IO.FileInfo(filepath).Directory.FullName;
+                Process.Start("explorer.exe", "\"" + dir + "\"");
+            }
         }
         public void OpenSelectedTorrentLocation(object sender, RoutedEventArgs e)
         {
@@ -456,7 +473,8 @@ namespace ByteFlood
         private void SetDataContext(TorrentInfo ti)
         {
             peers_list.ItemsSource = ti.Peers;
-            files_list.ItemsSource = ti.Files;
+            //files_list.ItemsSource = ti.Files;
+            files_tree.ItemsSource = ti.FilesTree.Values;
             pieces_list.ItemsSource = ti.Pieces;
             trackers_list.ItemsSource = ti.Trackers;
             overview_canvas.DataContext = ti;
@@ -465,7 +483,8 @@ namespace ByteFlood
         private void ResetDataContext()
         {
             peers_list.ItemsSource = null;
-            files_list.ItemsSource = null;
+            files_tree.ItemsSource = null;
+            //files_list.ItemsSource = null;
             pieces_list.ItemsSource = null;
             trackers_list.ItemsSource = null;
             overview_canvas.DataContext = null;
@@ -734,7 +753,7 @@ namespace ByteFlood
                     query.FilterExpression = entry.FilterExpression;
                     query.FilterAction = entry.FilterAction == RssUrlEntry.FilterActionEnum.Download ? 0 : 1;
                     query.AutoDownload = entry.AutoDownload;
-                    
+
                     if (query.ShowDialog() == true)
                     {
                         entry.FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip;
