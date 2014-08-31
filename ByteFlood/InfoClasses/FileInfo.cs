@@ -18,6 +18,11 @@ namespace ByteFlood
             }
         }
 
+        public string FileName 
+        {
+            get { return this.File.Path.Split(System.IO.Path.DirectorySeparatorChar).Last(); }
+        }
+
         public double Progress { get { return this.File.BitField.PercentComplete; } }
 
         public string Priority
@@ -79,7 +84,7 @@ namespace ByteFlood
 
         public void Update()
         {
-            UpdateList("Progress", "Name"); //The "Name" property should only update when App.Settings.ShowRelativePaths is changed
+            UpdateList("Progress");
         }
 
         #region INotifyPropertyChanged implementation
