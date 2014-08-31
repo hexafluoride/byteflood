@@ -32,6 +32,10 @@ namespace ByteFlood
                 this.File.Priority = pr;
                 UpdateList("Priority");
             }
+            if (this.Owner != null)
+            {
+                this.Owner.SetSavedFilePriority(this, pr);
+            }
         }
 
         public bool DownloadFile
@@ -58,9 +62,24 @@ namespace ByteFlood
 
         public FileInfo() { }
 
+        public TorrentInfo Owner { get; private set; }
+
         public FileInfo(TorrentInfo owner, TorrentFile file)
         {
             this.File = file;
+            this.Owner = owner;
+            if (this.Owner != null)
+            {
+                this.Owner.FileInfoList.Add(this);
+                var saved_pr = this.Owner.GetSavedFilePriority(this);
+
+                this.ChangePriority(saved_pr);
+            }
+        }
+
+        public void Update()
+        {
+            UpdateList("Progress", "Name"); //The "Name" property should only update when App.Settings.ShowRelativePaths is changed
         }
 
         #region INotifyPropertyChanged implementation
@@ -125,6 +144,18 @@ namespace ByteFlood
             }
         }
 
+
+    }
+
+    [Serializable]
+    [XmlType(TypeName = "FilePriority")]
+    public struct FilePriority
+    {
+        public string Key
+        { get; set; }
+
+        public MonoTorrent.Common.Priority Value
+        { get; set; }
 
     }
 
