@@ -440,8 +440,8 @@ namespace ByteFlood
             var results = FilesPriorities.Where(x => x.Key == fi.File.Path);
             if (results.Count() > 0)
             {
-                var fp = this.FilesPriorities.First();
-                fp.Value = pr;
+                this.FilesPriorities.Remove(results.First());
+                this.FilesPriorities.Add(new FilePriority { Key = fi.File.Path, Value = pr });
             }
             else
             {
