@@ -232,6 +232,9 @@
     <Content Include="Assets\add.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\folder.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\icon-16.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
