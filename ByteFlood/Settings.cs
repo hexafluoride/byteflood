@@ -52,6 +52,7 @@ namespace ByteFlood
         public bool RSSCheckForDuplicates { get; set; }
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
+        public bool NotifyOnTray { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
         public WindowBehavior ExitBehavior { get; set; }
         public TrayIconBehavior TrayIconDoubleClickBehavior { get; set; }
@@ -105,6 +106,7 @@ namespace ByteFlood
                     ShowClientIcons = true,
                     ShowFileIcons = true,
                     ShowRelativePaths = true,
+                    NotifyOnTray = true,
                     MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
                     ExitBehavior = WindowBehavior.MinimizeToTray,
                     TrayIconClickBehavior = TrayIconBehavior.ContextMenu,

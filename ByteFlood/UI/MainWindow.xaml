@@ -325,7 +325,7 @@
                     </TabItem>-->
                     <TabItem Header="Files">
                         <StackPanel>
-                            <ListView>
+                            <!--<ListView>
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="Name" Width="100" x:Name="files_name_column" />
@@ -334,7 +334,7 @@
                                         <GridViewColumn Header="Priority" Width="100" x:Name="files_priority_column" />
                                     </GridView>
                                 </ListView.View>
-                            </ListView>
+                            </ListView>-->
 
                             <TreeView Name="files_tree">
 
@@ -355,30 +355,30 @@
                                     </ContextMenu>
                                     <HierarchicalDataTemplate DataType="{x:Type bf:DirectoryKey}" ItemsSource="{Binding Values}">
                                         <StackPanel Orientation="Horizontal">
-                                            <!--<Image Height="16" Width="16" Source="pack://siteoforigin:,,,/Assets/folder.png" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
+                                            <Image Height="16" Width="16" Source="pack://siteoforigin:,,,/Assets/folder.png" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
                                             <Separator Width="3" Visibility="Hidden"/>
-                                            <TextBlock Text="{Binding Name}" FontStyle="Italic" />-->
+                                            <TextBlock Text="{Binding Name}" FontStyle="Italic" />
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
 
                                     <DataTemplate DataType="{x:Type bf:FileInfo}">
                                         <StackPanel Orientation="Horizontal">
-                                            <StackPanel Orientation="Horizontal" Width="{Binding ElementName=files_name_column, Path=Width}">
+                                            <StackPanel Orientation="Horizontal">
                                                 <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
                                                 <Separator Width="3" Visibility="Hidden"/>
                                                 <TextBlock Text="{Binding FileName}" />
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Width="{Binding ElementName=files_size_column, Path=Width}">
+                                            <StackPanel Orientation="Horizontal" >
                                                 <TextBlock Text="(" />
                                                 <TextBlock Text="{Binding Size}" Foreground="Blue" />
                                                 <TextBlock Text=")" />
                                             </StackPanel>
 
-                                            <StackPanel Orientation="Horizontal" Width="{Binding ElementName=files_progress_column, Path=Width}">
+                                            <StackPanel Orientation="Horizontal">
                                                 <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWay}" Height="10" Width="130" ToolTip="{Binding Progress}" />
                                             </StackPanel>
 
-                                            <TextBlock Text="{Binding Priority}" Width="{Binding ElementName=files_priority_column, Path=Width}" Foreground="Red" />
+                                            <TextBlock Text="{Binding Priority}" Foreground="Red" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
