@@ -674,7 +674,8 @@ namespace ByteFlood
                 case WindowBehavior.MinimizeToTray:
                     this.WindowState = System.Windows.WindowState.Minimized;
                     this.ShowInTaskbar = false;
-                    NotifyIcon.ShowBalloonTip("ByteFlood", "ByteFlood has been minimized to the traybar.", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
+                    if(App.Settings.NotifyOnTray)
+                        NotifyIcon.ShowBalloonTip("ByteFlood", "ByteFlood has been minimized to the traybar.", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
                     break;
                 case WindowBehavior.Exit:
                     ignoreclose = false;
