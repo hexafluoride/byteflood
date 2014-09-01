@@ -154,7 +154,7 @@ namespace ByteFlood
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            ExecuteWindowBehavior(WindowBehavior.Exit);
+            ExecuteWindowBehavior(App.Settings.ExitBehavior);
             if (ignoreclose)
                 e.Cancel = true;
             else
