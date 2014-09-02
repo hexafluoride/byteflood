@@ -474,7 +474,7 @@ namespace ByteFlood
         {
             peers_list.ItemsSource = ti.Peers;
             //files_list.ItemsSource = ti.Files;
-            files_tree.ItemsSource = ti.FilesTree.Values;
+            files_tree.Model = ti.FilesTree;
             pieces_list.ItemsSource = ti.Pieces;
             trackers_list.ItemsSource = ti.Trackers;
             overview_canvas.DataContext = ti;
@@ -483,7 +483,7 @@ namespace ByteFlood
         private void ResetDataContext()
         {
             peers_list.ItemsSource = null;
-            files_tree.ItemsSource = null;
+            files_tree.Model = null;
             //files_list.ItemsSource = null;
             pieces_list.ItemsSource = null;
             trackers_list.ItemsSource = null;

@@ -22,10 +22,10 @@
         xmlns:bf="clr-namespace:ByteFlood"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:controls="clr-namespace:ByteFlood.Controls"
+        xmlns:aga="clr-namespace:Aga.Controls.Tree"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen"
         TextOptions.TextFormattingMode="Display"
-        Left="0" Top="0"
         MinHeight="100"
         MinWidth="100"
         Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
@@ -273,10 +273,11 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <!--<TabItem Header="Files" Name="files">
-                        <ListView Name="files_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SelectionMode="Extended">
-                            <ListView.Resources>
-                                <ContextMenu x:Key="ItemContextMenu">
+                    <TabItem Header="Files">
+                        <aga:TreeList x:Name="files_tree">
+                            <aga:TreeList.Resources>
+                                
+                                <ContextMenu x:Key="FileItemContextMenu">
                                     <MenuItem Header="Open" Click="OpenSelectedFile" />
                                     <MenuItem Header="Open file location" Click="OpenSelectedFileLocation" />
                                     <MenuItem Header="Set file priority" Background="WhiteSmoke">
@@ -286,112 +287,87 @@
                                         <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
                                         <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
                                         <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
-                                        <MenuItem Header="Don't download" Tag="Skip" Click="ChangePriority" />
+                                        <MenuItem Header="Skip" Tag="Skip" Click="ChangePriority" />
                                     </MenuItem>
                                 </ContextMenu>
-                            </ListView.Resources>
 
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="{x:Type ListViewItem}" >
-                                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                            <ListView.View>
-                                <GridView>
-
-                                    <GridViewColumn Width="170" Header="Path">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
-                                                    <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-
-                                    <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=file_progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Width="130" Header="Priority" DisplayMemberBinding="{Binding Priority}" />
-                                    <GridViewColumn Width="50" Header="Size" DisplayMemberBinding="{Binding Size}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </TabItem>-->
-                    <TabItem Header="Files">
-                        <StackPanel>
-                            <!--<ListView>
-                                <ListView.View>
-                                    <GridView>
-                                        <GridViewColumn Header="Name" Width="100" x:Name="files_name_column" />
-                                        <GridViewColumn Header="Size" Width="100" x:Name="files_size_column"  />
-                                        <GridViewColumn Header="Progress" Width="100" x:Name="files_progress_column" />
-                                        <GridViewColumn Header="Priority" Width="100" x:Name="files_priority_column" />
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>-->
-
-                            <TreeView Name="files_tree">
-
-                                <TreeView.Resources>
-
-                                    <ContextMenu x:Key="FileItemContextMenu">
-                                        <MenuItem Header="Open" Click="OpenSelectedFile" />
-                                        <MenuItem Header="Open file location" Click="OpenSelectedFileLocation" />
-                                        <MenuItem Header="Set file priority" Background="WhiteSmoke">
-                                            <MenuItem Header="Immediate" Tag="Immediate" Click="ChangePriority" />
-                                            <MenuItem Header="Highest" Tag="Highest" Click="ChangePriority" />
-                                            <MenuItem Header="High" Tag="High" Click="ChangePriority" />
-                                            <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
-                                            <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
-                                            <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
-                                            <MenuItem Header="Skip" Tag="Skip" Click="ChangePriority" />
-                                        </MenuItem>
-                                    </ContextMenu>
-                                    <HierarchicalDataTemplate DataType="{x:Type bf:DirectoryKey}" ItemsSource="{Binding Values}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Height="16" Width="16" Source="pack://siteoforigin:,,,/Assets/folder.png" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
-                                            <Separator Width="3" Visibility="Hidden"/>
-                                            <TextBlock Text="{Binding Name}" FontStyle="Italic" />
-                                        </StackPanel>
-                                    </HierarchicalDataTemplate>
-
-                                    <DataTemplate DataType="{x:Type bf:FileInfo}">
-                                        <StackPanel Orientation="Horizontal">
+                                <controls:FileListTemplateSelector x:Key="FileListPathTemplateSelector">
+                                    <controls:FileListTemplateSelector.DirectoryTemplate>
+                                        <DataTemplate DataType="{x:Type bf:DirectoryKey}">
                                             <StackPanel Orientation="Horizontal">
-                                                <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
+                                                <aga:RowExpander/>
+                                                <Image Height="16" Width="16" Source="pack://siteoforigin:,,,/Assets/folder.png" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
                                                 <Separator Width="3" Visibility="Hidden"/>
-                                                <TextBlock Text="{Binding FileName}" />
+                                                <TextBlock Text="{Binding Name}"/>
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" >
-                                                <TextBlock Text="(" />
-                                                <TextBlock Text="{Binding Size}" Foreground="Blue" />
-                                                <TextBlock Text=")" />
-                                            </StackPanel>
+                                        </DataTemplate>
+                                    </controls:FileListTemplateSelector.DirectoryTemplate>
 
+                                    <controls:FileListTemplateSelector.FileTemplate>
+                                        <DataTemplate DataType="{x:Type bf:FileInfo}">
                                             <StackPanel Orientation="Horizontal">
-                                                <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWay}" Height="10" Width="130" ToolTip="{Binding Progress}" />
+                                                <aga:RowExpander/>
+                                                <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}"/>
+                                                <TextBlock Text="{Binding FileName}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
                                             </StackPanel>
+                                        </DataTemplate>
+                                    </controls:FileListTemplateSelector.FileTemplate>
+                                </controls:FileListTemplateSelector>
 
-                                            <TextBlock Text="{Binding Priority}" Foreground="Red" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </TreeView.Resources>
+                                <controls:FileListTemplateSelector x:Key="FileListProgressTemplateSelector">
+                                    <controls:FileListTemplateSelector.FileTemplate>
+                                        <DataTemplate DataType="{x:Type bf:FileInfo}">
+                                            <ProgressBar Maximum="100" Value="{Binding Progress,Mode=OneWay}" Width="{Binding ElementName=file_progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                        </DataTemplate>
+                                    </controls:FileListTemplateSelector.FileTemplate>
+                                    <controls:FileListTemplateSelector.DirectoryTemplate>
+                                        <DataTemplate></DataTemplate>
+                                    </controls:FileListTemplateSelector.DirectoryTemplate>
+                                </controls:FileListTemplateSelector>
 
-                                <TreeView.ItemContainerStyle>
-                                    <Style TargetType="{x:Type TreeViewItem}" >
-                                        <Setter Property="ContextMenu" Value="{StaticResource FileItemContextMenu}" />
-                                        <Setter Property="FontSize" Value="12"/>
-                                    </Style>
-                                </TreeView.ItemContainerStyle>
+                                <controls:FileListTemplateSelector x:Key="FileListPriorityTemplateSelector">
+                                    <controls:FileListTemplateSelector.FileTemplate>
+                                        <DataTemplate DataType="{x:Type bf:FileInfo}">
+                                            <TextBlock Text="{Binding Priority}" HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </controls:FileListTemplateSelector.FileTemplate>
+                                    
+                                    <controls:FileListTemplateSelector.DirectoryTemplate>
+                                        <DataTemplate></DataTemplate>
+                                    </controls:FileListTemplateSelector.DirectoryTemplate>
+                                </controls:FileListTemplateSelector>
 
-                            </TreeView>
-                        </StackPanel>
+                                <controls:FileListTemplateSelector x:Key="FileListSizeTemplateSelector">
+                                    <controls:FileListTemplateSelector.FileTemplate>
+                                        <DataTemplate DataType="{x:Type bf:FileInfo}">
+                                            <TextBlock Text="{Binding Size}" HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </controls:FileListTemplateSelector.FileTemplate>
+
+                                    <controls:FileListTemplateSelector.DirectoryTemplate>
+                                        <DataTemplate></DataTemplate>
+                                    </controls:FileListTemplateSelector.DirectoryTemplate>
+                                </controls:FileListTemplateSelector>
+
+                            </aga:TreeList.Resources>
+
+                            <aga:TreeList.View>
+                                <GridView>
+                                    <GridViewColumn Width="170" Header="Path" CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
+                                    <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress" CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"/>
+                                    <GridViewColumn Width="130" Header="Priority" CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}" />
+                                    <GridViewColumn Width="50" Header="Size" CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
+                                </GridView>
+                            </aga:TreeList.View>
+
+                            <aga:TreeList.ItemContainerStyle>
+                                <Style TargetType="{x:Type aga:TreeListItem}" >
+                                    <Setter Property="ContextMenu" Value="{StaticResource FileItemContextMenu}" />
+                                </Style>
+                            </aga:TreeList.ItemContainerStyle>
+
+                        </aga:TreeList>
+
                     </TabItem>
                     <TabItem Header="Peers" Name="peers">
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
