@@ -24,6 +24,7 @@ namespace ByteFlood
         public int UploadSlots { get; set; }
         public bool UseDHT { get; set; }
         public bool EnablePeerExchange { get; set; }
+        public string OnFinish { get; set; }
 
         public static TorrentProperties DefaultTorrentProperties = new TorrentProperties()
         {

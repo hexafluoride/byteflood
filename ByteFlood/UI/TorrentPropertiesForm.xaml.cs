@@ -84,8 +84,10 @@ namespace ByteFlood
             tp.UseDHT = (bool)dht.IsChecked;
             tp.EnablePeerExchange = (bool)peerex.IsChecked;
             tp.UploadSlots = int.Parse(uploadslots.Text);
-            if(!fake)
+            if (!fake)
+            {
                 TorrentProperties.Apply(torrent, tp);
+            }
             success = true;
             this.Close();
         }

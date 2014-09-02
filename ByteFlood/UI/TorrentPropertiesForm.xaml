@@ -20,9 +20,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         TextOptions.TextFormattingMode="Display"
         WindowStartupLocation="CenterOwner"
-        Title="Torrent options" Height="292" Width="355" Loaded="Window_Loaded">
+        Title="Torrent options" Height="388" Width="355" Loaded="Window_Loaded">
     <Grid>
-        <GroupBox Header="General" Height="213" HorizontalAlignment="Left" Name="groupBox1" VerticalAlignment="Top" Width="310" Margin="12,0,0,0">
+        <GroupBox Header="General" Height="310" HorizontalAlignment="Left" Name="groupBox1" VerticalAlignment="Top" Width="310" Margin="12,0,0,0">
             <Grid>
                 <Label Content="Maximum download speed(Kb/s): " Height="28" HorizontalAlignment="Left" Margin="10,8,0,0" Name="label1" VerticalAlignment="Top" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="197,12,0,0" Name="maxdown" VerticalAlignment="Top" Width="88" PreviewTextInput="PreviewTextInput" />
@@ -34,9 +34,15 @@
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="197,100,0,0" Name="maxcons" VerticalAlignment="Top" Width="88" PreviewTextInput="PreviewTextInput" />
                 <CheckBox Content="Enable peer exchange" Height="16" HorizontalAlignment="Left" Margin="10,132,0,0" Name="peerex" VerticalAlignment="Top" />
                 <CheckBox Content="Enable DHT" Height="16" HorizontalAlignment="Left" Margin="10,154,0,0" Name="dht" VerticalAlignment="Top" />
+                <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,176,0,0" Name="textBlock1" Text="Command to execute on torrent completion" VerticalAlignment="Top" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="10,196,0,0" Name="textBox1" VerticalAlignment="Top" Width="275" />
+                <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,225,0,0" Text="%s is replaced with the name of the torrent" VerticalAlignment="Top" />
+                <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,245,0,0" Text="%p is replaced with the path of the torrent file" VerticalAlignment="Top" />
+                <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,265,0,0" Text="%d is replaced with the root path of the download" VerticalAlignment="Top" />
+                
             </Grid>
         </GroupBox>
-        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="160,218,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
-        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="241,218,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="166,316,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="247,316,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
     </Grid>
 </Window>

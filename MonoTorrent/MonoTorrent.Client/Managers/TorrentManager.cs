@@ -114,6 +114,11 @@ namespace MonoTorrent.Client
 
         public bool Complete
         {
+            get { return this.Progress == 100d; }
+        }
+
+        public bool ActuallyComplete
+        {
             get { return this.bitfield.AllTrue; }
         }
 
@@ -230,7 +235,20 @@ namespace MonoTorrent.Client
         /// </summary>
         public double Progress
         {
-            get { return (this.bitfield.PercentComplete); }
+            get 
+            {
+                long total = 0;
+                long current = 0;
+                foreach (TorrentFile tf in this.Torrent.Files)
+                {
+                    if (tf.Priority != Priority.Skip)
+                    {
+                        total += tf.Length;
+                        current += tf.BytesDownloaded;
+                    }
+                }
+                return ((double)current / (double)total) * 100d;
+            }
         }
 
 
