@@ -44,7 +44,10 @@
         <RoutedUICommand x:Key="Commands.AddMagnet" />
         <RoutedUICommand x:Key="Commands.AddRssFeed" />
         <RoutedUICommand x:Key="Commands.OpenPreferences" />
+        
         <RoutedUICommand x:Key="TorrentCommands.ChangeFilePriority" />
+        <RoutedUICommand x:Key="TorrentCommands.OpenFile" />
+        <RoutedUICommand x:Key="TorrentCommands.OpenFileLocation" />
 
         <Style x:Key="SelectedItemCheckerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
@@ -70,6 +73,8 @@
         <CommandBinding Command="{StaticResource Commands.AddRssFeed}" Executed="Commands_AddRssFeed" />
         <CommandBinding Command="{StaticResource Commands.OpenPreferences}" Executed="Commands_OpenPreferences" />
         <CommandBinding Command="{StaticResource TorrentCommands.ChangeFilePriority}" Executed="TorrentCommands_ChangeFilePriority" />
+        <CommandBinding Command="{StaticResource TorrentCommands.OpenFile}" Executed="TorrentCommands_OpenFile" />
+        <CommandBinding Command="{StaticResource TorrentCommands.OpenFileLocation}" Executed="TorrentCommands_OpenFileLocation" />
     </Window.CommandBindings>
 
     <Window.Title>
@@ -280,8 +285,8 @@
                             <aga:TreeList.Resources>
                                 
                                 <ContextMenu x:Key="FileItemContextMenu">
-                                    <MenuItem Header="Open" Click="OpenSelectedFile" />
-                                    <MenuItem Header="Open file location" Click="OpenSelectedFileLocation" />
+                                    <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
+                                    <MenuItem Header="Open file location" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
                                     <MenuItem Header="Set priority" Background="WhiteSmoke">
                                         <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
                                         <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
@@ -392,7 +397,6 @@
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                                     <Image Height="18" Width="18" ToolTip="{Binding Value.Client}" Source="{Binding Value.Client, Converter={StaticResource PeerSoftwareToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='ClientIconVisibility'}" />
                                                     <Separator Visibility="Hidden" Width="4"/>
-                                                    <!-- epic -->
                                                     <TextBlock Text="{Binding Value.Client}"/>
                                                 </StackPanel>
                                             </DataTemplate>

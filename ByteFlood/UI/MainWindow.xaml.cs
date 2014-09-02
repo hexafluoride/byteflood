@@ -310,34 +310,6 @@ namespace ByteFlood
             }
         }
 
-        public void OpenSelectedFile(object sender, RoutedEventArgs e)
-        {
-            if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
-            {
-                FileInfo fi = (FileInfo)files_tree.SelectedItem;
-                string path = fi.Name;
-                if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data. Are you sure that you want to open {0}?", path), "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-                    if (System.IO.File.Exists(path))
-                    {
-                        Process.Start(path);
-                    }
-                    else
-                    {
-                        MessageBox.Show("File doesn't exist", "Error");
-                    }
-            }
-        }
-        public void OpenSelectedFileLocation(object sender, RoutedEventArgs e)
-        {
-            // TODO: Add support to open DirectoryKeys
-            if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
-            {
-                FileInfo fi = (FileInfo)files_tree.SelectedItem;
-                string filepath = fi.Name;
-                string dir = new System.IO.FileInfo(filepath).Directory.FullName;
-                Process.Start("explorer.exe", "\"" + dir + "\"");
-            }
-        }
         public void OpenSelectedTorrentLocation(object sender, RoutedEventArgs e)
         {
             TorrentInfo t;
@@ -478,6 +450,69 @@ namespace ByteFlood
                 else if (ob is DirectoryKey)
                 {
                     this.ApplyPriority_DirectoryTree(ob as DirectoryKey, p);
+                }
+            }
+        }
+
+        public void TorrentCommands_OpenFile(object sender, ExecutedRoutedEventArgs e)
+        {
+            Aga.Controls.Tree.TreeNode item = files_tree.SelectedItem as Aga.Controls.Tree.TreeNode;
+
+            if (item != null)
+            {
+                FileInfo fi = item.Tag as FileInfo;
+                if (fi != null)
+                {
+                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.FullPath);
+
+                    if (fifo.Exists)
+                    {
+                        string[] dangerous_file_types = { ".exe", ".scr", ".pif", ".com", ".bat", ".cmd", ".vbs", ".hta" };
+
+                        if (dangerous_file_types.Contains(fifo.Extension.ToLower()))
+                        {
+                            if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data."
+                                + " Are you sure that you want to open {0}?", fi.File.Path),
+                                "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                            {
+                                Process.Start(fifo.FullName);
+                            }
+                        }
+                        else
+                        {
+                            Process.Start(fifo.FullName);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("File doesn't exist", "Error");
+                    }
+
+                }
+            }
+        }
+
+        public void TorrentCommands_OpenFileLocation(object sender, RoutedEventArgs e)
+        {
+            // TODO: Add support to open DirectoryKeys
+            Aga.Controls.Tree.TreeNode item = files_tree.SelectedItem as Aga.Controls.Tree.TreeNode;
+
+            if (item != null)
+            {
+                FileInfo fi = item.Tag as FileInfo;
+                if (fi != null)
+                {
+                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.FullPath);
+
+                    if (fifo.Directory.Exists)
+                    {
+                        Process.Start("explorer.exe", "\"" + fifo.Directory.FullName + "\"");
+                    }
+                    else
+                    {
+                        Process.Start("explorer.exe", "\"" + fi.Owner.SavePath + "\"");
+                    }
+
                 }
             }
         }
