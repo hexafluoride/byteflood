@@ -38,7 +38,14 @@ namespace MonoTorrent.Client
             {
                 state = TorrentState.Seeding;
                 Manager.RaiseTorrentStateChanged(new TorrentStateChangedEventArgs(Manager, TorrentState.Downloading, TorrentState.Seeding));
-                Manager.TrackerManager.Announce(TorrentEvent.Completed);
+                if (Manager.ActuallyComplete)
+                    Manager.TrackerManager.Announce(TorrentEvent.Completed); // make sure we only do this if we downloaded all pieces
+            }
+            else if (!Manager.Complete && state == TorrentState.Seeding)
+            {
+                // a total hack
+                state = TorrentState.Downloading;
+                Manager.RaiseTorrentStateChanged(new TorrentStateChangedEventArgs(Manager, TorrentState.Seeding, TorrentState.Downloading));
             }
             for (int i = 0; i < Manager.Peers.ConnectedPeers.Count; i++)
                 if (!ShouldConnect(Manager.Peers.ConnectedPeers[i]))

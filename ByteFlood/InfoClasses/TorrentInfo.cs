@@ -49,6 +49,7 @@ namespace ByteFlood
         public long Uploaded { get; set; }
         public string Status { get { return Torrent.State.ToString(); } }
         public int PeerCount { get { return Seeders + Leechers; } }
+        public string CompletionCommand { get; set; }
         public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.Skip ? t.Length : 0).Sum(); } }
         public bool ShowOnList
         {
@@ -134,6 +135,7 @@ namespace ByteFlood
             Name = "";
             StartTime = DateTime.Now;
             this.Torrent = tm;
+            this.Torrent.TorrentStateChanged += new EventHandler<TorrentStateChangedEventArgs>(Torrent_TorrentStateChanged);
             //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
         }
 
@@ -328,6 +330,11 @@ namespace ByteFlood
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(ex.StackTrace);
             }
+        }
+
+        private void StateChanged()
+        {
+
         }
 
         private void PopulateFileList()
