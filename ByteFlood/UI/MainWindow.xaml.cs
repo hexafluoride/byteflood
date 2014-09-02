@@ -309,29 +309,7 @@ namespace ByteFlood
                     dir.Delete();
             }
         }
-        public void ChangePriority(object sender, RoutedEventArgs e)
-        {
-            string tag = ((MenuItem)e.Source).Tag.ToString();
-            Priority p = (Priority)Enum.Parse(typeof(Priority), tag);
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
 
-            //foreach (FileInfo fi in files_list.SelectedItems)
-            //    t.Torrent.Torrent.Files.FirstOrDefault(ti => ti.FullPath == fi.Name).Priority = p;
-
-            if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
-            {
-                var fi = (FileInfo)files_tree.SelectedItem;
-                fi.ChangePriority(p);
-            }
-
-            return;
-            //TorrentInfo t;
-            //if (!GetSelectedTorrent(out t))
-            //    return;
-            //t.Torrent.Torrent.Files[files_list.SelectedIndex].Priority = (Priority)Enum.Parse(typeof(Priority), tag);
-        }
         public void OpenSelectedFile(object sender, RoutedEventArgs e)
         {
             if (files_tree.SelectedItem != null && files_tree.SelectedItem.GetType() == typeof(FileInfo))
@@ -343,7 +321,7 @@ namespace ByteFlood
                     {
                         Process.Start(path);
                     }
-                    else 
+                    else
                     {
                         MessageBox.Show("File doesn't exist", "Error");
                     }
@@ -461,6 +439,47 @@ namespace ByteFlood
             pref.ShowDialog();
             state.SaveSettings();
             UpdateVisibility();
+        }
+
+        #endregion
+
+        #region Torrent Commands
+
+        private void TorrentCommands_ChangeFilePriority(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (files_tree.SelectedItems.Count > 0)
+            {
+                Priority p = (Priority)Enum.Parse(typeof(Priority), e.Parameter.ToString());
+
+                foreach (Aga.Controls.Tree.TreeNode item in files_tree.SelectedItems)
+                {
+                    if (item.Tag is FileInfo)
+                    {
+                        FileInfo fi = item.Tag as FileInfo;
+                        fi.ChangePriority(p);
+                    }
+                    else if (item.Tag is DirectoryKey)
+                    {
+                        DirectoryKey dk = item.Tag as DirectoryKey;
+                        ApplyPriority_DirectoryTree(dk, p);
+                    }
+                }
+            }
+        }
+
+        private void ApplyPriority_DirectoryTree(DirectoryKey dk, Priority p)
+        {
+            foreach (object ob in dk.Values)
+            {
+                if (ob is FileInfo)
+                {
+                    (ob as FileInfo).ChangePriority(p);
+                }
+                else if (ob is DirectoryKey)
+                {
+                    this.ApplyPriority_DirectoryTree(ob as DirectoryKey, p);
+                }
+            }
         }
 
         #endregion
@@ -674,7 +693,7 @@ namespace ByteFlood
                 case WindowBehavior.MinimizeToTray:
                     this.WindowState = System.Windows.WindowState.Minimized;
                     this.ShowInTaskbar = false;
-                    if(App.Settings.NotifyOnTray)
+                    if (App.Settings.NotifyOnTray)
                         NotifyIcon.ShowBalloonTip("ByteFlood", "ByteFlood has been minimized to the traybar.", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
                     break;
                 case WindowBehavior.Exit:
