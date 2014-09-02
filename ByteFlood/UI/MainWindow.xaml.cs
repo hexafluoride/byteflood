@@ -61,6 +61,10 @@ namespace ByteFlood
         public MainWindow()
         {
             InitializeComponent();
+var psi = Utility.ParseCommandLine("cmd");
+var psi2 = Utility.ParseCommandLine("donkey Top Kek M8");
+Console.WriteLine("f1: \"{0}\", a1: \"{1}\"", psi.FileName, psi.Arguments);
+Console.WriteLine("f2: \"{0}\", a2: \"{1}\"", psi2.FileName, psi2.Arguments);
         }
 
         public void ReDrawGraph()
@@ -220,7 +224,7 @@ namespace ByteFlood
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
-            TorrentPropertiesForm tp = new TorrentPropertiesForm(t.Torrent) { Owner = this, Icon = this.Icon };
+            TorrentPropertiesForm tp = new TorrentPropertiesForm(t) { Owner = this, Icon = this.Icon };
             tp.ShowDialog();
         }
 

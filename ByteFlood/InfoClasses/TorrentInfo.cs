@@ -15,6 +15,7 @@ using System.Threading;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace ByteFlood
 {
@@ -171,6 +172,21 @@ namespace ByteFlood
                 if (e.NewState != TorrentState.Downloading)
                 {
                     this.ETA = new TimeSpan(0, 0, 0);
+                }
+                if (e.TorrentManager.Complete && !string.IsNullOrWhiteSpace(CompletionCommand))
+                {
+                    try
+                    {
+                        string command = CompletionCommand.Replace("%s", this.Name)
+                                                          .Replace("%p", this.Path)
+                                                          .Replace("%d", this.SavePath);
+                        ProcessStartInfo psi = Utility.ParseCommandLine(command);
+                        Process.Start(psi);
+                    }
+                    catch 
+                    {
+                        // Let's keep this secret to our graves
+                    }
                 }
                 if (PropertyChanged != null)
                 {
@@ -330,11 +346,6 @@ namespace ByteFlood
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(ex.StackTrace);
             }
-        }
-
-        private void StateChanged()
-        {
-
         }
 
         private void PopulateFileList()

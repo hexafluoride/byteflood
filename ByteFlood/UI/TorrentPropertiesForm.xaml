@@ -34,8 +34,8 @@
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="197,100,0,0" Name="maxcons" VerticalAlignment="Top" Width="88" PreviewTextInput="PreviewTextInput" />
                 <CheckBox Content="Enable peer exchange" Height="16" HorizontalAlignment="Left" Margin="10,132,0,0" Name="peerex" VerticalAlignment="Top" />
                 <CheckBox Content="Enable DHT" Height="16" HorizontalAlignment="Left" Margin="10,154,0,0" Name="dht" VerticalAlignment="Top" />
-                <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,176,0,0" Name="textBlock1" Text="Command to execute on torrent completion" VerticalAlignment="Top" />
-                <TextBox Height="23" HorizontalAlignment="Left" Margin="10,196,0,0" Name="textBox1" VerticalAlignment="Top" Width="275" />
+                <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,176,0,0" Text="Command to execute on torrent completion" VerticalAlignment="Top" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="10,196,0,0" Name="comp" VerticalAlignment="Top" Width="275" />
                 <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,225,0,0" Text="%s is replaced with the name of the torrent" VerticalAlignment="Top" />
                 <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,245,0,0" Text="%p is replaced with the path of the torrent file" VerticalAlignment="Top" />
                 <TextBlock Height="23" HorizontalAlignment="Left" Margin="10,265,0,0" Text="%d is replaced with the root path of the download" VerticalAlignment="Top" />
