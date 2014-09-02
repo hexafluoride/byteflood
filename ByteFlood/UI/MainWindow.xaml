@@ -44,6 +44,7 @@
         <RoutedUICommand x:Key="Commands.AddMagnet" />
         <RoutedUICommand x:Key="Commands.AddRssFeed" />
         <RoutedUICommand x:Key="Commands.OpenPreferences" />
+        <RoutedUICommand x:Key="TorrentCommands.ChangeFilePriority" />
 
         <Style x:Key="SelectedItemCheckerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
@@ -68,6 +69,7 @@
         <CommandBinding Command="{StaticResource Commands.AddMagnet}" Executed="Commands_AddMagnet" />
         <CommandBinding Command="{StaticResource Commands.AddRssFeed}" Executed="Commands_AddRssFeed" />
         <CommandBinding Command="{StaticResource Commands.OpenPreferences}" Executed="Commands_OpenPreferences" />
+        <CommandBinding Command="{StaticResource TorrentCommands.ChangeFilePriority}" Executed="TorrentCommands_ChangeFilePriority" />
     </Window.CommandBindings>
 
     <Window.Title>
@@ -280,14 +282,14 @@
                                 <ContextMenu x:Key="FileItemContextMenu">
                                     <MenuItem Header="Open" Click="OpenSelectedFile" />
                                     <MenuItem Header="Open file location" Click="OpenSelectedFileLocation" />
-                                    <MenuItem Header="Set file priority" Background="WhiteSmoke">
-                                        <MenuItem Header="Immediate" Tag="Immediate" Click="ChangePriority" />
-                                        <MenuItem Header="Highest" Tag="Highest" Click="ChangePriority" />
-                                        <MenuItem Header="High" Tag="High" Click="ChangePriority" />
-                                        <MenuItem Header="Normal" Tag="Normal" Click="ChangePriority" />
-                                        <MenuItem Header="Low" Tag="Low" Click="ChangePriority" />
-                                        <MenuItem Header="Lowest" Tag="Lowest" Click="ChangePriority" />
-                                        <MenuItem Header="Skip" Tag="Skip" Click="ChangePriority" />
+                                    <MenuItem Header="Set priority" Background="WhiteSmoke">
+                                        <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
+                                        <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
+                                        <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="High" />
+                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="High" />
+                                        <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Low" />
+                                        <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Lowest" />
+                                        <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Skip" />
                                     </MenuItem>
                                 </ContextMenu>
 
