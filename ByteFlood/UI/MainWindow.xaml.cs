@@ -45,9 +45,7 @@ namespace ByteFlood
         bool gripped = false;
         bool ignoreclose = true;
         DateTime lastsave = DateTime.Now.Subtract(new TimeSpan(1, 0, 0));
-        //bool closing = false;
         Thread thr;
-        //bool bound = false;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
@@ -59,7 +57,7 @@ namespace ByteFlood
         public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.Progress == 100; });
         GraphDrawer graph;
         public State state;
-        //public Formatters.SpeedFormatter speedformatter = new Formatters.SpeedFormatter();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -527,7 +525,6 @@ namespace ByteFlood
         private void SetDataContext(TorrentInfo ti)
         {
             peers_list.ItemsSource = ti.Peers;
-            //files_list.ItemsSource = ti.Files;
             files_tree.Model = ti.FilesTree;
             pieces_list.ItemsSource = ti.Pieces;
             trackers_list.ItemsSource = ti.Trackers;
@@ -538,7 +535,6 @@ namespace ByteFlood
         {
             peers_list.ItemsSource = null;
             files_tree.Model = null;
-            //files_list.ItemsSource = null;
             pieces_list.ItemsSource = null;
             trackers_list.ItemsSource = null;
             overview_canvas.DataContext = null;
