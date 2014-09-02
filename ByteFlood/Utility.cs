@@ -38,6 +38,7 @@ using System.Reflection;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace ByteFlood
 {
@@ -249,6 +250,43 @@ namespace ByteFlood
                 newstyle.BasedOn = Application.Current.TryFindResource(typeof(Button)) as Style;
             }
             mw.Resources["SelectedItemCheckerButton"] = newstyle;
+        }
+
+        // TODO: Tidy this up
+        public static ProcessStartInfo ParseCommandLine(string command)
+        {
+            StringReader sr = new StringReader(command);
+            string filename = "";
+            string args = "";
+            bool file_read = false;
+            while (sr.Peek() != -1) // this makes us read the whole string
+            {
+                if (!file_read) // grab the filename first
+                {
+                    if (sr.Peek() == '"') // if there are quotes, let's parse that into one nice string
+                    {
+                        sr.Read(); // ignore the quotes
+                        while (sr.Peek() != -1 && sr.Peek() != '"')
+                            filename += (char)sr.Read(); // append to filename until there are no more chars or we find another quote
+                        if (!string.IsNullOrWhiteSpace(filename))
+                        {
+                            sr.Read(); // ignore the end-quotes
+                            file_read = true;
+                        }
+                    }
+                    if (file_read)
+                        continue; // we won't need to parse again, we already have the filename
+                    while (sr.Peek() != ' ' && sr.Peek() != -1)
+                        filename += (char)sr.Read(); // just append until we encounter a space
+                    if (sr.Peek() == -1)
+                        break;
+                    file_read = true;
+                }
+                args += (char)sr.Read(); // the rest of the string are arguments
+            }
+            filename = filename.Trim(); // just to be sure
+            args = args.Trim();
+            return new ProcessStartInfo(filename, args);
         }
 
         public static object CloneObject(object source)

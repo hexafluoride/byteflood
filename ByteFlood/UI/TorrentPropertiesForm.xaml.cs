@@ -38,7 +38,7 @@ namespace ByteFlood
     /// </summary>
     public partial class TorrentPropertiesForm : Window
     {
-        public TorrentManager torrent;
+        public TorrentInfo ti;
         public TorrentProperties tp;
         public bool fake = false;
         public bool success = false;
@@ -50,10 +50,10 @@ namespace ByteFlood
             tp = trp;
         }
 
-        public TorrentPropertiesForm(TorrentManager tm)
+        public TorrentPropertiesForm(TorrentInfo t)
         {
             InitializeComponent();
-            torrent = tm;
+            ti = t;
         }
         public void PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
@@ -62,7 +62,7 @@ namespace ByteFlood
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if(!fake)
-                tp = TorrentProperties.FromTorrentSettings(torrent.Settings);
+                tp = TorrentProperties.FromTorrentSettings(ti.Torrent.Settings);
             maxcons.Text = tp.MaxConnections.ToString();
             maxdown.Text = (tp.MaxDownloadSpeed / 1024).ToString();
             maxup.Text = (tp.MaxUploadSpeed / 1024).ToString();
@@ -86,7 +86,8 @@ namespace ByteFlood
             tp.UploadSlots = int.Parse(uploadslots.Text);
             if (!fake)
             {
-                TorrentProperties.Apply(torrent, tp);
+                TorrentProperties.Apply(ti.Torrent, tp);
+                ti.CompletionCommand = comp.Text;
             }
             success = true;
             this.Close();
