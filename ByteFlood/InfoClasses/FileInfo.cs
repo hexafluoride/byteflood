@@ -102,7 +102,7 @@ namespace ByteFlood
         #endregion
     }
 
-    public class DirectoryKey : System.Collections.Hashtable
+    public class DirectoryKey : System.Collections.Hashtable, Aga.Controls.Tree.ITreeModel
     {
         //public const string FILE_MARKER = "<files>";
 
@@ -112,16 +112,30 @@ namespace ByteFlood
             this.Name = name;
         }
 
-
         public string Name { get; private set; }
 
-        //public List<FileInfo> Files 
-        //{
-        //    get 
-        //    {
-        //        return (List<FileInfo>)base[FILE_MARKER];
-        //    }
-        //}
+        public System.Collections.IEnumerable GetChildren(object parent)
+        {
+            if (parent == null) 
+            {
+               return this.Values;
+            }
+            else if (parent is DirectoryKey) 
+            {
+                return (parent as DirectoryKey).Values;
+            }
+            return null;
+        }
+
+        public bool HasChildren(object parent)
+        {
+            if (parent is DirectoryKey) 
+            {
+                return ((DirectoryKey)parent).Count > 0;
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// No use outside of TorrentInfo.PopulateFileList()
