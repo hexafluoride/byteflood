@@ -67,10 +67,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\FileListTemplateSelector.cs" />
     <Compile Include="Controls\PieceBar.xaml.cs">
       <DependentUpon>PieceBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PieceView.cs" />
+    <Compile Include="Controls\TreeList\Collection.cs" />
+    <Compile Include="Controls\TreeList\Tree\Converters.cs" />
+    <Compile Include="Controls\TreeList\Tree\ITreeModel.cs" />
+    <Compile Include="Controls\TreeList\Tree\RowExpander.cs" />
+    <Compile Include="Controls\TreeList\Tree\TreeList.cs" />
+    <Compile Include="Controls\TreeList\Tree\TreeListItem.cs" />
+    <Compile Include="Controls\TreeList\Tree\TreeNode.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
     <Compile Include="Formatters\PeerCountryToIcon.cs" />
@@ -249,6 +257,7 @@
     <Content Include="Assets\stop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Controls\TreeList\Info.txt" />
     <Resource Include="Graphics\CountryFlags\zz.png" />
     <Resource Include="Graphics\CountryFlags\ad.png" />
     <Resource Include="Graphics\CountryFlags\ae.png" />

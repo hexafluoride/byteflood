@@ -375,19 +375,6 @@ namespace ByteFlood
             var peerlist = Torrent.GetPeers();
             Parallel.ForEach(peerlist, parallel, peer =>
             {
-                //var results = Peers.Where(t => t.IP == peer.Uri.ToString());
-                //int index = -1;
-                //if (results.Count() != 0)
-                //    index = Peers.IndexOf(results.ToList()[0]);
-                //PeerInfo pi = new PeerInfo();
-                //pi.IP = peer.Uri.ToString();
-                //pi.AddressBytes = peer.AddressBytes;
-                //pi.PieceInfo = peer.PiecesReceived + "/" + peer.PiecesSent;
-                //pi.Client = peer.ClientApp.Client.ToString();
-                //if (index == -1)
-                //    context.Send(x => Peers.Add(pi), null);
-                //else
-                //    context.Send(x => Peers[index].SetSelf(pi), null);
                 if (this.Peers.ContainsKey(peer.PeerID))
                 {
                     PeerInfo pi = this.Peers[peer.PeerID];
@@ -395,22 +382,6 @@ namespace ByteFlood
                     pi.Client = peer.ClientApp.Client == Client.Unknown ? peer.ClientApp.ShortId : peer.ClientApp.Client.ToString();
                 }
             });
-            //Parallel.For(0, peerlist.Count, parallel, i =>
-            //{
-            //    try
-            //    {
-            //        PeerInfo peer = Peers[i];
-            //        var results = peerlist.Where(t => t.Uri.ToString() == peer.IP);
-            //        if (results.Count() == 0)
-            //        {
-            //            context.Send(x => Peers.Remove(peer), null);
-            //        }
-            //    }
-            //    catch
-            //    {
-
-            //    }
-            //});
         }
         private void UpdateFileList(object obj)
         {
