@@ -178,6 +178,8 @@ namespace ByteFlood
                 {
                     try
                     {
+                        (App.Current.MainWindow as MainWindow).NotifyIcon.ShowBalloonTip(
+                            "ByteFlood", string.Format("'{0}' has been completed.", this.Name), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
                         string command = CompletionCommand.Replace("%s", this.Name)
                                                           .Replace("%p", this.Path)
                                                           .Replace("%d", this.SavePath);
