@@ -56,6 +56,20 @@ namespace ByteFlood
         public AddTorrentDialog(string path)
         {
             InitializeComponent();
+            if (!string.IsNullOrWhiteSpace(path))
+                Load(path);
+            else
+                loading.Visibility = Visibility.Visible;
+        }
+        public void UpdateSize()
+        {
+            DirectoryInfo dir = new DirectoryInfo(pathbox.Text);
+            DriveInfo drive = new DriveInfo(dir.Root.FullName);
+            size.Content = Utility.PrettifyAmount(tm.Torrent.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
+        }
+        public void Load(string path)
+        {
+            loading.Visibility = Visibility.Collapsed;
             tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
             this.DataContext = tm;
             ratiolimit.Text = (0f).ToString("0.000");
@@ -70,7 +84,7 @@ namespace ByteFlood
                 }
                 files.Add(fi);
             }
-            
+
             torrentname = tm.Torrent.Name;
             name.Text = torrentname;
             filelist.ItemsSource = files;
@@ -79,12 +93,6 @@ namespace ByteFlood
             UpdateSize();
 
             this.Activate();
-        }
-        public void UpdateSize()
-        {
-            DirectoryInfo dir = new DirectoryInfo(pathbox.Text);
-            DriveInfo drive = new DriveInfo(dir.Root.FullName);
-            size.Content = Utility.PrettifyAmount(tm.Torrent.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
         }
         ObservableCollection<FileInfo> files = new ObservableCollection<FileInfo>();
         private void button1_Click(object sender, RoutedEventArgs e)
