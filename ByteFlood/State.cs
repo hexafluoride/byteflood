@@ -129,7 +129,8 @@ namespace ByteFlood
                 Torrent t = Torrent.Load(path);
                 string newfile = t.InfoHash.ToHex() + ".torrent";
                 string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
-                File.Copy(path, newpath, true);
+                if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
+                    File.Copy(path, newpath, true);
                 path = newpath;
             }
             catch (TorrentException)
@@ -201,26 +202,45 @@ namespace ByteFlood
 
             try { mg = new MagnetLink(magnet); }
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
-
-            byte[] file_data = GetMagnetFromCache(mg);
-
-            if (file_data != null)
+            ThreadPool.QueueUserWorkItem(delegate
             {
-                string path = System.IO.Path.Combine(App.Settings.DefaultDownloadPath, mg.InfoHash.ToHex() + ".torrent");
+                string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
+                TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
 
-                if (!Directory.Exists(App.Settings.DefaultDownloadPath)) 
-                {
-                    Directory.CreateDirectory(App.Settings.DefaultDownloadPath);
-                }
+                ce.Register(tm);
+                tm.Start();
 
-                File.WriteAllBytes(path, file_data);
+                ce.DhtEngine.GetPeers(mg.InfoHash);
+
+                while (tm.State == TorrentState.Stopped) ;
+                while (tm.State == TorrentState.Metadata) ;
+
+                tm.Stop();
+                tm.Dispose();
+
                 this.AddTorrentByPath(path);
-            }
-            else 
-            {
-                MessageBox.Show("Could not find a cached copy of this magnet link.", "Loading failed", MessageBoxButton.OK, MessageBoxImage.Error); 
-                return;
-            }
+            });
+            return;
+
+            //byte[] file_data = GetMagnetFromCache(mg);
+
+            //if (file_data != null)
+            //{
+            //    string path = System.IO.Path.Combine(App.Settings.DefaultDownloadPath, mg.InfoHash.ToHex() + ".torrent");
+
+            //    if (!Directory.Exists(App.Settings.DefaultDownloadPath)) 
+            //    {
+            //        Directory.CreateDirectory(App.Settings.DefaultDownloadPath);
+            //    }
+
+            //    File.WriteAllBytes(path, file_data);
+            //    this.AddTorrentByPath(path);
+            //}
+            //else 
+            //{
+            //    MessageBox.Show("Could not find a cached copy of this magnet link.", "Loading failed", MessageBoxButton.OK, MessageBoxImage.Error); 
+            //    return;
+            //}
         }
 
         [XmlIgnore]

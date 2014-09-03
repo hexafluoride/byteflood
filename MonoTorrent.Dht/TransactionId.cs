@@ -8,15 +8,17 @@ namespace MonoTorrent.Dht
 {
     internal static class TransactionId
     {
-        private static byte[] current = new byte[2];
+        private static int current = 0;
+
+        private static Object lock_object = new Object();
 
         public static BEncodedString NextId()
         {
-            lock (current)
+            lock (lock_object)
             {
-                BEncodedString result = new BEncodedString((byte[])current.Clone());
-                if (current[0]++ == 255)
-                    current[1]++;
+                BEncodedString result = new BEncodedString(current.ToString());
+                if(current++ > int.MaxValue) // highly unlikely but
+                    current = 0;
                 return result;
             }
         }

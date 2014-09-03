@@ -238,7 +238,7 @@ namespace MonoTorrent.Dht
                 if (message is QueryMessage)
                     MessageFactory.RegisterSend((QueryMessage)message);
 
-                sendQueue.Enqueue(new SendDetails(endpoint, message));
+              sendQueue.Enqueue(new SendDetails(endpoint, message));
             }
         }
 
