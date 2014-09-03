@@ -3,6 +3,7 @@ using MonoTorrent.Dht.Messages;
 using System;
 using System.Net;
 using System.Collections.Generic;
+using System.Linq;
 using MonoTorrent.BEncoding;
 
 namespace MonoTorrent.Dht.Tasks
@@ -55,7 +56,7 @@ namespace MonoTorrent.Dht.Tasks
             {
                 try
                 {
-                    Node utorrent = new Node(NodeId.Create(), new System.Net.IPEndPoint(Dns.GetHostEntry("router.bittorrent.com").AddressList[0], 6881));
+                    Node utorrent = new Node(NodeId.Create(), new System.Net.IPEndPoint(Dns.GetHostEntry("router.utorrent.com").AddressList[0], 6881));
                     SendFindNode(new Node[] { utorrent });
                 }
                 catch
@@ -106,7 +107,7 @@ namespace MonoTorrent.Dht.Tasks
             foreach (Node node in Node.CloserNodes(engine.LocalId, nodes, newNodes, Bucket.MaxCapacity))
             {
                 activeRequests++;
-                FindNode request = new FindNode(engine.LocalId, engine.LocalId);
+                FindNode request = new FindNode(engine.LocalId, new NodeId(System.Text.Encoding.UTF8.GetBytes(Enumerable.Repeat<char>('a', 20).ToArray())));
                 SendQueryTask task = new SendQueryTask(engine, request, node);
                 task.Completed += FindNodeComplete;
                 task.Execute();
