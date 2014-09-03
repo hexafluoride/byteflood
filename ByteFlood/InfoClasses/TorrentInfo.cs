@@ -16,6 +16,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Web;
 
 namespace ByteFlood
 {
@@ -280,6 +281,16 @@ namespace ByteFlood
             if (Torrent.State != TorrentState.Stopped)
                 Torrent.Stop();
             Torrent.Dispose();
+        }
+
+        public string GetMagnetLink()
+        {
+            string str = "magnet:?xt=urn:btih:";
+            str += this.Torrent.Torrent.InfoHash.ToHex().Replace("-", "");
+            str += "&dn=" + HttpUtility.UrlEncode(this.Name);
+            foreach (TrackerInfo tracker in this.Trackers)
+                str += "&tr=" + HttpUtility.UrlPathEncode(tracker.URL);
+            return str;
         }
 
         public long GetDownloadedBytes() // I have to use this because Torrent.Monitor only shows bytes downloaded in this session
