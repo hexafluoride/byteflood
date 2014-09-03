@@ -11,6 +11,8 @@ namespace ByteFlood.Formatters
 {
     public class FileNameToIcon : IValueConverter
     {
+        static string temp_dir = Environment.GetFolderPath(Environment.SpecialFolder.InternetCache);
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (!App.Settings.ShowFileIcons)
@@ -18,27 +20,30 @@ namespace ByteFlood.Formatters
 
             string path = value.ToString();
 
-            var fi = new System.IO.FileInfo(path);
+            int dot = path.LastIndexOf('.');
 
-            if (Utility.IconCache.ContainsKey(fi.Extension))
+            string ext = "";
+
+            if (dot >= 0)
             {
-                return Utility.IconCache[fi.Extension];
+                ext = path.Substring(dot).ToLower();
+            }
+
+            if (Utility.IconCache.ContainsKey(ext))
+            {
+                return Utility.IconCache[ext];
             }
             else
             {
-                string temp_file = "";
+                string temp_file = Path.Combine(temp_dir, "temp" + ext);
 
-                if (!fi.Exists)
-                {
-                    string temp_dir = Environment.GetFolderPath(Environment.SpecialFolder.InternetCache);
-                    temp_file = Path.Combine(temp_dir, "temp" + fi.Extension);
-                    File.WriteAllText(temp_file, "");
-                    path = temp_file;
-                }
+                File.WriteAllText(temp_file, "");
+
+                path = temp_file;
 
                 Icon i = Icon.ExtractAssociatedIcon(path);
 
-                if (File.Exists(temp_file)) { File.Delete(temp_file); }
+                File.Delete(temp_file);
 
                 MemoryStream m = new MemoryStream();
 
@@ -51,11 +56,13 @@ namespace ByteFlood.Formatters
                 bi.CacheOption = BitmapCacheOption.Default;
                 bi.StreamSource = m;
                 bi.EndInit();
+                bi.Freeze();
 
-                Utility.IconCache.Add(fi.Extension, bi);
+                Utility.IconCache.Add(ext, bi);
 
                 return bi;
             }
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
