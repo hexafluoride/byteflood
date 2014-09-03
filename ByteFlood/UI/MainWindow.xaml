@@ -160,6 +160,7 @@
                             <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrents" />
                             <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrents" />
                         </MenuItem>
+                        <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
                     </ContextMenu>
                 </ListView.Resources>
 

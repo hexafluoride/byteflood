@@ -653,6 +653,12 @@ namespace ByteFlood
                 mainlist.Height = newheight;
         }
 
+        private void CopyMagnetLink(object sender, RoutedEventArgs e)
+        {
+            TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
+            Clipboard.SetText(ti.GetMagnetLink());
+        }
+
         private void SwitchTorrentDisplay(object sender, RoutedEventArgs e)
         {
             string tag = (string)((TreeViewItem)e.Source).Tag;
