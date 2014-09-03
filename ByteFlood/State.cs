@@ -163,6 +163,33 @@ namespace ByteFlood
             }, null);
         }
 
+        /// <summary>
+        /// Like AddTorrentByPath, but uses a provided AddTorrentDialog
+        /// </summary>
+        public void AddTorrentByPath(string path, AddTorrentDialog atd)
+        {
+            uiContext.Send(x =>
+            {
+                App.Current.MainWindow.Activate();
+                atd.Load(path);
+                atd.Closed += (e, s) =>
+                {
+                    if (atd.userselected)
+                    {
+                        TorrentInfo ti = CreateTorrentInfo(atd.tm);
+                        ti.Name = atd.torrentname;
+                        if (!atd.start)
+                            ti.Stop();
+                        ti.RatioLimit = atd.limit;
+                        TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
+                        ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
+                        Torrents.Add(ti);
+                    }
+                };
+            }, null);
+
+        }
+
         public bool AddTorrentRss(string path, TorrentSettings ts, bool autostart) 
         {
             Torrent t = null;
@@ -204,21 +231,34 @@ namespace ByteFlood
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
             ThreadPool.QueueUserWorkItem(delegate
             {
-                string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
-                TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
+                uiContext.Send(x =>
+                {
+                    string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
+                    TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
 
-                ce.Register(tm);
-                tm.Start();
+                    AddTorrentDialog atd = new AddTorrentDialog("");
+                    atd.Show();
 
-                ce.DhtEngine.GetPeers(mg.InfoHash);
+                    ce.Register(tm);
+                    tm.Start();
 
-                while (tm.State == TorrentState.Stopped) ;
-                while (tm.State == TorrentState.Metadata) ;
+                    ce.DhtEngine.GetPeers(mg.InfoHash);
+                    int i = 0;
 
-                tm.Stop();
-                tm.Dispose();
+                    while (tm.State == TorrentState.Stopped)
+                        Thread.Sleep(100);
+                    while (tm.State == TorrentState.Metadata)
+                    {
+                        Thread.Sleep(100);
+                        if((i++) % 100 == 0)
+                            ce.DhtEngine.GetPeers(mg.InfoHash);
+                    }
 
-                this.AddTorrentByPath(path);
+                    tm.Stop();
+                    tm.Dispose();
+
+                    this.AddTorrentByPath(path, atd);
+                }, null);
             });
             return;
 
