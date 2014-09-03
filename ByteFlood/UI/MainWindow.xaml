@@ -292,7 +292,7 @@
                                         <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
                                         <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
                                         <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="High" />
-                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="High" />
+                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Normal" />
                                         <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Low" />
                                         <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Lowest" />
                                         <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Skip" />
