@@ -149,13 +149,13 @@ namespace ByteFlood
                 App.Current.MainWindow.Activate();
                 AddTorrentDialog atd = new AddTorrentDialog(path);
                 atd.ShowDialog();
-                if (atd.userselected)
+                if (atd.DialogResult == true)
                 {
                     TorrentInfo ti = CreateTorrentInfo(atd.tm);
-                    ti.Name = atd.torrentname;
+                    ti.Name = atd.TorrentName;
                     if (!atd.start)
                         ti.Stop();
-                    ti.RatioLimit = atd.limit;
+                    ti.RatioLimit = atd.RatioLimit;
                     TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
                     ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
                     Torrents.Add(ti);
@@ -174,13 +174,13 @@ namespace ByteFlood
                 atd.Load(path);
                 atd.Closed += (e, s) =>
                 {
-                    if (atd.userselected)
+                    if (atd.DialogResult == true)
                     {
                         TorrentInfo ti = CreateTorrentInfo(atd.tm);
-                        ti.Name = atd.torrentname;
+                        ti.Name = atd.TorrentName;
                         if (!atd.start)
                             ti.Stop();
-                        ti.RatioLimit = atd.limit;
+                        ti.RatioLimit = atd.RatioLimit;
                         TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
                         ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
                         Torrents.Add(ti);
