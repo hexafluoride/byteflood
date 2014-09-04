@@ -242,22 +242,26 @@ namespace ByteFlood
                     ce.Register(tm);
                     tm.Start();
 
-                    ce.DhtEngine.GetPeers(mg.InfoHash);
-                    int i = 0;
-
-                    while (tm.State == TorrentState.Stopped)
-                        Thread.Sleep(100);
-                    while (tm.State == TorrentState.Metadata)
+                    System.Threading.Tasks.Task.Factory.StartNew(new Action(() => 
                     {
-                        Thread.Sleep(100);
-                        if((i++) % 100 == 0)
-                            ce.DhtEngine.GetPeers(mg.InfoHash);
-                    }
+                        ce.DhtEngine.GetPeers(mg.InfoHash);
+                        int i = 0;
 
-                    tm.Stop();
-                    tm.Dispose();
+                        while (tm.State == TorrentState.Stopped)
+                            Thread.Sleep(100);
+                        while (tm.State == TorrentState.Metadata)
+                        {
+                            Thread.Sleep(100);
+                            if ((i++) % 100 == 0)
+                                ce.DhtEngine.GetPeers(mg.InfoHash);
+                        }
 
-                    this.AddTorrentByPath(path, atd);
+                        tm.Stop();
+                        tm.Dispose();
+
+                        App.Current.Dispatcher.Invoke(new Action(() => { this.AddTorrentByPath(path, atd); }));
+                    }));
+
                 }, null);
             });
             return;
