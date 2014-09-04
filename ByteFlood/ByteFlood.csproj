@@ -86,6 +86,7 @@
     <Compile Include="Formatters\PeerSoftwareToIcon.cs" />
     <Compile Include="Formatters\PieceViewConverter.cs" />
     <Compile Include="Formatters\SettingsGetter.cs" />
+    <Compile Include="Formatters\StringToFloatConverter.cs" />
     <Compile Include="Formatters\Subtract5Formatter.cs" />
     <Compile Include="InfoClasses\FileInfo.cs" />
     <Compile Include="InfoClasses\PeerInfo.cs" />
