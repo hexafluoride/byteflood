@@ -220,54 +220,115 @@ namespace ByteFlood
 
         public void AddTorrentByMagnet(string magnet)
         {
-            MagnetLink mg = null;
+            /*
+             * MagnetLink mg = null;
 
             try { mg = new MagnetLink(magnet); }
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
+
+            if (!Directory.Exists(App.Settings.TorrentFileSavePath))
+                Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
+
+            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
+
+            AddTorrentDialog atd = new AddTorrentDialog("");
+            atd.Show();
+
+            byte[] data = GetMagnetFromCache(mg);
+            if (data != null)
+            {
+                File.WriteAllBytes(path, data);
+                this.AddTorrentByPath(path, atd);
+                return;
+            }
+
             ThreadPool.QueueUserWorkItem(delegate
             {
                 uiContext.Send(x =>
                 {
-                    string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex() + ".torrent");
                     TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
-
-                    AddTorrentDialog atd = new AddTorrentDialog("") { Icon = App.Current.MainWindow.Icon };
-                    atd.Show();
 
                     ce.Register(tm);
                     tm.Start();
 
-                    System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
+                    ce.DhtEngine.GetPeers(mg.InfoHash);
+                    int i = 0;
+
+                    while (tm.State == TorrentState.Stopped)
+                        Thread.Sleep(100);
+                    while (tm.State == TorrentState.Metadata)
                     {
-                        ce.DhtEngine.GetPeers(mg.InfoHash);
-                        int i = 0;
+                        Thread.Sleep(100);
+                        if((i++) % 100 == 0)
+                            ce.DhtEngine.GetPeers(mg.InfoHash);
+                    }
 
-                        while (tm.State == TorrentState.Stopped)
-                            Thread.Sleep(100);
-                        while (tm.State == TorrentState.Metadata)
-                        {
-                            Thread.Sleep(100);
-                            if ((i++) % 100 == 0)
-                                ce.DhtEngine.GetPeers(mg.InfoHash);
-                            if (atd.WindowClosed) //user cancelled the adding
-                            {
-                                tm.Stop();
-                                tm.Dispose();
-                                ce.Unregister(tm);
-                                return;
-                            }
-                        }
+                    tm.Stop();
+                    tm.Dispose();
 
-                        tm.Stop();
-                        tm.Dispose();
-                        ce.Unregister(tm);
-
-                        App.Current.Dispatcher.Invoke(new Action(() => { this.AddTorrentByPath(path, atd); }));
-                    }));
-
+                    this.AddTorrentByPath(path, atd);
                 }, null);
             });
             return;
+             * */
+            MagnetLink mg = null;
+
+            try { mg = new MagnetLink(magnet); }
+            catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
+
+            if (!Directory.Exists(App.Settings.TorrentFileSavePath))
+                Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
+
+            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
+
+            AddTorrentDialog atd = new AddTorrentDialog("") { Icon = App.Current.MainWindow.Icon };
+            atd.Show();
+
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                byte[] data = GetMagnetFromCache(mg);
+                if (data != null)
+                {
+                    File.WriteAllBytes(path, data);
+                    this.AddTorrentByPath(path, atd);
+                    return;
+                }
+
+                TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
+
+                ce.Register(tm);
+                tm.Start();
+
+                System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
+                {
+                    ce.DhtEngine.GetPeers(mg.InfoHash);
+                    int i = 0;
+
+                    while (tm.State == TorrentState.Stopped)
+                        Thread.Sleep(100);
+                    while (tm.State == TorrentState.Metadata)
+                    {
+                        Thread.Sleep(10);
+                        if ((i++) % 1000 == 0)
+                            ce.DhtEngine.GetPeers(mg.InfoHash);
+                        if (atd.WindowClosed) //user cancelled the adding
+                        {
+                            tm.Stop();
+                            while (tm.State == TorrentState.Stopping)
+                                Thread.Sleep(10);
+                            ce.Unregister(tm);
+                            return;
+                        }
+                    }
+
+                    tm.Stop();
+                    tm.Dispose();
+                    ce.Unregister(tm);
+
+                    App.Current.Dispatcher.Invoke(new Action(() => { this.AddTorrentByPath(path, atd); }));
+                }));
+            });
+            // return; why?
         }
 
         public byte[] MagnetLinkTorrentFile(string magnet)

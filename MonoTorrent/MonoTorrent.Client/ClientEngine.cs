@@ -433,7 +433,7 @@ namespace MonoTorrent.Client
                 if (manager.Engine != this)
                     throw new TorrentException("The manager has not been registered with this engine");
 
-                if (manager.State != TorrentState.Stopped)
+                if (manager.State != TorrentState.Stopped && manager.State != TorrentState.Error)
                     throw new TorrentException("The manager must be stopped before it can be unregistered");
 
                 this.torrents.Remove(manager);
