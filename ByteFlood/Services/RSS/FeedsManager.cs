@@ -309,7 +309,7 @@ namespace ByteFlood.Services.RSS
             if (item.Enclosure != null)
             {
                 // I never encountered such case, I NEED MORE FEEDS
-                return rt;
+                rt.TorrentFileUrl = item.Enclosure.Url.ToString();
             }
             else 
             {
