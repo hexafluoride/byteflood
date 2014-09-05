@@ -99,6 +99,7 @@ namespace ByteFlood.Services.RSS
         public RssTorrent[] Update()
         {
             tick++;
+            NotifyPropertyChanged("Count");
 
             if (tick >= UpdateInterval.TotalSeconds)
             {
@@ -145,7 +146,7 @@ namespace ByteFlood.Services.RSS
                         return new_item_list.ToArray();
                     }
                 }
-                catch
+                catch (Exception e)
                 {
                     this.tick = Convert.ToInt32(UpdateInterval.TotalSeconds / 2);
                     return null;
@@ -244,80 +245,6 @@ namespace ByteFlood.Services.RSS
             return torrents.ToArray();
         }
 
-
-        /// <summary>
-        /// Try to load an rss feed, while avoiding errors as possible.
-        /// But sometimes it throw exceptions.
-        /// </summary>
-        /// <returns></returns>
-        //private SyndicationFeed RetriveFeed()
-        //{
-        //    return null;
-        //    using (WebClient nc = new WebClient())
-        //    {
-        //        byte[] data = nc.DownloadData(this.Url);
-
-        //        using (XmlReader r = XmlReader.Create(new System.IO.MemoryStream(data),
-        //            new XmlReaderSettings()
-        //            {
-        //                DtdProcessing = DtdProcessing.Ignore,
-        //                IgnoreComments = true
-        //            }))
-        //        {
-        //            XmlDocument doc = new XmlDocument();
-        //            doc.Load(r);
-
-        //            //Theses items have been known to cause problems with the
-        //            //syndication feed parser
-        //            string[] items = { "atom:link" };
-        //            XmlElement channel_element = doc.DocumentElement["channel"];
-        //            foreach (var i in items)
-        //            {
-        //                try
-        //                {
-        //                    XmlElement e = doc.DocumentElement[i];
-        //                    if (e != null)
-        //                    {
-        //                        if (channel_element.LastChild != null)
-        //                        {
-        //                            channel_element.InsertBefore(e, channel_element.FirstChild);
-        //                        }
-        //                        else 
-        //                        {
-        //                            channel_element.AppendChild(e);
-        //                        }
-        //                    }
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                    //breakpoint
-        //                    continue;
-        //                }
-        //            }
-
-        //            return this.XmlDocumentToSyndicationFeed(doc);
-        //        }
-        //    }
-        //}
-
-        //private SyndicationFeed XmlDocumentToSyndicationFeed(System.Xml.XmlDocument document)
-        //{
-        //    try
-        //    {
-        //        TextReader tr = new StringReader(document.InnerXml);
-        //        XmlReader xmlReader = XmlReader.Create(tr);
-        //        SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
-
-        //        SyndicationFeed thefeed = SyndicationFeed.Load(xmlReader);
-
-        //        return thefeed;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw;
-        //    }
-        //}
-
         [XmlIgnore]
         Regex m = null;
 
@@ -345,6 +272,9 @@ namespace ByteFlood.Services.RSS
             return true;
         }
 
+        /// <summary>
+        /// This method is only to be called when the RSS Entry is edited.
+        /// </summary>
         public void NotifyUpdate()
         {
             this.m = null;

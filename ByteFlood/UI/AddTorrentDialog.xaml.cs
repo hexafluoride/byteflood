@@ -50,8 +50,9 @@ namespace ByteFlood
     {
         public TorrentManager tm;
 
-        public bool start = true;
-
+        public bool AutoStartTorrent = true;
+        public bool UserOK = false;
+        public bool WindowClosed = false;
         public float RatioLimit { get; set; }
 
         public Torrent Torrent
@@ -96,6 +97,7 @@ namespace ByteFlood
         public AddTorrentDialog(string path)
         {
             InitializeComponent();
+            this.Closed += (s, e) => { this.WindowClosed = true; };
             this.FileList = new ObservableCollection<FileInfo>();
             if (!string.IsNullOrWhiteSpace(path))
                 Load(path);
@@ -151,14 +153,14 @@ namespace ByteFlood
 
         private void Commands_OK(object sender, ExecutedRoutedEventArgs e)
         {
-            start = (start_torrent.IsChecked == true); // sorry
-            this.DialogResult = true;
+            this.AutoStartTorrent = (start_torrent.IsChecked == true); // sorry
+            this.UserOK = true;
             this.Close();
         }
 
         private void Commands_Cancel(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            this.UserOK = false;
             this.Close();
         }
 

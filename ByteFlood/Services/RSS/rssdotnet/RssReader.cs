@@ -162,7 +162,7 @@ namespace Rss
 					{
 						case XmlNodeType.Element:
 						{
-							if (reader.IsEmptyElement)
+                            if (reader.IsEmptyElement && readerName != "enclosure")
 								break;
 							elementText = new StringBuilder();
 
@@ -201,6 +201,10 @@ namespace Rss
 									}
 									break;
 								case "enclosure":
+                                    if (reader.AttributeCount == 0) 
+                                    {
+                                        break; 
+                                    }
 									enclosure = new RssEnclosure();
 									item.Enclosure = enclosure;
 									for (int i=0; i < reader.AttributeCount; i++)
@@ -381,7 +385,12 @@ namespace Rss
 											}
 									}
 									break;
-							
+                                case "torrent:magneturi":
+                                    if (!reader.HasValue) 
+                                    {
+                                        break;
+                                    }
+                                    break;
 							}
 							if (pushElement)
 								xmlNodeStack.Push(readerName);
