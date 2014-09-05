@@ -148,5 +148,11 @@ namespace ByteFlood
             UpdateDataContext(local);
         }
 
+        private void AssociateFiles(object sender, RoutedEventArgs e)
+        {
+            Utility.FileAssociate();
+            Utility.MagnetAssociate();
+        }
+
     }
 }

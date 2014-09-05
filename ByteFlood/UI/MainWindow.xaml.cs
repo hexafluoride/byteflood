@@ -157,6 +157,7 @@ namespace ByteFlood
                 e.Cancel = true;
             else
             {
+                NotifyIcon.Visibility = System.Windows.Visibility.Hidden;
                 state.Shutdown();
                 Environment.Exit(0);
             }

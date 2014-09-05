@@ -15,39 +15,61 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     -->
-    <Window x:Class="ByteFlood.AddTorrentDialog"
+<Window x:Class="ByteFlood.AddTorrentDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         xmlns:formatters="clr-namespace:ByteFlood.Formatters"
         TextOptions.TextFormattingMode="Display"
         WindowStartupLocation="CenterScreen"
-        Title="Add torrent..." Height="394" Width="723">
+        
+        Title="Add torrent..." Height="425" Width="740" ResizeMode="NoResize">
 
     <Window.Resources>
         <formatters:FileNameToIcon x:Key="FileNameToIcon" />
         <formatters:SettingsGetter x:Key="SettingsGetter" />
+        <formatters:StringToFloatConverter x:Key="StringToFloatConverter" />
         <Application x:Key="Application" />
+
+        <RoutedUICommand x:Key="Commands.OK"/>
+        <RoutedUICommand x:Key="Commands.Cancel"/>
+        <RoutedUICommand x:Key="Commands.SelectAll"/>
+        <RoutedUICommand x:Key="Commands.DeselectAll"/>
+        <RoutedUICommand x:Key="Commands.Browse"/>
+
+
     </Window.Resources>
-        
-    <Grid>
-        <GroupBox Header="Save in" Height="73" HorizontalAlignment="Left" Margin="13,0,0,0" Name="gb1" VerticalAlignment="Top" Width="324">
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource Commands.OK}" Executed="Commands_OK" />
+        <CommandBinding Command="{StaticResource Commands.Cancel}" Executed="Commands_Cancel" />
+        <CommandBinding Command="{StaticResource Commands.SelectAll}" Executed="Commands_SelectAll" />
+        <CommandBinding Command="{StaticResource Commands.DeselectAll}" Executed="Commands_DeselectAll" />
+        <CommandBinding Command="{StaticResource Commands.Browse}" Executed="Commands_Browse" />
+    </Window.CommandBindings>
+
+    <Canvas>
+
+        <GroupBox Header="Save in" Height="77" Width="327" Canvas.Left="10" Canvas.Top="10">
             <Grid Margin="2,0,-2,0" Width="309">
-                <TextBox Height="23" Text="" HorizontalAlignment="Left" Margin="6,14,0,0" Name="pathbox" VerticalAlignment="Top" Width="251" />
-                <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="263,14,0,0" Name="select" VerticalAlignment="Top" Width="43" Click="button1_Click" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="6,14,0,0" Text="{Binding TorrentSavePath}" VerticalAlignment="Top" Width="251" />
+                <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="263,14,0,0" VerticalAlignment="Top" Width="43" Command="{StaticResource Commands.Browse}" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Contents" HorizontalAlignment="Left" Margin="342,0,0,0" Name="gb2" Width="347" VerticalAlignment="Top" Height="314">
+
+        <GroupBox Header="Contents" Width="373" Height="342" Canvas.Left="342" Canvas.Top="10">
             <Grid>
-                <Label Content="Name:" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" Margin="6,6,0,0" />
-                <Label Content="Comment:" Height="28" HorizontalAlignment="Left" Margin="6,29,0,0" Name="label2" VerticalAlignment="Top" />
-                <Label Content="Size:" Height="28" HorizontalAlignment="Left" Margin="6,52,0,0" Name="label4" VerticalAlignment="Top" />
-                <Label Content="Date:" Height="28" HorizontalAlignment="Left" Margin="6,75,0,0" Name="label5" VerticalAlignment="Top" />
-                <Label Content="{Binding Torrent.Name}" Height="28" HorizontalAlignment="Left" Margin="76,6,0,0" Name="label3" VerticalAlignment="Top" />
-                <Label Content="{Binding Torrent.Comment}" Height="28" HorizontalAlignment="Left" Margin="76,29,0,0" Name="label6" VerticalAlignment="Top" />
-                <Label Height="28" HorizontalAlignment="Left" Margin="76,52,0,0" Name="size" VerticalAlignment="Top" />
-                <Label Content="{Binding Torrent.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" Name="label8" VerticalAlignment="Top" />
-                <ListView HorizontalAlignment="Left" Margin="6,133,0,6" Name="filelist" Width="323" SelectionMode="Single" SelectedIndex="0">
-                    <ListBox.ItemContainerStyle>
+                <Label Content="Name:" Height="28" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6,6,0,0" />
+                <Label Content="Comment:" Height="28" HorizontalAlignment="Left" Margin="6,29,0,0" VerticalAlignment="Top" />
+                <Label Content="Size:" Height="28" HorizontalAlignment="Left" Margin="6,52,0,0" VerticalAlignment="Top" />
+                <Label Content="Date:" Height="28" HorizontalAlignment="Left" Margin="6,75,0,0" VerticalAlignment="Top" />
+                <Label Content="{Binding Torrent.Name}" Height="28" HorizontalAlignment="Left" Margin="76,6,0,0" VerticalAlignment="Top" />
+                <Label Content="{Binding Torrent.Comment}" Height="28" HorizontalAlignment="Left" Margin="76,29,0,0" VerticalAlignment="Top" />
+                <Label Height="28" HorizontalAlignment="Left" Margin="76,52,0,0" VerticalAlignment="Top" Name="size" />
+                <Label Content="{Binding Torrent.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" VerticalAlignment="Top" />
+                <ListView HorizontalAlignment="Left" Margin="6,133,0,6" Width="345" SelectionMode="Single" SelectedIndex="0"
+                          ItemsSource="{Binding FileList}">
+                    <!--<ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Style.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -55,7 +77,7 @@
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                    </ListBox.ItemContainerStyle>
+                    </ListBox.ItemContainerStyle>-->
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="230" Header="Name">
@@ -63,7 +85,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Image Height="16" Width="16" Source="{Binding Name, Converter={StaticResource FileNameToIcon}}" Visibility="{Binding Converter={StaticResource SettingsGetter}, ConverterParameter='FileIconVisibility'}" />
-                                            <CheckBox IsChecked="{Binding DownloadFile}" Width="Auto" Click="CheckBox_Click" Height="Auto" />
+                                            <CheckBox Margin="5,0,0,0" IsChecked="{Binding DownloadFile}" Tag="{Binding}" Width="Auto" Click="CheckBox_Click" Height="Auto" />
                                             <TextBlock Text="{Binding Name}" Margin="5,0,0,0" Width="Auto" Height="Auto" />
                                         </StackPanel>
                                     </DataTemplate>
@@ -73,24 +95,45 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <Button Content="Select all" Height="23" HorizontalAlignment="Left" Margin="6,102,0,0" Name="button3" VerticalAlignment="Top" Width="75" Click="SelectAll" />
-                <Button Content="Deselect all" Height="23" HorizontalAlignment="Left" Margin="87,102,0,0" Name="button4" VerticalAlignment="Top" Width="75" Click="DeselectAll" />
+                <Button Content="Select all" Height="23" HorizontalAlignment="Left" Margin="6,102,0,0" VerticalAlignment="Top" Width="75" Command="{StaticResource Commands.SelectAll}" />
+                <Button Content="Deselect all" Height="23" HorizontalAlignment="Left" Margin="87,102,0,0" VerticalAlignment="Top" Width="75" Command="{StaticResource Commands.DeselectAll}" />
             </Grid>
         </GroupBox>
-        <GroupBox Header="Torrent options" Height="236" HorizontalAlignment="Left" Margin="13,78,0,0" Name="groupBox3" VerticalAlignment="Top" Width="324">
-            <Grid>                                                    
-                <Label Content="Name: " Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="label7" VerticalAlignment="Top" />
-                <TextBox Height="23" HorizontalAlignment="Left" Margin="60,10,0,0" Name="name" VerticalAlignment="Top" Width="246" />
+
+        <GroupBox Header="Torrent options" Height="260" Width="324" Canvas.Left="13" Canvas.Top="92">
+            <Grid>
+                <Label Content="Name: " Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" VerticalAlignment="Top" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="60,10,0,0" VerticalAlignment="Top" Width="246" 
+                         Text="{Binding Path=TorrentName}" />
                 <CheckBox Content="Start immediately" Height="16" HorizontalAlignment="Left" Margin="6,40,0,0" Name="start_torrent" IsChecked="True" VerticalAlignment="Top" />
-                <Label Content="Stop seeding when ratio exceeds" Height="28" HorizontalAlignment="Left" Margin="6,62,0,0" Name="label9" VerticalAlignment="Top" />
-                <TextBox Height="23" HorizontalAlignment="Left" Margin="192,65,0,0" Name="ratiolimit" VerticalAlignment="Top" Width="114" />
+                <Label Content="Stop seeding when ratio exceeds" Height="28" HorizontalAlignment="Left" Margin="6,62,0,0" VerticalAlignment="Top" />
+
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="192,65,0,0" VerticalAlignment="Top" Width="114" 
+                         Text="{Binding RatioLimit, StringFormat='0.000', Converter={StaticResource StringToFloatConverter}, ValidatesOnExceptions=True}"
+                         Style="{DynamicResource textBoxInError}">
+                    <TextBox.Resources>
+                        <Style x:Key="textBoxInError" TargetType="TextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="ToolTip"
+                                            Value="{Binding RelativeSource={x:Static RelativeSource.Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                    <Setter Property="Background" Value="Salmon"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+
                 <CheckBox Content="Initial seeding" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="212,40,0,0" Name="initial" VerticalAlignment="Top" />
             </Grid>
         </GroupBox>
-        <Button Content="OK" Height="23" HorizontalAlignment="Left" Margin="533,320,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click_1" />
-        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="614,320,0,0" Name="button2" VerticalAlignment="Top" Width="75" Click="button2_Click" />
-        <Border Background="#77000000" BorderThickness="0" Visibility="Collapsed" Name="loading">
+
+
+        <Button Content="OK" Height="23" VerticalAlignment="Center" Width="75" Command="{StaticResource Commands.OK}" Canvas.Left="560" Canvas.Top="357" />
+        <Button Content="Cancel" Height="23" VerticalAlignment="Center" Width="75" Command="{StaticResource Commands.Cancel}" Canvas.Left="640" Canvas.Top="357" />
+
+        <Border Background="#77000000" BorderThickness="0" Visibility="Collapsed" Name="loading" Height="397" Width="734">
             <TextBlock Text="Loading magnet link..."  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
         </Border>
-    </Grid>
+    </Canvas>
 </Window>

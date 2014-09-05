@@ -26,7 +26,9 @@ namespace ByteFlood.Services.RSS
         {
             get
             {
-                return ((MainWindow)App.Current.MainWindow).state;
+                State s = null;
+                App.Current.Dispatcher.Invoke(new Action(() => { s = ((MainWindow)App.Current.MainWindow).state; }));
+                return s;
             }
         }
 
@@ -79,7 +81,6 @@ namespace ByteFlood.Services.RSS
                         {
                             Process_NewRssItems(a, rt);
                         }
-                        a.NotifyUpdate();
                     }
                 }
                 catch (Exception ex)
@@ -91,6 +92,8 @@ namespace ByteFlood.Services.RSS
                 Thread.Sleep(1000);
             }
         }
+
+        #region RssUrlEntry Functions
 
         public static void Add(RssUrlEntry entry)
         {
@@ -135,6 +138,15 @@ namespace ByteFlood.Services.RSS
             }
         }
 
+        #endregion
+
+        private static List<RssTorrent> QueuedItems = new List<RssTorrent>();
+
+        private static bool IsQueued(RssTorrent rt)
+        {
+            return QueuedItems.Contains(rt);
+        }
+
         private static void Process_NewRssItems(RssUrlEntry entry, RssTorrent[] new_items)
         {
             foreach (var nitem in new_items)
@@ -146,7 +158,7 @@ namespace ByteFlood.Services.RSS
 
                 if (File.Exists(save_path))
                 {
-                    //re-load from cache
+                    //re-load from downloaded file
                     App.Current.Dispatcher.Invoke(new Action(() =>
                     {
                         nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
@@ -154,42 +166,56 @@ namespace ByteFlood.Services.RSS
                     continue;
                 }
 
-                var res = download(nitem.IsMagnetOnly ? nitem.TorrentMagnetUrl : nitem.TorrentFileUrl);
+                if (!IsQueued(nitem))
+                {
+                    QueuedItems.Add(nitem);
 
-                if (res.Type == DownloadRssResponse.ResonseType.OK || res.Type == DownloadRssResponse.ResonseType.MagnetLink)
-                {
-                    byte[] data = res.Data;
-                    if (data.Length > 0)
+                    System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
                     {
-                        File.WriteAllBytes(save_path, data);
-                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        Debug.WriteLine("[Rssdownloader-TQ]: Work Item '{0}' has been started", nitem.Name, "");
+
+                        var res = download(nitem.IsMagnetOnly ? nitem.TorrentMagnetUrl : nitem.TorrentFileUrl);
+
+                        Debug.WriteLine("[Rssdownloader-TQ]: Work Item '{0}' resp type is {1}", nitem.Name, res.Type);
+
+                        if (res.Type == DownloadRssResponse.ResonseType.OK || res.Type == DownloadRssResponse.ResonseType.MagnetLink)
                         {
-                            nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
-                        }));
-                    }
-                    else
-                    {
-                        if (res.Type == DownloadRssResponse.ResonseType.MagnetLink) 
-                        {
-                            Debug.WriteLine("[Rssdownloader]: Cannot add torrent ({0}) magnet ('{1}') since magnet cache failed to load it.",
-                                nitem.Name, nitem.TorrentMagnetUrl);
+                            byte[] data = res.Data;
+                            if (data.Length > 0)
+                            {
+                                File.WriteAllBytes(save_path, data);
+                                Debug.WriteLine("[Rssdownloader-TQ]: Work Item '{0}' succesfully downloaded", nitem.Name, "");
+
+                                App.Current.Dispatcher.Invoke(new Action(() =>
+                                {
+                                    nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                                }));
+                            }
+                            else
+                            {
+                                if (res.Type == DownloadRssResponse.ResonseType.MagnetLink)
+                                {
+                                    Debug.WriteLine("[Rssdownloader-TQ]: Cannot add torrent ({0}) magnet ('{1}')",
+                                        nitem.Name, nitem.TorrentMagnetUrl);
+                                }
+                                //What should we do?
+                            }
                         }
-                        //What should we do?
-                        continue;
-                    }
-                }
-                else if (res.Type == DownloadRssResponse.ResonseType.NotFound)
-                {
-                    if (!url_404.Contains(nitem.TorrentFileUrl))
-                    {
-                        url_404.Add(nitem.TorrentFileUrl);
-                        Debug.WriteLine("[Rssdownloader]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl, "");
-                    }
-                }
-                else
-                {
-                    //breakpoint time
-                    continue;
+                        else if (res.Type == DownloadRssResponse.ResonseType.NotFound)
+                        {
+                            if (!url_404.Contains(nitem.TorrentFileUrl))
+                            {
+                                url_404.Add(nitem.TorrentFileUrl);
+                                Debug.WriteLine("[Rssdownloader-TQ]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl, "");
+                            }
+                        }
+                        else if (res.Type == DownloadRssResponse.ResonseType.Fail) 
+                        {
+                            QueuedItems.Remove(nitem);
+                        }
+                        QueuedItems.Remove(nitem);
+                        return;
+                    }));
                 }
             }
         }
@@ -198,12 +224,32 @@ namespace ByteFlood.Services.RSS
         {
             if (Utility.IsMagnetLink(url))
             {
-                byte[] data = State.GetMagnetFromCache(url);
-                return new DownloadRssResponse()
+                try
                 {
-                    Type = DownloadRssResponse.ResonseType.MagnetLink,
-                    Data = data == null ? new byte[0] : data
-                };
+                    // First, we try to load the magnet from cache, since it's faster.
+                    // If the cache fail, we load magnets traditionally
+
+                    byte[] data = State.GetMagnetFromCache(url);
+
+                    if (data == null)
+                    {
+                        data = AppState.MagnetLinkTorrentFile(url);
+                    }
+
+                    return new DownloadRssResponse()
+                    {
+                        Type = DownloadRssResponse.ResonseType.MagnetLink,
+                        Data = data == null ? new byte[0] : data
+                    };
+                }
+                catch (Exception ex)
+                {
+                    return new DownloadRssResponse()
+                    {
+                        Type = DownloadRssResponse.ResonseType.Fail,
+                        Error = ex
+                    };
+                }
             }
             try
             {
@@ -251,50 +297,41 @@ namespace ByteFlood.Services.RSS
             }
         }
 
-        public static RssTorrent ToTorrent(this SyndicationItem i)
+        //(t => t.RelationshipType == "enclosure");
+        //(t => t.RelationshipType == "alternate");
+
+        public static RssTorrent ToTorrent(this Rss.RssItem item)
         {
-            var rt = new RssTorrent();
-            try
+            RssTorrent rt = new RssTorrent(item.Guid.Name)
             {
-                rt.Name = i.Title.Text;
+                Name = item.Title,
+                Summary = item.Description,
+                TimePublished = item.PubDate,
+            };
 
-                if (i.Links.Count > 0)
-                {
-                    var results = i.Links.Where(t => t.RelationshipType == "enclosure");
-                    if (results.Count() == 0)
-                    {
-                        //check for magnets links
-                        results = i.Links.Where(t => t.RelationshipType == "alternate");
-                        if (results.Count() == 0)
-                        {
-                            //fallback to whatever link exists
-                            rt.TorrentFileUrl = i.Links[0].Uri.ToString();
-                        }
-                        else
-                        {
-                            rt.TorrentMagnetUrl = results.First().Uri.ToString();
-                        }
-                    }
-                    else
-                    {
-                        rt.TorrentFileUrl = results.First().Uri.ToString();
-                    }
-                }
-
-                rt.TimePublished = i.PublishDate.DateTime;
-
-                if (i.Summary != null)
-                {
-                    rt.Summary = i.Summary.Text;
-                }
-                return rt;
-            }
-            catch (NullReferenceException ex)
+            if (item.Enclosure != null)
             {
-                if (rt != null) // try to recover as much info as we can
-                    return rt;
-                throw;
+                if (item.Enclosure.Type == "application/x-bittorrent") 
+                {
+                    rt.TorrentFileUrl = item.Enclosure.Url.ToString();
+                }
             }
+            else
+            {
+                string url = item.Link.ToString();
+                if (Utility.IsMagnetLink(url))
+                {
+                    rt.TorrentMagnetUrl = url;
+                }
+                else
+                {
+                    // Warning: This URL might not be the .torrent file. (In case of https://animetosho.org)
+                    rt.TorrentFileUrl = url;
+                }
+            }
+
+            return rt;
+
         }
 
         private struct DownloadRssResponse
