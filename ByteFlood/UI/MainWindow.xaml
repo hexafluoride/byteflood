@@ -86,7 +86,7 @@
     <Grid Name="ActualSize">
         <DockPanel LastChildFill="False">
 
-            <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="150">
+            <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="180">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
                     <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
@@ -105,14 +105,17 @@
                     </TreeViewItem.Resources>
                     <TreeViewItem.ItemTemplate>
                         <HierarchicalDataTemplate>
-                            <TextBlock Tag="{Binding}" ContextMenu="{StaticResource RssItemContextMenu}">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} ({1})">
-                                        <Binding Path="Name"/>
-                                        <Binding Path="Count"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Icon}"/>
+                                <TextBlock Margin="0,0,8,0" Tag="{Binding}" ContextMenu="{StaticResource RssItemContextMenu}">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Name"/>
+                                            <Binding Path="Count"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeViewItem.ItemTemplate>
                 </TreeViewItem>

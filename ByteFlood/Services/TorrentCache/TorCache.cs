@@ -14,7 +14,7 @@ namespace ByteFlood.Services.TorrentCache
 
         public byte[] Fetch(MonoTorrent.MagnetLink magnet)
         {
-            string url = string.Format("http://torcache.net/torrent/{0}.torrent", magnet.InfoHash.ToHex());
+            string url = string.Format("https://torcache.net/torrent/{0}.torrent", magnet.InfoHash.ToHex());
 
             using (WebClient nc = new WebClient())
             {

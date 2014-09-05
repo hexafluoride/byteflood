@@ -49,122 +49,147 @@ namespace ByteFlood
     public partial class AddTorrentDialog : Window
     {
         public TorrentManager tm;
-        public bool userselected = false;
-        public bool start = true;
-        public string torrentname = "";
-        public float limit = 0f;
+
+        public bool AutoStartTorrent = true;
+        public bool UserOK = false;
+        public bool WindowClosed = false;
+        public float RatioLimit { get; set; }
+
+        public Torrent Torrent
+        {
+            get { return (Torrent)GetValue(TorrentProperty); }
+            set { SetValue(TorrentProperty, value); }
+        }
+
+        public static readonly DependencyProperty TorrentProperty =
+            DependencyProperty.Register("Torrent", typeof(Torrent), typeof(AddTorrentDialog), new PropertyMetadata(null));
+
+
+        public ObservableCollection<FileInfo> FileList
+        {
+            get { return (ObservableCollection<FileInfo>)GetValue(FileListProperty); }
+            set { SetValue(FileListProperty, value); }
+        }
+
+        public static readonly DependencyProperty FileListProperty =
+            DependencyProperty.Register("FileList", typeof(ObservableCollection<FileInfo>), typeof(AddTorrentDialog), new PropertyMetadata(null));
+
+        public string TorrentName
+        {
+            get { return (string)GetValue(TorrentNameProperty); }
+            set { SetValue(TorrentNameProperty, value); }
+        }
+
+        public static readonly DependencyProperty TorrentNameProperty =
+            DependencyProperty.Register("TorrentName", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(null));
+
+
+        public string TorrentSavePath
+        {
+            get { return (string)GetValue(TorrentSavePathProperty); }
+            set { SetValue(TorrentSavePathProperty, value); UpdateSize(); }
+        }
+
+        public static readonly DependencyProperty TorrentSavePathProperty =
+            DependencyProperty.Register("TorrentSavePath", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(null));
+        
+
         public AddTorrentDialog(string path)
         {
             InitializeComponent();
+            this.Closed += (s, e) => { this.WindowClosed = true; };
+            this.FileList = new ObservableCollection<FileInfo>();
             if (!string.IsNullOrWhiteSpace(path))
                 Load(path);
             else
                 loading.Visibility = Visibility.Visible;
         }
+
         public void UpdateSize()
         {
-            DirectoryInfo dir = new DirectoryInfo(pathbox.Text);
+            DirectoryInfo dir = new DirectoryInfo(this.TorrentSavePath);
             DriveInfo drive = new DriveInfo(dir.Root.FullName);
             size.Content = Utility.PrettifyAmount(tm.Torrent.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
         }
+
         public void Load(string path)
         {
             loading.Visibility = Visibility.Collapsed;
-            tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
-            this.DataContext = tm;
-            ratiolimit.Text = (0f).ToString("0.000");
+            
+            this.tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
+            
+            this.Torrent = tm.Torrent;
+            
+            this.RatioLimit = 0f;
+
             foreach (TorrentFile file in tm.Torrent.Files)
             {
                 FileInfo fi = new FileInfo(null, file);
-                fi.DownloadFile = true;
-                if (App.Settings.EnableFileRegex && Regex.IsMatch(fi.Name, App.Settings.FileRegex))
-                {
-                    fi.DownloadFile = false;
-                    UpdateFile(fi.Name, fi.DownloadFile);
-                }
-                files.Add(fi);
+                fi.DownloadFile = !(App.Settings.EnableFileRegex && Regex.IsMatch(fi.Name, App.Settings.FileRegex));
+                this.FileList.Add(fi);
             }
 
-            torrentname = tm.Torrent.Name;
-            name.Text = torrentname;
-            filelist.ItemsSource = files;
-            UpdateTextBox();
+            this.TorrentName = tm.Torrent.Name;
 
-            UpdateSize();
+            this.TorrentSavePath = tm.SavePath;
 
             this.Activate();
         }
-        ObservableCollection<FileInfo> files = new ObservableCollection<FileInfo>();
-        private void button1_Click(object sender, RoutedEventArgs e)
+
+        #region Commands
+
+        private void Commands_Browse(object sender, ExecutedRoutedEventArgs e)
         {
-            var fd = new System.Windows.Forms.FolderBrowserDialog();
-            fd.ShowNewFolderButton = true;
-            fd.ShowDialog();
-            tm = new TorrentManager(tm.Torrent, fd.SelectedPath, new TorrentSettings());
-            UpdateTextBox();
-            UpdateSize();
+            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                fd.ShowNewFolderButton = true;
+                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    tm = new TorrentManager(tm.Torrent, fd.SelectedPath, new TorrentSettings());
+                    this.TorrentSavePath = tm.SavePath;
+                }
+            }
         }
 
-        private void UpdateTextBox()
+        private void Commands_OK(object sender, ExecutedRoutedEventArgs e)
         {
-            // i have to do this because WPF is retarded
-            pathbox.Text = tm.SavePath;
+            this.AutoStartTorrent = (start_torrent.IsChecked == true); // sorry
+            this.UserOK = true;
+            this.Close();
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void Commands_Cancel(object sender, RoutedEventArgs e)
         {
+            this.UserOK = false;
+            this.Close();
         }
+
+        private void Commands_SelectAll(object sender, ExecutedRoutedEventArgs e)
+        {
+            foreach (FileInfo file in this.FileList)
+            {
+                file.DownloadFile = true;
+            }
+        }
+
+        private void Commands_DeselectAll(object sender, ExecutedRoutedEventArgs e)
+        {
+            foreach (FileInfo file in this.FileList)
+            {
+                file.DownloadFile = false;
+            }
+        }
+
+        #endregion
+
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            string path = ((FileInfo)filelist.SelectedItem).Name;
-            UpdateFile(path, ((CheckBox)e.Source).IsChecked == true);
+            CheckBox s = sender as CheckBox;
+            FileInfo fi = s.Tag as FileInfo;
+            fi.DownloadFile = s.IsChecked == true;
         }
 
-        private void UpdateFile(string path, bool download)
-        {
-            if (download)
-                tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.Normal;
-            else
-                tm.Torrent.Files.First(t => t.Path == path).Priority = Priority.Skip;
-        }
 
-        private void button1_Click_1(object sender, RoutedEventArgs e)
-        {
-            userselected = true;
-            torrentname = name.Text;
-            start = (start_torrent.IsChecked == true); // sorry
-            if (!float.TryParse(ratiolimit.Text, out limit))
-            {
-                System.Media.SystemSounds.Beep.Play();
-                ratiolimit.Background = Brushes.Salmon;
-                return;
-            }
-            this.Close();
-        }
-
-        private void button2_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void SelectAll(object sender, RoutedEventArgs e)
-        {
-            foreach (FileInfo file in filelist.Items)
-            {
-                file.DownloadFile = true;
-                file.UpdateList("DownloadFile");
-                UpdateFile(file.Name, file.DownloadFile);
-            }
-        }
-        private void DeselectAll(object sender, RoutedEventArgs e)
-        {
-            foreach (FileInfo file in filelist.Items)
-            {
-                file.DownloadFile = false;
-                file.UpdateList("DownloadFile");
-                UpdateFile(file.Name, file.DownloadFile);
-            }
-        }
     }
 }

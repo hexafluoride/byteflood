@@ -33,6 +33,7 @@
                     <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="88" />
                     <TextBox Canvas.Left="305" Canvas.Top="85" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
                     <Button Canvas.Left="6" Canvas.Top="116" Content="Change default torrent settings..." Height="23" Name="default_settings" Width="198" Click="ChangeDefaultSettings" />
+                    <Button Canvas.Left="6" Canvas.Top="144" Content="Associate ByteFlood with torrent files" Height="23" Width="198" Click="AssociateFiles" />
                 </Canvas>
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">

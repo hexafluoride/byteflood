@@ -55,7 +55,8 @@ namespace ByteFlood
                 else
                 {
                     this.File.Priority = MonoTorrent.Common.Priority.Skip;
-                }
+                } 
+                UpdateList("DownloadFile");
             }
         }
 
@@ -89,11 +90,11 @@ namespace ByteFlood
 
         #region INotifyPropertyChanged implementation
 
-        public void UpdateList(params string[] columns)
+        public void UpdateList(string str)
         {
             if (PropertyChanged == null)
                 return;
-            foreach (string str in columns)
+            //foreach (string str in columns)
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
 
