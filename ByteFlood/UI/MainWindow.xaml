@@ -105,14 +105,17 @@
                     </TreeViewItem.Resources>
                     <TreeViewItem.ItemTemplate>
                         <HierarchicalDataTemplate>
-                            <TextBlock Tag="{Binding}" ContextMenu="{StaticResource RssItemContextMenu}">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0} ({1})">
-                                        <Binding Path="Name"/>
-                                        <Binding Path="Count"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Icon}"/>
+                                <TextBlock Tag="{Binding}" ContextMenu="{StaticResource RssItemContextMenu}">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Name"/>
+                                            <Binding Path="Count"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeViewItem.ItemTemplate>
                 </TreeViewItem>

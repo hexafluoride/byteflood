@@ -8,6 +8,8 @@ using System.Net;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace ByteFlood.Services.RSS
 {
@@ -38,19 +40,30 @@ namespace ByteFlood.Services.RSS
         private Dictionary<string, RssTorrent> items = new Dictionary<string, RssTorrent>();
 
         [XmlIgnore]
+        //The feed title provided by the webserver
+        private string feed_title = null;
+
+        [XmlIgnore]
         public string Name
         {
             get
             {
                 if (string.IsNullOrWhiteSpace(this.Alias))
                 {
-                    try
+                    if (string.IsNullOrEmpty(feed_title))
                     {
-                        return (new Uri(this.Url)).Host;
+                        try
+                        {
+                            return (new Uri(this.Url)).Host;
+                        }
+                        catch
+                        {
+                            return this.Url;
+                        }
                     }
-                    catch
+                    else
                     {
-                        return this.Url;
+                        return this.feed_title;
                     }
                 }
                 else
@@ -69,6 +82,16 @@ namespace ByteFlood.Services.RSS
             }
         }
 
+        [XmlIgnore]
+        public BitmapImage Icon
+        {
+            get;
+            private set;
+        }
+
+        [XmlIgnore]
+        private int icon_load_try_count = 0;
+
         /// <summary>
         /// Return an array of RssTorrent when new items are found, otherwise return null 
         /// </summary>
@@ -79,53 +102,92 @@ namespace ByteFlood.Services.RSS
 
             if (tick >= UpdateInterval.TotalSeconds)
             {
-                Debug.WriteLine("[Feed '{0}']: update started.", this.Url, "");
-
-                DateTime start = DateTime.Now;
-
-                List<RssTorrent> new_item_list = new List<RssTorrent>();
-
-                double time_diff_sum = 0;
-
-                using (XmlReader r = XmlReader.Create(this.Url, 
-                    new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
+                try
                 {
-                    SyndicationFeed feed = SyndicationFeed.Load(r);
-                    foreach (SyndicationItem item in feed.Items)
+                    Debug.WriteLine("[Feed '{0}']: update started.", this.Url, "");
+
+                    DateTime start = DateTime.Now;
+
+                    List<RssTorrent> new_item_list = new List<RssTorrent>();
+
+                    double time_diff_sum = 0;
+
+                    foreach (RssTorrent rt in RetriveFeed())
                     {
-                        
-                        if (!items.ContainsKey(item.Id))
+                        if (!items.ContainsKey(rt.Id))
                         {
-                            RssTorrent rt = item.ToTorrent();
                             time_diff_sum += (start - rt.TimePublished).TotalSeconds;
                             if (IsAllowed(rt))
                             {
-                                items.Add(item.Id, rt);
+                                items.Add(rt.Id, rt);
                                 new_item_list.Add(rt);
                             }
                         }
                         else
                         {
-                            time_diff_sum += (start - items[item.Id].TimePublished).TotalSeconds;
+                            time_diff_sum += (start - items[rt.Id].TimePublished).TotalSeconds;
                         }
                     }
+
+                    TryLoadIcon();
+                    NotifyPropertyChanged("Name");
+
+                    this.UpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(time_diff_sum / items.Count()));
+                    Debug.WriteLine("[Feed '{0}']: Calculated update interval: {1} sec", this.Url, this.UpdateInterval.TotalSeconds);
+                    tick = 0;
+
+                    Debug.WriteLine("[Feed '{0}']: update terminated.", this.Url, "");
+
+                    if (new_item_list.Count > 0)
+                    {
+                        Debug.WriteLine("[Feed '{0}']: {1} new item found.", this.Url, new_item_list.Count);
+                        NotifyPropertyChanged("Count");
+                        return new_item_list.ToArray();
+                    }
                 }
-
-                this.UpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(time_diff_sum / items.Count()));
-                Debug.WriteLine("[Feed '{0}']: Calculated update interval: {1} sec", this.Url, this.UpdateInterval.TotalSeconds);
-                tick = 0;
-
-                Debug.WriteLine("[Feed '{0}']: update terminated.", this.Url, "");
-
-                if (new_item_list.Count > 0)
+                catch
                 {
-                    Debug.WriteLine("[Feed '{0}']: {1} new item found.", this.Url, new_item_list.Count);
-                    NotifyPropertyChanged("Count");
-                    return new_item_list.ToArray();
+                    this.tick = Convert.ToInt32(UpdateInterval.TotalSeconds / 2);
+                    return null;
                 }
             }
 
             return null;
+        }
+
+        private void TryLoadIcon()
+        {
+            if (this.Icon == null && icon_load_try_count < 15)
+            {
+                try
+                {
+                    using (WebClient nc = new WebClient())
+                    {
+                        Uri i = new Uri(this.Url);
+
+                        string icon_file = string.Format("http://{0}/favicon.ico", i.Host);
+
+                        byte[] icon_data = nc.DownloadData(icon_file);
+
+                        if (icon_data != null && icon_data.Length > 0)
+                        {
+                            MemoryStream m = new MemoryStream(icon_data);
+
+                            BitmapImage bi = new BitmapImage();
+
+                            bi.BeginInit();
+                            bi.CacheOption = BitmapCacheOption.Default;
+                            bi.StreamSource = m;
+                            bi.EndInit();
+                            bi.Freeze();
+
+                            this.Icon = bi;
+                            NotifyPropertyChanged("Icon");
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
         public void ForceUpdate()
@@ -138,20 +200,8 @@ namespace ByteFlood.Services.RSS
             // TODO: Add more tests to check feed validity
             try
             {
-                using (WebClient nc = new WebClient())
-                {
-                    byte[] data = nc.DownloadData(this.Url);
-                    // Test1 passed: valid URL and server response
-
-                    using (XmlReader r = XmlReader.Create(new System.IO.MemoryStream(data), 
-                        new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
-                    {
-                        SyndicationFeed feed = SyndicationFeed.Load(r);
-                    }
-                    // Test2 passed: XML validity
-
-                    return true;
-                }
+                Rss.RssFeed.Read(this.Url);
+                return true;
             }
             catch (WebException wex)
             {
@@ -169,6 +219,104 @@ namespace ByteFlood.Services.RSS
                 return false;
             }
         }
+
+        private RssTorrent[] RetriveFeed()
+        {
+            Rss.RssFeed feed = Rss.RssFeed.Read(this.Url);
+
+            // Note:
+            // I don't know if more than 1 channel is allowed for torrents feeds
+            // But I will stick to the first one only.
+            // Idea: Probably multiple channels are for multiple languages.
+            // In this case, we select the prefered one.
+
+            Rss.RssChannel channel = feed.Channels[0];
+
+            List<RssTorrent> torrents = new List<RssTorrent>(channel.Items.Count);
+
+            foreach (Rss.RssItem item in channel.Items)
+            {
+                torrents.Add(item.ToTorrent());
+            }
+
+            this.feed_title = channel.Title;
+
+            return torrents.ToArray();
+        }
+
+
+        /// <summary>
+        /// Try to load an rss feed, while avoiding errors as possible.
+        /// But sometimes it throw exceptions.
+        /// </summary>
+        /// <returns></returns>
+        //private SyndicationFeed RetriveFeed()
+        //{
+        //    return null;
+        //    using (WebClient nc = new WebClient())
+        //    {
+        //        byte[] data = nc.DownloadData(this.Url);
+
+        //        using (XmlReader r = XmlReader.Create(new System.IO.MemoryStream(data),
+        //            new XmlReaderSettings()
+        //            {
+        //                DtdProcessing = DtdProcessing.Ignore,
+        //                IgnoreComments = true
+        //            }))
+        //        {
+        //            XmlDocument doc = new XmlDocument();
+        //            doc.Load(r);
+
+        //            //Theses items have been known to cause problems with the
+        //            //syndication feed parser
+        //            string[] items = { "atom:link" };
+        //            XmlElement channel_element = doc.DocumentElement["channel"];
+        //            foreach (var i in items)
+        //            {
+        //                try
+        //                {
+        //                    XmlElement e = doc.DocumentElement[i];
+        //                    if (e != null)
+        //                    {
+        //                        if (channel_element.LastChild != null)
+        //                        {
+        //                            channel_element.InsertBefore(e, channel_element.FirstChild);
+        //                        }
+        //                        else 
+        //                        {
+        //                            channel_element.AppendChild(e);
+        //                        }
+        //                    }
+        //                }
+        //                catch (Exception e)
+        //                {
+        //                    //breakpoint
+        //                    continue;
+        //                }
+        //            }
+
+        //            return this.XmlDocumentToSyndicationFeed(doc);
+        //        }
+        //    }
+        //}
+
+        //private SyndicationFeed XmlDocumentToSyndicationFeed(System.Xml.XmlDocument document)
+        //{
+        //    try
+        //    {
+        //        TextReader tr = new StringReader(document.InnerXml);
+        //        XmlReader xmlReader = XmlReader.Create(tr);
+        //        SyndicationFeed feed = SyndicationFeed.Load(xmlReader);
+
+        //        SyndicationFeed thefeed = SyndicationFeed.Load(xmlReader);
+
+        //        return thefeed;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         [XmlIgnore]
         Regex m = null;
@@ -197,7 +345,7 @@ namespace ByteFlood.Services.RSS
             return true;
         }
 
-        public void NotifyUpdate() 
+        public void NotifyUpdate()
         {
             this.m = null;
             NotifyPropertyChanged("Name", "Count");
@@ -211,7 +359,7 @@ namespace ByteFlood.Services.RSS
         {
             if (PropertyChanged != null)
             {
-                foreach(string propname in propnames)
+                foreach (string propname in propnames)
                     PropertyChanged(this, new PropertyChangedEventArgs(propname));
             }
         }

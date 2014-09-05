@@ -169,7 +169,7 @@ namespace ByteFlood.Services.RSS
                     }
                     else
                     {
-                        if (res.Type == DownloadRssResponse.ResonseType.MagnetLink) 
+                        if (res.Type == DownloadRssResponse.ResonseType.MagnetLink)
                         {
                             Debug.WriteLine("[Rssdownloader]: Cannot add torrent ({0}) magnet ('{1}') since magnet cache failed to load it.",
                                 nitem.Name, nitem.TorrentMagnetUrl);
@@ -251,50 +251,82 @@ namespace ByteFlood.Services.RSS
             }
         }
 
-        public static RssTorrent ToTorrent(this SyndicationItem i)
+        //public static RssTorrent ToTorrent(this SyndicationItem i)
+        //{
+        //    var rt = new RssTorrent();
+        //    try
+        //    {
+        //        rt.Name = i.Title.Text;
+
+        //        if (i.Links.Count > 0)
+        //        {
+        //            var results = i.Links.Where(t => t.RelationshipType == "enclosure");
+        //            if (results.Count() == 0)
+        //            {
+        //                //check for magnets links
+        //                results = i.Links.Where(t => t.RelationshipType == "alternate");
+        //                if (results.Count() == 0)
+        //                {
+        //                    //fallback to whatever link exists
+        //                    rt.TorrentFileUrl = i.Links[0].Uri.ToString();
+        //                }
+        //                else
+        //                {
+        //                    rt.TorrentMagnetUrl = results.First().Uri.ToString();
+        //                }
+        //            }
+        //            else
+        //            {
+        //                rt.TorrentFileUrl = results.First().Uri.ToString();
+        //            }
+        //        }
+
+        //        rt.TimePublished = i.PublishDate.DateTime;
+
+        //        if (i.Summary != null)
+        //        {
+        //            rt.Summary = i.Summary.Text;
+        //        }
+        //        return rt;
+        //    }
+        //    catch (NullReferenceException ex)
+        //    {
+        //        if (rt != null) // try to recover as much info as we can
+        //            return rt;
+        //        throw;
+        //    }
+        //}
+
+        public static RssTorrent ToTorrent(this Rss.RssItem item)
         {
-            var rt = new RssTorrent();
-            try
+            RssTorrent rt = new RssTorrent(item.Guid.Name)
             {
-                rt.Name = i.Title.Text;
+                Name = item.Title,
+                Summary = item.Description,
+                TimePublished = item.PubDate,
+            };
 
-                if (i.Links.Count > 0)
-                {
-                    var results = i.Links.Where(t => t.RelationshipType == "enclosure");
-                    if (results.Count() == 0)
-                    {
-                        //check for magnets links
-                        results = i.Links.Where(t => t.RelationshipType == "alternate");
-                        if (results.Count() == 0)
-                        {
-                            //fallback to whatever link exists
-                            rt.TorrentFileUrl = i.Links[0].Uri.ToString();
-                        }
-                        else
-                        {
-                            rt.TorrentMagnetUrl = results.First().Uri.ToString();
-                        }
-                    }
-                    else
-                    {
-                        rt.TorrentFileUrl = results.First().Uri.ToString();
-                    }
-                }
-
-                rt.TimePublished = i.PublishDate.DateTime;
-
-                if (i.Summary != null)
-                {
-                    rt.Summary = i.Summary.Text;
-                }
+            if (item.Enclosure != null)
+            {
+                // I never encountered such case, I NEED MORE FEEDS
                 return rt;
             }
-            catch (NullReferenceException ex)
+            else 
             {
-                if (rt != null) // try to recover as much info as we can
-                    return rt;
-                throw;
+                string url = item.Link.ToString();
+                if (Utility.IsMagnetLink(url))
+                {
+                    rt.TorrentMagnetUrl = url;
+                }
+                else 
+                {
+                    // Warning: This URL might not be the .torrent file. (In case of https://animetosho.org)
+                    rt.TorrentFileUrl = url;
+                }
             }
+
+            return rt;
+
         }
 
         private struct DownloadRssResponse
