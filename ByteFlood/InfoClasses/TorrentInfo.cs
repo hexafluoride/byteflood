@@ -50,6 +50,7 @@ namespace ByteFlood
         public long Downloaded { get { return GetDownloadedBytes(); } }
         public long Uploaded { get; set; }
         public string Status { get { return Torrent.State.ToString(); } }
+        public TorrentState SavedTorrentState { get; set; }
         public int PeerCount { get { return Seeders + Leechers; } }
         public string CompletionCommand { get; set; }
         public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.Skip ? t.Length : 0).Sum(); } }
@@ -168,6 +169,7 @@ namespace ByteFlood
 
         private void Torrent_TorrentStateChanged(object sender, TorrentStateChangedEventArgs e)
         {
+            this.SavedTorrentState = e.NewState;
             App.Current.Dispatcher.Invoke(new Action(() =>
             {
                 if (e.NewState != TorrentState.Downloading)
@@ -317,9 +319,12 @@ namespace ByteFlood
 
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
                     mw.state.ce.Register(this.Torrent);
-                    //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
 
-                    this.Start();
+                    TorrentState[] StoppedStates = { TorrentState.Stopped, TorrentState.Stopping, TorrentState.Error };
+                    if (!StoppedStates.Contains(this.SavedTorrentState)) 
+                    {
+                        this.Start();
+                    }
                 }));
             }
 
