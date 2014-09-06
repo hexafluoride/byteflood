@@ -52,6 +52,18 @@ namespace ByteFlood
             return tp;
         }
 
+        public TorrentSettings ToTorrentSettings()
+        {
+            TorrentSettings ts = new TorrentSettings();
+            ts.MaxConnections = MaxConnections;
+            ts.MaxDownloadSpeed = MaxDownloadSpeed;
+            ts.MaxUploadSpeed = MaxUploadSpeed;
+            ts.UploadSlots = UploadSlots;
+            ts.UseDht = UseDHT;
+            ts.EnablePeerExchange = EnablePeerExchange;
+            return ts;
+        }
+
         public static void Apply(TorrentManager tm, TorrentProperties tp)
         {
             if (tp == null) { return; }

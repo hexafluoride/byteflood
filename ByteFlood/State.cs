@@ -126,12 +126,12 @@ namespace ByteFlood
         {
             try
             {
-                Torrent t = Torrent.Load(path);
-                string newfile = t.InfoHash.ToHex() + ".torrent";
-                string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
-                if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
-                    File.Copy(path, newpath, true);
-                path = newpath;
+                //Torrent t = Torrent.Load(path);
+                //string newfile = t.InfoHash.ToHex() + ".torrent";
+                //string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
+                //if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
+                //    File.Copy(path, newpath, true);
+                path = BackupTorrent(path);
             }
             catch (TorrentException)
             {
@@ -161,6 +161,21 @@ namespace ByteFlood
                     Torrents.Add(ti);
                 }
             }, null);
+        }
+
+        /// <summary>
+        /// Copies a torrent to ./Torrents(or whatever Settings.TorrentFileSavePath is set to).
+        /// </summary>
+        /// <param name="path">The path of the torrent file to be copied.</param>
+        /// <returns>The new path of the torrent file.</returns>
+        public string BackupTorrent(string path)
+        {
+            Torrent t = Torrent.Load(path);
+            string newfile = t.InfoHash.ToHex() + ".torrent";
+            string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
+            if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
+                File.Copy(path, newpath, true);
+            return newpath;
         }
 
         /// <summary>

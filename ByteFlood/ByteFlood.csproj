@@ -155,6 +155,9 @@
     <Compile Include="UI\ApplicationError.xaml.cs">
       <DependentUpon>ApplicationError.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ImportTorrents.xaml.cs">
+      <DependentUpon>ImportTorrents.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Preferences.xaml.cs">
       <DependentUpon>Preferences.xaml</DependentUpon>
     </Compile>
@@ -191,6 +194,10 @@
     <Page Include="UI\ApplicationError.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\ImportTorrents.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

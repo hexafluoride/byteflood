@@ -39,7 +39,7 @@
             </ScrollViewer>
             
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Width="522" Height="30" Margin="0,10,8,10" Text="Due to error severity, ByteFlood need to close. Sorry for inconvenience"
+                <TextBlock Width="522" Height="30" Margin="0,10,8,10" Text="Due to error severity, ByteFlood needs to close. Sorry for the inconvenience."
                            FontSize="15" VerticalAlignment="Center" Visibility="{Binding WillClose}" />
                 <Button Width="60" Height="30" Command="{StaticResource Commands.Copy}" Margin="0,0,8,0" Content="Copy"/>
                 <Button Width="60" Height="30" Command="{StaticResource Commands.Close}" Content="Close"/>
