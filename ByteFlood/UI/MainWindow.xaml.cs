@@ -822,6 +822,10 @@ namespace ByteFlood
                         FeedsManager.Save();
                     }
                     break;
+                case "View":
+                    UI.FeedViewer fv = new UI.FeedViewer() { Owner = this, Icon = this.Icon, DataContext = entry };
+                    fv.Show();
+                    break;
             }
         }
 

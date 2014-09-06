@@ -101,6 +101,7 @@
                             <MenuItem Header="Refresh" Tag="Refresh" DataContext="{Binding}" Click="OperationOnRssItem" />
                             <MenuItem Header="Remove" Tag="Remove" DataContext="{Binding}" Click="OperationOnRssItem" />
                             <MenuItem Header="Edit" Tag="Edit"  DataContext="{Binding}" Click="OperationOnRssItem" />
+                            <MenuItem Header="View feeds" Tag="View"  DataContext="{Binding}" Click="OperationOnRssItem" />
                         </ContextMenu>
                     </TreeViewItem.Resources>
                     <TreeViewItem.ItemTemplate>
