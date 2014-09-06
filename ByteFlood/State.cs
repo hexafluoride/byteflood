@@ -279,7 +279,7 @@ namespace ByteFlood
             if (!Directory.Exists(App.Settings.TorrentFileSavePath))
                 Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
 
-            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
+            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex() + ".torrent");
 
             AddTorrentDialog atd = new AddTorrentDialog("") { Icon = App.Current.MainWindow.Icon };
             atd.Show();

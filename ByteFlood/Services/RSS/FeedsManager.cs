@@ -133,8 +133,12 @@ namespace ByteFlood.Services.RSS
         {
             if (File.Exists(EntriesSavePath))
             {
-                RssUrlEntry[] it = Utility.Deserialize<RssUrlEntry[]>(EntriesSavePath);
-                foreach (var i in it) { Add(i); }
+                try
+                {
+                    RssUrlEntry[] it = Utility.Deserialize<RssUrlEntry[]>(EntriesSavePath);
+                    foreach (var i in it) { Add(i); }
+                }
+                catch (Exception ex) { Debug.WriteLine("[FeedManager]: Could not load rss items '{0}' @ '{1}'", ex.Message, ex.StackTrace); }
             }
         }
 
@@ -161,6 +165,8 @@ namespace ByteFlood.Services.RSS
                     //re-load from downloaded file
                     App.Current.Dispatcher.Invoke(new Action(() =>
                     {
+                        nitem.LastResponseMessage = "Data was already saved";
+                        nitem.LastResponseType = DownloadRssResponse.ResonseType.OK;
                         nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
                     }));
                     continue;
@@ -175,6 +181,7 @@ namespace ByteFlood.Services.RSS
                         Debug.WriteLine("[Rssdownloader-TQ]: Work Item '{0}' has been started", nitem.Name, "");
 
                         var res = download(nitem.IsMagnetOnly ? nitem.TorrentMagnetUrl : nitem.TorrentFileUrl);
+                        nitem.LastResponse = res;
 
                         Debug.WriteLine("[Rssdownloader-TQ]: Work Item '{0}' resp type is {1}", nitem.Name, res.Type);
 
@@ -209,10 +216,7 @@ namespace ByteFlood.Services.RSS
                                 Debug.WriteLine("[Rssdownloader-TQ]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl, "");
                             }
                         }
-                        else if (res.Type == DownloadRssResponse.ResonseType.Fail) 
-                        {
-                            QueuedItems.Remove(nitem);
-                        }
+                        
                         QueuedItems.Remove(nitem);
                         return;
                     }));
@@ -334,7 +338,7 @@ namespace ByteFlood.Services.RSS
 
         }
 
-        private struct DownloadRssResponse
+        public struct DownloadRssResponse
         {
             public ResonseType Type;
             public byte[] Data;
