@@ -24,7 +24,11 @@ namespace ByteFlood
     /// </summary>
     public partial class ImportTorrents : Window
     {
-        public static string uTorrentDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "uTorrent");
+        public static string[] uTorrentDirs = 
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "uTorrent"),  
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BitTorrent")
+        };
         public ObservableCollection<TorrentListing> list = new ObservableCollection<TorrentListing>();
         public List<TorrentInfo> selected = new List<TorrentInfo>();
         public MainWindow MainWindow = (App.Current.MainWindow as MainWindow);
@@ -36,28 +40,46 @@ namespace ByteFlood
             InitializeComponent();
         }
 
+        public static bool ResumeExist()
+        {
+            foreach (string dir in uTorrentDirs)
+            {
+                string p = Path.Combine(dir, "resume.dat");
+                if (File.Exists(p))
+                    return true;
+            }
+
+            return false;
+        }
+
         public void Load()
         {
-            var val = BEncodedDictionary.Decode(new FileStream(Path.Combine(uTorrentDir, "resume.dat"), FileMode.Open));
-            BEncodedDictionary dict = val as BEncodedDictionary;
-            foreach (var pair in dict)
+            foreach (string dir in uTorrentDirs)
             {
-                try
+                string p = Path.Combine(dir, "resume.dat");
+                if (File.Exists(p))
                 {
-                    string key = pair.Key.ToString();
-                    if (key != ".fileguard") // special case
+                    var val = BEncodedDictionary.Decode(new FileStream(p, FileMode.Open));
+                    BEncodedDictionary dict = val as BEncodedDictionary;
+                    foreach (var pair in dict)
                     {
-                        TorrentListing tl = new TorrentListing();
-                        tl.Path = Path.Combine(uTorrentDir, key);
-                        BEncodedDictionary values = pair.Value as BEncodedDictionary;
-                        tl.Name = values[new BEncodedString("caption")].ToString();
-                        tl.SavePath = values[new BEncodedString("path")].ToString();
-                        tl.Import = true;
-                        list.Add(tl);
+                        try
+                        {
+                            string key = pair.Key.ToString();
+                            if (key != ".fileguard") // special case
+                            {
+                                TorrentListing tl = new TorrentListing();
+                                tl.Path = Path.Combine(dir, key);
+                                BEncodedDictionary values = pair.Value as BEncodedDictionary;
+                                tl.Name = values[new BEncodedString("caption")].ToString();
+                                tl.SavePath = values[new BEncodedString("path")].ToString();
+                                tl.Import = true;
+                                list.Add(tl);
+                            }
+                        }
+                        catch
+                        { }
                     }
-                }
-                catch 
-                { 
                 }
             }
             context.Send(t => torrents.Items.Refresh(), null);
