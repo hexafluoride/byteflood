@@ -97,12 +97,12 @@ namespace ByteFlood
         }
 
         /// <summary>
-        /// Imports torrents from uTorrent.
+        /// Imports torrents from BitTorrent/uTorrent.
         /// </summary>
         /// <returns>true if successful.</returns>
         public bool ImportTorrents()
         {
-            if (IO.File.Exists(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "uTorrent", "resume.dat")))
+            if (ByteFlood.ImportTorrents.ResumeExist())
             {
                 ImportTorrents it = new ImportTorrents() { Icon = this.Icon };
                 it.ShowDialog();
@@ -591,7 +591,7 @@ namespace ByteFlood
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
-            if(!App.Settings.ImportedTorrents)
+            if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
         }
