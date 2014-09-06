@@ -101,12 +101,21 @@ namespace ByteFlood
 
         private void PickPath(object sender, RoutedEventArgs e)
         {
-            using (var fd = new System.Windows.Forms.FolderBrowserDialog()) 
-            { 
+            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            {
                 fd.ShowNewFolderButton = true;
                 fd.ShowDialog();
                 local.DefaultDownloadPath = fd.SelectedPath;
                 downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+            }
+        }
+
+        private void ImportTorrents(object sender, RoutedEventArgs e)
+        {
+            MainWindow mw = (App.Current.MainWindow as MainWindow);
+            if (!mw.ImportTorrents())
+            {
+                MessageBox.Show("resume.dat not found! You either have no torrents or have not installed uTorrent.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

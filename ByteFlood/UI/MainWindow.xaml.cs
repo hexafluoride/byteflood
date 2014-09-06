@@ -33,6 +33,7 @@ using System.Threading;
 using System.Diagnostics;
 using ByteFlood.Services.RSS;
 using System.Threading.Tasks;
+using IO = System.IO;
 
 namespace ByteFlood
 {
@@ -95,8 +96,25 @@ namespace ByteFlood
                 graph.DrawGrid(size.Left, size.Top, size.Right, size.Bottom);
         }
 
-
-
+        /// <summary>
+        /// Imports torrents from uTorrent.
+        /// </summary>
+        /// <returns>true if successful.</returns>
+        public bool ImportTorrents()
+        {
+            if (IO.File.Exists(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "uTorrent", "resume.dat")))
+            {
+                ImportTorrents it = new ImportTorrents() { Icon = this.Icon };
+                it.ShowDialog();
+                foreach (TorrentInfo ti in it.selected)
+                {
+                    state.Torrents.Add(ti);
+                    ti.Start();
+                }
+                return true;
+            }
+            return false;
+        }
 
         public void Update()
         {
@@ -573,6 +591,8 @@ namespace ByteFlood
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
+            if(!App.Settings.ImportedTorrents)
+                ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
         }
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
