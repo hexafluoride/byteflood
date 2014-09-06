@@ -157,6 +157,7 @@
     </Compile>
     <Compile Include="UI\FeedViewer.xaml.cs">
       <DependentUpon>FeedViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ImportTorrents.xaml.cs">
       <DependentUpon>ImportTorrents.xaml</DependentUpon>
     </Compile>
@@ -198,6 +199,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\FeedViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ImportTorrents.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
