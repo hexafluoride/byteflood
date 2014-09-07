@@ -39,6 +39,8 @@ namespace MonoTorrent.Client
 {
     internal static partial class PeerIO
     {
+        public static ClientEngine ce; // this is probably very, very bad practice.
+
         const int MaxMessageLength = Piece.BlockSize * 4;
 
         static ICache <ReceiveMessageState> receiveCache = new Cache <ReceiveMessageState> (true).Synchronize ();
@@ -140,6 +142,13 @@ namespace MonoTorrent.Client
                 ClientEngine.BufferManager.FreeBuffer (data.Buffer);
                 data.Callback (false, null, data.State);
                 receiveCache.Enqueue (data);
+                return;
+            }
+
+            if (ce.Settings.ForceEncryption && (data.Decryptor is PlainTextEncryption || (data.State as PeerId).Encryptor is PlainTextEncryption))
+            {
+                PeerId peer = data.State as PeerId;
+                peer.ConnectionManager.AsyncCleanupSocket(peer, true, "Connection is required");
                 return;
             }
 
