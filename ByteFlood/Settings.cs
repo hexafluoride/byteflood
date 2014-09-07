@@ -55,6 +55,7 @@ namespace ByteFlood
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
         public bool ImportedTorrents { get; set; }
+        public List<string> PreviousPaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
         public WindowBehavior ExitBehavior { get; set; }
         public TrayIconBehavior TrayIconDoubleClickBehavior { get; set; }
@@ -111,6 +112,7 @@ namespace ByteFlood
                     ShowRelativePaths = true,
                     NotifyOnTray = true,
                     ImportedTorrents = false,
+                    PreviousPaths = new List<string>() { System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads") },
                     MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
                     ExitBehavior = WindowBehavior.MinimizeToTray,
                     TrayIconClickBehavior = TrayIconBehavior.ContextMenu,
@@ -169,6 +171,10 @@ namespace ByteFlood
                     }
                 }
             }
+
+            // this is a rather special case, for upgrading users
+            if ((s.PreviousPaths == Settings.DefaultSettings.PreviousPaths || s.PreviousPaths.Count == 0) && s.DefaultDownloadPath != null)
+                s.PreviousPaths = new List<string>() { s.DefaultDownloadPath };
 
             return s;
         }
