@@ -28,6 +28,8 @@ namespace MonoTorrent.Client
 			this.autostart = autostart;
 			this.filesExist = Manager.HasMetadata && manager.Engine.DiskManager.CheckAnyFilesExist(Manager);
             this.pieceCompleteCallback = PieceComplete;
+            foreach (TorrentFile tf in Manager.Torrent.Files)
+                tf.CheckedBytes = 0;
 		}
 
 		private void QueueNextHash()
