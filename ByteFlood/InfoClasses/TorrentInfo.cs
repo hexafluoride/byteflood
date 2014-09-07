@@ -10,6 +10,7 @@ using MonoTorrent.Client;
 using MonoTorrent.Dht;
 using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
+using MonoTorrent.Client.Encryption;
 using Microsoft.Win32;
 using System.Threading;
 using System.Xml.Serialization;
@@ -207,7 +208,8 @@ namespace ByteFlood
                     AddressBytes = e.PeerID.AddressBytes,
                     Client = e.PeerID.ClientApp.Client == Client.Unknown ? e.PeerID.ClientApp.ShortId : e.PeerID.ClientApp.Client.ToString(),
                     IP = e.PeerID.Uri.ToString(),
-                    PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent)
+                    PieceInfo = string.Format("{0}/{1}", e.PeerID.PiecesReceived, e.PeerID.PiecesSent),
+                    Encryption = (e.PeerID.Encryptor is PlainTextEncryption ? "None" : "RC4")
                 };
                 this.context.Send(x => { Peers.Add(e.PeerID.PeerID, pi); }, null);
             }
@@ -411,6 +413,7 @@ namespace ByteFlood
                     PeerInfo pi = this.Peers[peer.PeerID];
                     pi.PieceInfo = string.Format("{0}/{1}", peer.PiecesReceived, peer.PiecesSent);
                     pi.Client = peer.ClientApp.Client == Client.Unknown ? peer.ClientApp.ShortId : peer.ClientApp.Client.ToString();
+                    pi.Encryption = (peer.Encryptor is PlainTextEncryption ? "None" : "RC4");
                 }
             });
         }

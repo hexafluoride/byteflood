@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.Serialization;
 using System.Reflection;
+using MonoTorrent.Client;
 
 namespace ByteFlood
 {
@@ -60,6 +61,7 @@ namespace ByteFlood
         public TrayIconBehavior TrayIconRightClickBehavior { get; set; }
         public TrayIconBehavior TrayIconClickBehavior { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
+        public EncryptionForceType EncryptionType { get; set; }
         [XmlIgnore]
         public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
         [XmlIgnore]
@@ -94,7 +96,7 @@ namespace ByteFlood
                     UploadColor = Colors.Red,
                     DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
                     TorrentFileSavePath = "./Torrents",
-                    PreferEncryption = true,
+                    EncryptionType = EncryptionForceType.DoesntMatter,
                     ListeningPort = 1025,
                     FileRegex = "",
                     EnableFileRegex = false,

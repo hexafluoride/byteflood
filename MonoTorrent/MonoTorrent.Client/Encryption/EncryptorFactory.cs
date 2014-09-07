@@ -110,7 +110,20 @@ namespace MonoTorrent.Client.Encryption
                     EncryptionTypes usable = CheckRC4(id);
                     bool hasPlainText = Toolbox.HasEncryption(usable, EncryptionTypes.PlainText);
                     bool hasRC4 = Toolbox.HasEncryption(usable, EncryptionTypes.RC4Full) || Toolbox.HasEncryption(usable, EncryptionTypes.RC4Header);
-                    if (id.Engine.Settings.PreferEncryption)
+                    if (id.Engine.Settings.ForceEncryption)
+                    {
+                        if (!hasRC4)
+                        {
+                            c.Dispose();
+                            result.Complete();
+                        }
+                        else
+                        {
+                            result.EncSocket = new PeerAEncryption(id.TorrentManager.InfoHash, usable);
+                            result.EncSocket.BeginHandshake(id.Connection, CompletedEncryptedHandshakeCallback, result);
+                        }
+                    }
+                    else if (id.Engine.Settings.PreferEncryption)
                     {
                         if (hasRC4)
                         {
