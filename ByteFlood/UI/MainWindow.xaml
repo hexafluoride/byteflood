@@ -44,6 +44,7 @@
         <RoutedUICommand x:Key="Commands.AddMagnet" />
         <RoutedUICommand x:Key="Commands.AddRssFeed" />
         <RoutedUICommand x:Key="Commands.OpenPreferences" />
+        <RoutedUICommand x:Key="Commands.SearchOnlineTorrents" />
         
         <RoutedUICommand x:Key="TorrentCommands.ChangeFilePriority" />
         <RoutedUICommand x:Key="TorrentCommands.OpenFile" />
@@ -65,6 +66,8 @@
         </Style>
 
         <Path x:Key="Appbar.Rss" Stretch="Uniform" Fill="#FF000000" Data="F1 M 19,19C 39.9868,19 57,36.0132 57,57L 49.0833,57C 49.0833,40.3854 35.969,26.9167 19.7917,26.9167L 19,26.9274L 19,19 Z M 19,31.6667C 32.9912,31.6667 44.3333,43.0088 44.3333,57L 36.4167,57C 36.4167,47.3811 28.619,39.5834 19,39.5834L 19,31.6667 Z M 24.5417,45.9167C 27.6022,45.9167 30.0833,48.3978 30.0833,51.4583C 30.0833,54.5189 27.6022,57 24.5417,57C 21.4811,57 19,54.5189 19,51.4583C 19,48.3978 21.4811,45.9167 24.5417,45.9167 Z "/>
+
+        <Path x:Key="Appbar.Search" Stretch="Uniform" Fill="#FF000000" Data="F1 M 20,17L 43.25,17L 56,29.75L 56,40L 52,37.5L 52,34L 39,34L 39,21L 24,21L 24,55L 36,55L 32,59L 20,59L 20,17 Z M 43,22.25L 43,30L 50.75,30L 43,22.25 Z M 48,38C 53.5228,38 58,42.4772 58,48C 58,53.5229 53.5228,58 48,58C 46.1455,58 44.4089,57.4952 42.9201,56.6155L 36.1213,63.4142C 35.3403,64.1953 34.0739,64.1953 33.2929,63.4142L 32.5858,62.7071C 31.8047,61.9261 31.8047,60.6597 32.5858,59.8787L 39.3845,53.0799C 38.5048,51.5911 38,49.8545 38,48C 38,42.4772 42.4771,38 48,38 Z M 48,42C 44.6863,42 42,44.6863 42,48C 42,51.3137 44.6863,54 48,54C 51.3137,54 54,51.3137 54,48C 54,44.6863 51.3137,42 48,42 Z "/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -75,6 +78,8 @@
         <CommandBinding Command="{StaticResource TorrentCommands.ChangeFilePriority}" Executed="TorrentCommands_ChangeFilePriority" />
         <CommandBinding Command="{StaticResource TorrentCommands.OpenFile}" Executed="TorrentCommands_OpenFile" />
         <CommandBinding Command="{StaticResource TorrentCommands.OpenFileLocation}" Executed="TorrentCommands_OpenFileLocation" />
+        <CommandBinding Command="{StaticResource Commands.SearchOnlineTorrents}" Executed="Commands_SearchOnlineTorrents" />
+        
     </Window.CommandBindings>
 
     <Window.Title>
@@ -101,6 +106,7 @@
                             <MenuItem Header="Refresh" Tag="Refresh" DataContext="{Binding}" Click="OperationOnRssItem" />
                             <MenuItem Header="Remove" Tag="Remove" DataContext="{Binding}" Click="OperationOnRssItem" />
                             <MenuItem Header="Edit" Tag="Edit"  DataContext="{Binding}" Click="OperationOnRssItem" />
+                            <MenuItem Header="View feeds" Tag="View"  DataContext="{Binding}" Click="OperationOnRssItem" />
                         </ContextMenu>
                     </TreeViewItem.Resources>
                     <TreeViewItem.ItemTemplate>
@@ -130,6 +136,8 @@
                 </Button>
 
                 <Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" Content="{StaticResource Appbar.Rss}" />
+
+                <Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}" Content="{StaticResource Appbar.Search}" />
 
                 <Button Height="26" HorizontalAlignment="Left" Margin="7,7,7,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
                     <Image Source="pack://siteoforigin:,,,/Assets/settings.png" />
@@ -170,11 +178,16 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-
+                        <Setter Property="Height" Value="30"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="Blue"/>
+                                <Setter Property="BorderThickness" Value="0,0.4"/>
+                                <Setter Property="Background" Value="LightBlue"/>
+                            </Trigger>
                         </Style.Triggers>
                     </Style>
                 </ListView.ItemContainerStyle>
@@ -417,6 +430,11 @@
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
+                                    <GridViewColumn Width="100" Header="Update In" 
+                                                    DisplayMemberBinding="{Binding UpdateInString}" />
+                                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding State}" />
+                                    <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
+                                    <GridViewColumn Width="190" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

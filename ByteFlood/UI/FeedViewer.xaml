@@ -1,0 +1,17 @@
+﻿<Window x:Class="ByteFlood.UI.FeedViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FeedItemsViewer" Height="407" Width="844">
+    <ListView ItemsSource="{Binding items}">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Value.Name}" Width="200" />
+                <GridViewColumn Header="Success" DisplayMemberBinding="{Binding Value.Success}" Width="80" />
+                <GridViewColumn Header="Magnet Only" DisplayMemberBinding="{Binding Value.IsMagnetOnly}" Width="80" />
+                <GridViewColumn Header="Contain download links" DisplayMemberBinding="{Binding Value.ContainDownloadLinks}" Width="140" />
+                <GridViewColumn Header="Last Response" DisplayMemberBinding="{Binding Value.LastResponseType}" Width="100" />
+                <GridViewColumn Header="Last Response Message" DisplayMemberBinding="{Binding Value.LastResponseMessage}" Width="150" />
+            </GridView>
+        </ListView.View>
+    </ListView>
+</Window>
