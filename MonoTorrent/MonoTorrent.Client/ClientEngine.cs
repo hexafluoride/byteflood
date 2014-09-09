@@ -43,6 +43,7 @@ using System.Collections.ObjectModel;
 
 namespace MonoTorrent.Client
 {
+
     /// <summary>
     /// The Engine that contains the TorrentManagers
     /// </summary>
@@ -193,6 +194,7 @@ namespace MonoTorrent.Client
 
         public ClientEngine(EngineSettings settings, PeerListener listener, PieceWriter writer)
         {
+            PeerIO.ce = this;
             Check.Settings(settings);
             Check.Listener(listener);
             Check.Writer(writer);

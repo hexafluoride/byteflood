@@ -92,7 +92,11 @@ namespace ByteFlood
 
         public static readonly DependencyProperty TorrentSavePathProperty =
             DependencyProperty.Register("TorrentSavePath", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(null));
-        
+
+        public List<string> SavedPathList
+        {
+            get { return App.Settings.PreviousPaths; }
+        }
 
         public AddTorrentDialog(string path)
         {
@@ -103,6 +107,7 @@ namespace ByteFlood
                 Load(path);
             else
                 loading.Visibility = Visibility.Visible;
+
         }
 
         public void UpdateSize()
@@ -155,6 +160,7 @@ namespace ByteFlood
         {
             this.AutoStartTorrent = (start_torrent.IsChecked == true); // sorry
             this.UserOK = true;
+            App.Settings.PreviousPaths.Insert(0, TorrentSavePath);
             this.Close();
         }
 

@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.Serialization;
 using System.Reflection;
+using MonoTorrent.Client;
 
 namespace ByteFlood
 {
@@ -54,12 +55,14 @@ namespace ByteFlood
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
         public bool ImportedTorrents { get; set; }
+        public List<string> PreviousPaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
         public WindowBehavior ExitBehavior { get; set; }
         public TrayIconBehavior TrayIconDoubleClickBehavior { get; set; }
         public TrayIconBehavior TrayIconRightClickBehavior { get; set; }
         public TrayIconBehavior TrayIconClickBehavior { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
+        public EncryptionForceType EncryptionType { get; set; }
         [XmlIgnore]
         public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
         [XmlIgnore]
@@ -94,7 +97,7 @@ namespace ByteFlood
                     UploadColor = Colors.Red,
                     DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
                     TorrentFileSavePath = "./Torrents",
-                    PreferEncryption = true,
+                    EncryptionType = EncryptionForceType.DoesntMatter,
                     ListeningPort = 1025,
                     FileRegex = "",
                     EnableFileRegex = false,
@@ -109,6 +112,7 @@ namespace ByteFlood
                     ShowRelativePaths = true,
                     NotifyOnTray = true,
                     ImportedTorrents = false,
+                    PreviousPaths = new List<string>() { System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads") },
                     MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
                     ExitBehavior = WindowBehavior.MinimizeToTray,
                     TrayIconClickBehavior = TrayIconBehavior.ContextMenu,
@@ -167,6 +171,10 @@ namespace ByteFlood
                     }
                 }
             }
+
+            // this is a rather special case, for upgrading users
+            if ((s.PreviousPaths == Settings.DefaultSettings.PreviousPaths || s.PreviousPaths.Count == 0) && s.DefaultDownloadPath != null)
+                s.PreviousPaths = new List<string>() { s.DefaultDownloadPath };
 
             return s;
         }

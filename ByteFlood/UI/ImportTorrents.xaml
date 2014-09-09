@@ -9,7 +9,7 @@
         <ListView Height="284" HorizontalAlignment="Left" Margin="12,34,0,0" Name="torrents" VerticalAlignment="Top" Width="512">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="300" Header="Name">
+                    <GridViewColumn Width="250" Header="Name">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -19,8 +19,8 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="100" Header="Torrent path" DisplayMemberBinding="{Binding Path}" />
-                    <GridViewColumn Width="100" Header="Save path" DisplayMemberBinding="{Binding SavePath}" />
+                    <GridViewColumn Width="150" Header="Torrent path" DisplayMemberBinding="{Binding Path}" />
+                    <GridViewColumn Width="150" Header="Save path" DisplayMemberBinding="{Binding SavePath}" />
                 </GridView>
             </ListView.View>
         </ListView>

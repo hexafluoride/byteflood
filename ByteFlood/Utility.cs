@@ -304,7 +304,7 @@ namespace ByteFlood
             {
                 if (item.CanWrite)
                 {
-                    if (item.PropertyType.IsValueType || item.PropertyType.IsEnum || item.PropertyType.Equals(typeof(System.String)))
+                    if (item.PropertyType.IsValueType || item.PropertyType.IsEnum || item.PropertyType.Equals(typeof(System.String)) || item.PropertyType.Equals(typeof(List<string>)))
                     {
                         item.SetValue(target, item.GetValue(source, null), null);
                     }

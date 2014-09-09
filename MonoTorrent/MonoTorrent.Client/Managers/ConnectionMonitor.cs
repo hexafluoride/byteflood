@@ -128,7 +128,7 @@ namespace MonoTorrent.Client
             }
         }
 
-        internal void Reset()
+        public void Reset()
         {
             lock (locker)
             {

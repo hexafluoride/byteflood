@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MonoTorrent.Client;
 using System.ComponentModel;
 
 namespace ByteFlood
@@ -11,6 +12,7 @@ namespace ByteFlood
         public event PropertyChangedEventHandler PropertyChanged;
         public string IP { get; set; }
         public byte[] AddressBytes { get; set; }
+        public string Encryption { get; set; }
 
         private string client = null;
         public string Client
