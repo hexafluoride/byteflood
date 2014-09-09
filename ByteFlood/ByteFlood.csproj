@@ -40,6 +40,10 @@
     <ApplicationIcon>Assets\icon-allsizes.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Services\WebSearch\HAP\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="PresentationFramework.Aero2, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -132,6 +136,7 @@
     <Compile Include="Services\TorrentCache\TorCache.cs" />
     <Compile Include="Services\TorrentCache\Torrage.cs" />
     <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
+    <Compile Include="Services\WebSearch\TorrentzEu.cs" />
     <Compile Include="State.cs" />
     <Compile Include="StateRpcHandler.cs">
       <SubType>Component</SubType>
@@ -170,6 +175,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="UI\SearchOnlineTorrents.xaml.cs">
+      <DependentUpon>SearchOnlineTorrents.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\TorrentPropertiesForm.xaml.cs">
       <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
     </Compile>
@@ -219,6 +227,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\Preferences.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SearchOnlineTorrents.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -303,6 +315,15 @@
     <Content Include="Assets\stop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Controls\TreeList\Info.txt" />
     <Resource Include="Graphics\CountryFlags\zz.png" />
     <Resource Include="Graphics\CountryFlags\ad.png" />
