@@ -430,6 +430,12 @@ namespace ByteFlood
             UpdateVisibility();
         }
 
+        private void Commands_SearchOnlineTorrents(object sender, ExecutedRoutedEventArgs e)
+        {
+            UI.SearchOnlineTorrents a = new UI.SearchOnlineTorrents() { Owner = this, Icon = this.Icon };
+            a.Show();
+        }
+
         #endregion
 
         #region Torrent Commands
@@ -848,6 +854,8 @@ namespace ByteFlood
                     break;
             }
         }
+
+
 
     }
 }
