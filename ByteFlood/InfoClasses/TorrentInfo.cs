@@ -51,6 +51,7 @@ namespace ByteFlood
         public long Downloaded { get { return GetDownloadedBytes(); } }
         public long Uploaded { get; set; }
         public string Status { get { return Torrent.State.ToString(); } }
+        public TorrentState SavedTorrentState { get; set; }
         public int PeerCount { get { return Seeders + Leechers; } }
         public string CompletionCommand { get; set; }
         public long SizeToBeDownloaded { get { return Torrent.Torrent.Files.Select<TorrentFile, long>(t => t.Priority != Priority.Skip ? t.Length : 0).Sum(); } }
@@ -82,7 +83,9 @@ namespace ByteFlood
         //Because dictionary is not xml serializable
         public List<FilePriority> FilesPriorities = new List<FilePriority>();
 
+        [XmlIgnore]
         public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
+
         [XmlIgnore]
         public DirectoryKey FilesTree { get; private set; }
         private SynchronizationContext context;
@@ -169,6 +172,7 @@ namespace ByteFlood
 
         private void Torrent_TorrentStateChanged(object sender, TorrentStateChangedEventArgs e)
         {
+            this.SavedTorrentState = e.NewState;
             App.Current.Dispatcher.Invoke(new Action(() =>
             {
                 if (e.NewState != TorrentState.Downloading)
@@ -187,7 +191,7 @@ namespace ByteFlood
                         ProcessStartInfo psi = Utility.ParseCommandLine(command);
                         Process.Start(psi);
                     }
-                    catch 
+                    catch
                     {
                         // Let's keep this secret to our graves
                     }
@@ -319,9 +323,12 @@ namespace ByteFlood
 
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
                     mw.state.ce.Register(this.Torrent);
-                    //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
 
-                    this.Start();
+                    TorrentState[] StoppedStates = { TorrentState.Stopped, TorrentState.Stopping, TorrentState.Error };
+                    if (!StoppedStates.Contains(this.SavedTorrentState))
+                    {
+                        this.Start();
+                    }
                 }));
             }
 
@@ -330,7 +337,7 @@ namespace ByteFlood
             {
                 UpdateProperties();
                 PopulateFileList();
-
+                PopulateTrackerList();
                 //context.Send(x => Peers.Clear(), null);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdatePeerList));
@@ -383,26 +390,51 @@ namespace ByteFlood
                 }
             }
         }
-
-        private void UpdateTrackerList(object obj)
+        [XmlIgnore]
+        private bool trackers_populated = false;
+        private void PopulateTrackerList()
         {
-            foreach (var tracker in Torrent.Torrent.AnnounceUrls)
+            if (!trackers_populated)
             {
-                foreach (string str in tracker)
+                if (this.Torrent != null)
                 {
-                    var results = Trackers.Where(t => t.URL == str);
-                    int index = -1;
-                    if (results.Count() != 0)
-                        index = Trackers.IndexOf(results.ToList()[0]);
-                    TrackerInfo ti = new TrackerInfo();
-                    ti.URL = str;
-                    if (index == -1)
-                        context.Send(x => Trackers.Add(ti), null);
-                    else
-                        context.Send(x => Trackers[index].SetSelf(ti), null);
+                    var tm = this.Torrent.TrackerManager;
+
+                    foreach (MonoTorrent.Client.Tracker.TrackerTier tier in tm)
+                    {
+                        foreach (MonoTorrent.Client.Tracker.Tracker t in tier)
+                        {
+                            this.Trackers.Add(new TrackerInfo(t, this));
+                        }
+                    }
+                    trackers_populated = true;
                 }
             }
         }
+        private void UpdateTrackerList(object obj)
+        {
+            foreach (TrackerInfo ti in this.Trackers)
+            {
+                ti.Update();
+            }
+            //foreach (var tracker in Torrent.Torrent.AnnounceUrls)
+            //{
+            //    foreach (string str in tracker)
+            //    {
+            //        var results = Trackers.Where(t => t.URL == str);
+            //        int index = -1;
+            //        if (results.Count() != 0)
+            //            index = Trackers.IndexOf(results.ToList()[0]);
+            //        TrackerInfo ti = new TrackerInfo();
+            //        ti.URL = str;
+            //        if (index == -1)
+            //            context.Send(x => Trackers.Add(ti), null);
+            //        else
+            //            context.Send(x => Trackers[index].SetSelf(ti), null);
+            //    }
+            //}
+        }
+
         private void UpdatePeerList(object obj)
         {
             var peerlist = Torrent.GetPeers();

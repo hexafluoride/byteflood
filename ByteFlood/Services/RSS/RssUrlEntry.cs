@@ -37,7 +37,7 @@ namespace ByteFlood.Services.RSS
         [XmlIgnore]
         private int tick = 1000;
 
-        private Dictionary<string, RssTorrent> items = new Dictionary<string, RssTorrent>();
+        public ObservableDictionary<string, RssTorrent> items { get; private set; }
 
         [XmlIgnore]
         //The feed title provided by the webserver
@@ -91,6 +91,8 @@ namespace ByteFlood.Services.RSS
 
         [XmlIgnore]
         private int icon_load_try_count = 0;
+
+        public RssUrlEntry() { this.items = new ObservableDictionary<string, RssTorrent>(); }
 
         /// <summary>
         /// Return an array of RssTorrent when new items are found, otherwise return null 

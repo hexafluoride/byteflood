@@ -104,9 +104,10 @@ namespace ByteFlood.Services
 
         public GeoIPCountry(string path)
         {
-            if (File.Exists(path))
+            System.IO.FileInfo fi = new System.IO.FileInfo(path);
+            if (fi.Exists)
             {
-                this.GeoData = new MemoryStream(File.ReadAllBytes(path));
+                this.GeoData = new MemoryStream(File.ReadAllBytes(fi.FullName));
             }
             else
             {

@@ -20,9 +20,12 @@ namespace ByteFlood.Formatters
         {
             try
             {
-                this.goe = new Services.GeoIPCountry(System.IO.Path.Combine("Assets", "GeoIP.dat"));
+                this.goe = new Services.GeoIPCountry(System.IO.Path.Combine("./Assets", "GeoIP.dat"));
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                System.Diagnostics.Debug.WriteLine("[PeerCountryToIcon]: Unable to laod GeoIP.dat file. Exception message: " + ex.Message);
+            }
 
             //http://stackoverflow.com/questions/16870698/how-to-check-if-a-wpf-resource-exists/16870970#16870970
             var assembly = Assembly.GetExecutingAssembly();

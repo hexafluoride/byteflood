@@ -97,12 +97,12 @@ namespace ByteFlood
         }
 
         /// <summary>
-        /// Imports torrents from uTorrent.
+        /// Imports torrents from BitTorrent/uTorrent.
         /// </summary>
         /// <returns>true if successful.</returns>
         public bool ImportTorrents()
         {
-            if (IO.File.Exists(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "uTorrent", "resume.dat")))
+            if (ByteFlood.ImportTorrents.ResumeExist())
             {
                 ImportTorrents it = new ImportTorrents() { Icon = this.Icon };
                 it.ShowDialog();
@@ -430,6 +430,12 @@ namespace ByteFlood
             UpdateVisibility();
         }
 
+        private void Commands_SearchOnlineTorrents(object sender, ExecutedRoutedEventArgs e)
+        {
+            UI.SearchOnlineTorrents a = new UI.SearchOnlineTorrents() { Owner = this, Icon = this.Icon };
+            a.Show();
+        }
+
         #endregion
 
         #region Torrent Commands
@@ -591,7 +597,7 @@ namespace ByteFlood
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
-            if(!App.Settings.ImportedTorrents)
+            if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
         }
@@ -842,8 +848,14 @@ namespace ByteFlood
                         FeedsManager.Save();
                     }
                     break;
+                case "View":
+                    UI.FeedViewer fv = new UI.FeedViewer() { Owner = this, Icon = this.Icon, DataContext = entry };
+                    fv.Show();
+                    break;
             }
         }
+
+
 
     }
 }
