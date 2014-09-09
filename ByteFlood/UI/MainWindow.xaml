@@ -425,6 +425,11 @@
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
+                                    <GridViewColumn Width="100" Header="Update In" 
+                                                    DisplayMemberBinding="{Binding UpdateInString}" />
+                                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding State}" />
+                                    <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
+                                    <GridViewColumn Width="190" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
