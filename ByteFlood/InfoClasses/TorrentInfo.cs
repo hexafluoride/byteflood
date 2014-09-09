@@ -417,22 +417,6 @@ namespace ByteFlood
             {
                 ti.Update();
             }
-            //foreach (var tracker in Torrent.Torrent.AnnounceUrls)
-            //{
-            //    foreach (string str in tracker)
-            //    {
-            //        var results = Trackers.Where(t => t.URL == str);
-            //        int index = -1;
-            //        if (results.Count() != 0)
-            //            index = Trackers.IndexOf(results.ToList()[0]);
-            //        TrackerInfo ti = new TrackerInfo();
-            //        ti.URL = str;
-            //        if (index == -1)
-            //            context.Send(x => Trackers.Add(ti), null);
-            //        else
-            //            context.Send(x => Trackers[index].SetSelf(ti), null);
-            //    }
-            //}
         }
 
         private void UpdatePeerList(object obj)
