@@ -35,6 +35,10 @@ using System.Net;
 
 namespace MonoTorrent.Client
 {
+    public enum EncryptionForceType
+    {
+        Forced, Preferred, DoesntMatter
+    }
     /// <summary>
     /// Represents the Settings which need to be passed to the engine
     /// </summary>
@@ -53,7 +57,7 @@ namespace MonoTorrent.Client
         private int maxOpenStreams = 15;                // The maximum number of simultaenous open filestreams
         private int maxReadRate;                        // The maximum read rate from the harddisk (for all active torrentmanagers)
         private int maxWriteRate;                       // The maximum write rate to the harddisk (for all active torrentmanagers)
-        private bool preferEncryption;                  // If encrypted and unencrypted connections are enabled, specifies if encryption should be chosen first
+        public EncryptionForceType Force = EncryptionForceType.DoesntMatter; // If encrypted and unencrypted connections are enabled, specifies if encryption should be chosen first
         private IPEndPoint reportedEndpoint;            // The IPEndpoint reported to the tracker
         private string savePath;                        // The path that torrents will be downloaded to by default
 
@@ -132,8 +136,12 @@ namespace MonoTorrent.Client
 
         public bool PreferEncryption
         {
-            get { return preferEncryption; }
-            set { preferEncryption = value; }
+            get { return Force == EncryptionForceType.Preferred; }
+        }
+
+        public bool ForceEncryption
+        {
+            get { return Force == EncryptionForceType.Forced; }
         }
 		
         public string SavePath

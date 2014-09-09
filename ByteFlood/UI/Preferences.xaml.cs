@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using System.Collections.ObjectModel;
+using MonoTorrent.Client;
 
 namespace ByteFlood
 {
@@ -52,6 +53,15 @@ namespace ByteFlood
         public ComboBox[] TrayIconComboBoxes;
         public ComboBox[] WindowComboBoxes;
 
+        public EncryptionForceType[] EncryptionTypes = (EncryptionForceType[])Enum.GetValues(typeof(EncryptionForceType));
+
+        public string[] EncryptionTypesReadable = new string[]
+        {
+            "Forced",
+            "Preferred",
+            "Doesn't matter"
+        };
+
         public Preferences()
         {
             InitializeComponent();
@@ -67,7 +77,7 @@ namespace ByteFlood
             WindowComboBoxes = new ComboBox[] { mb, cb };
             Utility.SetItemsSource<ComboBox>(TrayIconComboBoxes, TrayIconBehaviorsReadable);
             Utility.SetItemsSource<ComboBox>(WindowComboBoxes, WindowBehaviorsReadable);
-            
+            enctype.ItemsSource = EncryptionTypesReadable;
         }
 
         private void UpdateDataContext(Settings s)
@@ -140,6 +150,9 @@ namespace ByteFlood
             local.TrayIconDoubleClickBehavior = TrayIconBehaviors[tdcb.SelectedIndex];
             local.MinimizeBehavior = WindowBehaviors[mb.SelectedIndex];
             local.ExitBehavior = WindowBehaviors[cb.SelectedIndex];
+            local.EncryptionType = EncryptionTypes[enctype.SelectedIndex];
+            MainWindow mw = (App.Current.MainWindow as MainWindow);
+            mw.state.ce.Settings.Force = local.EncryptionType;
             local.Theme = (Theme)themeCombox.SelectedItem;
             App.Settings = (Settings)Utility.CloneObject(local);
             this.Close();

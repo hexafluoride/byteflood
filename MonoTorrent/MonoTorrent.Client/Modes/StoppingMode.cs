@@ -33,7 +33,7 @@ namespace MonoTorrent.Client
 
 			handle.AddHandle(engine.DiskManager.CloseFileStreams(manager), "DiskManager");
 
-			manager.Monitor.Reset();
+            //manager.Monitor.Reset();
 			manager.PieceManager.Reset();
 			engine.ConnectionManager.CancelPendingConnects(manager);
 			engine.Stop();

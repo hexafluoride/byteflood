@@ -415,6 +415,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
                                     <GridViewColumn Width="130" Header="Pieces Received/Sent" DisplayMemberBinding="{Binding Value.PieceInfo}" />
+                                    <GridViewColumn Width="130" Header="Encryption" DisplayMemberBinding="{Binding Value.Encryption}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

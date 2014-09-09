@@ -63,7 +63,7 @@ namespace ByteFlood
             ce = new ClientEngine(new EngineSettings());
             dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, App.Settings.ListeningPort));
             DhtEngine dht = new DhtEngine(dhtl);
-
+            ce.Settings.Force = App.Settings.EncryptionType;
             ce.RegisterDht(dht);
             ce.DhtEngine.Start();
 
