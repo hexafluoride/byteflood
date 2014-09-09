@@ -178,11 +178,16 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-
+                        <Setter Property="Height" Value="30"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="Blue"/>
+                                <Setter Property="BorderThickness" Value="0,0.4"/>
+                                <Setter Property="Background" Value="LightBlue"/>
+                            </Trigger>
                         </Style.Triggers>
                     </Style>
                 </ListView.ItemContainerStyle>
