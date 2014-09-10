@@ -98,6 +98,7 @@
     <Compile Include="InfoClasses\TrackerInfo.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="ObservableDictionary.cs" />
+    <Compile Include="Services\AutoUpdater.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
     <Compile Include="Services\RSS\FeedsManager.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\ExceptionCollection.cs" />
