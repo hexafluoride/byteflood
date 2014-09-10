@@ -16,7 +16,7 @@ namespace ByteFlood
             }
         }
 
-        public string FileName 
+        public string FileName
         {
             get { return this.File.Path.Split(System.IO.Path.DirectorySeparatorChar).Last(); }
         }
@@ -53,7 +53,7 @@ namespace ByteFlood
                 else
                 {
                     this.File.Priority = MonoTorrent.Common.Priority.Skip;
-                } 
+                }
                 UpdateList("DownloadFile");
             }
         }
@@ -111,11 +111,11 @@ namespace ByteFlood
 
         public System.Collections.IEnumerable GetChildren(object parent)
         {
-            if (parent == null) 
+            if (parent == null)
             {
-               return this.Values;
+                return this.Values;
             }
-            else if (parent is DirectoryKey) 
+            else if (parent is DirectoryKey)
             {
                 return (parent as DirectoryKey).Values;
             }
@@ -124,7 +124,7 @@ namespace ByteFlood
 
         public bool HasChildren(object parent)
         {
-            if (parent is DirectoryKey) 
+            if (parent is DirectoryKey)
             {
                 return ((DirectoryKey)parent).Count > 0;
             }
@@ -172,3 +172,4 @@ namespace ByteFlood
         { get; set; }
 
     }
+}
