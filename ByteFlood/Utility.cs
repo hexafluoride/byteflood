@@ -440,5 +440,16 @@ namespace ByteFlood
             }
             return n.ToString();
         }
+
+        /// <summary>
+        /// Please don't inlude dots. 'v0.6.2' become 062
+        /// </summary>
+        public static int ByteFloodVersion
+        {
+            get
+            {
+                return 61;
+            }
+        }
     }
 }

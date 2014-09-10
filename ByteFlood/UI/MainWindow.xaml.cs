@@ -600,7 +600,51 @@ namespace ByteFlood
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
+
+            Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
+            Services.AutoUpdater.StartMonitoring();
         }
+
+        bool notify_later_clicked = false;
+        void AutoUpdater_NewUpdate(Services.NewUpdateInfo info)
+        {
+            if (notify_later_clicked) { return; }
+            App.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                UI.NewUpdateWindow nuw = new UI.NewUpdateWindow()
+                {
+                    DataContext = info,
+                    Icon = this.Icon,
+                    Owner = this
+                };
+
+                bool? res = nuw.ShowDialog();
+
+                if (res == true)
+                {
+                    string byteflood_location = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    System.IO.FileInfo fi = new IO.FileInfo(byteflood_location);
+                    string updater = System.IO.Path.Combine(fi.DirectoryName, "ByteFloodUpdater.exe");
+                    if (System.IO.File.Exists(updater))
+                    {
+                        ProcessStartInfo psi = new ProcessStartInfo(updater);
+                        psi.Arguments = string.Format("\"{0}\" \"{1}\"", info.DownloadUrl, fi.DirectoryName);
+
+                        Process.Start(psi);
+
+                        state.Shutdown();
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Updater executable does not exist!", "Cannot update");
+                    }
+                }
+
+                notify_later_clicked = res == false;
+            }));
+        }
+
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
             if (depObj != null)
