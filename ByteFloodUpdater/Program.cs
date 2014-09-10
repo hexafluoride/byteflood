@@ -36,6 +36,9 @@ namespace ByteFloodUpdater
 
             Console.Title = "ByteFlood Updater";
 
+            //Wait for byteflood to exit
+            System.Threading.Thread.Sleep(1500);
+
             #region Terminate byteflood
             bool shutdown_signal_sent = false;
 
@@ -43,7 +46,7 @@ namespace ByteFloodUpdater
             {
                 if (shutdown_signal_sent)
                 {
-                    Console.WriteLine("ByteFlood did not respond for the shutdown signal.");
+                    Console.WriteLine("ByteFlood did not respond for the shutdown signal or it does not support it.");
                     Console.WriteLine("Please close it manually and press any key to continue.");
                     Console.ReadKey();
                 }
@@ -53,6 +56,8 @@ namespace ByteFloodUpdater
                     try
                     {
                         send_shutdown_signal();
+                        //wait to exit
+                        System.Threading.Thread.Sleep(2500);
                     }
                     catch (Exception ex)
                     {
@@ -71,34 +76,57 @@ namespace ByteFloodUpdater
 
             string temp_extract_rm = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "rm");
 
-            Directory.CreateDirectory(temp_extract_dir);
-            Directory.CreateDirectory(temp_extract_rm);
+            check_dir(temp_extract_dir);
+            check_dir(temp_extract_rm);
 
-            MemoryStream memIO = new MemoryStream();
+            bool file_downloaded = false;
 
-            HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+            MemoryStream memIO = null;
 
-            int length = 1;
-            int downloaded = 0;
-            using (var response = wr.GetResponse())
+            while (!file_downloaded)
             {
-                length = Convert.ToInt32(response.ContentLength);
-
-                using (var response_stream = response.GetResponseStream())
+                try
                 {
-                    byte[] buffer = new byte[4096];
+                    memIO = new MemoryStream();
+                    HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
 
-                    int bs = 0;
-
-                    while ((bs = response_stream.Read(buffer, 0, 4096)) > 0)
+                    int length = 1;
+                    int downloaded = 0;
+                    using (var response = wr.GetResponse())
                     {
-                        memIO.Write(buffer, 0, bs);
-                        downloaded += bs;
-                        update_progress(downloaded, length);
+                        length = Convert.ToInt32(response.ContentLength);
+
+                        using (var response_stream = response.GetResponseStream())
+                        {
+                            byte[] buffer = new byte[4096];
+
+                            int bs = 0;
+
+                            while ((bs = response_stream.Read(buffer, 0, 4096)) > 0)
+                            {
+                                memIO.Write(buffer, 0, bs);
+                                downloaded += bs;
+                                update_progress(downloaded, length);
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine("Download finished");
+                            file_downloaded = true;
+                            System.Threading.Thread.Sleep(500);
+                        }
                     }
-                    Console.WriteLine();
-                    Console.WriteLine("Download finished");
-                    System.Threading.Thread.Sleep(500);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Could not download the update.");
+                    Console.WriteLine("Error was:");
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine("Retry? Y/N");
+                    if (!Console.ReadLine().ToUpper().StartsWith("Y"))
+                    {
+                        Console.WriteLine("Exiting...");
+                        return;
+                    }
                 }
             }
 
@@ -107,6 +135,8 @@ namespace ByteFloodUpdater
             Unzip f = new Unzip(memIO);
             f.ExtractToDirectory(temp_extract_dir);
             f.Dispose();
+
+            Console.WriteLine("Copying files...");
 
             //Move new files
             List<MoveFileAction> actions = new List<MoveFileAction>();
@@ -124,16 +154,20 @@ namespace ByteFloodUpdater
             }
 
             bool err = false;
+            int files_copied = 0;
 
             foreach (var action in actions)
             {
                 try
                 {
                     action.PerformAction();
+                    files_copied++;
+                    update_progress(files_copied, actions.Count);
                 }
                 catch
                 {
                     err = true;
+                    break;
                 }
                 finally
                 {
@@ -157,6 +191,16 @@ namespace ByteFloodUpdater
 
             Directory.Delete(temp_extract_dir, true);
             Directory.Delete(temp_extract_rm, true);
+        }
+
+        private static void check_dir(string dir)
+        {
+            if (Directory.Exists(dir))
+            {
+                Directory.Delete(dir, true);
+                Directory.CreateDirectory(dir);
+            }
+            else { Directory.CreateDirectory(dir); }
         }
 
         public class MoveFileAction
@@ -215,10 +259,14 @@ namespace ByteFloodUpdater
 
             public void CleanUp()
             {
-                if (!string.IsNullOrEmpty(temp_rm))
+                try
                 {
-                    if (File.Exists(temp_rm)) { File.Delete(temp_rm); }
+                    if (!string.IsNullOrEmpty(temp_rm))
+                    {
+                        if (File.Exists(temp_rm)) { File.Delete(temp_rm); }
+                    }
                 }
+                catch { }
             }
         }
 
@@ -244,7 +292,7 @@ namespace ByteFloodUpdater
                 }
             }
 
-            Console.Write("] {0}%  ", percent * 100);
+            Console.Write("] {0}%  ", (percent * 100).ToString("0.00"));
         }
 
         private static void send_shutdown_signal()
