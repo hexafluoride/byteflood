@@ -74,7 +74,7 @@ namespace ByteFlood.Services.WebSearch
                             switch (n.GetAttributeValue("class", ""))
                             {
                                 case "v":
-                                    r.Votes= n.InnerText;
+                                    r.Votes = HttpUtility.HtmlDecode(n.InnerText);
                                     break;
                                 case "a":
                                     r.UploadDate = n.ChildNodes[0].GetAttributeValue("title", "");
@@ -229,5 +229,49 @@ namespace ByteFlood.Services.WebSearch
         public string Votes { get; set; }
         public string SeederCount { get; set; }
         public string LeechersCount { get; set; }
+
+        public DateTime TimeAdded
+        {
+            get { return DateTime.Parse(this.UploadDate); }
+        }
+
+        private long _sb;
+
+        public void SearchResults()
+        {
+            _sb = -1;
+        }
+
+        public long SizeBytes
+        {
+            get
+            {
+                if (_sb > 0) { return _sb; }
+
+                string siz = this.Size.Trim().ToLower();
+
+                long mult = 1;
+
+                if (siz.Contains("kb")) { mult = 1024; siz = siz.Replace("kb", ""); }
+                if (siz.Contains("mb")) { mult = 1024 * 1024; siz = siz.Replace("mb", ""); }
+                if (siz.Contains("gb")) { mult = 1024 * 1024 * 1024; siz = siz.Replace("gb", ""); }
+
+                long result = -1;
+
+                long.TryParse(siz.Trim(), out result);
+
+                if (result >= 0)
+                {
+                    _sb = result * mult;
+                    return _sb;
+                }
+                else
+                {
+                    _sb = 0;
+                    return 0;
+                }
+            }
+
+        }
     }
 }

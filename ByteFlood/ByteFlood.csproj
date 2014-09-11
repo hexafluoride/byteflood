@@ -73,6 +73,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\FileListTemplateSelector.cs" />
+    <Compile Include="Controls\GridViewSort.cs" />
     <Compile Include="Controls\PieceBar.xaml.cs">
       <DependentUpon>PieceBar.xaml</DependentUpon>
     </Compile>
@@ -327,15 +328,9 @@
     <Content Include="Assets\stop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
+    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
+    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
     <Resource Include="Controls\TreeList\Info.txt" />
     <Resource Include="Graphics\CountryFlags\zz.png" />
     <Resource Include="Graphics\CountryFlags\ad.png" />
