@@ -57,7 +57,7 @@ namespace ByteFloodUpdater
                     {
                         send_shutdown_signal();
                         //wait to exit
-                        System.Threading.Thread.Sleep(2500);
+                        System.Threading.Thread.Sleep(5000);
                     }
                     catch (Exception ex)
                     {
@@ -72,9 +72,9 @@ namespace ByteFloodUpdater
             #endregion
             Console.WriteLine("ByteFlood is terminated. Commencing download");
 
-            string temp_extract_dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "extracted");
+            string temp_extract_dir = Path.Combine(Path.GetTempPath(), "extracted");
 
-            string temp_extract_rm = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "rm");
+            string temp_extract_rm = Path.Combine(Path.GetTempPath(), "rm");
 
             check_dir(temp_extract_dir);
             check_dir(temp_extract_rm);
@@ -144,8 +144,11 @@ namespace ByteFloodUpdater
             DirectoryInfo temp_dir = new DirectoryInfo(temp_extract_dir);
             DirectoryInfo dest_dir = new DirectoryInfo(destination_dir);
 
+            bool updater_need_update = false;
+
             foreach (FileInfo fi in temp_dir.GetFiles("*", SearchOption.AllDirectories))
             {
+                if (fi.Name == "ByteFloodUpdater.exe") { updater_need_update = true; continue; }
                 string relative_name = fi.FullName.Remove(0, temp_dir.FullName.Length + 1);
                 string dst_file = Path.Combine(dest_dir.FullName, relative_name);
                 FileInfo iiiii = new FileInfo(dst_file);
@@ -186,7 +189,29 @@ namespace ByteFloodUpdater
             else
             {
                 Console.WriteLine("All OK.");
-                Process.Start(Path.Combine(destination_dir, "byteflood.exe"));
+                Process.Start(Path.Combine(dest_dir.FullName, "byteflood.exe"));
+                if (updater_need_update)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("taskkill /IM ByteFloodUpdater.exe");
+                    sb.AppendFormat("copy /Y /B \"{0}\" \"{1}\"", Path.Combine(temp_dir.FullName, "ByteFloodUpdater.exe"),
+                                                                  Path.Combine(dest_dir.FullName, "ByteFloodUpdater.exe"));
+                    sb.AppendLine();
+                    sb.AppendFormat("del /Q \"{0}\"", temp_extract_dir);
+                    sb.AppendLine();
+
+                    sb.AppendFormat("del /Q \"{0}\"", temp_extract_rm);
+                    sb.AppendLine();
+
+                    string cmd_file = Path.Combine(Path.GetTempPath(), "a.bat");
+                    sb.AppendFormat("del \"{0}\"", cmd_file);
+
+                    File.WriteAllText(cmd_file, sb.ToString());
+                    ProcessStartInfo psi = new ProcessStartInfo(cmd_file);
+                    psi.CreateNoWindow = true;
+                    psi.UseShellExecute = false;
+                    Process.Start(psi);
+                }
             }
 
             Directory.Delete(temp_extract_dir, true);
