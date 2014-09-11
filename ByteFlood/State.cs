@@ -358,7 +358,7 @@ namespace ByteFlood
 
             string hash = mg.InfoHash.ToHex();
             string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, hash + ".torrent");
-            string temp_save = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), hash);
+            string temp_save = System.IO.Path.Combine(System.IO.Path.GetTempPath(), hash);
             Directory.CreateDirectory(temp_save);
             TorrentManager tm = new TorrentManager(mg, temp_save, new TorrentSettings(), path);
 
