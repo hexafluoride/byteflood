@@ -124,7 +124,7 @@ namespace ByteFlood
                 "Active",
                "Finished"
             };
-            int secs = 0;
+            int secs = 120;
             while (true)
             {
                 try
