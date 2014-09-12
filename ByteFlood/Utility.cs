@@ -39,6 +39,7 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using MonoTorrent.Common;
 
 namespace ByteFlood
 {
@@ -250,6 +251,41 @@ namespace ByteFlood
                 newstyle.BasedOn = Application.Current.TryFindResource(typeof(Button)) as Style;
             }
             mw.Resources["SelectedItemCheckerButton"] = newstyle;
+        }
+
+        public static Brush GetBrushFromTorrentState(TorrentState s, bool finished)
+        {
+            Style pstyle = (Style)Application.Current.TryFindResource(typeof(ProgressBar));
+            Brush def = Brushes.Gray; ;
+            foreach (Setter setter in pstyle.Setters)
+            {
+                if (setter.Property == ProgressBar.ForegroundProperty)
+                {
+                    def = (Brush)setter.Value; // set to default progressbar color
+                    break;
+                }
+            }
+            Brush yellow = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFe5e500")); // we need a better color for this
+            switch (s)
+            {
+                case TorrentState.Downloading:
+                case TorrentState.Seeding:
+                    return def;
+                case TorrentState.Stopped:
+                case TorrentState.Stopping:
+                    if (finished)
+                        return Brushes.Green;
+                    else
+                        return Brushes.Red;
+                case TorrentState.Error:
+                    return Brushes.Red;
+                case TorrentState.Paused:
+                    return yellow;
+                case TorrentState.Hashing:
+                    return Brushes.Orange;
+                default:
+                    return def;
+            }
         }
 
         // TODO: Tidy this up
