@@ -179,6 +179,7 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                        <Setter Property="Height" Value="Auto"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -203,7 +204,7 @@
                         <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ProgressBar Maximum="100" Value="{Binding Progress}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                    <ProgressBar Maximum="100" Value="{Binding Progress}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

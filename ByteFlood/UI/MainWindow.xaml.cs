@@ -124,7 +124,7 @@ namespace ByteFlood
                 "Active",
                "Finished"
             };
-            int secs = 120;
+            int ticks = 120;
             while (true)
             {
                 try
@@ -154,14 +154,14 @@ namespace ByteFlood
                     }
                     state.NotifyChanged("TorrentCount");
 
-                    if (secs >= 120) //1 min
+                    if (ticks >= 120) //1 min
                     {
                         state.SaveState();
-                        secs = 0;
+                        ticks = 0;
                     }
                     else
                     {
-                        secs++;
+                        ticks++;
                     }
                 }
                 catch
