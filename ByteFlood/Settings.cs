@@ -87,6 +87,8 @@ namespace ByteFlood
 
         public string UpdateSourceEtag { get; set; }
 
+        public string OpenTorrentDialogLastPath { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -122,7 +124,8 @@ namespace ByteFlood
                     TrayIconRightClickBehavior = TrayIconBehavior.ContextMenu,
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties,
                     AssociationAsked = false,
-                    UpdateSourceEtag = null
+                    UpdateSourceEtag = null,
+                    OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
                 };
             }
         }

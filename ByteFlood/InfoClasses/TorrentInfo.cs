@@ -141,7 +141,7 @@ namespace ByteFlood
             Name = "";
             StartTime = DateTime.Now;
             this.Torrent = tm;
-            this.Torrent.TorrentStateChanged += new EventHandler<TorrentStateChangedEventArgs>(Torrent_TorrentStateChanged);
+            TryHookEvents();
             //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
         }
 
@@ -167,7 +167,16 @@ namespace ByteFlood
 
                 events_hooked = true;
             }
-            catch { }
+#if DEBUG
+            catch (Exception ex)
+            {
+                //breakpoint here
+                throw ex;
+            }
+#else
+            catch {}
+#endif
+
         }
 
         private void Torrent_TorrentStateChanged(object sender, TorrentStateChangedEventArgs e)
@@ -329,10 +338,11 @@ namespace ByteFlood
                     {
                         this.Start();
                     }
+
+                    TryHookEvents();
                 }));
             }
 
-            TryHookEvents();
             try // I hate having to do this
             {
                 UpdateProperties();
