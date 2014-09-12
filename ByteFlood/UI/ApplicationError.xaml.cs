@@ -47,8 +47,9 @@ namespace ByteFlood.UI
         {
             if (WillClose == Visibility.Visible)
             {
-                //try save
-                ((MainWindow)App.Current.MainWindow).state.Shutdown(); 
+                //try save (Shutdown already saves the state and config)
+                State state = ((MainWindow)App.Current.MainWindow).state;
+                state.uiContext.Send(x => state.Shutdown(), null); 
                 Environment.Exit(-1);
             }
 
