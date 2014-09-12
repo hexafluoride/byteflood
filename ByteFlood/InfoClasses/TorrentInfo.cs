@@ -25,7 +25,7 @@ namespace ByteFlood
     public class TorrentInfo : INotifyPropertyChanged
     {
         #region Properties and variables
-        public event PropertyChangedEventHandler PropertyChanged;
+
         [XmlIgnore]
         public TorrentManager Torrent { get; private set; }
         [XmlIgnore]
@@ -57,7 +57,7 @@ namespace ByteFlood
         public long WastedBytes { get { return PieceLength * HashFails; } }
         public int Seeders { get { return Torrent.Peers.Seeds; } }
         public int Leechers { get { return Torrent.Peers.Leechs; } }
-        public long Downloaded { get { return GetDownloadedBytes(); } }
+        public long Downloaded { get { return this.Torrent.Monitor.DataBytesDownloaded; } }
         public long Uploaded { get; set; }
         public string Status { get { return Torrent.State.ToString(); } }
         public TorrentState SavedTorrentState { get; set; }
@@ -70,7 +70,7 @@ namespace ByteFlood
             {
                 if (Torrent == null)
                     return false;
-                return Invisible || ((MainWindow)App.Current.MainWindow).itemselector(this);
+                return Invisible || this.MainAppWindow.itemselector(this);
             }
         }
         public bool Invisible { get; set; }
@@ -138,10 +138,14 @@ namespace ByteFlood
         [XmlIgnore]
         public List<float> downspeeds = new List<float>();
         private long up_previous = 0;
+        [XmlIgnore]
+        private MainWindow MainAppWindow { get; set; }
         #endregion
 
         public TorrentInfo() // this is reserved for the XML deserializer.
         {
+            this.MainAppWindow = (App.Current.MainWindow as MainWindow);
+            this.context = this.MainAppWindow.uiContext;
         }
 
         public TorrentInfo(SynchronizationContext c, TorrentManager tm)
@@ -150,8 +154,15 @@ namespace ByteFlood
             Name = "";
             StartTime = DateTime.Now;
             this.Torrent = tm;
+            this.MainAppWindow = (App.Current.MainWindow as MainWindow);
+           
             TryHookEvents();
-            //this.Pieces = new PieceInfo[this.Torrent.Torrent.Pieces.Count]; 
+            PopulateFileList();
+            PopulateTrackerList();
+
+            this.Path = Torrent.Torrent.TorrentPath;
+            this.SavePath = Torrent.SavePath;
+            this.TorrentSettings = Torrent.Settings;
         }
 
         #region Event Handling
@@ -250,15 +261,6 @@ namespace ByteFlood
 
         private void PieceHashed(object sender, PieceHashedEventArgs e)
         {
-            //if (this.Pieces[e.PieceIndex] != null)
-            //{
-            //    PieceInfo p = this.Pieces[e.PieceIndex];
-            //    p.Finished = e.HashPassed;
-            //}
-            //else 
-            //{
-            //    this.Pieces[e.PieceIndex] = new PieceInfo() { Finished = e.HashPassed, ID = e.PieceIndex };
-            //}
             if (e.HashPassed)
             {
                 try
@@ -286,10 +288,12 @@ namespace ByteFlood
             Torrent.Stop();
             this.Peers.Clear();
         }
+
         public void Start()
         {
             Torrent.Start();
         }
+
         public void UpdateGraphData()
         {
             downspeeds.Add(Torrent.Monitor.DownloadSpeed);
@@ -301,7 +305,6 @@ namespace ByteFlood
             Torrent.Pause();
         }
 
-
         public void OffMyself() // Dispose
         {
             if (Torrent.State != TorrentState.Stopped)
@@ -311,36 +314,38 @@ namespace ByteFlood
 
         public string GetMagnetLink()
         {
-            string str = "magnet:?xt=urn:btih:";
-            str += this.Torrent.Torrent.InfoHash.ToHex().Replace("-", "");
-            str += "&dn=" + HttpUtility.UrlEncode(this.Name);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("magnet:?xt=urn:btih:");
+            sb.Append(this.Torrent.Torrent.InfoHash.ToHex());
+            sb.AppendFormat("&dn={0}", HttpUtility.UrlEncode(this.Name));
+
             foreach (TrackerInfo tracker in this.Trackers)
-                str += "&tr=" + HttpUtility.UrlPathEncode(tracker.URL);
-            return str;
+                sb.AppendFormat("&tr={0}", HttpUtility.UrlPathEncode(tracker.URL));
+
+            return sb.ToString();
         }
 
-        public long GetDownloadedBytes() // I have to use this because Torrent.Monitor only shows bytes downloaded in this session
-        {
-            long ret = 0;
-            foreach (TorrentFile file in Torrent.Torrent.Files)
-            {
-                ret += file.CheckedBytes;
-            }
-            ret += Torrent.Monitor.DataBytesDownloaded;
-            return ret;
-        }
+        [XmlIgnore]
+        private bool TorrentNotLoaded = true;
 
         public void Update()
         {
-            if (this.Torrent == null)
+            if (this.TorrentNotLoaded && this.Torrent == null)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    MainWindow mw = Application.Current.MainWindow as MainWindow;
-                    this.context = mw.uiContext;
+                this.TorrentNotLoaded = false;
+                State t = null;
 
+                //Setup some stuffs
+                App.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    t = this.MainAppWindow.state;
+                }));
+
+                //Load torrrent in the background, while not locking up the UI thread
+                Task.Factory.StartNew(new Action(() =>
+                {
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
-                    mw.state.ce.Register(this.Torrent);
+                    t.ce.Register(this.Torrent);
 
                     TorrentState[] StoppedStates = { TorrentState.Stopped, TorrentState.Stopping, TorrentState.Error };
                     if (!StoppedStates.Contains(this.SavedTorrentState))
@@ -349,16 +354,22 @@ namespace ByteFlood
                     }
 
                     TryHookEvents();
+                    PopulateFileList();
+                    PopulateTrackerList();
+
+                    this.Path = Torrent.Torrent.TorrentPath;
+                    this.SavePath = Torrent.SavePath;
+                    this.TorrentSettings = Torrent.Settings;
                 }));
             }
 
             try // I hate having to do this
             {
                 UpdateProperties();
-                PopulateFileList();
-                PopulateTrackerList();
-                //context.Send(x => Peers.Clear(), null);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
+                if (this.Torrent.State == TorrentState.Downloading)
+                {
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
+                }
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdatePeerList));
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateTrackerList));
                 UpdateList("DownloadSpeed",
@@ -410,27 +421,25 @@ namespace ByteFlood
                 }
             }
         }
-        [XmlIgnore]
-        private bool trackers_populated = false;
+
         private void PopulateTrackerList()
         {
-            if (!trackers_populated)
+            if (this.Torrent != null)
             {
-                if (this.Torrent != null)
-                {
-                    var tm = this.Torrent.TrackerManager;
+                var tm = this.Torrent.TrackerManager;
 
-                    foreach (MonoTorrent.Client.Tracker.TrackerTier tier in tm)
+                foreach (MonoTorrent.Client.Tracker.TrackerTier tier in tm)
+                {
+                    foreach (MonoTorrent.Client.Tracker.Tracker t in tier)
                     {
-                        foreach (MonoTorrent.Client.Tracker.Tracker t in tier)
-                        {
-                            this.Trackers.Add(new TrackerInfo(t, this));
-                        }
+                        this.Trackers.Add(new TrackerInfo(t, this));
                     }
-                    trackers_populated = true;
                 }
             }
         }
+
+        #region ListsUpdaters
+
         private void UpdateTrackerList(object obj)
         {
             foreach (TrackerInfo ti in this.Trackers)
@@ -453,6 +462,7 @@ namespace ByteFlood
                 }
             });
         }
+
         private void UpdateFileList(object obj)
         {
             if (this.FilesTree != null)
@@ -463,6 +473,9 @@ namespace ByteFlood
                 });
             }
         }
+
+        #endregion
+
         #region SavedFilePriority
 
         public MonoTorrent.Common.Priority GetSavedFilePriority(FileInfo fi)
@@ -491,6 +504,11 @@ namespace ByteFlood
         }
 
         #endregion
+
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public void UpdateList(params string[] columns)
         {
             if (PropertyChanged == null)
@@ -499,12 +517,10 @@ namespace ByteFlood
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
 
+        #endregion
+
         private void UpdateProperties()
         {
-            this.Path = Torrent.Torrent.TorrentPath;
-            this.SavePath = Torrent.SavePath;
-            this.TorrentSettings = Torrent.Settings;
-
             if (this.Torrent.State == TorrentState.Downloading)
             {
                 var seconds = 0;

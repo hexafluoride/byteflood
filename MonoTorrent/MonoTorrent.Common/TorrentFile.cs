@@ -67,7 +67,28 @@ namespace MonoTorrent.Common
             get { return this.bitfield; }
         }
 
-        public long CheckedBytes;
+        private long _cb;
+        public long CheckedBytes
+        {
+            get { return _cb; }
+        }
+
+        public delegate void CheckedBytesModifiedEvent(TorrentFile sender, long amount);
+        public event CheckedBytesModifiedEvent CheckedBytesModified;
+
+        public void AddCheckedBytes(long amount) 
+        {
+            System.Threading.Interlocked.Add(ref _cb, amount);
+            if (this.CheckedBytesModified != null) 
+            {
+                CheckedBytesModified(this, amount);
+            }
+        }
+
+        public void ResetCheckedBytes() 
+        {
+            this._cb = 0;
+        }
 
         public long BytesDownloaded
         { 

@@ -444,8 +444,16 @@ namespace MonoTorrent.Client
 
             if (HasMetadata) {
                 foreach (TorrentFile file in torrent.Files)
-                    file.FullPath = Path.Combine (SavePath, file.Path);
+                {
+                    file.FullPath = Path.Combine(SavePath, file.Path);
+                    file.CheckedBytesModified += file_CheckedBytesModified;
+                }   
             }
+        }
+
+        void file_CheckedBytesModified(TorrentFile sender, long amount)
+        {
+            this.monitor.PreviousDataBytesDownloaded += amount;
         }
 
         void CreateRateLimiters()
