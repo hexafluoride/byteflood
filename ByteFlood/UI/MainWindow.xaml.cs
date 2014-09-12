@@ -42,10 +42,8 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
-        RssUrlEntry SelectedRssEntry = null;
         bool gripped = false;
         bool ignoreclose = true;
-        DateTime lastsave = DateTime.Now.Subtract(new TimeSpan(1, 0, 0));
         Thread thr;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
@@ -118,6 +116,15 @@ namespace ByteFlood
 
         public void Update()
         {
+            string[] torrentstates = new string[] 
+            { 
+                "Downloading",
+                "Seeding",
+                "Inactive",
+                "Active",
+               "Finished"
+            };
+            int secs = 0;
             while (true)
             {
                 try
@@ -137,28 +144,24 @@ namespace ByteFlood
                                     ti.UpdateGraphData();
                         }
                         updategraph = !updategraph;
-
                         MultiBindingExpression exp = BindingOperations.GetMultiBindingExpression(this, MainWindow.TitleProperty);
                         exp.UpdateTarget();
                     }, null);
 
-                    string[] torrentstates = new string[] { 
-                        "Downloading",
-                        "Seeding",
-                        "Inactive",
-                        "Active",
-                        "Finished"
-                    };
                     foreach (string str in torrentstates)
                     {
                         state.NotifyChanged(str + "Torrents", str + "TorrentCount");
                     }
                     state.NotifyChanged("TorrentCount");
 
-                    if ((DateTime.Now - lastsave).TotalMinutes > 1)
+                    if (secs >= 120) //1 min
                     {
                         state.SaveState();
-                        lastsave = DateTime.Now;
+                        secs = 0;
+                    }
+                    else
+                    {
+                        secs++;
                     }
                 }
                 catch
@@ -353,13 +356,16 @@ namespace ByteFlood
             ofd.Title = "Open a torrent...";
             ofd.Filter = "Torrent files|*.torrent";
             ofd.DefaultExt = "*.torrent";
-            ofd.InitialDirectory = Environment.CurrentDirectory;
+            ofd.InitialDirectory = App.Settings.OpenTorrentDialogLastPath;
             ofd.CheckFileExists = true;
             ofd.Multiselect = true;
-            ofd.ShowDialog();
-            foreach (string str in ofd.FileNames)
+            if (ofd.ShowDialog() == true)
             {
-                state.AddTorrentByPath(str);
+                App.Settings.OpenTorrentDialogLastPath = System.IO.Path.GetDirectoryName(ofd.FileName);
+                foreach (string str in ofd.FileNames)
+                {
+                    state.AddTorrentByPath(str);
+                }
             }
         }
 
