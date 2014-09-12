@@ -18,6 +18,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Web;
+using System.Windows.Media;
 
 namespace ByteFlood
 {
@@ -31,6 +32,14 @@ namespace ByteFlood
         public string Ratio { get { return RawRatio.ToString("0.000"); } }
         [XmlIgnore]
         public TimeSpan ETA { get; private set; }
+        [XmlIgnore]
+        public Brush ProgressBarColor
+        {
+            get
+            {
+                return Utility.GetBrushFromTorrentState(Torrent.State, Torrent.Complete);
+            }
+        }
         public string Path = "";
         public string SavePath = "";
         public TorrentSettings TorrentSettings { get; set; }
@@ -361,7 +370,8 @@ namespace ByteFlood
                     "AverageUploadSpeed",
                     "MaxDownloadSpeed",
                     "MaxUploadSpeed",
-                    "ShowOnList");
+                    "ShowOnList",
+                    "ProgressBarColor");
             }
             catch (Exception ex)
             {
