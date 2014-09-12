@@ -51,15 +51,15 @@ namespace MonoTorrent.Client
 
 
         #region Public Properties
-
+        public long PreviousDataBytesDownloaded { get; set; }
         public long DataBytesDownloaded
         {
-            get { return dataDown.Total; }
+            get { return this.PreviousDataBytesDownloaded + dataDown.Total; }
         }
-
+        public long PreviousDataBytesUploaded { get; set; }
         public long DataBytesUploaded
         {
-            get { return dataUp.Total; }
+            get { return this.PreviousDataBytesUploaded + dataUp.Total; }
         }
 
         public int DownloadSpeed
