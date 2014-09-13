@@ -36,12 +36,21 @@ using MonoTorrent.Client.Encryption;
 
 namespace MonoTorrent.Client.Connections
 {
+    public delegate void ExceptionThrownHandler(Exception ex); // why
     public class IPV4Connection : IConnection
     {
         private bool isIncoming;
-        private IPEndPoint endPoint;
+        private IPEndPoint localEndPoint;
+        private IPEndPoint remoteEndPoint;
         private Socket socket;
         private Uri uri;
+        private int localPort;
+
+        public static int[] LocalPorts;
+        public static bool UseRandomPorts;
+        public static IPAddress LocalAddress;
+        public static event ExceptionThrownHandler ExceptionThrown;
+        public static Random Random = new Random();
 
         #region Member Variables
 
@@ -57,12 +66,12 @@ namespace MonoTorrent.Client.Connections
 
         EndPoint IConnection.EndPoint
         {
-            get { return endPoint; }
+            get { return remoteEndPoint; }
         }
 
         public IPEndPoint EndPoint
         {
-            get { return this.endPoint; }
+            get { return this.remoteEndPoint; }
         }
 
         public bool IsIncoming
@@ -75,13 +84,18 @@ namespace MonoTorrent.Client.Connections
             get { return uri; }
         }
 
+        public int LocalPort
+        {
+            get { return localPort; }
+        }
+
         #endregion
 
 
         #region Constructors
 
         public IPV4Connection(Uri uri)
-            : this(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), 
+            : this(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp),
                    new IPEndPoint(IPAddress.Parse(uri.Host), (uri.Port == -1 ? 1 : uri.Port)),
                    false)
         {
@@ -104,7 +118,12 @@ namespace MonoTorrent.Client.Connections
         private IPV4Connection(Socket socket, IPEndPoint endpoint, bool isIncoming)
         {
             this.socket = socket;
-            this.endPoint = endpoint;
+            if (!UseRandomPorts)
+                this.localPort = LocalPorts[Random.Next(LocalPorts.Length)];
+            else
+                this.localPort = Random.Next(1024, 65536);
+            this.localEndPoint = new IPEndPoint(LocalAddress, this.localPort);
+            this.remoteEndPoint = endpoint;
             this.isIncoming = isIncoming;
         }
 
@@ -115,12 +134,23 @@ namespace MonoTorrent.Client.Connections
 
         public byte[] AddressBytes
         {
-            get { return this.endPoint.Address.GetAddressBytes(); }
+            get { return this.remoteEndPoint.Address.GetAddressBytes(); }
         }
 
         public IAsyncResult BeginConnect(AsyncCallback peerEndCreateConnection, object state)
         {
-            return this.socket.BeginConnect(this.endPoint, peerEndCreateConnection, state);
+            try
+            {
+                this.socket.Bind(this.localEndPoint);
+            }
+            catch (Exception ex)
+            {
+                if (ExceptionThrown != null)
+                    ExceptionThrown(ex);
+            }
+            Console.WriteLine("Connecting to {0}, local end point is {1}", this.remoteEndPoint.Address.ToString() + ":" + this.remoteEndPoint.Port, 
+                this.localEndPoint.Address.ToString() + ":" + this.localEndPoint.Port);
+            return this.socket.BeginConnect(this.remoteEndPoint, peerEndCreateConnection, state);
         }
 
         public IAsyncResult BeginReceive(byte[] buffer, int offset, int count, AsyncCallback asyncCallback, object state)

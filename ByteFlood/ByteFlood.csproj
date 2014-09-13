@@ -84,6 +84,7 @@
     <Compile Include="Controls\TreeList\Tree\TreeList.cs" />
     <Compile Include="Controls\TreeList\Tree\TreeListItem.cs" />
     <Compile Include="Controls\TreeList\Tree\TreeNode.cs" />
+    <Compile Include="Formatters\InvertBooleanConverter.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
     <Compile Include="Formatters\PeerCountryToIcon.cs" />

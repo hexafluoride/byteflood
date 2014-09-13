@@ -63,6 +63,9 @@ namespace ByteFlood
         public TrayIconBehavior TrayIconClickBehavior { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
         public EncryptionForceType EncryptionType { get; set; }
+        public int OutgoingPortsStart { get; set; }
+        public int OutgoingPortsEnd { get; set; }
+        public bool OutgoingPortsRandom { get; set; }
         [XmlIgnore]
         public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
         [XmlIgnore]
@@ -112,6 +115,9 @@ namespace ByteFlood
                     ShowRelativePaths = true,
                     NotifyOnTray = true,
                     ImportedTorrents = false,
+                    OutgoingPortsRandom = true,
+                    OutgoingPortsStart = 10000,
+                    OutgoingPortsEnd = 20000,
                     PreviousPaths = new List<string>() { System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads") },
                     MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
                     ExitBehavior = WindowBehavior.MinimizeToTray,
@@ -163,11 +169,27 @@ namespace ByteFlood
 
             foreach (PropertyInfo prop in props)
             {
-                if (prop.CanWrite && prop.GetValue(s, null) == null)
+                if (prop.CanWrite)
                 {
-                    if (prop.PropertyType.IsValueType || prop.PropertyType.IsEnum || prop.PropertyType.Equals(typeof(System.String)))
+                    if (prop.GetValue(s, null) == null)
                     {
-                        prop.SetValue(s, prop.GetValue(default_settings, null), null);
+                        if (prop.PropertyType.IsValueType || prop.PropertyType.IsEnum || prop.PropertyType.Equals(typeof(System.String)))
+                        {
+                            prop.SetValue(s, prop.GetValue(default_settings, null), null);
+                        }
+                    }
+                    else if ((prop.PropertyType.Equals(typeof(System.Int32)) || 
+                        prop.PropertyType.Equals(typeof(System.Boolean))))
+                    {
+                        try
+                        {
+                            object obj = prop.GetValue(s, null);
+                            if ((int)obj == 0 || (bool)obj == false)
+                                prop.SetValue(s, prop.GetValue(default_settings, null), null);
+                        }
+                        catch
+                        {
+                        }
                     }
                 }
             }

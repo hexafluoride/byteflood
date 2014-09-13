@@ -10,32 +10,30 @@
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <formatters:ObjectToIntConverter x:Key="ObjectToInt" />
+        <formatters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
     </Window.Resources>
     <Grid>
         <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
             <TreeViewItem Header="General" Name="general_tree" IsSelected="True" />
             <TreeViewItem Header="RSS" Name="rss_tree" />
-            <TreeViewItem Header="UI" Name="ui_tree" >
-            </TreeViewItem>
+            <TreeViewItem Header="UI" Name="ui_tree" />
+            <TreeViewItem Header="Network" Name="conn_tree"  />
         </TreeView>
         <TabControl HorizontalAlignment="Left" Margin="158,10,0,0" Name="tabControl1" Width="437" Height="431" VerticalAlignment="Top">
             <TabItem Name="general" IsSelected="{Binding IsSelected, ElementName=general_tree}" Height="0">
                 <Canvas>
-                    <TextBlock Text="Encryption type" Height="20" HorizontalAlignment="Left" Margin="6,6,0,0" Name="checkBox1" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="180" />
-                    
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock1" Text="Default download path" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="-16" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="134,27,0,0" Name="downpath" VerticalAlignment="Top" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="0" Canvas.Top="-16" />
                     <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="385,27,0,0" Name="button1" VerticalAlignment="Top" Width="40" Click="PickPath" Canvas.Left="0" Canvas.Top="-16" />
-                    
+
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,56,0,0" Name="textBlock2" Text="Listening port" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="-14" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="305,56,0,0" Name="textBox2" VerticalAlignment="Top" Width="120" Text="{Binding ListeningPort}" Canvas.Left="0" Canvas.Top="-16" />
-                    
+
                     <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="72" />
                     <TextBox Canvas.Left="305" Canvas.Top="69" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
                     <Button Canvas.Left="6" Canvas.Top="100" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
                     <Button Canvas.Left="6" Canvas.Top="128" Content="Associate ByteFlood with torrent files" Height="23" Width="218" Click="AssociateFiles" />
                     <Button Canvas.Left="6" Canvas.Top="157" Content="Import torrents from uTorrent" Height="23" Click="ImportTorrents" Width="218" />
-                    <ComboBox Canvas.Left="275" Canvas.Top="183" Height="23" Name="enctype" Width="150" SelectedIndex="{Binding EncryptionType, Converter={StaticResource ObjectToInt}}" />
                 </Canvas>
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">
@@ -43,10 +41,10 @@
                     <CheckBox Content="Draw graph grid" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="checkBox2" VerticalAlignment="Top" IsChecked="{Binding DrawGrid}" />
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock3" Text="Download color" VerticalAlignment="Top" />
                     <Button Height="23" HorizontalAlignment="Left" Margin="350,24,0,0" Name="downcolor" VerticalAlignment="Top" Width="75" Click="SelectDownloadColor" Background="{Binding DownloadBrush}" />
-                    
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,55,0,0" Name="textBlock4" Text="Upload color" VerticalAlignment="Top" />
+
+                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,55,0,0" Text="Upload color" VerticalAlignment="Top" />
                     <Button Height="23" HorizontalAlignment="Left" Margin="350,53,0,0" Name="upcolor" VerticalAlignment="Top" Width="75" Click="SelectUploadColor" Background="{Binding UploadBrush}" />
-                    
+
                     <ComboBox Height="23" HorizontalAlignment="Right" Width="150" VerticalAlignment="Top" Margin="1,83,0,100" 
                               SelectionChanged="ReloadTheme"
                               Name="themeCombox" Canvas.Right="5" />
@@ -75,6 +73,25 @@
                     <RadioButton Content="Download content matching regex: " Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="rss_regex_selector" VerticalAlignment="Top" GroupName="rss_content_selectors" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="220,26,0,0" Name="rss_regex" VerticalAlignment="Top" Width="205" Text="{Binding RSSRegex}" IsEnabled="{Binding ElementName=rss_regex_selector, Path=IsChecked}"/>
                     <CheckBox Content="Check for duplicates" Height="16" HorizontalAlignment="Left" Margin="6,50,0,0" Name="dupes" IsChecked="{Binding RSSCheckForDuplicates}" VerticalAlignment="Top" />
+                </Canvas>
+            </TabItem>
+            <TabItem Name="conn" IsSelected="{Binding IsSelected, ElementName=conn_tree}" Height="0">
+                <Canvas>
+                    <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing ports" Height="77" Width="414">
+                        <Canvas>
+                            <RadioButton Height="16" Name="selectoports" Canvas.Top="29" Canvas.Left="10" IsChecked="{Binding OutgoingPortsRandom, Converter={StaticResource InvertBooleanConverter}}" GroupName="out" />
+                            <StackPanel Orientation="Horizontal" Canvas.Left="26" Canvas.Top="24" IsEnabled="{Binding ElementName=selectoports, Path=IsChecked}">
+                                <TextBlock Height="Auto" Margin="5,0,0,0" VerticalAlignment="Center" Name="textBlock5" Text="From" />
+                                <TextBox Height="23" Margin="7,0,0,0" VerticalAlignment="Center" Text="{Binding OutgoingPortsStart}" Width="66" />
+
+                                <TextBlock Height="Auto" Margin="7,0,0,0" VerticalAlignment="Center" Name="textBlock6" Text="to" />
+                                <TextBox Height="23" Margin="7,0,0,0" VerticalAlignment="Center" Text="{Binding OutgoingPortsEnd}" Width="66" />
+                            </StackPanel>
+                            <RadioButton Canvas.Left="10" Canvas.Top="7" Content="Use random ports (recommended)" IsChecked="{Binding OutgoingPortsRandom}" Height="16" GroupName="out" />
+                        </Canvas>
+                    </GroupBox>
+                    <TextBlock Canvas.Left="6" Canvas.Top="93" Height="20" Text="Encryption type" />
+                    <ComboBox Canvas.Left="275" Canvas.Top="89" Height="23" Name="enctype" SelectedIndex="{Binding EncryptionType, Converter={StaticResource ObjectToInt}}" Width="150" />
                 </Canvas>
             </TabItem>
         </TabControl>
