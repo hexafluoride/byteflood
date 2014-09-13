@@ -211,9 +211,10 @@ namespace ByteFlood
         {
             // these are not handled in the usual "ByteFlood has encountered an exception" way
             Console.WriteLine("---------- ERROR LOG START ----------");
-            Console.WriteLine("Connection failed, reason: {0}", ex.Message);
+            Console.WriteLine("Exception thrown, reason: {0}", ex.Message);
             Console.WriteLine("Stack trace: {0}", ex.StackTrace);
-            Console.WriteLine("Dumping InnerExceptions.");
+            if(ex.InnerException != null)
+                Console.WriteLine("Dumping InnerExceptions.");
             int id = 0;
             while (ex.InnerException != null)
             {
