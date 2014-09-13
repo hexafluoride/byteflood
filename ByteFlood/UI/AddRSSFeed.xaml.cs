@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
 
 namespace ByteFlood.UI
 {
@@ -18,7 +19,7 @@ namespace ByteFlood.UI
     /// </summary>
     public partial class AddRSSFeed : Window
     {
-        
+
         #region Properties
 
         public string Url
@@ -75,11 +76,24 @@ namespace ByteFlood.UI
         public static readonly DependencyProperty AllowUrlChangeProperty =
             DependencyProperty.Register("AllowUrlChange", typeof(bool), typeof(AddRSSFeed), new PropertyMetadata(true));
 
+
+
+        public ObservableCollection<Services.RSS.RssFilter> Filters
+        {
+            get { return (ObservableCollection<Services.RSS.RssFilter>)GetValue(FiltersProperty); }
+            set { SetValue(FiltersProperty, value); }
+        }
+
+        public static readonly DependencyProperty FiltersProperty =
+            DependencyProperty.Register("Filters", typeof(ObservableCollection<Services.RSS.RssFilter>), typeof(AddRSSFeed), new PropertyMetadata(null));
+
         #endregion
 
         public AddRSSFeed()
         {
             InitializeComponent();
+            this.Filters = new ObservableCollection<Services.RSS.RssFilter>();
+            this.RemoveEvent = new RoutedEventHandler(this.Filters_Remove);
         }
 
         #region Commands
@@ -94,7 +108,40 @@ namespace ByteFlood.UI
             this.DialogResult = true; this.Close();
         }
 
+        private RoutedEventHandler RemoveEvent;
+
+        private void Filters_Add(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(this.FilterExpression))
+            {
+                var action = this.FilterAction == 0 ? Services.RSS.RssFilter.FilterActionEnum.Download : Services.RSS.RssFilter.FilterActionEnum.Skip;
+                this.Filters.Add(new Services.RSS.RssFilter()
+                {
+                    FilterAction = action,
+                    FilterText = this.FilterExpression,
+                    RemoveAction = RemoveEvent
+                });
+                this.FilterExpression = "";
+            }
+        }
+
+        private void Filters_Remove(object sender, RoutedEventArgs e)
+        {
+            Controls.ClickableLabel label = sender as Controls.ClickableLabel;
+            Services.RSS.RssFilter filter = label.Tag as Services.RSS.RssFilter;
+            this.Filters.Remove(filter);
+        }
+
         #endregion
+
+        public void LoadFilters(Services.RSS.RssFilter[] filters) 
+        {
+            foreach (var filter in filters) 
+            {
+                filter.RemoveAction = this.RemoveEvent;
+                this.Filters.Add(filter);
+            }
+        }
 
 
     }

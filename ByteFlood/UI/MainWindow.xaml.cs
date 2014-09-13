@@ -395,8 +395,7 @@ namespace ByteFlood
                     Url = query.Url,
                     Alias = query.CustomAlias,
                     AutoDownload = query.AutoDownload == true,
-                    FilterExpression = query.FilterExpression,
-                    FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip,
+                    Filters = query.Filters,
                     DefaultSettings = new TorrentSettings()
                 };
 
@@ -884,16 +883,14 @@ namespace ByteFlood
                     query.AllowUrlChange = false;
                     query.Url = entry.Url;
                     query.CustomAlias = entry.Alias;
-                    query.FilterExpression = entry.FilterExpression;
-                    query.FilterAction = entry.FilterAction == RssUrlEntry.FilterActionEnum.Download ? 0 : 1;
+                    query.LoadFilters(entry.Filters.ToArray());
                     query.AutoDownload = entry.AutoDownload;
 
                     if (query.ShowDialog() == true)
                     {
-                        entry.FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip;
                         entry.Alias = query.CustomAlias;
-                        entry.FilterExpression = query.FilterExpression;
                         entry.AutoDownload = query.AutoDownload == true;
+                        entry.Filters = query.Filters;
                         entry.NotifyUpdate();
                         FeedsManager.Save();
                     }

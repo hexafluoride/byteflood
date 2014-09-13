@@ -28,6 +28,8 @@ namespace ByteFlood.Services.RSS
         public string TorrentFilePath { get; set; }
         public DateTime TimePublished { get; set; }
 
+        public bool IsAllowed { get; set; }
+
         private bool _success = false;
         public bool Success
         {
