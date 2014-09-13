@@ -224,6 +224,7 @@ namespace ByteFlood
                 id++;
             }
             Console.WriteLine("----------- ERROR LOG END -----------");
+
         }
 
         public static void ReloadTheme(Theme t)
