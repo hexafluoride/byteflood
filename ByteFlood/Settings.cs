@@ -184,20 +184,14 @@ namespace ByteFlood
                             prop.SetValue(s, prop.GetValue(default_settings, null), null);
                         }
                     }
-                    else if ((prop.PropertyType.Equals(typeof(System.Int32)) || 
-                        prop.PropertyType.Equals(typeof(System.Boolean))))
-                    {
-                        try
-                        {
-                            object obj = prop.GetValue(s, null);
-                            if ((int)obj == 0 || (bool)obj == false)
-                                prop.SetValue(s, prop.GetValue(default_settings, null), null);
-                        }
-                        catch
-                        {
-                        }
-                    }
                 }
+            }
+
+            if (s.OutgoingPortsRandom == false && s.OutgoingPortsEnd == s.OutgoingPortsStart && s.OutgoingPortsStart == 0)
+            {
+                s.OutgoingPortsRandom = default_settings.OutgoingPortsRandom;
+                s.OutgoingPortsStart = default_settings.OutgoingPortsStart;
+                s.OutgoingPortsEnd = default_settings.OutgoingPortsEnd;
             }
 
             // this is a rather special case, for upgrading users
