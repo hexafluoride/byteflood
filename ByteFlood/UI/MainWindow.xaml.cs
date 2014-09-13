@@ -397,6 +397,8 @@ namespace ByteFlood
                     AutoDownload = query.AutoDownload == true,
                     Filters = query.Filters,
                     DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath,
+                    IsCustomtUpdateInterval = query.UpdateIntervalType == 1,
+                    CustomUpdateInterval = new TimeSpan(0,0, query.CustomIntervalSeconds),
                     DefaultSettings = new TorrentSettings()
                 };
 
@@ -887,6 +889,8 @@ namespace ByteFlood
                     query.LoadFilters(entry.Filters.ToArray());
                     query.AutoDownload = entry.AutoDownload;
                     query.DownloadPath = entry.DownloadDirectory;
+                    query.UpdateIntervalType = entry.IsCustomtUpdateInterval ? 1 : 0;
+                    query.ManualUpdateIntervalSeconds = entry.CustomUpdateInterval.TotalSeconds.ToString();
 
                     if (query.ShowDialog() == true)
                     {
@@ -894,6 +898,8 @@ namespace ByteFlood
                         entry.AutoDownload = query.AutoDownload == true;
                         entry.Filters = query.Filters;
                         entry.DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath;
+                        entry.CustomUpdateInterval = new TimeSpan(0, 0, query.CustomIntervalSeconds);
+                        entry.IsCustomtUpdateInterval = query.UpdateIntervalType == 1;
                         entry.NotifyUpdate();
                         FeedsManager.Save();
                     }

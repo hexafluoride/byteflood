@@ -96,6 +96,44 @@ namespace ByteFlood.UI
         public static readonly DependencyProperty FiltersProperty =
             DependencyProperty.Register("Filters", typeof(ObservableCollection<Services.RSS.RssFilter>), typeof(AddRSSFeed), new PropertyMetadata(null));
 
+
+        public int UpdateIntervalType
+        {
+            get { return (int)GetValue(UpdateIntervalTypeProperty); }
+            set { SetValue(UpdateIntervalTypeProperty, value); }
+        }
+
+        public static readonly DependencyProperty UpdateIntervalTypeProperty =
+            DependencyProperty.Register("UpdateIntervalType", typeof(int), typeof(AddRSSFeed), new PropertyMetadata(0));
+
+        public int CustomIntervalSeconds;
+        public string ManualUpdateIntervalSeconds
+        {
+            get { return this.CustomIntervalSeconds.ToString(); }
+            set
+            {
+                Int32.TryParse(value, out this.CustomIntervalSeconds);
+                if (this.CustomIntervalSeconds < 0)
+                {
+                    this.CustomIntervalSeconds = -this.CustomIntervalSeconds;   
+                }
+                else if (this.CustomIntervalSeconds == 0) 
+                {
+                    this.CustomIntervalSeconds = 15 * 60;
+                }
+                this.ManualUpdateIntervalSecondsText = Formatters.HMSFormatter.GetReadableTimespan(new TimeSpan(0, 0, this.CustomIntervalSeconds));
+            }
+        }
+
+        public string ManualUpdateIntervalSecondsText
+        {
+            get { return (string)GetValue(ManualUpdateIntervalSecondsTextProperty); }
+            set { SetValue(ManualUpdateIntervalSecondsTextProperty, value); }
+        }
+
+        public static readonly DependencyProperty ManualUpdateIntervalSecondsTextProperty =
+            DependencyProperty.Register("ManualUpdateIntervalSecondsText", typeof(string), typeof(AddRSSFeed), new PropertyMetadata(null));
+
         #endregion
 
         public AddRSSFeed()
@@ -104,6 +142,7 @@ namespace ByteFlood.UI
             this.Filters = new ObservableCollection<Services.RSS.RssFilter>();
             this.RemoveEvent = new RoutedEventHandler(this.Filters_Remove);
             this.DownloadPath = App.Settings.DefaultDownloadPath;
+            this.ManualUpdateIntervalSeconds = "120";
         }
 
         #region Commands
@@ -154,9 +193,9 @@ namespace ByteFlood.UI
 
         #endregion
 
-        public void LoadFilters(Services.RSS.RssFilter[] filters) 
+        public void LoadFilters(Services.RSS.RssFilter[] filters)
         {
-            foreach (var filter in filters) 
+            foreach (var filter in filters)
             {
                 filter.RemoveAction = this.RemoveEvent;
                 this.Filters.Add(filter);

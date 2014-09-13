@@ -32,8 +32,27 @@ namespace ByteFlood.Services.RSS
 
         public string DownloadDirectory { get; set; }
 
+        private TimeSpan ComputedUpdateInterval;
+
         [XmlIgnore]
-        private TimeSpan UpdateInterval { get; set; }
+        public TimeSpan UpdateInterval
+        {
+            get 
+            {
+                if (this.IsCustomtUpdateInterval)
+                {
+                    return this.CustomUpdateInterval;
+                }
+                else
+                {
+                    return this.ComputedUpdateInterval;
+                }
+            }
+        }
+
+        public bool IsCustomtUpdateInterval { get; set; }
+
+        public TimeSpan CustomUpdateInterval { get; set; }
 
         [XmlIgnore]
         private int tick = 1000;
@@ -95,7 +114,7 @@ namespace ByteFlood.Services.RSS
 
         public RssUrlEntry()
         {
-            this.UpdateInterval = new TimeSpan(0, 15, 0);
+            this.ComputedUpdateInterval = new TimeSpan(0, 15, 0);
             this.items = new ObservableDictionary<string, RssTorrent>();
             this.Filters = new ObservableCollection<RssFilter>();
             this.DownloadDirectory = App.Settings.DefaultDownloadPath;
@@ -126,7 +145,10 @@ namespace ByteFlood.Services.RSS
                     {
                         if (!items.ContainsKey(rt.Id))
                         {
-                            time_diff_sum += (start - rt.TimePublished).TotalSeconds;
+                            if (!this.IsCustomtUpdateInterval)
+                            {
+                                time_diff_sum += (start - rt.TimePublished).TotalSeconds;
+                            }
                             rt.IsAllowed = IsAllowed(rt);
                             if (rt.IsAllowed)
                             {
@@ -136,15 +158,21 @@ namespace ByteFlood.Services.RSS
                         }
                         else
                         {
-                            time_diff_sum += (start - items[rt.Id].TimePublished).TotalSeconds;
+                            if (!this.IsCustomtUpdateInterval)
+                            {
+                                time_diff_sum += (start - items[rt.Id].TimePublished).TotalSeconds;
+                            }
                         }
                     }
 
                     TryLoadIcon();
                     NotifyPropertyChanged("Name");
 
-                    this.UpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(time_diff_sum / items.Count()));
-                    Debug.WriteLine("[Feed '{0}']: Calculated update interval: {1} sec", this.Url, this.UpdateInterval.TotalSeconds);
+                    if (!this.IsCustomtUpdateInterval)
+                    {
+                        this.ComputedUpdateInterval = new TimeSpan(0, 0, Convert.ToInt32(time_diff_sum / items.Count()));
+                        Debug.WriteLine("[Feed '{0}']: Calculated update interval: {1} sec", this.Url, this.UpdateInterval.TotalSeconds);
+                    }
                     tick = 0;
 
                     Debug.WriteLine("[Feed '{0}']: update terminated.", this.Url, "");
