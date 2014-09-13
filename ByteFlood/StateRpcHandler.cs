@@ -37,5 +37,17 @@ namespace ByteFlood
         {
             return State.Torrents.Count;
         }
+
+        [JsonRpcMethod]
+        public void Shutdown()
+        {
+            System.Threading.Tasks.Task.Factory.StartNew(new Action(() => 
+            {
+                System.Threading.Thread.Sleep(2500);
+                State.Shutdown();
+                App.Current.Dispatcher.Invoke(new Action(() => { App.Current.Shutdown(0); }));
+            }));
+        }
+
     }
 }

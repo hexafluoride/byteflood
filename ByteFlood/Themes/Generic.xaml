@@ -96,4 +96,40 @@
 
     </Style>
 
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type l:RssFiltersView},ResourceId=RssFiltersView}"
+         TargetType="{x:Type ListView}" BasedOn="{StaticResource {x:Type ListBox}}">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border Name="bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                  Background="{TemplateBinding Background}" Margin="{TemplateBinding Margin}">
+                        <ScrollViewer IsDeferredScrollingEnabled ="True" Margin="{TemplateBinding Padding}">
+                            <WrapPanel IsItemsHost="True" MinWidth="100"
+                                       Width="{Binding ActualWidth,RelativeSource={RelativeSource AncestorType=ScrollContentPresenter}}"/>
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <f:RssFiltersViewConverter x:Key="RssFiltersViewConverter" />
+
+    <Style x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type l:RssFiltersView},ResourceId=RssFiltersViewItem}"
+         TargetType='{x:Type ListViewItem}' BasedOn='{StaticResource {x:Type ListBoxItem}}'>
+        <Setter Property='Padding' Value='4'/>
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Background="{Binding FilterAction, Converter={StaticResource RssFiltersViewConverter}}">
+                        <TextBlock Text="{Binding FilterText}" Foreground="White"/>
+                        <l:ClickableLabel Content="[x]" Tag="{Binding}" Foreground="White" ClickEvent="{Binding RemoveAction}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
 </ResourceDictionary>

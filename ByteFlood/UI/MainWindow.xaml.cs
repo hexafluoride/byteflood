@@ -42,10 +42,8 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
-        RssUrlEntry SelectedRssEntry = null;
         bool gripped = false;
         bool ignoreclose = true;
-        DateTime lastsave = DateTime.Now.Subtract(new TimeSpan(1, 0, 0));
         Thread thr;
         bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
@@ -118,6 +116,15 @@ namespace ByteFlood
 
         public void Update()
         {
+            string[] torrentstates = new string[] 
+            { 
+                "Downloading",
+                "Seeding",
+                "Inactive",
+                "Active",
+               "Finished"
+            };
+            int ticks = 120;
             while (true)
             {
                 try
@@ -137,28 +144,24 @@ namespace ByteFlood
                                     ti.UpdateGraphData();
                         }
                         updategraph = !updategraph;
-
                         MultiBindingExpression exp = BindingOperations.GetMultiBindingExpression(this, MainWindow.TitleProperty);
                         exp.UpdateTarget();
                     }, null);
 
-                    string[] torrentstates = new string[] { 
-                        "Downloading",
-                        "Seeding",
-                        "Inactive",
-                        "Active",
-                        "Finished"
-                    };
                     foreach (string str in torrentstates)
                     {
                         state.NotifyChanged(str + "Torrents", str + "TorrentCount");
                     }
                     state.NotifyChanged("TorrentCount");
 
-                    if ((DateTime.Now - lastsave).TotalMinutes > 1)
+                    if (ticks >= 120) //1 min
                     {
                         state.SaveState();
-                        lastsave = DateTime.Now;
+                        ticks = 0;
+                    }
+                    else
+                    {
+                        ticks++;
                     }
                 }
                 catch
@@ -353,13 +356,16 @@ namespace ByteFlood
             ofd.Title = "Open a torrent...";
             ofd.Filter = "Torrent files|*.torrent";
             ofd.DefaultExt = "*.torrent";
-            ofd.InitialDirectory = Environment.CurrentDirectory;
+            ofd.InitialDirectory = App.Settings.OpenTorrentDialogLastPath;
             ofd.CheckFileExists = true;
             ofd.Multiselect = true;
-            ofd.ShowDialog();
-            foreach (string str in ofd.FileNames)
+            if (ofd.ShowDialog() == true)
             {
-                state.AddTorrentByPath(str);
+                App.Settings.OpenTorrentDialogLastPath = System.IO.Path.GetDirectoryName(ofd.FileName);
+                foreach (string str in ofd.FileNames)
+                {
+                    state.AddTorrentByPath(str);
+                }
             }
         }
 
@@ -389,8 +395,10 @@ namespace ByteFlood
                     Url = query.Url,
                     Alias = query.CustomAlias,
                     AutoDownload = query.AutoDownload == true,
-                    FilterExpression = query.FilterExpression,
-                    FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip,
+                    Filters = query.Filters,
+                    DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath,
+                    IsCustomtUpdateInterval = query.UpdateIntervalType == 1,
+                    CustomUpdateInterval = new TimeSpan(0,0, query.CustomIntervalSeconds),
                     DefaultSettings = new TorrentSettings()
                 };
 
@@ -600,7 +608,51 @@ namespace ByteFlood
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
+
+            Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
+            Services.AutoUpdater.StartMonitoring();
         }
+
+        bool notify_later_clicked = false;
+        void AutoUpdater_NewUpdate(Services.NewUpdateInfo info)
+        {
+            if (notify_later_clicked) { return; }
+            App.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                UI.NewUpdateWindow nuw = new UI.NewUpdateWindow()
+                {
+                    DataContext = info,
+                    Icon = this.Icon,
+                    Owner = this
+                };
+
+                bool? res = nuw.ShowDialog();
+
+                if (res == true)
+                {
+                    string byteflood_location = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    System.IO.FileInfo fi = new IO.FileInfo(byteflood_location);
+                    string updater = System.IO.Path.Combine(fi.DirectoryName, "ByteFloodUpdater.exe");
+                    if (System.IO.File.Exists(updater))
+                    {
+                        ProcessStartInfo psi = new ProcessStartInfo(updater);
+                        psi.Arguments = string.Format("\"{0}\" \"{1}\"", info.DownloadUrl, fi.DirectoryName);
+
+                        Process.Start(psi);
+
+                        state.Shutdown();
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Updater executable does not exist!", "Cannot update");
+                    }
+                }
+
+                notify_later_clicked = res == false;
+            }));
+        }
+
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
             if (depObj != null)
@@ -834,16 +886,20 @@ namespace ByteFlood
                     query.AllowUrlChange = false;
                     query.Url = entry.Url;
                     query.CustomAlias = entry.Alias;
-                    query.FilterExpression = entry.FilterExpression;
-                    query.FilterAction = entry.FilterAction == RssUrlEntry.FilterActionEnum.Download ? 0 : 1;
+                    query.LoadFilters(entry.Filters.ToArray());
                     query.AutoDownload = entry.AutoDownload;
+                    query.DownloadPath = entry.DownloadDirectory;
+                    query.UpdateIntervalType = entry.IsCustomtUpdateInterval ? 1 : 0;
+                    query.ManualUpdateIntervalSeconds = entry.CustomUpdateInterval.TotalSeconds.ToString();
 
                     if (query.ShowDialog() == true)
                     {
-                        entry.FilterAction = query.FilterAction == 0 ? RssUrlEntry.FilterActionEnum.Download : RssUrlEntry.FilterActionEnum.Skip;
                         entry.Alias = query.CustomAlias;
-                        entry.FilterExpression = query.FilterExpression;
                         entry.AutoDownload = query.AutoDownload == true;
+                        entry.Filters = query.Filters;
+                        entry.DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath;
+                        entry.CustomUpdateInterval = new TimeSpan(0, 0, query.CustomIntervalSeconds);
+                        entry.IsCustomtUpdateInterval = query.UpdateIntervalType == 1;
                         entry.NotifyUpdate();
                         FeedsManager.Save();
                     }

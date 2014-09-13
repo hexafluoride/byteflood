@@ -167,7 +167,7 @@ namespace ByteFlood.Services.RSS
                     {
                         nitem.LastResponseMessage = "Data was already saved";
                         nitem.LastResponseType = DownloadRssResponse.ResonseType.OK;
-                        nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                        nitem.Success = AppState.AddTorrentRss(save_path, entry);
                     }));
                     continue;
                 }
@@ -195,7 +195,7 @@ namespace ByteFlood.Services.RSS
 
                                 App.Current.Dispatcher.Invoke(new Action(() =>
                                 {
-                                    nitem.Success = AppState.AddTorrentRss(save_path, entry.DefaultSettings, entry.AutoDownload);
+                                    nitem.Success = AppState.AddTorrentRss(save_path, entry);
                                 }));
                             }
                             else

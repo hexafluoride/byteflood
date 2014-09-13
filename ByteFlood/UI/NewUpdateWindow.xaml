@@ -1,0 +1,29 @@
+﻿<Window x:Class="ByteFlood.UI.NewUpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="An update is available" Height="350" Width="590" 
+        ResizeMode="NoResize" Topmost="True"
+        WindowStartupLocation="CenterScreen">
+    <Canvas>
+        <TextBlock Text="{Binding Tag, FallbackValue='v0.00'}" FontSize="28" Canvas.Left="10" Canvas.Top="10"
+                   Foreground="LightGreen"/>
+        <TextBlock Text="{Binding Title, FallbackValue='Release Title'}"
+                   TextAlignment="Center" FontSize="28" Canvas.Left="80" Canvas.Top="10" Width="485"/>
+
+        <TextBlock Text="What's new?" Canvas.Left="14" Canvas.Top="61" FontSize="16"/>
+
+        <TextBlock Canvas.Left="18" Canvas.Top="265">GitHub Link</TextBlock>
+
+        <TextBlock Canvas.Left="18" Canvas.Top="280" Width="378">
+            <Hyperlink Click="Hyperlink_Click">
+                <TextBlock Text="{Binding Link, FallbackValue=Link}"/>
+            </Hyperlink>
+        </TextBlock>
+
+        <TextBlock Canvas.Left="14" Canvas.Top="87" Height="173" Width="551"
+                   Text="{Binding ChangeLog,FallbackValue=Nothing}" Background="AliceBlue" />
+
+        <Button Height="32" Width="60" Canvas.Left="505" Canvas.Top="265" Content="Install" Click="Button_Click_1"/>
+        <Button Height="32" Width="99" Canvas.Left="401" Canvas.Top="265" Content="Remind me later" Click="Button_Click"/>
+    </Canvas>
+</Window>
