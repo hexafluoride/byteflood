@@ -29,7 +29,7 @@ namespace MonoTorrent.Client
 			this.filesExist = Manager.HasMetadata && manager.Engine.DiskManager.CheckAnyFilesExist(Manager);
             this.pieceCompleteCallback = PieceComplete;
             foreach (TorrentFile tf in Manager.Torrent.Files)
-                tf.CheckedBytes = 0;
+                tf.ResetCheckedBytes();
 		}
 
 		private void QueueNextHash()
@@ -58,7 +58,7 @@ namespace MonoTorrent.Client
                     foreach (TorrentFile file in Manager.Torrent.Files)
                     {
                         if (index > file.StartPieceIndex && index < file.EndPieceIndex)
-                            file.CheckedBytes += Manager.Torrent.PieceLength;
+                            file.AddCheckedBytes(Manager.Torrent.PieceLength);
                     }
                 }
 				index++;

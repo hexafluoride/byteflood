@@ -72,11 +72,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ClickableLabel.cs" />
     <Compile Include="Controls\FileListTemplateSelector.cs" />
+    <Compile Include="Controls\GridViewSort.cs" />
     <Compile Include="Controls\PieceBar.xaml.cs">
       <DependentUpon>PieceBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PieceView.cs" />
+    <Compile Include="Controls\RssFiltersView.cs" />
     <Compile Include="Controls\TreeList\Collection.cs" />
     <Compile Include="Controls\TreeList\Tree\Converters.cs" />
     <Compile Include="Controls\TreeList\Tree\ITreeModel.cs" />
@@ -90,6 +93,7 @@
     <Compile Include="Formatters\PeerCountryToIcon.cs" />
     <Compile Include="Formatters\PeerSoftwareToIcon.cs" />
     <Compile Include="Formatters\PieceViewConverter.cs" />
+    <Compile Include="Formatters\RssFiltersViewConverter.cs" />
     <Compile Include="Formatters\SettingsGetter.cs" />
     <Compile Include="Formatters\StringToFloatConverter.cs" />
     <Compile Include="Formatters\Subtract5Formatter.cs" />
@@ -99,6 +103,7 @@
     <Compile Include="InfoClasses\TrackerInfo.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="ObservableDictionary.cs" />
+    <Compile Include="Services\AutoUpdater.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
     <Compile Include="Services\RSS\FeedsManager.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\ExceptionCollection.cs" />
@@ -131,6 +136,7 @@
     <Compile Include="Services\RSS\rssdotnet\Shared\RssDefault.cs" />
     <Compile Include="Services\RSS\rssdotnet\Shared\RssElement.cs" />
     <Compile Include="Services\RSS\rssdotnet\Shared\RssEnumerators.cs" />
+    <Compile Include="Services\RSS\RssFilter.cs" />
     <Compile Include="Services\RSS\RssTorrent.cs" />
     <Compile Include="Services\RSS\RssUrlEntry.cs" />
     <Compile Include="Services\TorrentCache\ITorrentCache.cs" />
@@ -166,6 +172,9 @@
     </Compile>
     <Compile Include="UI\ImportTorrents.xaml.cs">
       <DependentUpon>ImportTorrents.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\NewUpdateWindow.xaml.cs">
+      <DependentUpon>NewUpdateWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Preferences.xaml.cs">
       <DependentUpon>Preferences.xaml</DependentUpon>
@@ -227,6 +236,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\NewUpdateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Preferences.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -267,6 +280,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ByteFloodUpdater\ByteFloodUpdater.csproj">
+      <Project>{aeada459-a688-4bc5-8160-845f5f9d8ca4}</Project>
+      <Name>ByteFloodUpdater</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Jayrock.Json\Jayrock.Json.csproj">
       <Project>{F10A6A7D-B8E4-4F8B-8BD9-5B42ACE5520E}</Project>
       <Name>Jayrock.Json</Name>
@@ -316,15 +333,9 @@
     <Content Include="Assets\stop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
+    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
+    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
     <Resource Include="Controls\TreeList\Info.txt" />
     <Resource Include="Graphics\CountryFlags\zz.png" />
     <Resource Include="Graphics\CountryFlags\ad.png" />
