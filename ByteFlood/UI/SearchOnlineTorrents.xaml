@@ -1,6 +1,7 @@
 ﻿<Window x:Class="ByteFlood.UI.SearchOnlineTorrents"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ByteFlood.Controls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Search for torrents" Height="400" Width="820" WindowStartupLocation="CenterOwner">
     <Window.Resources>
@@ -27,10 +28,13 @@
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" Text="{Binding SearchQuery}" IsEnabled="{Binding ControlsEnabled}"
                      TextAlignment="Center"/>
-            <Button Grid.Column="1" Content="Search" Command="{StaticResource Commands.Search}" IsEnabled="{Binding ControlsEnabled}" />
+            <Button Grid.Column="1" Content="Search" Command="{StaticResource Commands.Search}" IsEnabled="{Binding ControlsEnabled}" IsDefault="True" />
         </Grid>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Items}">
+        <ListView Grid.Row="1" ItemsSource="{Binding Items}"
+                  IsSynchronizedWithCurrentItem="True"
+                  controls:GridViewSort.AutoSort="True"
+                  controls:GridViewSort.ShowSortGlyph="True">
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
@@ -40,12 +44,12 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="380"/>
-                    <GridViewColumn Header="Votes" DisplayMemberBinding="{Binding Votes}" Width="60"/>
-                    <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" Width="60"/>
-                    <GridViewColumn Header="Seeds" DisplayMemberBinding="{Binding SeederCount}" Width="60"/>
-                    <GridViewColumn Header="Leechs" DisplayMemberBinding="{Binding LeechersCount}" Width="60"/>
-                    <GridViewColumn Header="Added since" Width="150">
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="380" controls:GridViewSort.PropertyName="Name"/>
+                    <GridViewColumn Header="Votes" DisplayMemberBinding="{Binding Votes}" Width="60" controls:GridViewSort.PropertyName="Votes"/>
+                    <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" Width="60" controls:GridViewSort.PropertyName="SizeBytes"/>
+                    <GridViewColumn Header="Seeds" DisplayMemberBinding="{Binding SeederCount}" Width="60" controls:GridViewSort.PropertyName="SeederCount"/>
+                    <GridViewColumn Header="Leechs" DisplayMemberBinding="{Binding LeechersCount}" Width="60" controls:GridViewSort.PropertyName="LeechersCount"/>
+                    <GridViewColumn Header="Added since" Width="150" controls:GridViewSort.PropertyName="TimeAdded">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock ToolTip="{Binding UploadDate}" Text="{Binding AddedSince}"/>

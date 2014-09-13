@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MonoTorrent.Common;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -18,7 +16,7 @@ namespace ByteFlood
             }
         }
 
-        public string FileName 
+        public string FileName
         {
             get { return this.File.Path.Split(System.IO.Path.DirectorySeparatorChar).Last(); }
         }
@@ -55,7 +53,7 @@ namespace ByteFlood
                 else
                 {
                     this.File.Priority = MonoTorrent.Common.Priority.Skip;
-                } 
+                }
                 UpdateList("DownloadFile");
             }
         }
@@ -92,10 +90,8 @@ namespace ByteFlood
 
         public void UpdateList(string str)
         {
-            if (PropertyChanged == null)
-                return;
-            //foreach (string str in columns)
-                PropertyChanged(this, new PropertyChangedEventArgs(str));
+            if (PropertyChanged == null) { return; }
+            PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -105,11 +101,9 @@ namespace ByteFlood
 
     public class DirectoryKey : System.Collections.Hashtable, Aga.Controls.Tree.ITreeModel
     {
-        //public const string FILE_MARKER = "<files>";
 
         public DirectoryKey(string name)
         {
-            //base.Add(FILE_MARKER, new FileList());
             this.Name = name;
         }
 
@@ -117,11 +111,11 @@ namespace ByteFlood
 
         public System.Collections.IEnumerable GetChildren(object parent)
         {
-            if (parent == null) 
+            if (parent == null)
             {
-               return this.Values;
+                return this.Values;
             }
-            else if (parent is DirectoryKey) 
+            else if (parent is DirectoryKey)
             {
                 return (parent as DirectoryKey).Values;
             }
@@ -130,7 +124,7 @@ namespace ByteFlood
 
         public bool HasChildren(object parent)
         {
-            if (parent is DirectoryKey) 
+            if (parent is DirectoryKey)
             {
                 return ((DirectoryKey)parent).Count > 0;
             }
@@ -178,28 +172,4 @@ namespace ByteFlood
         { get; set; }
 
     }
-
-    //public class FileList 
-    //{
-    //    private List<FileInfo> a = new List<FileInfo>();
-
-    //    public void Add(FileInfo f) { a.Add(f); }
-
-    //    public FileInfo this[int index] 
-    //    {
-    //        get 
-    //        {
-    //            return a[index];
-    //        }
-    //        set 
-    //        {
-    //            a[index] = value;
-    //        }
-    //    }
-
-    //    public FileInfo[] Files 
-    //    {
-    //        get { return a.ToArray(); }
-    //    }
-    //}
 }

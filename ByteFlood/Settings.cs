@@ -88,6 +88,10 @@ namespace ByteFlood
 
         public string RssTorrentsStorageDirectory { get; set; }
 
+        public string UpdateSourceEtag { get; set; }
+
+        public string OpenTorrentDialogLastPath { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -125,7 +129,9 @@ namespace ByteFlood
                     TrayIconDoubleClickBehavior = TrayIconBehavior.ShowHide,
                     TrayIconRightClickBehavior = TrayIconBehavior.ContextMenu,
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties,
-                    AssociationAsked = false
+                    AssociationAsked = false,
+                    UpdateSourceEtag = null,
+                    OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
                 };
             }
         }

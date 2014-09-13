@@ -217,7 +217,7 @@ namespace ByteFlood
 
         }
 
-        public bool AddTorrentRss(string path, TorrentSettings ts, bool autostart)
+        public bool AddTorrentRss(string path, Services.RSS.RssUrlEntry entry)
         {
             Torrent t = null;
             try
@@ -234,10 +234,11 @@ namespace ByteFlood
                     success = false;
                     return;
                 }
-                TorrentManager tm = new TorrentManager(t, App.Settings.DefaultDownloadPath, ts);
+                Directory.CreateDirectory(entry.DownloadDirectory);
+                TorrentManager tm = new TorrentManager(t, entry.DownloadDirectory, entry.DefaultSettings);
                 TorrentInfo ti = CreateTorrentInfo(tm);
                 ti.Name = t.Name;
-                if (autostart)
+                if (entry.AutoDownload)
                 { ti.Start(); }
                 Torrents.Add(ti);
 
@@ -370,7 +371,7 @@ namespace ByteFlood
 
             string hash = mg.InfoHash.ToHex();
             string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, hash + ".torrent");
-            string temp_save = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), hash);
+            string temp_save = System.IO.Path.Combine(System.IO.Path.GetTempPath(), hash);
             Directory.CreateDirectory(temp_save);
             TorrentManager tm = new TorrentManager(mg, temp_save, new TorrentSettings(), path);
 
