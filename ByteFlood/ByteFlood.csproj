@@ -72,12 +72,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ClickableLabel.cs" />
     <Compile Include="Controls\FileListTemplateSelector.cs" />
     <Compile Include="Controls\GridViewSort.cs" />
     <Compile Include="Controls\PieceBar.xaml.cs">
       <DependentUpon>PieceBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PieceView.cs" />
+    <Compile Include="Controls\RssFiltersView.cs" />
     <Compile Include="Controls\TreeList\Collection.cs" />
     <Compile Include="Controls\TreeList\Tree\Converters.cs" />
     <Compile Include="Controls\TreeList\Tree\ITreeModel.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Formatters\PeerCountryToIcon.cs" />
     <Compile Include="Formatters\PeerSoftwareToIcon.cs" />
     <Compile Include="Formatters\PieceViewConverter.cs" />
+    <Compile Include="Formatters\RssFiltersViewConverter.cs" />
     <Compile Include="Formatters\SettingsGetter.cs" />
     <Compile Include="Formatters\StringToFloatConverter.cs" />
     <Compile Include="Formatters\Subtract5Formatter.cs" />
@@ -132,6 +135,7 @@
     <Compile Include="Services\RSS\rssdotnet\Shared\RssDefault.cs" />
     <Compile Include="Services\RSS\rssdotnet\Shared\RssElement.cs" />
     <Compile Include="Services\RSS\rssdotnet\Shared\RssEnumerators.cs" />
+    <Compile Include="Services\RSS\RssFilter.cs" />
     <Compile Include="Services\RSS\RssTorrent.cs" />
     <Compile Include="Services\RSS\RssUrlEntry.cs" />
     <Compile Include="Services\TorrentCache\ITorrentCache.cs" />

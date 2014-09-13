@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace ByteFlood.Services.RSS
 {
@@ -21,9 +22,7 @@ namespace ByteFlood.Services.RSS
 
         public bool CheckDuplicate { get; set; }
 
-        public string FilterExpression { get; set; }
-
-        public FilterActionEnum FilterAction { get; set; }
+        public ObservableCollection<RssFilter> Filters { get; set; }
 
         public enum FilterActionEnum { Download, Skip }
 
@@ -32,7 +31,7 @@ namespace ByteFlood.Services.RSS
         public MonoTorrent.Client.TorrentSettings DefaultSettings { get; set; }
 
         [XmlIgnore]
-        private TimeSpan UpdateInterval = new TimeSpan(0, 15, 0);
+        private TimeSpan UpdateInterval { get; set; }
 
         [XmlIgnore]
         private int tick = 1000;
@@ -92,7 +91,12 @@ namespace ByteFlood.Services.RSS
         [XmlIgnore]
         private int icon_load_try_count = 0;
 
-        public RssUrlEntry() { this.items = new ObservableDictionary<string, RssTorrent>(); }
+        public RssUrlEntry()
+        {
+            this.UpdateInterval = new TimeSpan(0, 15, 0);
+            this.items = new ObservableDictionary<string, RssTorrent>();
+            this.Filters = new ObservableCollection<RssFilter>();
+        }
 
         /// <summary>
         /// Return an array of RssTorrent when new items are found, otherwise return null 
@@ -120,7 +124,8 @@ namespace ByteFlood.Services.RSS
                         if (!items.ContainsKey(rt.Id))
                         {
                             time_diff_sum += (start - rt.TimePublished).TotalSeconds;
-                            if (IsAllowed(rt))
+                            rt.IsAllowed = IsAllowed(rt);
+                            if (rt.IsAllowed)
                             {
                                 items.Add(rt.Id, rt);
                                 new_item_list.Add(rt);
@@ -148,7 +153,7 @@ namespace ByteFlood.Services.RSS
                         return new_item_list.ToArray();
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     this.tick = Convert.ToInt32(UpdateInterval.TotalSeconds / 2);
                     return null;
@@ -247,28 +252,21 @@ namespace ByteFlood.Services.RSS
             return torrents.ToArray();
         }
 
-        [XmlIgnore]
-        Regex m = null;
-
         private bool IsAllowed(RssTorrent t)
         {
-            if (!string.IsNullOrWhiteSpace(this.FilterExpression))
+            if (this.Filters.Count > 0)
             {
-                if (m == null)
+                for (int i = 0; i < this.Filters.Count; i++)
                 {
-                    m = new Regex(Regex.Escape(this.FilterExpression), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    try
+                    {
+                        if (this.Filters[i].IsAllowed(t)) { return true; }
+                    }
+                    catch (IndexOutOfRangeException) { break; }
+                    catch (Exception) { continue; }
                 }
 
-                bool regex_match = m.IsMatch(t.Name);
-
-                if (this.FilterAction == FilterActionEnum.Download)
-                {
-                    return regex_match;
-                }
-                else //In Skip action, we don't want stuffs that match the filter
-                {
-                    return !regex_match;
-                }
+                return false;
             }
 
             return true;
@@ -279,7 +277,6 @@ namespace ByteFlood.Services.RSS
         /// </summary>
         public void NotifyUpdate()
         {
-            this.m = null;
             NotifyPropertyChanged("Name", "Count");
         }
 
