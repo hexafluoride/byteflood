@@ -203,6 +203,28 @@ namespace ByteFlood
             }
         }
 
+        /// <summary>
+        /// Used for general exceptions that occur regularly throughout the lifetime of the program.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        public static void LogException(Exception ex)
+        {
+            // these are not handled in the usual "ByteFlood has encountered an exception" way
+            Console.WriteLine("---------- ERROR LOG START ----------");
+            Console.WriteLine("Connection failed, reason: {0}", ex.Message);
+            Console.WriteLine("Stack trace: {0}", ex.StackTrace);
+            Console.WriteLine("Dumping InnerExceptions.");
+            int id = 0;
+            while (ex.InnerException != null)
+            {
+                ex = ex.InnerException;
+                Console.WriteLine("Exception {0} message: {1}", id, ex.Message);
+                Console.WriteLine("Exception {0} stack trace: {1}", id, ex.StackTrace);
+                id++;
+            }
+            Console.WriteLine("----------- ERROR LOG END -----------");
+        }
+
         public static void ReloadTheme(Theme t)
         {
             var app = (ByteFlood.App)App.Current;
