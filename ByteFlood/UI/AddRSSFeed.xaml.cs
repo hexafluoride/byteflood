@@ -78,6 +78,15 @@ namespace ByteFlood.UI
 
 
 
+        public string DownloadPath
+        {
+            get { return (string)GetValue(DownloadPathProperty); }
+            set { SetValue(DownloadPathProperty, value); }
+        }
+
+        public static readonly DependencyProperty DownloadPathProperty =
+            DependencyProperty.Register("DownloadPath", typeof(string), typeof(AddRSSFeed), new PropertyMetadata(null));
+
         public ObservableCollection<Services.RSS.RssFilter> Filters
         {
             get { return (ObservableCollection<Services.RSS.RssFilter>)GetValue(FiltersProperty); }
@@ -94,6 +103,7 @@ namespace ByteFlood.UI
             InitializeComponent();
             this.Filters = new ObservableCollection<Services.RSS.RssFilter>();
             this.RemoveEvent = new RoutedEventHandler(this.Filters_Remove);
+            this.DownloadPath = App.Settings.DefaultDownloadPath;
         }
 
         #region Commands
@@ -106,6 +116,16 @@ namespace ByteFlood.UI
         private void Commands_Add(object sender, ExecutedRoutedEventArgs e)
         {
             this.DialogResult = true; this.Close();
+        }
+
+        private void Commands_Browse(object sender, ExecutedRoutedEventArgs e)
+        {
+            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                fd.ShowNewFolderButton = true;
+                fd.ShowDialog();
+                this.DownloadPath = fd.SelectedPath;
+            }
         }
 
         private RoutedEventHandler RemoveEvent;
