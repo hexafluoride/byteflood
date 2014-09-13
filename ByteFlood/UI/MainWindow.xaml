@@ -190,8 +190,8 @@
                                 <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="Blue"/>
-                                <Setter Property="BorderThickness" Value="0,0.4"/>
+                                <!--<Setter Property="BorderBrush" Value="Blue"/>
+                                <Setter Property="BorderThickness" Value="0"/>-->
                                 <Setter Property="Background" Value="LightBlue"/>
                             </Trigger>
                         </Style.Triggers>

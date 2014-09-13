@@ -40,6 +40,7 @@ namespace ByteFlood
                 return Utility.GetBrushFromTorrentState(Torrent.State, Torrent.Complete);
             }
         }
+        public bool RanCommand { get; set; }
         public string Path = "";
         public string SavePath = "";
         public TorrentSettings TorrentSettings { get; set; }
@@ -152,6 +153,7 @@ namespace ByteFlood
         {
             context = c;
             Name = "";
+            RanCommand = false;
             StartTime = DateTime.Now;
             this.Torrent = tm;
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
@@ -208,17 +210,18 @@ namespace ByteFlood
                 {
                     this.ETA = new TimeSpan(0, 0, 0);
                 }
-                if (e.TorrentManager.Complete && !string.IsNullOrWhiteSpace(CompletionCommand))
+                if (e.TorrentManager.Complete && !string.IsNullOrWhiteSpace(CompletionCommand) && !RanCommand)
                 {
                     try
                     {
                         (App.Current.MainWindow as MainWindow).NotifyIcon.ShowBalloonTip(
                             "ByteFlood", string.Format("'{0}' has been completed.", this.Name), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
                         string command = CompletionCommand.Replace("%s", this.Name)
-                                                          .Replace("%p", this.Path)
-                                                          .Replace("%d", this.SavePath);
+                                                          .Replace("%p", System.IO.Path.GetFullPath(this.Path))
+                                                          .Replace("%d", System.IO.Path.GetFullPath(this.SavePath));
                         ProcessStartInfo psi = Utility.ParseCommandLine(command);
                         Process.Start(psi);
+                        RanCommand = true;
                     }
                     catch
                     {

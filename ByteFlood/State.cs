@@ -20,6 +20,7 @@ using System.Xml.Serialization;
 using MonoTorrent.Dht;
 using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
+using MonoTorrent.Client.Connections;
 using Microsoft.Win32;
 using System.Threading;
 using System.Net;
@@ -60,6 +61,10 @@ namespace ByteFlood
 
         public void Initialize()
         {
+            UpdateConnectionSettings();
+            IPV4Connection.ExceptionThrown += Utility.LogException;
+            //IPV4Connection.LocalAddress = new IPAddress(new byte[] { 127,0,0,1 });
+            IPV4Connection.LocalAddress = IPAddress.Any;
             ce = new ClientEngine(new EngineSettings());
             dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, App.Settings.ListeningPort));
             DhtEngine dht = new DhtEngine(dhtl);
@@ -87,6 +92,13 @@ namespace ByteFlood
             }
             listener = new Listener(this);
             listener.State = this;
+        }
+
+        public void UpdateConnectionSettings()
+        {
+            IPV4Connection.UseRandomPorts = App.Settings.OutgoingPortsRandom;
+            if (!IPV4Connection.UseRandomPorts)
+                IPV4Connection.LocalPorts = Enumerable.Range(App.Settings.OutgoingPortsStart, App.Settings.OutgoingPortsEnd - App.Settings.OutgoingPortsStart).ToArray();
         }
 
         public static void Save(State s, string path)
