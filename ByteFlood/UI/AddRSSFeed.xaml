@@ -2,18 +2,19 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:ByteFlood.Controls"
-        Title="Add new feed" Height="437" Width="505"
+        Title="Add new feed" Height="470" Width="505"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <RoutedUICommand x:Key="Commands.Add"/>
         <RoutedUICommand x:Key="Commands.Cancel"/>
         <RoutedUICommand x:Key="Filters.Add"/>
+        <RoutedUICommand x:Key="Commands.Browse"/>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource Commands.Add}" Executed="Commands_Add" />
         <CommandBinding Command="{StaticResource Commands.Cancel}" Executed="Commands_Cancel" />
-
+        <CommandBinding Command="{StaticResource Commands.Browse}" Executed="Commands_Browse" />
         <CommandBinding Command="{StaticResource Filters.Add}" Executed="Filters_Add" />
     </Window.CommandBindings>
 
@@ -26,7 +27,7 @@
         <TextBox Text="{Binding CustomAlias}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="55"/>
         <TextBlock Text="(Leave empty for default)" FontSize="10" Canvas.Left="10" Canvas.Top="82" />
 
-        <GroupBox Header="Options" FontSize="17" Height="263" Width="474" Canvas.Left="10" Canvas.Top="100">
+        <GroupBox Header="Options" FontSize="17" Height="263" Width="474" Canvas.Left="10" Canvas.Top="135">
             <Canvas>
                 <CheckBox IsChecked="{Binding AutoDownload}" Content="Automatically start the download of new items" FontSize="13" Canvas.Left="10" Canvas.Top="10" Width="442"/>
 
@@ -56,7 +57,10 @@
             </Canvas>
         </GroupBox>
 
-        <Button Content="Cancel" Height="28" Width="80" Canvas.Left="404" Canvas.Top="368" Command="{StaticResource Commands.Cancel}" IsCancel="True" />
-        <Button Content="Add" Height="28" Width="80" Canvas.Left="319" Canvas.Top="368" Command="{StaticResource Commands.Add}" IsDefault="True" />
+        <Button Content="Cancel" Height="28" Width="80" Canvas.Left="404" Canvas.Top="403" Command="{StaticResource Commands.Cancel}" IsCancel="True" />
+        <Button Content="Add" Height="28" Width="80" Canvas.Left="319" Canvas.Top="403" Command="{StaticResource Commands.Add}" IsDefault="True" />
+        <TextBlock Text="Download in:" FontSize="16" Canvas.Left="11" Canvas.Top="104" />
+        <TextBox Text="{Binding DownloadPath}" Height="25" Width="335" Canvas.Left="113" Canvas.Top="103"/>
+        <Button Content="..." Command="{StaticResource Commands.Browse}" Height="28" Width="31" Canvas.Left="453" Canvas.Top="102"/>
     </Canvas>
 </Window>

@@ -30,6 +30,8 @@ namespace ByteFlood.Services.RSS
 
         public MonoTorrent.Client.TorrentSettings DefaultSettings { get; set; }
 
+        public string DownloadDirectory { get; set; }
+
         [XmlIgnore]
         private TimeSpan UpdateInterval { get; set; }
 
@@ -96,6 +98,7 @@ namespace ByteFlood.Services.RSS
             this.UpdateInterval = new TimeSpan(0, 15, 0);
             this.items = new ObservableDictionary<string, RssTorrent>();
             this.Filters = new ObservableCollection<RssFilter>();
+            this.DownloadDirectory = App.Settings.DefaultDownloadPath;
         }
 
         /// <summary>

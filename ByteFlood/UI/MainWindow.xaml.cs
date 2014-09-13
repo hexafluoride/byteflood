@@ -396,6 +396,7 @@ namespace ByteFlood
                     Alias = query.CustomAlias,
                     AutoDownload = query.AutoDownload == true,
                     Filters = query.Filters,
+                    DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath,
                     DefaultSettings = new TorrentSettings()
                 };
 
@@ -885,12 +886,14 @@ namespace ByteFlood
                     query.CustomAlias = entry.Alias;
                     query.LoadFilters(entry.Filters.ToArray());
                     query.AutoDownload = entry.AutoDownload;
+                    query.DownloadPath = entry.DownloadDirectory;
 
                     if (query.ShowDialog() == true)
                     {
                         entry.Alias = query.CustomAlias;
                         entry.AutoDownload = query.AutoDownload == true;
                         entry.Filters = query.Filters;
+                        entry.DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath;
                         entry.NotifyUpdate();
                         FeedsManager.Save();
                     }

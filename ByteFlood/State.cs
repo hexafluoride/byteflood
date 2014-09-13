@@ -205,7 +205,7 @@ namespace ByteFlood
 
         }
 
-        public bool AddTorrentRss(string path, TorrentSettings ts, bool autostart)
+        public bool AddTorrentRss(string path, Services.RSS.RssUrlEntry entry)
         {
             Torrent t = null;
             try
@@ -222,10 +222,11 @@ namespace ByteFlood
                     success = false;
                     return;
                 }
-                TorrentManager tm = new TorrentManager(t, App.Settings.DefaultDownloadPath, ts);
+                Directory.CreateDirectory(entry.DownloadDirectory);
+                TorrentManager tm = new TorrentManager(t, entry.DownloadDirectory, entry.DefaultSettings);
                 TorrentInfo ti = CreateTorrentInfo(tm);
                 ti.Name = t.Name;
-                if (autostart)
+                if (entry.AutoDownload)
                 { ti.Start(); }
                 Torrents.Add(ti);
 
