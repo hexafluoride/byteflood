@@ -129,8 +129,8 @@
         </GroupBox>
 
 
-        <Button Content="OK" Height="23" VerticalAlignment="Center" Width="75" Command="{StaticResource Commands.OK}" Canvas.Left="560" Canvas.Top="357" />
-        <Button Content="Cancel" Height="23" VerticalAlignment="Center" Width="75" Command="{StaticResource Commands.Cancel}" Canvas.Left="640" Canvas.Top="357" />
+        <Button Content="OK" Height="23" VerticalAlignment="Center" Width="75" Command="{StaticResource Commands.OK}" Canvas.Left="560" Canvas.Top="357" IsDefault="True" />
+        <Button Content="Cancel" Height="23" VerticalAlignment="Center" Width="75" Command="{StaticResource Commands.Cancel}" Canvas.Left="640" Canvas.Top="357" IsCancel="True" />
 
         <Border Background="#77000000" BorderThickness="0" Visibility="Collapsed" Name="loading" Height="397" Width="734">
             <TextBlock Text="Loading magnet link..."  VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
