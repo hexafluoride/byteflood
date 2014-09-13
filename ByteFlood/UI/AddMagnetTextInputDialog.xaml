@@ -26,8 +26,8 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto" Margin="0,4,0,0">
             <Button Height="26" Width="50" Content="Paste" Margin="0,0,8,0" Command="{StaticResource Commands.PasteFromClipboard}" VerticalAlignment="Top" />
-            <Button Height="26" Width="50" Content="OK" Margin="0,0,8,0" Command="{StaticResource Commands.OK}" VerticalAlignment="Top" />
-            <Button Height="26" Width="50" Content="Cancel" Command="{StaticResource Commands.Cancel}" VerticalAlignment="Top" />
+            <Button Height="26" Width="50" Content="OK" Margin="0,0,8,0" Command="{StaticResource Commands.OK}" VerticalAlignment="Top" IsDefault="True" />
+            <Button Height="26" Width="50" Content="Cancel" Command="{StaticResource Commands.Cancel}" VerticalAlignment="Top" IsCancel="True" />
         </StackPanel>
         <TextBox Grid.Row="1" Height="160" HorizontalAlignment="Center" Text="{Binding Path=Input}" VerticalAlignment="Center" Width="330" TextWrapping="Wrap" />
     </Grid>

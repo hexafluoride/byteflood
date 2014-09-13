@@ -158,6 +158,7 @@
             </StackPanel>
             <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Stretch" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Extended" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
                 <ListView.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
                         <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
@@ -183,6 +184,11 @@
                             <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter Property="BorderBrush" Value="Blue"/>
+                                <Setter Property="BorderThickness" Value="0,0.4"/>
+                                <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <!--<Setter Property="BorderBrush" Value="Blue"/>
                                 <Setter Property="BorderThickness" Value="0"/>-->

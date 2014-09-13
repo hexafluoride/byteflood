@@ -11,8 +11,6 @@ namespace ByteFlood.Formatters
 {
     public class FileNameToIcon : IValueConverter
     {
-        static string temp_dir = Environment.GetFolderPath(Environment.SpecialFolder.InternetCache);
-
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (!App.Settings.ShowFileIcons)
@@ -35,10 +33,10 @@ namespace ByteFlood.Formatters
             }
             else
             {
-                string temp_file = Path.Combine(temp_dir, "temp" + ext);
+                string temp_file = Path.Combine(Path.GetTempPath(), "temp" + ext);
 
-                File.WriteAllText(temp_file, "");
-
+                File.Open(temp_file, FileMode.OpenOrCreate).Close();
+                
                 path = temp_file;
 
                 Icon i = Icon.ExtractAssociatedIcon(path);

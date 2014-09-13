@@ -25,8 +25,8 @@
             </ListView.View>
         </ListView>
         <StackPanel Orientation="Horizontal" Margin="367,325,9,12">
-            <Button Content="OK" Height="23" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="Import" />
-            <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="7,0,0,0" VerticalAlignment="Top" Width="75" Click="Cancel" />
+            <Button Content="OK" Height="23" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="Import" IsDefault="True" />
+            <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="7,0,0,0" VerticalAlignment="Top" Width="75" Click="Cancel" IsCancel="True" />
         </StackPanel>
     </Grid>
 </Window>
