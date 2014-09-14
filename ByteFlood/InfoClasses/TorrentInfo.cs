@@ -141,6 +141,7 @@ namespace ByteFlood
         private long up_previous = 0;
         [XmlIgnore]
         private MainWindow MainAppWindow { get; set; }
+        public Services.MoviesDatabases.ImdbSearchResult PickedMovieData { get; set; }
         #endregion
 
         public TorrentInfo() // this is reserved for the XML deserializer.
@@ -157,7 +158,7 @@ namespace ByteFlood
             StartTime = DateTime.Now;
             this.Torrent = tm;
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
-           
+
             TryHookEvents();
             PopulateFileList();
             PopulateTrackerList();
@@ -196,7 +197,7 @@ namespace ByteFlood
                 throw ex;
             }
 #else
-            catch {}
+            catch { }
 #endif
 
         }
@@ -401,6 +402,35 @@ namespace ByteFlood
             {
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(ex.StackTrace);
+            }
+        }
+
+        [XmlIgnore]
+        private bool is_lmdif_loading_data = false;
+        public void LoadMovieDataIntoFolder()
+        {
+            if (this.PickedMovieData != null)
+            {
+                string save_path = System.IO.Path.Combine(this.SavePath, "folder.jpg");
+                if (!System.IO.File.Exists(save_path))
+                {
+                    Task.Factory.StartNew(new Action(() =>
+                    {
+                        is_lmdif_loading_data = true;
+                        try
+                        {
+                            using (System.Net.WebClient nc = new System.Net.WebClient())
+                            {
+                                byte[] data = nc.DownloadData(this.PickedMovieData.PosterImageLink);
+                                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(save_path));
+                                System.IO.File.WriteAllBytes(save_path, data);
+                            }
+                        }
+                        catch { }
+                        is_lmdif_loading_data = false;
+                    }));
+                }
+                return;
             }
         }
 
