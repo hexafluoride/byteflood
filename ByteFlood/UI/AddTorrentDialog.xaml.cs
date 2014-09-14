@@ -87,7 +87,7 @@ namespace ByteFlood
         public string TorrentSavePath
         {
             get { return (string)GetValue(TorrentSavePathProperty); }
-            set { SetValue(TorrentSavePathProperty, value); UpdateSize(); }
+            set { SetValue(TorrentSavePathProperty, value); ChangeSavePath(value); }
         }
 
         public static readonly DependencyProperty TorrentSavePathProperty =
@@ -141,6 +141,12 @@ namespace ByteFlood
             this.Activate();
         }
 
+        public void ChangeSavePath(string newpath)
+        {
+            tm = new TorrentManager(tm.Torrent, newpath, new TorrentSettings());
+            UpdateSize();
+        }
+
         #region Commands
 
         private void Commands_Browse(object sender, ExecutedRoutedEventArgs e)
@@ -160,7 +166,8 @@ namespace ByteFlood
         {
             this.AutoStartTorrent = (start_torrent.IsChecked == true); // sorry
             this.UserOK = true;
-            App.Settings.PreviousPaths.Insert(0, TorrentSavePath);
+            if(!App.Settings.PreviousPaths.Contains(TorrentSavePath))
+                App.Settings.PreviousPaths.Insert(0, TorrentSavePath);
             this.Close();
         }
 
@@ -194,6 +201,11 @@ namespace ByteFlood
             CheckBox s = sender as CheckBox;
             FileInfo fi = s.Tag as FileInfo;
             fi.DownloadFile = s.IsChecked == true;
+        }
+
+        private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ChangeSavePath(TorrentSavePath);
         }
 
 
