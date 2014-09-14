@@ -105,6 +105,7 @@
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
+    <Compile Include="Services\MoviesDB\Imdb.cs" />
     <Compile Include="Services\RSS\FeedsManager.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\ExceptionCollection.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\RssCategoryCollection.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Services\TorrentCache\TorCache.cs" />
     <Compile Include="Services\TorrentCache\Torrage.cs" />
     <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
+    <Compile Include="Services\WebSearch\HAP\HapHelper.cs" />
     <Compile Include="Services\WebSearch\TorrentzEu.cs" />
     <Compile Include="State.cs" />
     <Compile Include="StateRpcHandler.cs">
@@ -172,6 +174,9 @@
     </Compile>
     <Compile Include="UI\ImportTorrents.xaml.cs">
       <DependentUpon>ImportTorrents.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MovieInfoChooser.xaml.cs">
+      <DependentUpon>MovieInfoChooser.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\NewUpdateWindow.xaml.cs">
       <DependentUpon>NewUpdateWindow.xaml</DependentUpon>
@@ -236,6 +241,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\MovieInfoChooser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\NewUpdateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
