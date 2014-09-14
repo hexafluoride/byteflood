@@ -125,6 +125,10 @@ namespace ByteFlood.Services.MoviesDatabases
         public int Year { get; set; }
         public Imdb.MediaType Type { get; set; }
         public string ThumbImageUrl { get; set; }
+        public Uri ThumbImageUri
+        {
+            get { return new Uri(this.ThumbImageUrl); }
+        }
         public bool IsIndevelopment { get; set; }
         public string MoviePageLink
         {

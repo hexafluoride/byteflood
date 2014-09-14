@@ -175,6 +175,9 @@
     <Compile Include="UI\ImportTorrents.xaml.cs">
       <DependentUpon>ImportTorrents.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\MovieInfoChooser.xaml.cs">
+      <DependentUpon>MovieInfoChooser.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\NewUpdateWindow.xaml.cs">
       <DependentUpon>NewUpdateWindow.xaml</DependentUpon>
     </Compile>
@@ -238,6 +241,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\MovieInfoChooser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\NewUpdateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
