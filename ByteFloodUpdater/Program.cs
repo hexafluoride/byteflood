@@ -192,6 +192,7 @@ namespace ByteFloodUpdater
                 Process.Start(Path.Combine(dest_dir.FullName, "byteflood.exe"));
                 if (updater_need_update)
                 {
+                    // TODO: Replace these with multiplatform commands
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine("taskkill /IM ByteFloodUpdater.exe");
                     sb.AppendFormat("copy /Y /B \"{0}\" \"{1}\"", Path.Combine(temp_dir.FullName, "ByteFloodUpdater.exe"),

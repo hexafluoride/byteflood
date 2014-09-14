@@ -304,9 +304,9 @@ namespace ByteFlood
                 case TorrentState.Error:
                     return Brushes.Red;
                 case TorrentState.Paused:
-                    return yellow;
-                case TorrentState.Hashing:
                     return Brushes.Orange;
+                case TorrentState.Hashing:
+                    return Brushes.DarkOrange;
                 default:
                     return def;
             }
