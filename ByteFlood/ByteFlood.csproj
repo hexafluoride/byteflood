@@ -105,6 +105,7 @@
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
+    <Compile Include="Services\MoviesDB\Imdb.cs" />
     <Compile Include="Services\RSS\FeedsManager.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\ExceptionCollection.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\RssCategoryCollection.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Services\TorrentCache\TorCache.cs" />
     <Compile Include="Services\TorrentCache\Torrage.cs" />
     <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
+    <Compile Include="Services\WebSearch\HAP\HapHelper.cs" />
     <Compile Include="Services\WebSearch\TorrentzEu.cs" />
     <Compile Include="State.cs" />
     <Compile Include="StateRpcHandler.cs">
