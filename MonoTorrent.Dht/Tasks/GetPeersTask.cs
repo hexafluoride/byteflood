@@ -86,7 +86,10 @@ namespace MonoTorrent.Dht.Tasks
                 if (response.Values != null)
                 {
                     // We have actual peers!
-                    engine.RaisePeersFound(infoHash, MonoTorrent.Client.Peer.Decode(response.Values));
+                    var peers = MonoTorrent.Client.Peer.Decode(response.Values);
+                    for(int i = 0; i < peers.Count; i++)
+                        peers[i].FromDHT = true;
+                    engine.RaisePeersFound(infoHash, peers);
                 }
                 else if (response.Nodes != null)
                 {

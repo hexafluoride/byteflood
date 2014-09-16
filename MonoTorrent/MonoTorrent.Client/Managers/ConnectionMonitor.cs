@@ -62,6 +62,16 @@ namespace MonoTorrent.Client
             get { return this.PreviousDataBytesUploaded + dataUp.Total; }
         }
 
+        public long DataBytesDownloadedNow
+        {
+            get { return dataDown.Total; }
+        }
+
+        public long DataBytesUploadedNow
+        {
+            get { return dataUp.Total; }
+        }
+
         public int DownloadSpeed
         {
             get { return dataDown.Rate + protocolDown.Rate; }

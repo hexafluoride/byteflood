@@ -91,6 +91,51 @@
     <Grid Name="ActualSize">
         <DockPanel LastChildFill="False">
 
+            <StatusBar Name="StatusBar" DockPanel.Dock="Bottom" Height="22">
+
+                <StatusBar.Resources>
+                    <Style TargetType="Separator">
+                        <Setter Property="Width" Value="1" />
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Width" Value="200" />
+                    </Style>
+                </StatusBar.Resources>
+                <!--<StatusBar.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid HorizontalAlignment="Right">
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </StatusBar.ItemsPanel>-->
+
+                <StatusBarItem DockPanel.Dock="Right">
+                    <TextBlock Name="UploadStatus">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="U: {0} T: {1}">
+                                <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                <Binding Path="TotalUploaded" Converter="{StaticResource SizeToString}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StatusBarItem>
+                <Separator />
+                <StatusBarItem DockPanel.Dock="Right">
+                    <TextBlock Name="DownloadStatus">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="D: {0} T: {1}">
+                                <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                <Binding Path="TotalDownloaded" Converter="{StaticResource SizeToString}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StatusBarItem>
+                <Separator />
+                <StatusBarItem DockPanel.Dock="Right">
+                    <TextBlock Name="DHTStatus" Text="{Binding Path=DHTPeers, StringFormat=DHT: {0} peers}">
+                    </TextBlock>
+                </StatusBarItem>
+                <StatusBarItem />
+            </StatusBar>
             <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="180">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />

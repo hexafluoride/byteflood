@@ -25,10 +25,6 @@
                     <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock1" Text="Default download path" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="-16" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="134,27,0,0" Name="downpath" VerticalAlignment="Top" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="0" Canvas.Top="-16" />
                     <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="385,27,0,0" Name="button1" VerticalAlignment="Top" Width="40" Click="PickPath" Canvas.Left="0" Canvas.Top="-16" />
-
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,56,0,0" Name="textBlock2" Text="Listening port" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="-14" />
-                    <TextBox Height="23" HorizontalAlignment="Left" Margin="305,56,0,0" Name="textBox2" VerticalAlignment="Top" Width="120" Text="{Binding ListeningPort}" Canvas.Left="0" Canvas.Top="-16" />
-
                     <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="72" />
                     <TextBox Canvas.Left="305" Canvas.Top="69" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
                     <Button Canvas.Left="6" Canvas.Top="100" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
@@ -77,7 +73,7 @@
             </TabItem>
             <TabItem Name="conn" IsSelected="{Binding IsSelected, ElementName=conn_tree}" Height="0">
                 <Canvas>
-                    <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing ports" Height="77" Width="414">
+                    <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing" Height="77" Width="414">
                         <Canvas>
                             <RadioButton Height="16" Name="selectoports" Canvas.Top="29" Canvas.Left="10" IsChecked="{Binding OutgoingPortsRandom, Converter={StaticResource InvertBooleanConverter}}" GroupName="out" />
                             <StackPanel Orientation="Horizontal" Canvas.Left="26" Canvas.Top="24" IsEnabled="{Binding ElementName=selectoports, Path=IsChecked}">
@@ -90,8 +86,18 @@
                             <RadioButton Canvas.Left="10" Canvas.Top="7" Content="Use random ports (recommended)" IsChecked="{Binding OutgoingPortsRandom}" Height="16" GroupName="out" />
                         </Canvas>
                     </GroupBox>
-                    <TextBlock Canvas.Left="6" Canvas.Top="93" Height="20" Text="Encryption type" />
-                    <ComboBox Canvas.Left="275" Canvas.Top="89" Height="23" Name="enctype" SelectedIndex="{Binding EncryptionType, Converter={StaticResource ObjectToInt}}" Width="150" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="183" Height="20" Text="Encryption type" />
+                    <ComboBox Canvas.Left="275" Canvas.Top="179" Height="23" Name="enctype" SelectedIndex="{Binding EncryptionType, Converter={StaticResource ObjectToInt}}" Width="150" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="212" Height="20" Text="Network interface" />
+                    <ComboBox Canvas.Left="275" Canvas.Top="208" Height="23" Name="interfaces" Width="150" />
+                    <GroupBox Canvas.Left="6" Canvas.Top="89" Header="Incoming" Height="88" Width="414">
+                        <Canvas>
+                            <TextBlock Height="23" Text="Listening port" Canvas.Left="4" Canvas.Top="9" />
+                            <TextBox Height="23" Text="{Binding ListeningPort}" Width="120" Canvas.Left="276" Canvas.Top="6" />
+                            <TextBlock Height="23" Text="DHT listening port" Canvas.Left="4" Canvas.Top="38" />
+                            <TextBox Height="23" Text="{Binding DHTListeningPort}" Width="120" Canvas.Left="276" Canvas.Top="35" />
+                        </Canvas>
+                    </GroupBox>
                 </Canvas>
             </TabItem>
         </TabControl>

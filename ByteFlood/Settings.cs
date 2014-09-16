@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -45,6 +46,7 @@ namespace ByteFlood
         public string DefaultDownloadPath { get; set; }
         public bool PreferEncryption { get; set; }
         public int ListeningPort { get; set; }
+        public int DHTListeningPort { get; set; }
         public string FileRegex { get; set; }
         public bool EnableFileRegex { get; set; }
         public bool DownloadAllRSS { get; set; }
@@ -54,6 +56,7 @@ namespace ByteFlood
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
+        public NetworkInterface Interface { get; set; }
         public bool ImportedTorrents { get; set; }
         public List<string> PreviousPaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
@@ -106,6 +109,7 @@ namespace ByteFlood
                     TorrentFileSavePath = "./Torrents",
                     EncryptionType = EncryptionForceType.DoesntMatter,
                     ListeningPort = 1025,
+                    DHTListeningPort = 1026,
                     FileRegex = "",
                     EnableFileRegex = false,
                     DownloadAllRSS = false,
