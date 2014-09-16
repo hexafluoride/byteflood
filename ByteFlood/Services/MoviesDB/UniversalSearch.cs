@@ -18,17 +18,19 @@ namespace ByteFlood.Services.MoviesDatabases
 
         public static IMovieDBSearchResult[] Search(string queryText)
         {
+            List<IMovieDBSearchResult> l = new List<IMovieDBSearchResult>();
+         
             foreach (IMovieDB engine in Engines)
             {
                 var results = engine.Search(queryText);
 
                 if (results.Length > 0)
                 {
-                    return results;
+                    l.AddRange(results);
                 }
             }
 
-            return new IMovieDBSearchResult[0];
+            return l.ToArray();
         }
 
     }
