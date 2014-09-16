@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using MonoTorrent;
 using MonoTorrent.Client;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using MonoTorrent.Client.Encryption;
-using Microsoft.Win32;
 using System.Threading;
 using System.Xml.Serialization;
-using System.Xml;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Web;
 using System.Windows.Media;
+using ByteFlood.Services.MoviesDatabases;
 
 namespace ByteFlood
 {
@@ -141,13 +136,17 @@ namespace ByteFlood
         private long up_previous = 0;
         [XmlIgnore]
         private MainWindow MainAppWindow { get; set; }
+
+        public IMDBSRSerializeable<IMovieDBSearchResult> PickedMovieData { get; set; }
+
+
         #endregion
 
         public TorrentInfo() // this is reserved for the XML deserializer.
         {
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.context = this.MainAppWindow.uiContext;
-
+            this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
         }
 
         public TorrentInfo(SynchronizationContext c, TorrentManager tm)
@@ -158,7 +157,8 @@ namespace ByteFlood
             StartTime = DateTime.Now;
             this.Torrent = tm;
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
-           
+            this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
+
             TryHookEvents();
             PopulateFileList();
             PopulateTrackerList();
@@ -197,7 +197,7 @@ namespace ByteFlood
                 throw ex;
             }
 #else
-            catch {}
+            catch { }
 #endif
 
         }
@@ -364,6 +364,8 @@ namespace ByteFlood
                     this.Path = Torrent.Torrent.TorrentPath;
                     this.SavePath = Torrent.SavePath;
                     this.TorrentSettings = Torrent.Settings;
+
+                    this.LoadMovieDataIntoFolder();
                 }));
             }
 
@@ -402,6 +404,45 @@ namespace ByteFlood
             {
                 Console.Error.WriteLine(ex.Message);
                 Console.Error.WriteLine(ex.StackTrace);
+            }
+        }
+
+        [XmlIgnore]
+        private bool is_lmdif_loading_data = false;
+        public void LoadMovieDataIntoFolder()
+        {
+            if (this.PickedMovieData != null && this.PickedMovieData.Value != null)
+            {
+                if (is_lmdif_loading_data) { return; }
+                string save_path = System.IO.Path.Combine(this.SavePath, "folder.jpg");
+                if (!System.IO.File.Exists(save_path))
+                {
+                    Task.Factory.StartNew(new Action(() =>
+                    {
+                        is_lmdif_loading_data = true;
+                        int retry_count = 0;
+                        while (true)
+                        {
+                            try
+                            {
+                                using (System.Net.WebClient nc = new System.Net.WebClient())
+                                {
+                                    byte[] data = nc.DownloadData(this.PickedMovieData.Value.PosterImageUri);
+                                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(save_path));
+                                    System.IO.File.WriteAllBytes(save_path, data);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                if (retry_count > 5) { break; }
+                                retry_count++;
+                            }
+                            Thread.Sleep(5000);
+                        }
+                        is_lmdif_loading_data = false;
+                    }));
+                }
+                return;
             }
         }
 
