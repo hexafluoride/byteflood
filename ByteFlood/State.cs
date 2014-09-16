@@ -53,6 +53,8 @@ namespace ByteFlood
         public DhtListener dhtl;
         [XmlIgnore]
         public Listener listener;
+        [XmlIgnore]
+        public int DHTPeers { get; set; }
 
         public State()
         {
@@ -70,6 +72,7 @@ namespace ByteFlood
             DhtEngine dht = new DhtEngine(dhtl);
             ce.Settings.Force = App.Settings.EncryptionType;
             ce.RegisterDht(dht);
+            dht.PeersFound += new EventHandler<PeersFoundEventArgs>(PeersFound);
             ce.DhtEngine.Start();
 
             if (!App.Settings.AssociationAsked)
@@ -92,6 +95,11 @@ namespace ByteFlood
             }
             listener = new Listener(this);
             listener.State = this;
+        }
+
+        void PeersFound(object sender, PeersFoundEventArgs e)
+        {
+            DHTPeers += e.Peers.Count;
         }
 
         public void UpdateConnectionSettings()

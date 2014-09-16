@@ -56,6 +56,7 @@ namespace ByteFlood
         public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.Progress == 100; });
         GraphDrawer graph;
         public State state;
+        int ticks = 0;
 
         public MainWindow()
         {
@@ -124,7 +125,6 @@ namespace ByteFlood
                 "Active",
                "Finished"
             };
-            int ticks = 120;
             while (true)
             {
                 try
@@ -144,8 +144,14 @@ namespace ByteFlood
                                     ti.UpdateGraphData();
                         }
                         updategraph = !updategraph;
-                        MultiBindingExpression exp = BindingOperations.GetMultiBindingExpression(this, MainWindow.TitleProperty);
-                        exp.UpdateTarget();
+                        List<MultiBindingExpression> multi_update = new List<MultiBindingExpression>();
+                        List<BindingExpression> single_update = new List<BindingExpression>();
+                        multi_update.Add(BindingOperations.GetMultiBindingExpression(this, MainWindow.TitleProperty));
+                        multi_update.Add(BindingOperations.GetMultiBindingExpression(DownloadStatus, TextBlock.TextProperty));
+                        multi_update.Add(BindingOperations.GetMultiBindingExpression(UploadStatus, TextBlock.TextProperty));
+                        single_update.Add(BindingOperations.GetBindingExpression(DHTStatus, TextBlock.TextProperty));
+                        multi_update.ForEach(t => t.UpdateTarget());
+                        single_update.ForEach(t => t.UpdateTarget());
                     }, null);
 
                     foreach (string str in torrentstates)
@@ -156,6 +162,14 @@ namespace ByteFlood
 
                     if (ticks >= 120) //1 min
                     {
+                        // find DHT peers
+                        if (state.DHTPeers < 500)
+                        {
+                            foreach (TorrentInfo ti in state.Torrents)
+                                if (state.DHTPeers < 500 // we don't know if there are a lot of torrents, so let's check every time
+                                    && ti.Torrent.State == TorrentState.Downloading || ti.Torrent.State == TorrentState.Seeding)
+                                    state.ce.DhtEngine.GetPeers(ti.Torrent.InfoHash);
+                        }
                         state.SaveState();
                         ticks = 0;
                     }
@@ -608,6 +622,9 @@ namespace ByteFlood
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
+            DownloadStatus.DataContext = state.ce;
+            UploadStatus.DataContext = state.ce;
+            DHTStatus.DataContext = state;
 
             Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
             Services.AutoUpdater.StartMonitoring();

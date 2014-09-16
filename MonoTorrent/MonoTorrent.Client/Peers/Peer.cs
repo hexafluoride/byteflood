@@ -80,6 +80,8 @@ namespace MonoTorrent.Client
             get { return this.totalHashFails; }
         }
 
+        public bool FromDHT { get; set; }
+
         internal string PeerId
         {
             get { return peerId; }

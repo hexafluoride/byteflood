@@ -425,6 +425,10 @@ namespace MonoTorrent.Client
                 return (int)(long)Toolbox.Accumulate<TorrentManager>(torrents, delegate(TorrentManager m) { return m.Monitor.UploadSpeed; });
             }
         }
+        public long TotalDownloaded { get; set; }
+        public long TotalUploaded { get; set; }
+        private long downloadedPrevious;
+        private long uploadedPrevious;
 
         public void Unregister(TorrentManager manager)
         {
@@ -474,6 +478,20 @@ namespace MonoTorrent.Client
             ConnectionManager.TryConnect ();
             for (int i = 0; i < this.torrents.Count; i++)
                 this.torrents[i].Mode.Tick(tickCount);
+
+            long currentdown = (long)Toolbox.Accumulate<TorrentManager>(torrents, delegate(TorrentManager m) { return m.Monitor.DataBytesDownloadedNow; });
+            long currentup = (long)Toolbox.Accumulate<TorrentManager>(torrents, delegate(TorrentManager m) { return m.Monitor.DataBytesUploadedNow; });
+
+            long downdelta = currentdown - downloadedPrevious;
+            long updelta = currentup - uploadedPrevious;
+
+            if (downdelta > 0)
+                TotalDownloaded += downdelta;
+            if (updelta > 0)
+                TotalUploaded += updelta;
+
+            downloadedPrevious = currentdown;
+            uploadedPrevious = currentup;
 
             RaiseStatsUpdate(new StatsUpdateEventArgs());
         }

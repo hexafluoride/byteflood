@@ -147,6 +147,7 @@ namespace ByteFlood
         {
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.context = this.MainAppWindow.uiContext;
+
         }
 
         public TorrentInfo(SynchronizationContext c, TorrentManager tm)
