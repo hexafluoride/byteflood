@@ -140,7 +140,7 @@ namespace ByteFlood
                             if (updategraph)
                                 ReDrawGraph();
                             foreach (TorrentInfo ti in state.Torrents)
-                                if (ti.Torrent.State != TorrentState.Paused)
+                                if (ti.Torrent != null && ti.Torrent.State != TorrentState.Paused)
                                     ti.UpdateGraphData();
                         }
                         updategraph = !updategraph;
@@ -424,10 +424,6 @@ namespace ByteFlood
 
                 }));
             }
-            //Services.RSS.FeedsManager.Add(new Services.RSS.RssUrlEntry() 
-            //{
-            //    Url = "http://www.nyaa.se/?page=rss"
-            //});
         }
 
         private void Commands_OpenPreferences(object sender, ExecutedRoutedEventArgs e)
@@ -741,6 +737,14 @@ namespace ByteFlood
         private void Torrent_RetrieveMovieInfo(object sender, RoutedEventArgs e)
         {
             TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
+            if (ti.PickedMovieData != null && ti.PickedMovieData.Value != null)
+            {
+                var a = MessageBox.Show("The selected torrent already has movie infomation. Do you which to change it?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (a != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
             UI.MovieInfoChooser m = new UI.MovieInfoChooser()
             {
                 Title = string.Format("Pick info for torrent: {0}", ti.Name),

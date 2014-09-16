@@ -106,6 +106,9 @@
     <Compile Include="Services\AutoUpdater.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
     <Compile Include="Services\MoviesDB\Imdb.cs" />
+    <Compile Include="Services\MoviesDB\IMovieDB.cs" />
+    <Compile Include="Services\MoviesDB\UniversalSearch.cs" />
+    <Compile Include="Services\MoviesDB\YifyAPI.cs" />
     <Compile Include="Services\RSS\FeedsManager.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\ExceptionCollection.cs" />
     <Compile Include="Services\RSS\rssdotnet\Collections\RssCategoryCollection.cs" />
