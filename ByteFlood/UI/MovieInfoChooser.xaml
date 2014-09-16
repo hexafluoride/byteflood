@@ -40,7 +40,7 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="32">
+                    <GridViewColumn Width="55">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Image Source="{Binding ThumbImageUri}" Width="32" Height="44"/>
@@ -51,6 +51,13 @@
                     <GridViewColumn Header="Title" DisplayMemberBinding="{Binding Title}" Width="200"/>
                     <GridViewColumn Header="Year" DisplayMemberBinding="{Binding Year}" Width="50"/>
                     <GridViewColumn Header="Type" DisplayMemberBinding="{Binding IMediaType}" Width="80"/>
+                    <GridViewColumn Header="Service" Width="50">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding ServiceIcon}" Width="32" Height="44"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Width="45">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

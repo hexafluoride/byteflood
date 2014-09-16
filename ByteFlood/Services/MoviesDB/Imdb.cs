@@ -124,7 +124,7 @@ namespace ByteFlood.Services.MoviesDatabases
         public string Title { get; set; }
         public int Year { get; set; }
         public Imdb.MediaType Type { get; set; }
-
+        public Uri ServiceIcon { get { return new Uri("http://www.imdb.com/favicon.ico"); } }
         public IMovieDBSearchResultType IMediaType 
         {
             get 
