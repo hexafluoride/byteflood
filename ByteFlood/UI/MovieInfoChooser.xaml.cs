@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using ByteFlood.Services.MoviesDatabases;
 using System.Threading.Tasks;
-using System.Threading;
+
 namespace ByteFlood.UI
 {
     /// <summary>
@@ -30,14 +21,14 @@ namespace ByteFlood.UI
         public static readonly DependencyProperty SearchQueryProperty =
             DependencyProperty.Register("SearchQuery", typeof(string), typeof(MovieInfoChooser), new PropertyMetadata(null));
 
-        public ImdbSearchResult[] Items
+        public IMovieDBSearchResult[] Items
         {
-            get { return (ImdbSearchResult[])GetValue(ItemsProperty); }
+            get { return (IMovieDBSearchResult[])GetValue(ItemsProperty); }
             set { SetValue(ItemsProperty, value); }
         }
 
         public static readonly DependencyProperty ItemsProperty =
-            DependencyProperty.Register("Items", typeof(ImdbSearchResult[]), typeof(MovieInfoChooser), new PropertyMetadata(null));
+            DependencyProperty.Register("Items", typeof(IMovieDBSearchResult[]), typeof(MovieInfoChooser), new PropertyMetadata(null));
 
         public Visibility SearchMessageVisible
         {
@@ -81,7 +72,7 @@ namespace ByteFlood.UI
                 string sq = this.SearchQuery;
                 Task.Factory.StartNew(new Action(() =>
                 {
-                    var res = Imdb.Search(sq);
+                    var res = UniversalSearch.Search(sq);
 
                     App.Current.Dispatcher.Invoke(new Action(() =>
                     {
@@ -113,7 +104,7 @@ namespace ByteFlood.UI
 
         private void Commands_Pick(object sender, ExecutedRoutedEventArgs e)
         {
-            Torrent.PickedMovieData = e.Parameter as ImdbSearchResult;
+            Torrent.PickedMovieData.Value = e.Parameter as IMovieDBSearchResult;
             Torrent.LoadMovieDataIntoFolder();
             this.Close();
         }

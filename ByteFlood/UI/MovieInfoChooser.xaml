@@ -50,7 +50,7 @@
 
                     <GridViewColumn Header="Title" DisplayMemberBinding="{Binding Title}" Width="200"/>
                     <GridViewColumn Header="Year" DisplayMemberBinding="{Binding Year}" Width="50"/>
-                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="80"/>
+                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding IMediaType}" Width="80"/>
                     <GridViewColumn Width="45">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -72,6 +72,6 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Grid.Row="2" Text="Powered by IMDb.com"/>
+        <TextBlock Grid.Row="2" Text="Powered by YifyTorrentsAPI &amp; IMDb.com"/>
     </Grid>
 </Window>

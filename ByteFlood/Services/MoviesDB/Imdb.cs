@@ -6,9 +6,9 @@ using System.Web;
 
 namespace ByteFlood.Services.MoviesDatabases
 {
-    public static class Imdb
+    public class Imdb : IMovieDB
     {
-        public static ImdbSearchResult[] Search(string queryText)
+        public IMovieDBSearchResult[] Search(string queryText)
         {
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load(string.Format("http://www.imdb.com/find?q={0}&s=tt&exact=true", HttpUtility.UrlEncode(queryText)));
@@ -20,17 +20,17 @@ namespace ByteFlood.Services.MoviesDatabases
             }
             else
             {
-                return ParseResults(doc);
+                return this.ParseResults(doc);
             }
         }
 
-        private static bool IsMoviePage(HtmlDocument doc)
+        private bool IsMoviePage(HtmlDocument doc)
         {
             HtmlNode i = doc.DocumentNode.GetElementById("overview-top");
             return (i != null);
         }
 
-        private static ImdbSearchResult[] ParseResults(HtmlDocument doc)
+        private ImdbSearchResult[] ParseResults(HtmlDocument doc)
         {
             Regex RESULT_ID_MATCHER = new Regex(@"tt\d+", RegexOptions.Compiled);
             Regex RESULT_TYPE_MATCHER = new Regex(@"\(\D+\)", RegexOptions.Compiled);
@@ -118,12 +118,35 @@ namespace ByteFlood.Services.MoviesDatabases
         }
     }
 
-    public class ImdbSearchResult
+    public class ImdbSearchResult : IMovieDBSearchResult
     {
         public int ID;
         public string Title { get; set; }
         public int Year { get; set; }
         public Imdb.MediaType Type { get; set; }
+
+        public IMovieDBSearchResultType IMediaType 
+        {
+            get 
+            {
+                switch (this.Type) 
+                {
+                    case Imdb.MediaType.Film:
+                    case Imdb.MediaType.Short:
+                    case Imdb.MediaType.TV_Movie:
+                    case Imdb.MediaType.Video:
+                        return IMovieDBSearchResultType.Movie;
+                    case Imdb.MediaType.TV_Episode:
+                        return IMovieDBSearchResultType.TVEpisode;
+                    case Imdb.MediaType.TV_Mini_Series:
+                    case Imdb.MediaType.TV_Series:
+                        return IMovieDBSearchResultType.TVSeries;
+                    default:
+                        return IMovieDBSearchResultType.Other;
+                }
+            }
+        }
+
         public string ThumbImageUrl { get; set; }
         public Uri ThumbImageUri
         {
@@ -223,6 +246,11 @@ namespace ByteFlood.Services.MoviesDatabases
                     return this._poster_image_link;
                 }
             }
+        }
+
+        public Uri PosterImageUri 
+        {
+            get { return new Uri(this.PosterImageLink); }
         }
 
         #endregion
