@@ -19,6 +19,7 @@ namespace ByteFlood.Services.MoviesDatabases
         int Year { get; }
         Uri ThumbImageUri { get; }
         Uri PosterImageUri { get; }
+        Uri ServiceIcon { get; }
         float Rating { get; }
         IMovieDBSearchResultType IMediaType { get; }
     }

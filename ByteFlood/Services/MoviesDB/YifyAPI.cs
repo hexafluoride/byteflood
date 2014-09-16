@@ -125,6 +125,13 @@ namespace ByteFlood.Services.MoviesDatabases
                 return IMovieDBSearchResultType.Movie;
             }
         }
+        public Uri ServiceIcon 
+        {
+            get
+            {
+                return new Uri("http://yify-torrents.com/favicon.ico");
+            }
+        }
         #endregion
 
         public int MovieID { get; set; }
