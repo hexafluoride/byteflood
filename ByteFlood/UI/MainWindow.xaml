@@ -28,8 +28,10 @@
         TextOptions.TextFormattingMode="Display"
         MinHeight="100"
         MinWidth="100"
-        Height="528" Width="Auto" MouseMove="ResizeInfoAreaMove" MouseUp="ResizeInfoAreaEnd" SizeToContent="Width" mc:Ignorable="d" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded" StateChanged="Window_StateChanged">
+        Height="528" Width="Auto" SizeToContent="Width" mc:Ignorable="d" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" Loaded="Window_Loaded" StateChanged="Window_StateChanged">
     <Window.Resources>
         <formatters:SizeToString x:Key="SizeToString" />
         <formatters:TimeSpanToString x:Key="TimeSpanToString" />
@@ -45,7 +47,7 @@
         <RoutedUICommand x:Key="Commands.AddRssFeed" />
         <RoutedUICommand x:Key="Commands.OpenPreferences" />
         <RoutedUICommand x:Key="Commands.SearchOnlineTorrents" />
-        
+
         <RoutedUICommand x:Key="TorrentCommands.ChangeFilePriority" />
         <RoutedUICommand x:Key="TorrentCommands.OpenFile" />
         <RoutedUICommand x:Key="TorrentCommands.OpenFileLocation" />
@@ -79,7 +81,6 @@
         <CommandBinding Command="{StaticResource TorrentCommands.OpenFile}" Executed="TorrentCommands_OpenFile" />
         <CommandBinding Command="{StaticResource TorrentCommands.OpenFileLocation}" Executed="TorrentCommands_OpenFileLocation" />
         <CommandBinding Command="{StaticResource Commands.SearchOnlineTorrents}" Executed="Commands_SearchOnlineTorrents" />
-        
     </Window.CommandBindings>
 
     <Window.Title>
@@ -88,55 +89,21 @@
             <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
         </MultiBinding>
     </Window.Title>
-    <Grid Name="ActualSize">
-        <DockPanel LastChildFill="False">
 
-            <StatusBar Name="StatusBar" DockPanel.Dock="Bottom" Height="22">
+    <Grid>
 
-                <StatusBar.Resources>
-                    <Style TargetType="Separator">
-                        <Setter Property="Width" Value="1" />
-                    </Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Width" Value="200" />
-                    </Style>
-                </StatusBar.Resources>
-                <!--<StatusBar.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Grid HorizontalAlignment="Right">
-                        </Grid>
-                    </ItemsPanelTemplate>
-                </StatusBar.ItemsPanel>-->
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition MaxHeight="25"/>
+        </Grid.RowDefinitions>
 
-                <StatusBarItem DockPanel.Dock="Right">
-                    <TextBlock Name="UploadStatus">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="U: {0} T: {1}">
-                                <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                <Binding Path="TotalUploaded" Converter="{StaticResource SizeToString}" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </StatusBarItem>
-                <Separator />
-                <StatusBarItem DockPanel.Dock="Right">
-                    <TextBlock Name="DownloadStatus">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="D: {0} T: {1}">
-                                <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                <Binding Path="TotalDownloaded" Converter="{StaticResource SizeToString}" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </StatusBarItem>
-                <Separator />
-                <StatusBarItem DockPanel.Dock="Right">
-                    <TextBlock Name="DHTStatus" Text="{Binding Path=DHTPeers, StringFormat=DHT: {0} peers}">
-                    </TextBlock>
-                </StatusBarItem>
-                <StatusBarItem />
-            </StatusBar>
-            <TreeView Height="Auto" HorizontalAlignment="Left" Visibility="{Binding TreeViewVisibility}" DockPanel.Dock="Left" VerticalAlignment="Stretch" Name="left_treeview" Width="180">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="left_tree_colum" Width="180"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <TreeView Grid.Column="0" Visibility="{Binding TreeViewVisibility}" Name="left_treeview" Width="180">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
                     <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
@@ -172,113 +139,138 @@
                 </TreeViewItem>
             </TreeView>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Button Height="26" HorizontalAlignment="Left" Name="kek" Margin="7,7,0,7" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}" >
-                    <Image Source="pack://siteoforigin:,,,/Assets/add.png" />
-                </Button>
-                <Button Height="26" HorizontalAlignment="Left" Margin="7,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
-                    <Image Source="pack://siteoforigin:,,,/Assets/magnet.png" />
-                </Button>
+            <Grid Grid.Column="1">
 
-                <Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" Content="{StaticResource Appbar.Rss}" />
+                <Grid.RowDefinitions>
+                    <RowDefinition MaxHeight="35" Height="35"/>
+                    <RowDefinition Height="250"/>
+                    <RowDefinition Name="info_tabs_row" MinHeight="200"/>
+                </Grid.RowDefinitions>
 
-                <Button Height="26" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}" Content="{StaticResource Appbar.Search}" />
+                <StackPanel Grid.Row="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left">
 
-                <Button Height="26" HorizontalAlignment="Left" Margin="7,7,7,0" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
-                    <Image Source="pack://siteoforigin:,,,/Assets/settings.png" />
-                </Button>
-                <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
-                <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" VerticalAlignment="Top" BorderThickness="0" Tag="Start" Click="OperationOnSelectedTorrents">
-                    <Image Source="pack://siteoforigin:,,,/Assets/resume.png" Style="{DynamicResource SelectedItemCheckerImage}" />
-                </Button>
-                <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" VerticalAlignment="Top" BorderThickness="0" Tag="Stop" Click="OperationOnSelectedTorrents">
-                    <Image Source="pack://siteoforigin:,,,/Assets/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
-                </Button>
-                <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" VerticalAlignment="Top" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents">
-                    <Image Source="pack://siteoforigin:,,,/Assets/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
-                </Button>
-                <Button Height="26" Margin="7,7,0,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" VerticalAlignment="Top" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents">
-                    <Image Source="pack://siteoforigin:,,,/Assets/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
-                </Button>
-            </StackPanel>
-            <ListView Height="151" Margin="0,0,0,0" HorizontalAlignment="Stretch" BorderThickness="0,1,1,0" DockPanel.Dock="Top" VerticalAlignment="Top" Name="mainlist" Grid.Row="2" SelectionMode="Extended" SelectionChanged="mainlist_SelectionChanged" MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
-                <ListView.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
-                    <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
-                        <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
-                        <MenuItem Header="Stop" Tag="Stop" Click="OperationOnSelectedTorrents" />
-                        <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
-                        <Separator />
-                        <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
-                        <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrents" />
-                        <MenuItem Header="Remove and" Background="WhiteSmoke">
-                            <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrents" />
-                            <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrents" />
-                            <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrents" />
-                        </MenuItem>
-                        <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
-                        <MenuItem Header="Download movie data" Click="Torrent_RetrieveMovieInfo" />
-                    </ContextMenu>
-                </ListView.Resources>
+                    <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}">
+                        <Image Source="pack://siteoforigin:,,,/Assets/add.png" />
+                    </Button>
 
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                        <Setter Property="Height" Value="Auto"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                            <Trigger Property="IsSelected" Value="true">
-                                <Setter Property="BorderBrush" Value="Blue"/>
-                                <Setter Property="BorderThickness" Value="0,0.4"/>
-                                <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <!--<Setter Property="BorderBrush" Value="Blue"/>
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
+                        <Image Source="pack://siteoforigin:,,,/Assets/magnet.png" />
+                    </Button>
+
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" Content="{StaticResource Appbar.Rss}" />
+
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}" Content="{StaticResource Appbar.Search}" />
+
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
+                        <Image Source="pack://siteoforigin:,,,/Assets/settings.png" />
+                    </Button>
+
+                    <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
+
+                    <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Start" Click="OperationOnSelectedTorrents">
+                        <Image Source="pack://siteoforigin:,,,/Assets/resume.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                    </Button>
+
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Stop" Click="OperationOnSelectedTorrents">
+                        <Image Source="pack://siteoforigin:,,,/Assets/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                    </Button>
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents">
+                        <Image Source="pack://siteoforigin:,,,/Assets/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                    </Button>
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents">
+                        <Image Source="pack://siteoforigin:,,,/Assets/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                    </Button>
+                </StackPanel>
+
+                <ListView Grid.Row="1" Name="mainlist"
+                          BorderThickness="0,1,1,0"
+                          SelectionMode="Extended" 
+                          SelectionChanged="mainlist_SelectionChanged"
+                          MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
+
+                    <ListView.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
+                        <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
+                            <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
+                            <MenuItem Header="Stop" Tag="Stop" Click="OperationOnSelectedTorrents" />
+                            <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
+                            <Separator />
+                            <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
+                            <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrents" />
+                            <MenuItem Header="Remove and" Background="WhiteSmoke">
+                                <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrents" />
+                                <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrents" />
+                                <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrents" />
+                            </MenuItem>
+                            <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
+                            <MenuItem Header="Download movie data" Click="Torrent_RetrieveMovieInfo" />
+                        </ContextMenu>
+                    </ListView.Resources>
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                            <Setter Property="Height" Value="Auto"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=ShowOnList}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <Trigger Property="IsSelected" Value="true">
+                                    <Setter Property="BorderBrush" Value="Blue"/>
+                                    <Setter Property="BorderThickness" Value="0,0.4"/>
+                                    <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <!--<Setter Property="BorderBrush" Value="Blue"/>
                                 <Setter Property="BorderThickness" Value="0"/>-->
-                                <Setter Property="Background" Value="LightBlue"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                                    <Setter Property="Background" Value="LightBlue"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
 
-                        <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ProgressBar Maximum="100" Value="{Binding Progress}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+                            <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ProgressBar Maximum="100" Value="{Binding Progress}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
 
-                        <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
+                            <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
 
-                        <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
-                        <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
 
-                        <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
-                        <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                        <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                        <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
-                        <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
-                        <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
+                            <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
+                            <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                            <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                            <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
+                            <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
+                            <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
 
-                        <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
-            <Canvas Height="200" HorizontalAlignment="Stretch" Name="info_canvas"  Visibility="{Binding BottomCanvasVisibility}" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Grid.Row="1">
-                <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="1" Panel.ZIndex="99" />
-                <Border BorderBrush="Transparent" BorderThickness="4" Name="grip" MouseDown="ResizeInfoAreaStart" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="4" Cursor="SizeNS" Panel.ZIndex="99" />
-                <Grid Canvas.Left="219" Canvas.Top="72" />
-                <TabControl Name="tabControl1" Margin="0,0,0,0" Width="{Binding ElementName=info_canvas, Path=ActualWidth}" Height="{Binding ElementName=info_canvas, Path=ActualHeight}">
+                            <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <GridSplitter Grid.Row="2"
+                              Background="Black"
+                              Height="1"
+                              VerticalAlignment="Top"
+                              HorizontalAlignment="Stretch"
+                              ResizeDirection="Rows"/>
+
+                <TabControl Grid.Row="2" Name="info_canvas" Visibility="{Binding BottomCanvasVisibility}">
                     <TabItem Header="Overview" Name="overview">
                         <ScrollViewer>
-                            <Canvas Name="overview_canvas" Height="200" VerticalAlignment="Top">
+                            <Canvas Name="overview_canvas">
                                 <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
                                 <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Text="Time elapsed:" HorizontalAlignment="Right" />
                                 <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Text="Downloaded:" HorizontalAlignment="Right" />
@@ -352,7 +344,7 @@
                     <TabItem Header="Files">
                         <aga:TreeList x:Name="files_tree">
                             <aga:TreeList.Resources>
-                                
+
                                 <ContextMenu x:Key="FileItemContextMenu">
                                     <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
                                     <MenuItem Header="Open file location" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
@@ -407,7 +399,7 @@
                                             <TextBlock Text="{Binding Priority}" HorizontalAlignment="Center"/>
                                         </DataTemplate>
                                     </controls:FileListTemplateSelector.FileTemplate>
-                                    
+
                                     <controls:FileListTemplateSelector.DirectoryTemplate>
                                         <DataTemplate></DataTemplate>
                                     </controls:FileListTemplateSelector.DirectoryTemplate>
@@ -492,8 +484,55 @@
                         </ListView>
                     </TabItem>
                 </TabControl>
-            </Canvas>
-        </DockPanel>
+            </Grid>
+        </Grid>
+
+        <StatusBar Grid.Row="1" Name="StatusBar" Height="25">
+
+            <StatusBar.Resources>
+                <Style TargetType="Separator">
+                    <Setter Property="Width" Value="1" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Width" Value="200" />
+                </Style>
+            </StatusBar.Resources>
+
+            <!--<StatusBar.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid HorizontalAlignment="Right">
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </StatusBar.ItemsPanel>-->
+
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock Name="UploadStatus">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="U: {0} T: {1}">
+                            <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                            <Binding Path="TotalUploaded" Converter="{StaticResource SizeToString}" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock Name="DownloadStatus">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="D: {0} T: {1}">
+                            <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                            <Binding Path="TotalDownloaded" Converter="{StaticResource SizeToString}" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock Name="DHTStatus" Text="{Binding Path=DHTPeers, StringFormat=DHT: {0} peers}">
+                </TextBlock>
+            </StatusBarItem>
+            <StatusBarItem />
+        </StatusBar>
 
         <tb:TaskbarIcon x:Name="NotifyIcon"
                     Visibility="Visible"
