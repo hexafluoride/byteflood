@@ -42,7 +42,7 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
-        bool gripped = false;
+        //bool gripped = false;
         bool ignoreclose = true;
         Thread thr;
         bool updategraph = false;
@@ -61,12 +61,16 @@ namespace ByteFlood
         public MainWindow()
         {
             InitializeComponent();
+            UpdateGridLength();
         }
 
         public void ReDrawGraph()
         {
             if (mainlist.SelectedIndex == -1)
+            {
+                graph.Clear();
                 return;
+            }
             TorrentInfo ti = ((TorrentInfo)mainlist.Items[mainlist.SelectedIndex]);
             graph.Clear();
             bool drawdown = false;
@@ -690,6 +694,7 @@ namespace ByteFlood
             //App.Settings.NotifyChanged("TreeViewVisibility", "BottomCanvasVisibility");
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
+            UpdateGridLength();
             BindingExpression exp1 = left_treeview.GetBindingExpression(TreeView.VisibilityProperty);
             BindingExpression exp2 = info_canvas.GetBindingExpression(Canvas.VisibilityProperty);
             exp1.UpdateTarget();
@@ -708,6 +713,14 @@ namespace ByteFlood
             }
         }
 
+        private void UpdateGridLength() 
+        {
+            GridLength auto = new GridLength(1, GridUnitType.Star);
+            GridLength zero = new GridLength(0);
+            this.left_tree_colum.Width = App.Settings.TreeViewVisible ? new GridLength(180d) : zero;
+            this.info_tabs_row.Height = App.Settings.BottomCanvasVisible ? auto : zero;
+        }
+        /*
         private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
         {
             gripped = true;
@@ -716,7 +729,7 @@ namespace ByteFlood
         {
             gripped = false;
         }
-
+        
         private void ResizeInfoAreaMove(object sender, MouseEventArgs e)
         {
             if (gripped)
@@ -743,7 +756,7 @@ namespace ByteFlood
             double newheight = ActualSize.ActualHeight - info_canvas.ActualHeight - listpos.Y;
             if (newheight > 20)
                 mainlist.Height = newheight;
-        }
+        }*/
 
         private void CopyMagnetLink(object sender, RoutedEventArgs e)
         {
