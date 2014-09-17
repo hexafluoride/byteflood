@@ -504,7 +504,6 @@
                         </Grid>
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>-->
-
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Name="UploadStatus">
                     <TextBlock.Text>
@@ -515,7 +514,7 @@
                     </TextBlock.Text>
                 </TextBlock>
             </StatusBarItem>
-            <Separator />
+            <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Name="DownloadStatus">
                     <TextBlock.Text>
@@ -526,11 +525,12 @@
                     </TextBlock.Text>
                 </TextBlock>
             </StatusBarItem>
-            <Separator />
+            <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Name="DHTStatus" Text="{Binding Path=DHTPeers, StringFormat=DHT: {0} peers}">
                 </TextBlock>
             </StatusBarItem>
+            <Separator DockPanel.Dock="Right" />
             <StatusBarItem />
         </StatusBar>
 
