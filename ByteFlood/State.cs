@@ -1,32 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using MonoTorrent;
 using MonoTorrent.Client;
-using System.Xml;
 using System.Xml.Serialization;
 using MonoTorrent.Dht;
 using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using MonoTorrent.Client.Connections;
-using Microsoft.Win32;
 using System.Threading;
 using System.Net;
 using System.IO;
-using Jayrock;
-using Jayrock.JsonRpc;
 
 namespace ByteFlood
 {
@@ -46,7 +32,9 @@ namespace ByteFlood
         public int ActiveTorrentCount { get { return Torrents.Count(window.Active); } set { } }
         public int InactiveTorrentCount { get { return TorrentCount - ActiveTorrentCount; } set { } }
         public int FinishedTorrentCount { get { return Torrents.Count(window.Finished); } set { } }
-        public int TorrentCount { get { return Torrents.Count; } set { } }
+        [XmlIgnore]
+        public int TorrentCount { get { return Torrents.Count; } }
+
         [XmlIgnore]
         public Thread mainthread;
         [XmlIgnore]
@@ -56,12 +44,12 @@ namespace ByteFlood
         [XmlIgnore]
         private int _dht_peers_count = 0;
         [XmlIgnore]
-        public int DHTPeers 
+        public int DHTPeers
         {
             get { return _dht_peers_count; }
-            set 
+            set
             {
-                if (value != _dht_peers_count) 
+                if (value != _dht_peers_count)
                 {
                     this._dht_peers_count = value;
                     NotifySinglePropertyChanged("DHTPeers");
@@ -71,6 +59,7 @@ namespace ByteFlood
 
         public State()
         {
+            this.Torrents.CollectionChanged += Torrents_CollectionChanged;
             this.Initialize();
         }
 
@@ -87,7 +76,6 @@ namespace ByteFlood
             ce.RegisterDht(dht);
             dht.PeersFound += new EventHandler<PeersFoundEventArgs>(PeersFound);
             ce.DhtEngine.Start();
-
             if (!App.Settings.AssociationAsked)
             {
                 bool assoc = Utility.Associated();
@@ -110,10 +98,19 @@ namespace ByteFlood
             listener.State = this;
         }
 
+        private void Torrents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            NotifySinglePropertyChanged("TorrentCount");
+        }
+
+        #region DHT Engine Events
+
         void PeersFound(object sender, PeersFoundEventArgs e)
         {
             DHTPeers += e.Peers.Count;
         }
+
+        #endregion
 
         public void UpdateConnectionSettings()
         {
@@ -269,57 +266,6 @@ namespace ByteFlood
 
         public void AddTorrentByMagnet(string magnet)
         {
-            /*
-             * MagnetLink mg = null;
-
-            try { mg = new MagnetLink(magnet); }
-            catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
-
-            if (!Directory.Exists(App.Settings.TorrentFileSavePath))
-                Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
-
-            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex().Replace("-", "") + ".torrent");
-
-            AddTorrentDialog atd = new AddTorrentDialog("");
-            atd.Show();
-
-            byte[] data = GetMagnetFromCache(mg);
-            if (data != null)
-            {
-                File.WriteAllBytes(path, data);
-                this.AddTorrentByPath(path, atd);
-                return;
-            }
-
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-                uiContext.Send(x =>
-                {
-                    TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
-
-                    ce.Register(tm);
-                    tm.Start();
-
-                    ce.DhtEngine.GetPeers(mg.InfoHash);
-                    int i = 0;
-
-                    while (tm.State == TorrentState.Stopped)
-                        Thread.Sleep(100);
-                    while (tm.State == TorrentState.Metadata)
-                    {
-                        Thread.Sleep(100);
-                        if((i++) % 100 == 0)
-                            ce.DhtEngine.GetPeers(mg.InfoHash);
-                    }
-
-                    tm.Stop();
-                    tm.Dispose();
-
-                    this.AddTorrentByPath(path, atd);
-                }, null);
-            });
-            return;
-             * */
             MagnetLink mg = null;
 
             try { mg = new MagnetLink(magnet); }
@@ -344,7 +290,7 @@ namespace ByteFlood
                 }
 
                 TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
-
+               
                 ce.Register(tm);
                 tm.Start();
 
@@ -494,7 +440,7 @@ namespace ByteFlood
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
         }
 
-        public void NotifySinglePropertyChanged(string name) 
+        public void NotifySinglePropertyChanged(string name)
         {
             if (PropertyChanged != null)
             {
