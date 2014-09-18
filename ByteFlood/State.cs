@@ -54,7 +54,20 @@ namespace ByteFlood
         [XmlIgnore]
         public Listener listener;
         [XmlIgnore]
-        public int DHTPeers { get; set; }
+        private int _dht_peers_count = 0;
+        [XmlIgnore]
+        public int DHTPeers 
+        {
+            get { return _dht_peers_count; }
+            set 
+            {
+                if (value != _dht_peers_count) 
+                {
+                    this._dht_peers_count = value;
+                    NotifySinglePropertyChanged("DHTPeers");
+                }
+            }
+        }
 
         public State()
         {
@@ -479,6 +492,14 @@ namespace ByteFlood
                 return;
             foreach (string str in props)
                 PropertyChanged(this, new PropertyChangedEventArgs(str));
+        }
+
+        public void NotifySinglePropertyChanged(string name) 
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
         }
     }
 }
