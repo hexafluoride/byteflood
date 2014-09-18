@@ -168,14 +168,14 @@ namespace ByteFlood
 
         public void Update()
         {
-            string[] torrentstates = new string[] 
-            { 
-                "Downloading",
-                "Seeding",
-                "Inactive",
-                "Active",
-               "Finished"
-            };
+            //string[] torrentstates = new string[] 
+            //{ 
+            //    "Downloading",
+            //    "Seeding",
+            //    "Inactive",
+            //    "Active",
+            //   "Finished"
+            //};
             while (true)
             {
                 try
@@ -197,11 +197,9 @@ namespace ByteFlood
                         updategraph = !updategraph;
                     }, null);
 
-                    foreach (string str in torrentstates)
-                    {
-                        state.NotifyChanged(str + "Torrents", str + "TorrentCount");
-                    }
-                    state.NotifyChanged("TorrentCount");
+                    // TODO: Update theses values only when they are really changed.
+                    state.NotifyChanged("DownloadingTorrentCount", "SeedingTorrentCount",
+                        "InactiveTorrentCount", "ActiveTorrentCount", "FinishedTorrentCount");
 
                     if (ticks >= 120) //1 min
                     {
