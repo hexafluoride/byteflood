@@ -42,7 +42,6 @@ namespace ByteFlood
     /// </summary>
     public partial class MainWindow : Window
     {
-        //bool gripped = false;
         bool ignoreclose = true;
         Thread thr;
         bool updategraph = false;
@@ -57,6 +56,54 @@ namespace ByteFlood
         GraphDrawer graph;
         public State state;
         int ticks = 0;
+
+        #region ClientEngine Statistics Properties
+
+        #region TotalDownSpeed
+        public int TotalDownSpeed
+        {
+            get { return (int)GetValue(TotalDownSpeedProperty); }
+            set { SetValue(TotalDownSpeedProperty, value); }
+        }
+
+        public static readonly DependencyProperty TotalDownSpeedProperty =
+            DependencyProperty.Register("TotalDownSpeed", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+        #endregion
+
+        #region TotalUpSpeed
+        public int TotalUpSpeed
+        {
+            get { return (int)GetValue(TotalUpSpeedProperty); }
+            set { SetValue(TotalUpSpeedProperty, value); }
+        }
+
+        public static readonly DependencyProperty TotalUpSpeedProperty =
+            DependencyProperty.Register("TotalUpSpeed", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+        #endregion
+
+        #region TotalDownloaded
+        public long TotalDownloaded
+        {
+            get { return (long)GetValue(TotalDownloadedProperty); }
+            set { SetValue(TotalDownloadedProperty, value); }
+        }
+
+        public static readonly DependencyProperty TotalDownloadedProperty =
+            DependencyProperty.Register("TotalDownloaded", typeof(long), typeof(MainWindow), new PropertyMetadata(0L));
+        #endregion
+
+        #region TotalUploaded
+        public long TotalUploaded
+        {
+            get { return (long)GetValue(TotalUploadedProperty); }
+            set { SetValue(TotalUploadedProperty, value); }
+        }
+
+        public static readonly DependencyProperty TotalUploadedProperty =
+            DependencyProperty.Register("TotalUploaded", typeof(long), typeof(MainWindow), new PropertyMetadata(0L));
+        #endregion 
+
+        #endregion
 
         public MainWindow()
         {
@@ -121,14 +168,14 @@ namespace ByteFlood
 
         public void Update()
         {
-            string[] torrentstates = new string[] 
-            { 
-                "Downloading",
-                "Seeding",
-                "Inactive",
-                "Active",
-               "Finished"
-            };
+            //string[] torrentstates = new string[] 
+            //{ 
+            //    "Downloading",
+            //    "Seeding",
+            //    "Inactive",
+            //    "Active",
+            //   "Finished"
+            //};
             while (true)
             {
                 try
@@ -148,21 +195,11 @@ namespace ByteFlood
                                     ti.UpdateGraphData();
                         }
                         updategraph = !updategraph;
-                        List<MultiBindingExpression> multi_update = new List<MultiBindingExpression>();
-                        List<BindingExpression> single_update = new List<BindingExpression>();
-                        multi_update.Add(BindingOperations.GetMultiBindingExpression(this, MainWindow.TitleProperty));
-                        multi_update.Add(BindingOperations.GetMultiBindingExpression(DownloadStatus, TextBlock.TextProperty));
-                        multi_update.Add(BindingOperations.GetMultiBindingExpression(UploadStatus, TextBlock.TextProperty));
-                        single_update.Add(BindingOperations.GetBindingExpression(DHTStatus, TextBlock.TextProperty));
-                        multi_update.ForEach(t => t.UpdateTarget());
-                        single_update.ForEach(t => t.UpdateTarget());
                     }, null);
 
-                    foreach (string str in torrentstates)
-                    {
-                        state.NotifyChanged(str + "Torrents", str + "TorrentCount");
-                    }
-                    state.NotifyChanged("TorrentCount");
+                    // TODO: Update theses values only when they are really changed.
+                    state.NotifyChanged("DownloadingTorrentCount", "SeedingTorrentCount",
+                        "InactiveTorrentCount", "ActiveTorrentCount", "FinishedTorrentCount");
 
                     if (ticks >= 120) //1 min
                     {
@@ -602,6 +639,7 @@ namespace ByteFlood
             state.uiContext = uiContext;
             state.mainthread = thr;
             thr.Start();
+            state.ce.StatsUpdate += ce_StatsUpdate;
             mainlist.ItemsSource = state.Torrents;
             torrents_treeview.DataContext = state;
             itemselector = ShowAll;
@@ -615,19 +653,28 @@ namespace ByteFlood
                     state.AddTorrentByPath(str);
             }
 
-            this.DataContext = state.ce;
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
-            DownloadStatus.DataContext = state.ce;
-            UploadStatus.DataContext = state.ce;
+
             DHTStatus.DataContext = state;
 
             Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
             Services.AutoUpdater.StartMonitoring();
+        }
+
+        private void ce_StatsUpdate(object sender, StatsUpdateEventArgs e)
+        {
+            this.uiContext.Send(x =>
+            {
+                this.TotalDownSpeed = this.state.ce.TotalDownloadSpeed;
+                this.TotalUpSpeed = this.state.ce.TotalUploadSpeed;
+                this.TotalDownloaded = this.state.ce.TotalDownloaded;
+                this.TotalUploaded = this.state.ce.TotalUploaded;
+            }, null);
         }
 
         bool notify_later_clicked = false;
@@ -713,7 +760,7 @@ namespace ByteFlood
             }
         }
 
-        private void UpdateGridLength() 
+        private void UpdateGridLength()
         {
             GridLength auto = new GridLength(1, GridUnitType.Star);
             GridLength zero = new GridLength(0);

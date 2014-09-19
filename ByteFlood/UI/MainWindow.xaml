@@ -85,8 +85,8 @@
 
     <Window.Title>
         <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
-            <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
-            <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+            <Binding Path="TotalDownSpeed" Converter="{StaticResource SpeedFormatter}" />
+            <Binding Path="TotalUpSpeed" Converter="{StaticResource SpeedFormatter}" />
         </MultiBinding>
     </Window.Title>
 
@@ -508,7 +508,7 @@
                 <TextBlock Name="UploadStatus">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="U: {0} T: {1}">
-                            <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                            <Binding Path="TotalUpSpeed" Converter="{StaticResource SpeedFormatter}" />
                             <Binding Path="TotalUploaded" Converter="{StaticResource SizeToString}" />
                         </MultiBinding>
                     </TextBlock.Text>
@@ -519,7 +519,7 @@
                 <TextBlock Name="DownloadStatus">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="D: {0} T: {1}">
-                            <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                            <Binding Path="TotalDownSpeed" Converter="{StaticResource SpeedFormatter}" />
                             <Binding Path="TotalDownloaded" Converter="{StaticResource SizeToString}" />
                         </MultiBinding>
                     </TextBlock.Text>

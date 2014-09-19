@@ -78,6 +78,42 @@ namespace ByteFlood
             Utility.SetItemsSource<ComboBox>(TrayIconComboBoxes, TrayIconBehaviorsReadable);
             Utility.SetItemsSource<ComboBox>(WindowComboBoxes, WindowBehaviorsReadable);
             enctype.ItemsSource = EncryptionTypesReadable;
+            LoadNetworkInterfaces();
+        }
+
+        private void LoadNetworkInterfaces() 
+        {
+            foreach (var iface in Utility.GetValidNetworkInterfaces()) 
+            {
+                ComboBoxItem bi = new ComboBoxItem();
+                bi.Content = iface.Name;
+                bi.Tag = iface;
+                interfaces.Items.Add(bi);
+                if (iface.Id == local.NetworkInterfaceID) 
+                {
+                    interfaces.SelectedItem = bi;
+                }
+            }
+            if (interfaces.SelectedIndex == -1) 
+            {
+                interfaces.SelectedIndex = 0;
+            }
+            interfaces.SelectionChanged += interfaces_SelectionChanged;
+        }
+
+        void interfaces_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem bi = interfaces.SelectedItem as ComboBoxItem;
+            var iface = bi.Tag as System.Net.NetworkInformation.NetworkInterface;
+            local.NetworkInterfaceID = iface.Id;
+            if (iface.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) 
+            {
+                iface_error.Visibility = Visibility.Visible;
+            }
+            else 
+            {
+                iface_error.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void UpdateDataContext(Settings s)
@@ -154,7 +190,12 @@ namespace ByteFlood
             MainWindow mw = (App.Current.MainWindow as MainWindow);
             mw.state.ce.Settings.Force = local.EncryptionType;
             local.Theme = (Theme)themeCombox.SelectedItem;
+            bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
             App.Settings = (Settings)Utility.CloneObject(local);
+            if (iface_changed) 
+            {
+                mw.state.ChangeNetworkInterface();
+            }
             this.Close();
         }
 
