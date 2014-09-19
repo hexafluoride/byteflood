@@ -432,10 +432,21 @@ namespace ByteFlood
                                     System.IO.File.WriteAllBytes(save_path, data);
                                 }
                             }
+                            catch (System.Net.WebException wex) 
+                            {
+                                if (wex.Status == System.Net.WebExceptionStatus.NameResolutionFailure) 
+                                {
+                                    break;
+                                }
+                                else 
+                                {
+                                    if (retry_count > 5) { break; }
+                                    retry_count++;
+                                }
+                            }
                             catch (Exception ex)
                             {
-                                if (retry_count > 5) { break; }
-                                retry_count++;
+                                break;
                             }
                             Thread.Sleep(5000);
                         }

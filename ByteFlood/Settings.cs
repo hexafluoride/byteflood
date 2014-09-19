@@ -56,7 +56,7 @@ namespace ByteFlood
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
-        public NetworkInterface Interface { get; set; }
+        //public NetworkInterface Interface { get; set; }
         public bool ImportedTorrents { get; set; }
         public List<string> PreviousPaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
@@ -94,6 +94,8 @@ namespace ByteFlood
         public string UpdateSourceEtag { get; set; }
 
         public string OpenTorrentDialogLastPath { get; set; }
+
+        public string NetworkInterfaceID { get; set; }
 
         public static Settings DefaultSettings
         {
@@ -135,7 +137,8 @@ namespace ByteFlood
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties,
                     AssociationAsked = false,
                     UpdateSourceEtag = null,
-                    OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+                    OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId()
                 };
             }
         }
