@@ -95,6 +95,8 @@ namespace ByteFlood
 
         public string OpenTorrentDialogLastPath { get; set; }
 
+        public string NetworkInterfaceID { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -135,7 +137,8 @@ namespace ByteFlood
                     DefaultTorrentProperties = TorrentProperties.DefaultTorrentProperties,
                     AssociationAsked = false,
                     UpdateSourceEtag = null,
-                    OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+                    OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId()
                 };
             }
         }

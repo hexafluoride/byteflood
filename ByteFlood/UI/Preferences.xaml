@@ -98,6 +98,8 @@
                             <TextBox Height="23" Text="{Binding DHTListeningPort}" Width="120" Canvas.Left="276" Canvas.Top="35" />
                         </Canvas>
                     </GroupBox>
+                    <TextBlock Name="iface_error" Text="Warning: This interface is down!" Canvas.Left="275" Canvas.Top="236" Height="34" Width="142"
+                               Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed"/>
                 </Canvas>
             </TabItem>
         </TabControl>

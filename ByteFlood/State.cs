@@ -69,13 +69,15 @@ namespace ByteFlood
             IPV4Connection.ExceptionThrown += Utility.LogException;
             //IPV4Connection.LocalAddress = new IPAddress(new byte[] { 127,0,0,1 });
             IPV4Connection.LocalAddress = IPAddress.Any;
+
+            var iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
             ce = new ClientEngine(new EngineSettings());
-            dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, App.Settings.ListeningPort));
-            DhtEngine dht = new DhtEngine(dhtl);
+            ce.ChangeListenEndpoint(new IPEndPoint(iface.GetIPv4(), ce.Listener.Endpoint.Port));
             ce.Settings.Force = App.Settings.EncryptionType;
-            ce.RegisterDht(dht);
-            dht.PeersFound += new EventHandler<PeersFoundEventArgs>(PeersFound);
+
+            ce.RegisterDht(get_dht_engine(iface.GetIPv4()));
             ce.DhtEngine.Start();
+
             if (!App.Settings.AssociationAsked)
             {
                 bool assoc = Utility.Associated();
@@ -96,6 +98,34 @@ namespace ByteFlood
             }
             listener = new Listener(this);
             listener.State = this;
+        }
+
+        /// <summary>
+        /// return a new dht engine with ByteFlood settings
+        /// </summary>
+        /// <returns></returns>
+        private DhtEngine get_dht_engine(IPAddress ip)
+        {
+            dhtl = new DhtListener(new IPEndPoint(ip, App.Settings.ListeningPort));
+            DhtEngine dht = new DhtEngine(dhtl);
+            dht.PeersFound += new EventHandler<PeersFoundEventArgs>(PeersFound);
+            return dht;
+        }
+
+        public void ChangeNetworkInterface()
+        {
+            var new_iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
+            ce.ChangeListenEndpoint(new IPEndPoint(new_iface.GetIPv4(), ce.Listener.Endpoint.Port));
+            
+            //stop the current dht engine
+            ce.DhtEngine.Stop();
+            ce.DhtEngine.Dispose();
+            ce.DhtEngine.PeersFound -= PeersFound;
+            this.DHTPeers = 0;
+           
+            //registering a new dht engine will overrides the old one
+            ce.RegisterDht(get_dht_engine(new_iface.GetIPv4()));
+            ce.DhtEngine.Start();
         }
 
         private void Torrents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -290,7 +320,7 @@ namespace ByteFlood
                 }
 
                 TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
-               
+
                 ce.Register(tm);
                 tm.Start();
 
