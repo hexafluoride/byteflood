@@ -217,5 +217,12 @@ namespace ByteFlood
             Utility.MagnetAssociate();
         }
 
+        private void RefreshNetworkInterfaces(object sender, RoutedEventArgs e)
+        {
+            interfaces.SelectionChanged -= interfaces_SelectionChanged;
+            interfaces.Items.Clear();
+            LoadNetworkInterfaces();
+        }
+
     }
 }
