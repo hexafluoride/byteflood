@@ -56,7 +56,7 @@ namespace ByteFlood
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
-        public NetworkInterface Interface { get; set; }
+        //public NetworkInterface Interface { get; set; }
         public bool ImportedTorrents { get; set; }
         public List<string> PreviousPaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
