@@ -172,7 +172,7 @@ namespace ByteFlood
 
         private void ChangeDefaultSettings(object sender, RoutedEventArgs e)
         {
-            TorrentPropertiesForm tpf = new TorrentPropertiesForm(local.DefaultTorrentProperties);
+            TorrentPropertiesForm tpf = new TorrentPropertiesForm(local.DefaultTorrentProperties) { Owner = this, Icon = this.Icon };
             tpf.ShowDialog();
             if (tpf.success)
                 local.DefaultTorrentProperties = tpf.tp;
