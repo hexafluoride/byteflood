@@ -147,11 +147,10 @@ namespace ByteFlood
 
         private void PickPath(object sender, RoutedEventArgs e)
         {
-            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            string new_path = Utility.PromptFolderSelection("Choose default download path", local.DefaultDownloadPath, this);
+            if (new_path != null)
             {
-                fd.ShowNewFolderButton = true;
-                fd.ShowDialog();
-                local.DefaultDownloadPath = fd.SelectedPath;
+                local.DefaultDownloadPath = new_path;
                 downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
             }
         }
