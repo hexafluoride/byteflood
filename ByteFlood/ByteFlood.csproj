@@ -87,6 +87,14 @@
     <Compile Include="Controls\TreeList\Tree\TreeList.cs" />
     <Compile Include="Controls\TreeList\Tree\TreeListItem.cs" />
     <Compile Include="Controls\TreeList\Tree\TreeNode.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\comguids.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\errorhelper.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\helpers.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\nativemethods.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\nativetaskdialogshowstate.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\shellcominterfaces.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\shellwrapperdefinitions.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\library\WPFFolderBrowserDialog.cs" />
     <Compile Include="Formatters\InvertBooleanConverter.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
@@ -345,9 +353,9 @@
     <Content Include="Assets\stop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
-    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
     <Resource Include="Controls\TreeList\Info.txt" />
     <Resource Include="Graphics\CountryFlags\zz.png" />
     <Resource Include="Graphics\CountryFlags\ad.png" />

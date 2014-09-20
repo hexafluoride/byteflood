@@ -120,11 +120,11 @@ namespace ByteFlood
         public void Load(string path)
         {
             loading.Visibility = Visibility.Collapsed;
-            
+
             this.tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
-            
+
             this.Torrent = tm.Torrent;
-            
+
             this.RatioLimit = 0f;
 
             foreach (TorrentFile file in tm.Torrent.Files)
@@ -151,14 +151,11 @@ namespace ByteFlood
 
         private void Commands_Browse(object sender, ExecutedRoutedEventArgs e)
         {
-            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            string path = Utility.PromptFolderSelection("Choose torrent save directory", null, this);
+            if (path != null)
             {
-                fd.ShowNewFolderButton = true;
-                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    tm = new TorrentManager(tm.Torrent, fd.SelectedPath, new TorrentSettings());
-                    this.TorrentSavePath = tm.SavePath;
-                }
+                tm = new TorrentManager(tm.Torrent, path, new TorrentSettings());
+                this.TorrentSavePath = tm.SavePath;
             }
         }
 
@@ -166,7 +163,7 @@ namespace ByteFlood
         {
             this.AutoStartTorrent = (start_torrent.IsChecked == true); // sorry
             this.UserOK = true;
-            if(!App.Settings.PreviousPaths.Contains(TorrentSavePath))
+            if (!App.Settings.PreviousPaths.Contains(TorrentSavePath))
                 App.Settings.PreviousPaths.Insert(0, TorrentSavePath);
             this.Close();
         }
