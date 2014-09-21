@@ -40,6 +40,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using MonoTorrent.Common;
+using System.Net.NetworkInformation;
 
 namespace ByteFlood
 {
@@ -222,7 +223,7 @@ namespace ByteFlood
             Console.WriteLine("---------- ERROR LOG START ----------");
             Console.WriteLine("Exception thrown, reason: {0}", ex.Message);
             Console.WriteLine("Stack trace: {0}", ex.StackTrace);
-            if(ex.InnerException != null)
+            if (ex.InnerException != null)
                 Console.WriteLine("Dumping InnerExceptions.");
             int id = 0;
             while (ex.InnerException != null)
@@ -562,6 +563,85 @@ namespace ByteFlood
 
             }
             return n.ToString();
+        }
+
+        public static NetworkInterface[] GetValidNetworkInterfaces()
+        {
+            NetworkInterface[] ifaces = NetworkInterface.GetAllNetworkInterfaces();
+            List<NetworkInterface> valid = new List<NetworkInterface>(ifaces.Length);
+
+            foreach (var iface in ifaces)
+            {
+                if (iface.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                    iface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                {
+                    valid.Add(iface);
+                }
+            }
+
+            return valid.ToArray();
+        }
+
+        public static NetworkInterface GetNetworkInterface(string Id) 
+        {
+            foreach (var iface in GetValidNetworkInterfaces()) 
+            {
+                if (iface.Id == Id) { return iface; }
+            }
+            return GetLoopbackIface();
+        }
+
+        public static string GetDefaultNetworkInterfaceId() 
+        {
+            var valid = GetValidNetworkInterfaces();
+            if (valid.Length > 0) 
+            {
+                return valid[0].Id;
+            }
+            else { return GetLoopbackIface().Id; }
+        }
+
+        private static NetworkInterface GetLoopbackIface() 
+        {
+            foreach (var iface in NetworkInterface.GetAllNetworkInterfaces()) 
+            {
+                if (iface.NetworkInterfaceType == NetworkInterfaceType.Loopback) 
+                { return iface; }
+            }
+
+            return null;
+        }
+
+        public static System.Net.IPAddress GetIPv4(this NetworkInterface ni)
+        {
+            if (ni.OperationalStatus == OperationalStatus.Up)
+            {
+                foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        return ip.Address;
+                    }
+                }
+            }
+
+            return System.Net.IPAddress.None;
+        }
+
+        public static System.Net.IPAddress GetIPv6(this NetworkInterface ni)
+        {
+            if (ni.OperationalStatus == OperationalStatus.Up)
+            {
+                foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    {
+                        return ip.Address;
+                    }
+                }
+            }
+
+            return System.Net.IPAddress.IPv6None;
         }
 
         /// <summary>
