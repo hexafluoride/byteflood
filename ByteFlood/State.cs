@@ -65,7 +65,6 @@ namespace ByteFlood
         {
             UpdateConnectionSettings();
             IPV4Connection.ExceptionThrown += Utility.LogException;
-            //IPV4Connection.LocalAddress = new IPAddress(new byte[] { 127,0,0,1 });
             IPV4Connection.LocalAddress = IPAddress.Any;
             ce = new ClientEngine(new EngineSettings());
             dhtl = new DhtListener(new IPEndPoint(IPAddress.Any, App.Settings.ListeningPort));
