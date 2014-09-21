@@ -67,7 +67,6 @@ namespace ByteFlood
         {
             UpdateConnectionSettings();
             IPV4Connection.ExceptionThrown += Utility.LogException;
-            //IPV4Connection.LocalAddress = new IPAddress(new byte[] { 127,0,0,1 });
             IPV4Connection.LocalAddress = IPAddress.Any;
 
             var iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);

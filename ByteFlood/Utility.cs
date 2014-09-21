@@ -49,22 +49,31 @@ namespace ByteFlood
 
         public static Dictionary<string, BitmapImage> IconCache = new Dictionary<string, BitmapImage>();
 
-        const double K = 1024;
-        const double M = 1048576;
-        const double G = 1073741824;
-        const double T = 1099511627776;
+        public const double K = 1024;
+        public const double M = 1048576;
+        public const double G = 1073741824;
+        public const double T = 1099511627776;
 
         static string OpenWith = Assembly.GetCallingAssembly().Location;
 
-        public static string PrettifyAmount(double amount)
+        static List<decimal> multipliers = new List<decimal>()
+            {
+                0.1m,
+                0.5m,
+                1m,
+                2m,
+                10m
+            };
+
+        public static string PrettifyAmount(double amount, double max = T)
         {
-            if (amount > T)
+            if (amount > T && max >= T)
                 return (amount / T).ToString("0.00") + " TB";
-            if (amount > G)
+            if (amount > G && max >= G)
                 return (amount / G).ToString("0.00") + " GB";
-            if (amount > M)
+            if (amount > M && max >= M)
                 return (amount / M).ToString("0.00") + " MB";
-            if (amount > K)
+            if (amount > K && max >= K)
                 return (amount / K).ToString("0.00") + " KB";
             return amount.ToString("0.00") + " B";
         }
@@ -74,9 +83,9 @@ namespace ByteFlood
         //    return PrettifyAmount((ulong)amount);
         //}
 
-        public static string PrettifySpeed(long speed)
+        public static string PrettifySpeed(long speed, double max = T)
         {
-            return PrettifyAmount((ulong)speed) + "/s";
+            return PrettifyAmount((ulong)speed, max) + "/s";
         }
 
         public static bool IsMagnetLink(string path)
@@ -322,6 +331,60 @@ namespace ByteFlood
                 newstyle.BasedOn = Application.Current.TryFindResource(typeof(Button)) as Style;
             }
             mw.Resources["SelectedItemCheckerButton"] = newstyle;
+        }
+
+        public static ContextMenu GenerateContextMenu(bool download, State state)
+        {
+            // there's some messy code here, so it's documented thoroughly
+            ContextMenu c = new ContextMenu();
+            decimal current = (decimal)(download ? state.ce.Settings.GlobalMaxDownloadSpeed : state.ce.Settings.GlobalMaxUploadSpeed); // I wanted to use ref instead of this, but ref doesn't work in anonymous methods.
+
+            List<MenuItem> items = new List<MenuItem>();
+            MenuItem unlimited = new MenuItem();
+            unlimited.Header = "Unlimited";
+            unlimited.Click += (ea, s) => // binding click event to an anonymous method that sets the limit
+            {
+                if (download)
+                    state.ce.Settings.GlobalMaxDownloadSpeed = 0;
+                else
+                    state.ce.Settings.GlobalMaxUploadSpeed = 0;
+            };
+            bool dontselect = false; // this variable determines whether the loop should check the menuitem equal to "current"
+            if (current == 0m)
+            {
+                unlimited.IsChecked = unlimited.IsCheckable = true;
+                current = (int)(100 * Utility.K); // 100 kb/s
+                dontselect = true; // we do this so there are not 2 checked items, but one
+            }
+            c.Items.Add(unlimited);       // self explanatory
+            c.Items.Add(new Separator()); //
+            foreach (decimal multiplier in multipliers)
+            {
+                MenuItem item = new MenuItem();
+                if (current > int.MaxValue / multiplier)
+                {
+                    current = int.MaxValue / multiplier;
+                    item.IsEnabled = false;
+                }
+                int val = (int)(current * multiplier);
+                if (val < K)
+                    val = (int)K;
+                item.Header = Utility.PrettifySpeed(val, K);
+                item.Click += (ea, s) => // binding click event to an anonymous method that sets the limit
+                {
+                    if (download)
+                        state.ce.Settings.GlobalMaxDownloadSpeed = val;
+                    else
+                        state.ce.Settings.GlobalMaxUploadSpeed = val;
+                };
+                if (multiplier == 1m && !dontselect) // dontselect is set to true if the limit is unlimited
+                {
+                    item.IsCheckable = true;
+                    item.IsChecked = true;
+                }
+                c.Items.Add(item);
+            }
+            return c;
         }
 
         public static Brush GetBrushFromTorrentState(TorrentState s, bool finished)
