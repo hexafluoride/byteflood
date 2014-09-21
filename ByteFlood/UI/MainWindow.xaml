@@ -505,7 +505,7 @@
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>-->
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="UploadStatus">
+                <TextBlock Name="UploadStatus" MouseRightButtonUp="GenerateUploadContextMenu">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="U: {0} T: {1}">
                             <Binding Path="TotalUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
@@ -516,7 +516,7 @@
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="DownloadStatus">
+                <TextBlock Name="DownloadStatus" MouseRightButtonUp="GenerateDownloadContextMenu">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="D: {0} T: {1}">
                             <Binding Path="TotalDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />

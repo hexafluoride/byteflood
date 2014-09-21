@@ -202,6 +202,16 @@ namespace ByteFlood
             }
         }
 
+        private void GenerateDownloadContextMenu(object sender, MouseButtonEventArgs e)
+        {
+            DownloadStatus.ContextMenu = Utility.GenerateContextMenu(true, state);
+        }
+
+        private void GenerateUploadContextMenu(object sender, MouseButtonEventArgs e)
+        {
+            UploadStatus.ContextMenu = Utility.GenerateContextMenu(false, state);
+        }
+
         private void mainlist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0)
@@ -958,8 +968,5 @@ namespace ByteFlood
                     break;
             }
         }
-
-
-
     }
 }
