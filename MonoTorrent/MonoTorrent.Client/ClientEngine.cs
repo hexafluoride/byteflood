@@ -234,7 +234,7 @@ namespace MonoTorrent.Client
 
             RateLimiter uploader = new RateLimiter();
             uploadLimiter = new RateLimiterGroup();
-            downloadLimiter.Add(new DiskWriterLimiter(DiskManager));
+            uploadLimiter.Add(new DiskWriterLimiter(DiskManager));
             uploadLimiter.Add(uploader);
 
             ClientEngine.MainLoop.QueueTimeout(TimeSpan.FromSeconds(1), delegate {
@@ -473,6 +473,8 @@ namespace MonoTorrent.Client
             {
                 diskManager.writeLimiter.UpdateChunks(settings.MaxWriteRate, diskManager.WriteRate);
                 diskManager.readLimiter.UpdateChunks(settings.MaxReadRate, diskManager.ReadRate);
+                uploadLimiter.UpdateChunks(settings.GlobalMaxUploadSpeed, TotalUploadSpeed);
+                downloadLimiter.UpdateChunks(settings.GlobalMaxDownloadSpeed, TotalDownloadSpeed);
             }
 
             ConnectionManager.TryConnect ();

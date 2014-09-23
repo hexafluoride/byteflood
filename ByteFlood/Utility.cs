@@ -291,7 +291,7 @@ namespace ByteFlood
         {
             // there's some messy code here, so it's documented thoroughly
             ContextMenu c = new ContextMenu();
-            decimal current = (decimal)(download ? state.ce.Settings.GlobalMaxDownloadSpeed : state.ce.Settings.GlobalMaxUploadSpeed); // I wanted to use ref instead of this, but ref doesn't work in anonymous methods.
+            decimal current = (decimal)(download ? state.GlobalMaxDownloadSpeed : state.GlobalMaxUploadSpeed); // I wanted to use ref instead of this, but ref doesn't work in anonymous methods.
 
             List<MenuItem> items = new List<MenuItem>();
             MenuItem unlimited = new MenuItem();
@@ -299,9 +299,9 @@ namespace ByteFlood
             unlimited.Click += (ea, s) => // binding click event to an anonymous method that sets the limit
             {
                 if (download)
-                    state.ce.Settings.GlobalMaxDownloadSpeed = 0;
+                    state.GlobalMaxDownloadSpeed = 0;
                 else
-                    state.ce.Settings.GlobalMaxUploadSpeed = 0;
+                    state.GlobalMaxUploadSpeed = 0;
             };
             bool dontselect = false; // this variable determines whether the loop should check the menuitem equal to "current"
             if (current == 0m)
@@ -327,9 +327,9 @@ namespace ByteFlood
                 item.Click += (ea, s) => // binding click event to an anonymous method that sets the limit
                 {
                     if (download)
-                        state.ce.Settings.GlobalMaxDownloadSpeed = val;
+                        state.GlobalMaxDownloadSpeed = val;
                     else
-                        state.ce.Settings.GlobalMaxUploadSpeed = val;
+                        state.GlobalMaxUploadSpeed = val;
                 };
                 if (multiplier == 1m && !dontselect) // dontselect is set to true if the limit is unlimited
                 {
