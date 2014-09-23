@@ -115,9 +115,9 @@ namespace ByteFlood.UI
                 Int32.TryParse(value, out this.CustomIntervalSeconds);
                 if (this.CustomIntervalSeconds < 0)
                 {
-                    this.CustomIntervalSeconds = -this.CustomIntervalSeconds;   
+                    this.CustomIntervalSeconds = -this.CustomIntervalSeconds;
                 }
-                else if (this.CustomIntervalSeconds == 0) 
+                else if (this.CustomIntervalSeconds == 0)
                 {
                     this.CustomIntervalSeconds = 15 * 60;
                 }
@@ -159,11 +159,10 @@ namespace ByteFlood.UI
 
         private void Commands_Browse(object sender, ExecutedRoutedEventArgs e)
         {
-            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            string path = Utility.PromptFolderSelection("Choose RSS save directory", null, this);
+            if (path != null)
             {
-                fd.ShowNewFolderButton = true;
-                fd.ShowDialog();
-                this.DownloadPath = fd.SelectedPath;
+                this.DownloadPath = path;
             }
         }
 

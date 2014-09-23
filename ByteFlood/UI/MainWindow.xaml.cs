@@ -40,7 +40,7 @@ namespace ByteFlood
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDisposable
     {
         bool ignoreclose = true;
         Thread thr;
@@ -109,6 +109,16 @@ namespace ByteFlood
         {
             InitializeComponent();
             UpdateGridLength();
+        }
+
+        bool disposed = false;
+        public void Dispose() 
+        {
+            if (!disposed)
+            {
+                this.NotifyIcon.Dispose();
+                disposed = true;
+            }
         }
 
         public void ReDrawGraph()
