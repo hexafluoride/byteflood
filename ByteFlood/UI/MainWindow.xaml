@@ -543,7 +543,7 @@
                     PopupActivation="None"
                     MenuActivation="None">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
+                <ContextMenu TextOptions.TextFormattingMode="Display">
                     <MenuItem Header="Resume all torrents" Click="ActionOnAllTorrents" Tag="resume" />
                     <MenuItem Header="Pause all torrents" Click="ActionOnAllTorrents" Tag="pause" />
                     <MenuItem Header="Show/Hide ByteFlood" Click="ShowHide" />
