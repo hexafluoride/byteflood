@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:ByteFlood.Controls"
         Title="Add new feed" Height="557" Width="507"
+        TextOptions.TextFormattingMode="Display"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Window.Resources>
