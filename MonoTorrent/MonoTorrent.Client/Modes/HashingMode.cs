@@ -55,11 +55,7 @@ namespace MonoTorrent.Client
 				Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, index, Manager.Bitfield[index]));
                 if (valid)
                 {
-                    foreach (TorrentFile file in Manager.Torrent.Files)
-                    {
-                        if (index > file.StartPieceIndex && index < file.EndPieceIndex)
-                            file.AddCheckedBytes(Manager.Torrent.PieceLength);
-                    }
+                    
                 }
 				index++;
 				QueueNextHash();

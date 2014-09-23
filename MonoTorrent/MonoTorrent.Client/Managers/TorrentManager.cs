@@ -817,7 +817,13 @@ namespace MonoTorrent.Client
             {
                 List<PeerId> connected = Peers.ConnectedPeers;
                 for (int i = 0; i < connected.Count; i++)
-                    connected[i].IsAllowedFastPieces.Remove(index);
+                    connected[i].IsAllowedFastPieces.Remove(index); 
+
+                foreach (TorrentFile file in this.Torrent.Files)
+                {
+                    if (index > file.StartPieceIndex && index < file.EndPieceIndex)
+                        file.AddCheckedBytes(this.Torrent.PieceLength);
+                }
             }
 
             Toolbox.RaiseAsyncEvent<PieceHashedEventArgs>(PieceHashed, this, args);
@@ -901,8 +907,10 @@ namespace MonoTorrent.Client
 
             bitfield.From(data.Bitfield);
             for (int i = 0; i < torrent.Pieces.Count; i++)
-                RaisePieceHashed (new PieceHashedEventArgs (this, i, bitfield[i]));
-
+            {
+                RaisePieceHashed(new PieceHashedEventArgs(this, i, bitfield[i]));
+                
+            }
             this.hashChecked = true;
         }
 

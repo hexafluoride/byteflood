@@ -7,6 +7,7 @@ using System.ComponentModel;
 using MonoTorrent.Client;
 using MonoTorrent.Common;
 using MonoTorrent.Client.Encryption;
+using MonoTorrent.BEncoding;
 using System.Threading;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
@@ -41,6 +42,9 @@ namespace ByteFlood
         public TorrentSettings TorrentSettings { get; set; }
         public string Name { get; set; }
         public double Progress { get { return Torrent.Progress; } set { } }
+        public string FastResumeData { get { return Convert.ToBase64String(Torrent.SaveFastResume().Encode().Encode()); } set { fastResumeData = value; } }
+        [XmlIgnore]
+        private string fastResumeData;
         public long Size { get { return Torrent.Torrent.Size; } }
         public int DownloadSpeed { get { return Torrent.Monitor.DownloadSpeed; } }
         public int MaxDownloadSpeed { get { return Torrent.Settings.MaxDownloadSpeed; } }
@@ -350,6 +354,11 @@ namespace ByteFlood
                 {
                     this.Torrent = new TorrentManager(MonoTorrent.Common.Torrent.Load(this.Path), SavePath, TorrentSettings, false);
                     t.ce.Register(this.Torrent);
+                    if (!string.IsNullOrWhiteSpace(fastResumeData))
+                    {
+                        byte[] fastresume = Convert.FromBase64String(fastResumeData);
+                        this.Torrent.LoadFastResume(new FastResume((BEncodedDictionary)BEncodedDictionary.Decode(fastresume)));
+                    }
 
                     TorrentState[] StoppedStates = { TorrentState.Stopped, TorrentState.Stopping, TorrentState.Error };
                     if (!StoppedStates.Contains(this.SavedTorrentState))
@@ -378,6 +387,7 @@ namespace ByteFlood
                 }
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdatePeerList));
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateTrackerList));
+
                 UpdateList("DownloadSpeed",
                     "UploadSpeed",
                     "PeerCount",
