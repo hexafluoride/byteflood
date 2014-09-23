@@ -75,6 +75,14 @@
     <Compile Include="Controls\ClickableLabel.cs" />
     <Compile Include="Controls\FileListTemplateSelector.cs" />
     <Compile Include="Controls\GridViewSort.cs" />
+    <Compile Include="Controls\PhotoLoader\ImageLoaders\CachedExternalResoucre.cs" />
+    <Compile Include="Controls\PhotoLoader\ImageLoaders\ExternalLoader.cs" />
+    <Compile Include="Controls\PhotoLoader\ImageLoaders\ILoader.cs" />
+    <Compile Include="Controls\PhotoLoader\ImageLoaders\LoaderFactory.cs" />
+    <Compile Include="Controls\PhotoLoader\ImageLoaders\LocalDiskLoader.cs" />
+    <Compile Include="Controls\PhotoLoader\Loader.cs" />
+    <Compile Include="Controls\PhotoLoader\Manager.cs" />
+    <Compile Include="Controls\PhotoLoader\Types.cs" />
     <Compile Include="Controls\PieceBar.xaml.cs">
       <DependentUpon>PieceBar.xaml</DependentUpon>
     </Compile>
@@ -87,6 +95,14 @@
     <Compile Include="Controls\TreeList\Tree\TreeList.cs" />
     <Compile Include="Controls\TreeList\Tree\TreeListItem.cs" />
     <Compile Include="Controls\TreeList\Tree\TreeNode.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\comguids.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\errorhelper.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\helpers.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\nativemethods.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\nativetaskdialogshowstate.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\shellcominterfaces.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\interop\shellwrapperdefinitions.cs" />
+    <Compile Include="Controls\VistaFolderBrowser\library\WPFFolderBrowserDialog.cs" />
     <Compile Include="Formatters\InvertBooleanConverter.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
@@ -200,6 +216,10 @@
       <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
+    <Page Include="Controls\PhotoLoader\Resources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\PieceBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -274,6 +294,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -345,9 +366,9 @@
     <Content Include="Assets\stop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
-    <Content Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
-    <Resource Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
     <Resource Include="Controls\TreeList\Info.txt" />
     <Resource Include="Graphics\CountryFlags\zz.png" />
     <Resource Include="Graphics\CountryFlags\ad.png" />

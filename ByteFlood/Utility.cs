@@ -172,6 +172,52 @@ namespace ByteFlood
             return data * spp;
         }
 
+        public static string PromptFolderSelection(string title = null, string initialDir = null, Window owner = null)
+        {
+            string link = null;
+            if (IsWindowsVistaOrNewer)
+            {
+                var dialog = title == null ? new WPFFolderBrowser.WPFFolderBrowserDialog() : new WPFFolderBrowser.WPFFolderBrowserDialog(title);
+                dialog.ShowPlacesList = true;
+
+                if (initialDir != null) 
+                {
+                    dialog.FileName = initialDir;
+                }
+
+                if (dialog.ShowDialog(owner) == true)
+                {
+                    link = dialog.FileName;
+                }
+
+            }
+            else
+            {
+                var fd = new System.Windows.Forms.FolderBrowserDialog();
+                fd.Description = title;
+                fd.ShowNewFolderButton = true;
+                if (initialDir != null)
+                {
+                    fd.SelectedPath = initialDir;
+                }
+                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK) 
+                {
+                    link = fd.SelectedPath;
+                };
+            }
+            return link;
+        }
+
+        public static bool IsWindowsVistaOrNewer
+        {
+            get
+            {
+                var os = Environment.OSVersion;
+                return os.Platform == PlatformID.Win32NT &&
+                       (os.Version.Major >= 6);
+            }
+        }
+
         public static bool IsWindows8OrNewer
         {
             get
@@ -582,30 +628,30 @@ namespace ByteFlood
             return valid.ToArray();
         }
 
-        public static NetworkInterface GetNetworkInterface(string Id) 
+        public static NetworkInterface GetNetworkInterface(string Id)
         {
-            foreach (var iface in GetValidNetworkInterfaces()) 
+            foreach (var iface in GetValidNetworkInterfaces())
             {
                 if (iface.Id == Id) { return iface; }
             }
             return GetLoopbackIface();
         }
 
-        public static string GetDefaultNetworkInterfaceId() 
+        public static string GetDefaultNetworkInterfaceId()
         {
             var valid = GetValidNetworkInterfaces();
-            if (valid.Length > 0) 
+            if (valid.Length > 0)
             {
                 return valid[0].Id;
             }
             else { return GetLoopbackIface().Id; }
         }
 
-        private static NetworkInterface GetLoopbackIface() 
+        private static NetworkInterface GetLoopbackIface()
         {
-            foreach (var iface in NetworkInterface.GetAllNetworkInterfaces()) 
+            foreach (var iface in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (iface.NetworkInterfaceType == NetworkInterfaceType.Loopback) 
+                if (iface.NetworkInterfaceType == NetworkInterfaceType.Loopback)
                 { return iface; }
             }
 

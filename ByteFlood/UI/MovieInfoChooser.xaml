@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        TextOptions.TextFormattingMode="Display"
+        xmlns:al="clr-namespace:PhotoLoader"
+	TextOptions.TextFormattingMode="Display"
         Title="MovieInfoChooser" Height="318" Width="566" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <RoutedCommand x:Key="Commands.Search"/>
@@ -18,7 +19,6 @@
         <Grid.RowDefinitions>
             <RowDefinition MaxHeight="30"/>
             <RowDefinition/>
-            <RowDefinition MaxHeight="15"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -44,7 +44,10 @@
                     <GridViewColumn Width="55">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding ThumbImageUri}" Width="32" Height="44"/>
+                                <Image al:Loader.Source="{Binding ThumbImageUri}" 
+                                       al:Loader.DisplayErrorThumbnailOnError="True"
+                                       al:Loader.DisplayWaitingAnimationDuringLoading="True"
+                                       al:Loader.SourceType="ExternalResource" Width="32" Height="44"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -55,7 +58,11 @@
                     <GridViewColumn Header="Service" Width="50">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding ServiceIcon}" Width="32" Height="44"/>
+                                <Image al:Loader.Source="{Binding ServiceIcon}" 
+                                       al:Loader.DisplayErrorThumbnailOnError="True"
+                                       al:Loader.DisplayWaitingAnimationDuringLoading="True"
+                                       al:Loader.DisplayOption="FullResolution"
+                                       al:Loader.SourceType="CachedExternalResoucre" Width="32" Height="44"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -79,7 +86,5 @@
                 <Button Margin="3" Content="Cancel" Command="{StaticResource Commands.CancelSearch}"/>
             </StackPanel>
         </Border>
-
-        <TextBlock Grid.Row="2" Text="Powered by YifyTorrentsAPI &amp; IMDb.com"/>
     </Grid>
 </Window>

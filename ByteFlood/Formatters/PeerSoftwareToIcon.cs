@@ -11,38 +11,36 @@ namespace ByteFlood.Formatters
 {
     public class PeerSoftwareToIcon : IValueConverter
     {
-        string[] Resources = null;
-
-        public PeerSoftwareToIcon()
+        static string[] icons = new string[] 
         {
-            //http://stackoverflow.com/questions/16870698/how-to-check-if-a-wpf-resource-exists/16870970#16870970
-            var assembly = Assembly.GetExecutingAssembly();
-            string resName = assembly.GetName().Name + ".g.resources";
-            using (var stream = assembly.GetManifestResourceStream(resName))
-            {
-                using (var reader = new System.Resources.ResourceReader(stream))
-                {
-                    this.Resources = reader.Cast<DictionaryEntry>().Select(entry =>
-                             (string)entry.Key).ToArray();
-                }
-            }
-            return;
-        }
+            "ABC","Ares","Artemis","Artic","Azureus","BTG","BitBuddy",
+            "BitComet","BitPump","BitRocket","BitSpirit","BitTornado","BitTorrent",
+            "BitsOnWheels","DelugeTorrent","ElectricSheep","KTorrent","Lphant","MLDonkey",
+            "MooPolice","MoonlightTorrent","Opera","Shareaza","Transmission","Tribler",
+            "Vuze","XBTClient","XanTorrent","ZipTorrent","qBittorrent","uTorrent"
+        };
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (!App.Settings.ShowClientIcons)
                 return null;
 
-            string ClientName = value.ToString();
-
-            string url = string.Format("Graphics/ClientIcons/{0}.png", ClientName);
-
-            if (Resources.Contains(url.ToLower()))
+            try
             {
-                return new BitmapImage(new Uri("/ByteFlood;component/" + url, UriKind.Relative));
+                string ClientName = value.ToString();
+
+                string url = string.Format("Graphics/ClientIcons/{0}.png", ClientName);
+
+                if (icons.Contains(ClientName))
+                {
+                    return new BitmapImage(new Uri("/ByteFlood;component/" + url, UriKind.Relative));
+                }
+                else { return null; }
             }
-            else { return null; }
+            catch
+            {
+                return null;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
