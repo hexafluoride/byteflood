@@ -147,11 +147,10 @@ namespace ByteFlood
 
         private void PickPath(object sender, RoutedEventArgs e)
         {
-            using (var fd = new System.Windows.Forms.FolderBrowserDialog())
+            string new_path = Utility.PromptFolderSelection("Choose default download path", local.DefaultDownloadPath, this);
+            if (new_path != null)
             {
-                fd.ShowNewFolderButton = true;
-                fd.ShowDialog();
-                local.DefaultDownloadPath = fd.SelectedPath;
+                local.DefaultDownloadPath = new_path;
                 downpath.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
             }
         }
@@ -173,7 +172,7 @@ namespace ByteFlood
 
         private void ChangeDefaultSettings(object sender, RoutedEventArgs e)
         {
-            TorrentPropertiesForm tpf = new TorrentPropertiesForm(local.DefaultTorrentProperties);
+            TorrentPropertiesForm tpf = new TorrentPropertiesForm(local.DefaultTorrentProperties) { Owner = this, Icon = this.Icon };
             tpf.ShowDialog();
             if (tpf.success)
                 local.DefaultTorrentProperties = tpf.tp;
@@ -215,6 +214,13 @@ namespace ByteFlood
         {
             Utility.FileAssociate();
             Utility.MagnetAssociate();
+        }
+
+        private void RefreshNetworkInterfaces(object sender, RoutedEventArgs e)
+        {
+            interfaces.SelectionChanged -= interfaces_SelectionChanged;
+            interfaces.Items.Clear();
+            LoadNetworkInterfaces();
         }
 
     }
