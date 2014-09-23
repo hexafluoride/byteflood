@@ -28,7 +28,7 @@
         TextOptions.TextFormattingMode="Display"
         MinHeight="100"
         MinWidth="100"
-        Height="528" Width="Auto" SizeToContent="Width" mc:Ignorable="d" 
+        Height="528" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         d:DesignWidth="1155" Closing="Window_Closing" AllowDrop="True" Drop="Window_Drop" HorizontalAlignment="Right" Loaded="Window_Loaded" StateChanged="Window_StateChanged">
