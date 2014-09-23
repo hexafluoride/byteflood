@@ -395,7 +395,11 @@ namespace ByteFlood
             {
                 if (setter.Property == ProgressBar.ForegroundProperty)
                 {
-                    def = (Brush)setter.Value; // set to default progressbar color
+                    var brush = setter.Value as Brush;
+                    if (brush != null)
+                    {
+                        def = brush; // set to default progressbar color
+                    }
                     break;
                 }
             }
