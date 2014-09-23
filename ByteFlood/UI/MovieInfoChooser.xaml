@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         xmlns:al="clr-namespace:PhotoLoader"
+	TextOptions.TextFormattingMode="Display"
         Title="MovieInfoChooser" Height="318" Width="566" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <RoutedCommand x:Key="Commands.Search"/>

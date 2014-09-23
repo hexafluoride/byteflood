@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="An update is available" Height="350" Width="590" 
         ResizeMode="NoResize" Topmost="True"
+        TextOptions.TextFormattingMode="Display"
         WindowStartupLocation="CenterScreen">
     <Canvas>
         <TextBlock Text="{Binding Tag, FallbackValue='v0.00'}" FontSize="28" Canvas.Left="10" Canvas.Top="10"
