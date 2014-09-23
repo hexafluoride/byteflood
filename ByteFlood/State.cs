@@ -57,6 +57,10 @@ namespace ByteFlood
             }
         }
 
+        public int GlobalMaxDownloadSpeed { get { return ce.Settings.GlobalMaxDownloadSpeed; } set { ce.Settings.GlobalMaxDownloadSpeed = value; } }
+        public int GlobalMaxUploadSpeed { get { return ce.Settings.GlobalMaxUploadSpeed; } set { ce.Settings.GlobalMaxUploadSpeed = value; } }
+
+
         public State()
         {
             this.Torrents.CollectionChanged += Torrents_CollectionChanged;
