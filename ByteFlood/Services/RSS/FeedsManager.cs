@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ServiceModel.Syndication;
 using System.Threading;
 using System.IO;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 namespace ByteFlood.Services.RSS
@@ -83,12 +80,14 @@ namespace ByteFlood.Services.RSS
                         }
                     }
                 }
+#if DEBUG
                 catch (Exception ex)
                 {
-#if DEBUG
                     throw;
-#endif
                 }
+#else
+                catch {}
+#endif
                 Thread.Sleep(1000);
             }
         }
@@ -216,7 +215,7 @@ namespace ByteFlood.Services.RSS
                                 Debug.WriteLine("[Rssdownloader-TQ]: URL '{0}' not found, therefore banned.", nitem.TorrentFileUrl, "");
                             }
                         }
-                        
+
                         QueuedItems.Remove(nitem);
                         return;
                     }));
@@ -315,7 +314,7 @@ namespace ByteFlood.Services.RSS
 
             if (item.Enclosure != null)
             {
-                if (item.Enclosure.Type == "application/x-bittorrent") 
+                if (item.Enclosure.Type == "application/x-bittorrent")
                 {
                     rt.TorrentFileUrl = item.Enclosure.Url.ToString();
                 }
