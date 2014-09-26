@@ -28,7 +28,8 @@ namespace PhotoLoader.ImageLoaders
 
                     if (html == null || html.Length == 0) return null;
 
-                    cache.Add(source, html);
+                    try { cache.Add(source, html); }
+                    catch { }
 
                     return new MemoryStream(html);
                 }
