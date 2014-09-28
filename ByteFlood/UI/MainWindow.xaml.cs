@@ -102,7 +102,7 @@ namespace ByteFlood
         public static readonly DependencyProperty TotalUploadedProperty =
             DependencyProperty.Register("TotalUploaded", typeof(long), typeof(MainWindow), new PropertyMetadata(0L));
         #endregion 
-
+        
         #endregion
 
         public MainWindow()
@@ -663,6 +663,7 @@ namespace ByteFlood
             thr.Start();
             state.ce.StatsUpdate += ce_StatsUpdate;
             mainlist.ItemsSource = state.Torrents;
+            mainlist.DataContext = App.Settings;
             torrents_treeview.DataContext = state;
             itemselector = ShowAll;
             graph = new GraphDrawer(graph_canvas);
@@ -831,43 +832,6 @@ namespace ByteFlood
             this.left_tree_colum.Width = App.Settings.TreeViewVisible ? new GridLength(180d) : zero;
             this.info_tabs_row.Height = App.Settings.BottomCanvasVisible ? auto : zero;
         }
-        /*
-        private void ResizeInfoAreaStart(object sender, MouseButtonEventArgs e)
-        {
-            gripped = true;
-        }
-        private void ResizeInfoAreaEnd(object sender, MouseButtonEventArgs e)
-        {
-            gripped = false;
-        }
-        
-        private void ResizeInfoAreaMove(object sender, MouseEventArgs e)
-        {
-            if (gripped)
-            {
-                Point p = e.MouseDevice.GetPosition(this);
-                Point position = info_canvas.TransformToAncestor(this).Transform(new Point(0, 0));
-                double ypos = position.Y;
-                double left = info_canvas.Margin.Left;
-                if (p.Y > ActualSize.ActualHeight - 120 || p.Y < 90)
-                    return;
-                Point listpos = mainlist.TransformToAncestor(this).Transform(new Point(0, 0));
-                double totalsize = mainlist.ActualHeight + info_canvas.ActualHeight;
-                double mouse_relative_to_list = p.Y - listpos.Y;
-                double listsize = mouse_relative_to_list;
-                double canvassize = totalsize - mouse_relative_to_list;
-                mainlist.Height = listsize;
-                info_canvas.Height = canvassize;
-            }
-        }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Point listpos = mainlist.TransformToAncestor(this).Transform(new Point(0, 0));
-            double newheight = ActualSize.ActualHeight - info_canvas.ActualHeight - listpos.Y;
-            if (newheight > 20)
-                mainlist.Height = newheight;
-        }*/
 
         private void CopyMagnetLink(object sender, RoutedEventArgs e)
         {

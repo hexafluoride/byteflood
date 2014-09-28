@@ -4,7 +4,7 @@
         xmlns:controls="clr-namespace:ByteFlood.Controls"
         TextOptions.TextFormattingMode="Display"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Search for torrents" Height="400" Width="820" WindowStartupLocation="CenterOwner">
+        Title="Search for torrents" Height="400" Width="823" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <RoutedCommand x:Key="Commands.Search"/>
         <RoutedCommand x:Key="Commands.AddTorrent"/>
@@ -25,11 +25,11 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition MaxWidth="45"/>
+                <ColumnDefinition MaxWidth="65"/>
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Text="{Binding SearchQuery}" IsEnabled="{Binding ControlsEnabled}"
-                     TextAlignment="Center"/>
-            <Button Grid.Column="1" Content="Search" Command="{StaticResource Commands.Search}" IsEnabled="{Binding ControlsEnabled}" IsDefault="True" />
+            <TextBox Grid.Column="0" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding ControlsEnabled}"
+                     TextAlignment="Left" Margin="5,5,2.5,5" Name="searchbox" KeyDown="searchbox_KeyDown" />
+            <Button Grid.Column="1" Content="Search" Command="{StaticResource Commands.Search}" Name="search" IsEnabled="{Binding ControlsEnabled}" Margin="2.5,5,5,5" IsDefault="True" />
         </Grid>
 
         <ListView Grid.Row="1" ItemsSource="{Binding Items}"

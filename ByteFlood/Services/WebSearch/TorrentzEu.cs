@@ -62,36 +62,42 @@ namespace ByteFlood.Services.WebSearch
 
                     foreach (HtmlNode dl in dl_nodes)
                     {
-                        SearchResult r = new SearchResult();
-
-                        r.InfoHash = dl.ChildNodes[0].ChildNodes[0].GetAttributeValue("href", " ").Replace("/", "").ToUpper();
-                        r.Name = HttpUtility.HtmlDecode(dl.ChildNodes[0].ChildNodes[0].InnerText);
-
-                        r.Categories = HttpUtility.HtmlDecode(dl.ChildNodes[0].ChildNodes[1].InnerText);
-
-                        foreach (HtmlNode n in dl.ChildNodes[1].ChildNodes)
+                        try
                         {
-                            switch (n.GetAttributeValue("class", ""))
-                            {
-                                case "v":
-                                    r.Votes = HttpUtility.HtmlDecode(n.InnerText);
-                                    break;
-                                case "a":
-                                    r.UploadDate = n.ChildNodes[0].GetAttributeValue("title", "");
-                                    r.AddedSince = n.ChildNodes[0].InnerText;
-                                    break;
-                                case "s":
-                                    r.Size = n.InnerText; break;
-                                case "u":
-                                    r.SeederCount = n.InnerText; break;
-                                case "d":
-                                    r.LeechersCount = n.InnerText; break;
-                                default:
-                                    break;
-                            }
-                        }
+                            SearchResult r = new SearchResult();
 
-                        results.Add(r);
+                            r.InfoHash = dl.ChildNodes[0].ChildNodes[0].GetAttributeValue("href", " ").Replace("/", "").ToUpper();
+                            r.Name = HttpUtility.HtmlDecode(dl.ChildNodes[0].ChildNodes[0].InnerText);
+
+                            r.Categories = HttpUtility.HtmlDecode(dl.ChildNodes[0].ChildNodes[1].InnerText);
+
+                            foreach (HtmlNode n in dl.ChildNodes[1].ChildNodes)
+                            {
+                                switch (n.GetAttributeValue("class", ""))
+                                {
+                                    case "v":
+                                        r.Votes = HttpUtility.HtmlDecode(n.InnerText);
+                                        break;
+                                    case "a":
+                                        r.UploadDate = n.ChildNodes[0].GetAttributeValue("title", "");
+                                        r.AddedSince = n.ChildNodes[0].InnerText;
+                                        break;
+                                    case "s":
+                                        r.Size = n.InnerText; break;
+                                    case "u":
+                                        r.SeederCount = n.InnerText; break;
+                                    case "d":
+                                        r.LeechersCount = n.InnerText; break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            results.Add(r);
+                        }
+                        catch
+                        {
+                        }
                     }
 
                     #endregion

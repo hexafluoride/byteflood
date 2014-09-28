@@ -195,10 +195,10 @@
                     <ListView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
                         <ContextMenu x:Key="ItemContextMenu">
-                            <MenuItem Header="Force start" Tag="ForceStart" Click="OperationOnSelectedTorrents" />
+                            <MenuItem Header="Force Start" Tag="ForceStart" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
-                            <MenuItem Header="Force pause" Tag="ForcePause" Click="OperationOnSelectedTorrents" />
+                            <MenuItem Header="Force Pause" Tag="ForcePause" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Stop" Tag="Stop" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
                             <Separator />
