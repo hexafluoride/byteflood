@@ -147,7 +147,8 @@
                     <RowDefinition Name="info_tabs_row" Height="200"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0"
+                <StackPanel Name="toolbar"
+                            Grid.Row="0"
                             Margin="5"
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
@@ -265,6 +266,7 @@
                 </ListView>
 
                 <GridSplitter Grid.Row="2"
+                              Name="splitter"
                               Height="5"
                               Margin="5 0 0 5"
                               VerticalAlignment="Top"

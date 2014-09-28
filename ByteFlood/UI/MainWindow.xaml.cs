@@ -109,6 +109,7 @@ namespace ByteFlood
         {
             InitializeComponent();
             UpdateGridLength();
+            UpdateAppStyle();
         }
 
         bool disposed = false;
@@ -778,6 +779,48 @@ namespace ByteFlood
                 catch
                 {
                 }
+            }
+        }
+
+        public void UpdateAppStyle(int _override = -1) 
+        {
+            int style = App.Settings.ApplicationStyle;
+            if (_override > -1) 
+            {
+                style = _override;
+            }
+
+            if (style == 0) 
+            {
+                left_treeview.Width = 170d;
+                left_treeview.Margin = new Thickness(5);
+
+                toolbar.Margin = new Thickness(5);
+
+                mainlist.Margin = new Thickness(5);
+                mainlist.ClearValue(ListView.BorderThicknessProperty);
+
+                splitter.ClearValue(GridSplitter.BackgroundProperty);
+                splitter.Height = 5d;
+                splitter.Margin = new Thickness(5,0,0,5);
+
+                info_canvas.Margin = new Thickness(5);
+            }
+            else 
+            {
+                left_treeview.Width = 180d;
+                left_treeview.ClearValue(TreeView.MarginProperty);
+
+                toolbar.ClearValue(TreeView.MarginProperty);
+
+                mainlist.ClearValue(TreeView.MarginProperty);
+                mainlist.BorderThickness = new Thickness(0, 1, 1, 0);
+
+                splitter.Background = Brushes.Black;
+                splitter.Height = 1d;
+                splitter.ClearValue(TreeView.MarginProperty);
+
+                info_canvas.ClearValue(TreeView.MarginProperty);
             }
         }
 
