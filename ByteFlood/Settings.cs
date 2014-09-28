@@ -69,6 +69,7 @@ namespace ByteFlood
         public EncryptionForceType EncryptionType { get; set; }
         public int OutgoingPortsStart { get; set; }
         public int OutgoingPortsEnd { get; set; }
+        public int MaxDHTPeers { get; set; }
         public bool OutgoingPortsRandom { get; set; }
         [XmlIgnore]
         public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
@@ -134,6 +135,7 @@ namespace ByteFlood
                     ShowFileIcons = true,
                     QueueSize = 2,
                     ShowRelativePaths = true,
+                    MaxDHTPeers = 500,
                     NotifyOnTray = true,
                     ImportedTorrents = false,
                     OutgoingPortsRandom = true,

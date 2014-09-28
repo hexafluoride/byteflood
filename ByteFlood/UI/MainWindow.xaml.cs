@@ -215,10 +215,10 @@ namespace ByteFlood
                     if (ticks >= 120) //1 min
                     {
                         // find DHT peers
-                        if (state.DHTPeers < 500)
+                        if (state.DHTPeers < App.Settings.MaxDHTPeers)
                         {
                             foreach (TorrentInfo ti in state.Torrents)
-                                if (state.DHTPeers < 500 // we don't know if there are a lot of torrents, so let's check every time
+                                if (state.DHTPeers < App.Settings.MaxDHTPeers // we don't know if there are a lot of torrents, so let's check every time
                                     && ti.Torrent.State == TorrentState.Downloading || ti.Torrent.State == TorrentState.Seeding)
                                     state.ce.DhtEngine.GetPeers(ti.Torrent.InfoHash);
                         }
