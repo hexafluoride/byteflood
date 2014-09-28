@@ -234,7 +234,6 @@ namespace MonoTorrent.Client
 
             RateLimiter uploader = new RateLimiter();
             uploadLimiter = new RateLimiterGroup();
-            uploadLimiter.Add(new DiskWriterLimiter(DiskManager));
             uploadLimiter.Add(uploader);
 
             ClientEngine.MainLoop.QueueTimeout(TimeSpan.FromSeconds(1), delegate {
