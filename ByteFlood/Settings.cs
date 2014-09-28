@@ -56,6 +56,7 @@ namespace ByteFlood
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
+        public int QueueSize { get; set; }
         //public NetworkInterface Interface { get; set; }
         public bool ImportedTorrents { get; set; }
         public List<string> PreviousPaths { get; set; }
@@ -122,6 +123,7 @@ namespace ByteFlood
                     TreeViewVisible = true,
                     ShowClientIcons = true,
                     ShowFileIcons = true,
+                    QueueSize = 2,
                     ShowRelativePaths = true,
                     NotifyOnTray = true,
                     ImportedTorrents = false,
@@ -184,12 +186,19 @@ namespace ByteFlood
             {
                 if (prop.CanWrite)
                 {
-                    if (prop.GetValue(s, null) == null)
+                    try
                     {
-                        if (prop.PropertyType.IsValueType || prop.PropertyType.IsEnum || prop.PropertyType.Equals(typeof(System.String)))
+                        var value = prop.GetValue(s, null);
+                        if (value == null || value.Equals(Utility.GetDefault(value.GetType())))
                         {
-                            prop.SetValue(s, prop.GetValue(default_settings, null), null);
+                            if (prop.PropertyType.IsValueType || prop.PropertyType.IsEnum || prop.PropertyType.Equals(typeof(System.String)))
+                            {
+                                prop.SetValue(s, prop.GetValue(default_settings, null), null);
+                            }
                         }
+                    }
+                    catch
+                    {
                     }
                 }
             }
