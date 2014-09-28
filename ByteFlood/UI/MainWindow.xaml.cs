@@ -804,6 +804,7 @@ namespace ByteFlood
                 splitter.ClearValue(GridSplitter.BackgroundProperty);
                 splitter.Height = 5d;
                 splitter.Margin = new Thickness(5,0,0,5);
+                splitter.ClearValue(Panel.ZIndexProperty);
 
                 info_canvas.Margin = new Thickness(5);
             }
@@ -820,6 +821,7 @@ namespace ByteFlood
                 splitter.Background = Brushes.Black;
                 splitter.Height = 1d;
                 splitter.ClearValue(TreeView.MarginProperty);
+                splitter.SetValue(Panel.ZIndexProperty, 5);
 
                 info_canvas.ClearValue(TreeView.MarginProperty);
             }
