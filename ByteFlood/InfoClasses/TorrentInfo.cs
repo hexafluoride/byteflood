@@ -68,6 +68,7 @@ namespace ByteFlood
         public long Downloaded { get { return this.Torrent.Monitor.DataBytesDownloaded; } }
         public long Uploaded { get; set; }
         public QueueState QueueState { get; set; }
+        public string QueueNumber { get; set; } // set by the state
         public string Status { get { return (QueueState == ByteFlood.QueueState.Queued && Torrent.State == TorrentState.Paused) ? "Queued" : Torrent.State.ToString(); } }
         public TorrentState SavedTorrentState { get; set; }
         public int PeerCount { get { return Seeders + Leechers; } }

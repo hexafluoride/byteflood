@@ -492,7 +492,7 @@ namespace ByteFlood
                 var inactive = applicable.Where(t => t.Torrent.State != TorrentState.Downloading);
                 if (active.Count() > App.Settings.QueueSize) // we need to reduce the number of active torrents
                 {
-                    while (ActiveTorrentCount > App.Settings.QueueSize)
+                    while (active.Count() > App.Settings.QueueSize)
                     {
                         TorrentInfo ti = active.First(t => t.QueueState == QueueState.Queued);
                         ti.Pause();
@@ -500,7 +500,7 @@ namespace ByteFlood
                 }
                 else if (inactive.Count() > App.Settings.QueueSize) // we need to increase the number of active torrents
                 {
-                    while (ActiveTorrentCount < App.Settings.QueueSize)
+                    while (inactive.Count() > App.Settings.QueueSize)
                     {
                         TorrentInfo ti = inactive.First(t => t.QueueState == QueueState.Queued);
                         ti.Start();
@@ -512,6 +512,16 @@ namespace ByteFlood
             }
 
             Torrents.Where(t => t.QueueState == QueueState.Unprocessed).ToList().ForEach(t => t.QueueState = QueueState.Queued);
+
+            int i = 0;
+            foreach (TorrentInfo ti in Torrents)
+            {
+                if (ti.QueueState == QueueState.Forced || ti.QueueState == QueueState.NotQueued)
+                    ti.QueueNumber = "-";
+                else
+                    ti.QueueNumber = (++i).ToString();
+                ti.UpdateList("QueueNumber");
+            }
         }
 
         public void NotifyChanged(params string[] props)
