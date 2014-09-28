@@ -22,9 +22,9 @@
         <TabControl HorizontalAlignment="Left" Margin="158,10,0,0" Name="tabControl1" Width="437" Height="431" VerticalAlignment="Top">
             <TabItem Name="general" IsSelected="{Binding IsSelected, ElementName=general_tree}" Height="0">
                 <Canvas>
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock1" Text="Default download path" VerticalAlignment="Top" Canvas.Left="0" Canvas.Top="-16" />
-                    <TextBox Height="23" HorizontalAlignment="Left" Margin="134,27,0,0" Name="downpath" VerticalAlignment="Top" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="0" Canvas.Top="-16" />
-                    <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="385,27,0,0" Name="button1" VerticalAlignment="Top" Width="40" Click="PickPath" Canvas.Left="0" Canvas.Top="-16" />
+                    <TextBlock Height="23" Text="Default download path" Canvas.Left="5" Canvas.Top="13" />
+                    <TextBox Height="23" Name="downpath" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="136" Canvas.Top="10" />
+                    <Button Content="..." Height="23"  Width="40" Click="PickPath" Canvas.Left="385" Canvas.Top="9" />
                     <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="72" />
                     <TextBox Canvas.Left="305" Canvas.Top="69" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
                     <Button Canvas.Left="6" Canvas.Top="100" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
@@ -34,19 +34,19 @@
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">
                 <Canvas>
-                    <CheckBox Content="Draw graph grid" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="checkBox2" VerticalAlignment="Top" IsChecked="{Binding DrawGrid}" />
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,28,0,0" Name="textBlock3" Text="Download color" VerticalAlignment="Top" />
-                    <Button Height="23" HorizontalAlignment="Left" Margin="350,24,0,0" Name="downcolor" VerticalAlignment="Top" Width="75" Click="SelectDownloadColor" Background="{Binding DownloadBrush}" />
+                    <CheckBox Content="Draw graph grid" Height="16" Name="checkBox2" IsChecked="{Binding DrawGrid}" Canvas.Left="6" Canvas.Top="7" />
+                    <TextBlock Height="23" Text="Download color" Canvas.Left="6" Canvas.Top="28" />
+                    <Button Height="23" Name="downcolor" Width="75" Click="SelectDownloadColor" Background="{Binding DownloadBrush}" Canvas.Left="350" Canvas.Top="25" />
 
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,55,0,0" Text="Upload color" VerticalAlignment="Top" />
-                    <Button Height="23" HorizontalAlignment="Left" Margin="350,53,0,0" Name="upcolor" VerticalAlignment="Top" Width="75" Click="SelectUploadColor" Background="{Binding UploadBrush}" />
+                    <TextBlock Height="23" Canvas.Left="6" Canvas.Top="55" Text="Upload color" />
+                    <Button Height="23" Canvas.Left="350" Canvas.Top="53" Name="upcolor" Width="75" Click="SelectUploadColor" Background="{Binding UploadBrush}" />
 
-                    <ComboBox Height="23" HorizontalAlignment="Right" Width="160" VerticalAlignment="Top" 
+                    <ComboBox Height="23" Width="160" 
                               SelectionChanged="ReloadTheme"
                               Name="themeCombox" Canvas.Right="5" Canvas.Left="75" Canvas.Top="83" />
 
-                    <TextBlock Height="23" HorizontalAlignment="Left" Margin="6,83,0,0" Text="Theme" VerticalAlignment="Top" />
-                    
+                    <TextBlock Height="23" Canvas.Left="6" Canvas.Top="83" Text="Theme" />
+
                     <TextBlock Height="19" Text="Style" Canvas.Left="256" Canvas.Top="87" />
                     <ComboBox Name="styleCombox"
                               Height="23" Width="123"
@@ -57,7 +57,7 @@
                             <ComboBoxItem>Compact</ComboBoxItem>
                         </ComboBox.Items>
                     </ComboBox>
-                    
+
                     <CheckBox Canvas.Left="6" Canvas.Top="112" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
                     <CheckBox Canvas.Left="6" Canvas.Top="134" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
                     <CheckBox Canvas.Left="6" Canvas.Top="156" Content="Show file icons throughout the UI" Height="16" IsChecked="{Binding ShowFileIcons}" Name="checkBox5" />
