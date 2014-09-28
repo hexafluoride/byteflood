@@ -94,7 +94,10 @@ namespace ByteFlood.UI
             EnableControls();
         }
 
-
-
+        private void searchbox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return || e.Key == Key.Enter) // :(
+                Commands_Search(null, null);
+        }
     }
 }

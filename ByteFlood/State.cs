@@ -468,22 +468,6 @@ namespace ByteFlood
 
         public void UpdateQueue()
         {
-            //if (Torrents.Count(t => t.Torrent.State == TorrentState.Downloading) > App.Settings.QueueSize)
-            //{
-            //    Torrents.Where(t => t.Torrent.State == TorrentState.Downloading).Skip(App.Settings.QueueSize).ToList().ForEach(t =>
-            //    {
-            //        t.Pause();
-            //    });
-            //}
-            //else if (Torrents.Count(t => t.Torrent.State == TorrentState.Downloading) < App.Settings.QueueSize)
-            //{
-            //    while (this.DownloadingTorrentCount < App.Settings.QueueSize && Torrents.Any(t => t.Queued))
-            //    {
-            //        TorrentInfo ti = Torrents.First(t => t.Queued);
-            //        ti.Start();
-            //        ti.Queued = false;
-            //    }
-            //}
             try
             {
                 var applicable = Torrents.Where(t => t.QueueState != QueueState.Forced);
@@ -498,9 +482,9 @@ namespace ByteFlood
                         ti.Pause();
                     }
                 }
-                else if (inactive.Count() > App.Settings.QueueSize) // we need to increase the number of active torrents
+                else if (active.Count() < App.Settings.QueueSize) // we need to increase the number of active torrents
                 {
-                    while (inactive.Count() > App.Settings.QueueSize)
+                    while (active.Count() < App.Settings.QueueSize)
                     {
                         TorrentInfo ti = inactive.First(t => t.QueueState == QueueState.Queued);
                         ti.Start();

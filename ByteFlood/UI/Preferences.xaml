@@ -25,11 +25,14 @@
                     <TextBlock Height="23" Text="Default download path" Canvas.Left="5" Canvas.Top="13" />
                     <TextBox Height="23" Name="downpath" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="136" Canvas.Top="10" />
                     <Button Content="..." Height="23"  Width="40" Click="PickPath" Canvas.Left="385" Canvas.Top="9" />
-                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="72" />
-                    <TextBox Canvas.Left="305" Canvas.Top="69" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
-                    <Button Canvas.Left="6" Canvas.Top="100" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
-                    <Button Canvas.Left="6" Canvas.Top="128" Content="Associate ByteFlood with torrent files" Height="23" Width="218" Click="AssociateFiles" />
-                    <Button Canvas.Left="6" Canvas.Top="157" Content="Import torrents from uTorrent" Height="23" Click="ImportTorrents" Width="218" />
+                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="43" />
+                    <TextBox Canvas.Left="305" Canvas.Top="40" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
+                    <Button Canvas.Left="6" Canvas.Top="71" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
+                    <Button Canvas.Left="6" Canvas.Top="99" Content="Associate ByteFlood with torrent files" Height="23" Width="218" Click="AssociateFiles" />
+                    <Button Canvas.Left="6" Canvas.Top="128" Content="Import torrents from uTorrent" Height="23" Click="ImportTorrents" Width="218" />
+                    <TextBlock Canvas.Left="7" Canvas.Top="179" Height="23" Text="Maximum active torrents" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" />
+                    <TextBox Canvas.Left="305" Canvas.Top="177" Height="23" Text="{Binding QueueSize}" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Width="120" />
+                    <CheckBox Canvas.Left="8" Canvas.Top="157" Content="Enable queueing" Height="16" Name="enablequeue" IsChecked="{Binding EnableQueue}" />
                 </Canvas>
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">

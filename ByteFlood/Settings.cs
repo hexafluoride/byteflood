@@ -77,6 +77,7 @@ namespace ByteFlood
         public bool TreeViewVisible { get; set; }
         public bool BottomCanvasVisible { get; set; }
         public bool ShowFileIcons { get; set; }
+        public bool EnableQueue { get; set; }
         public bool ShowClientIcons { get; set; }
         [XmlIgnore]
         public Visibility FileIconVisibility { get { return ShowFileIcons ? Visibility.Visible : Visibility.Collapsed; } }
@@ -126,6 +127,7 @@ namespace ByteFlood
                     RSSRegex = "",
                     RSSCheckForDuplicates = false,
                     MetroStyleHover = false,
+                    EnableQueue = true,
                     BottomCanvasVisible = true,
                     TreeViewVisible = true,
                     ShowClientIcons = true,
