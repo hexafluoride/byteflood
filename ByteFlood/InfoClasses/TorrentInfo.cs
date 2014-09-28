@@ -18,6 +18,14 @@ using ByteFlood.Services.MoviesDatabases;
 
 namespace ByteFlood
 {
+    // A few notes on this:
+    // A paused/resumed torrent has the "Unprocessed" state for the queue manager to ignore it.
+    // All "Unprocessed" torrents are turned into "Queued" ones in the next queue manager tick.
+    // A force pause/force resume means that the queue manager should completely ignore this torrent.
+    public enum QueueState
+    {
+        Queued, NotQueued, Forced, Unprocessed
+    }
     public class TorrentInfo : INotifyPropertyChanged
     {
         #region Properties and variables
@@ -59,7 +67,8 @@ namespace ByteFlood
         public int Leechers { get { return Torrent.Peers.Leechs; } }
         public long Downloaded { get { return this.Torrent.Monitor.DataBytesDownloaded; } }
         public long Uploaded { get; set; }
-        public string Status { get { return Torrent.State.ToString(); } }
+        public QueueState QueueState { get; set; }
+        public string Status { get { return (QueueState == ByteFlood.QueueState.Queued && Torrent.State == TorrentState.Paused) ? "Queued" : Torrent.State.ToString(); } }
         public TorrentState SavedTorrentState { get; set; }
         public int PeerCount { get { return Seeders + Leechers; } }
         public string CompletionCommand { get; set; }
@@ -297,9 +306,22 @@ namespace ByteFlood
             this.Peers.Clear();
         }
 
+        public void ForcePause()
+        {
+            Pause();
+            QueueState = QueueState.Forced;
+        }
+
+        public void ForceStart()
+        {
+            Start();
+            QueueState = QueueState.Forced;
+        }
+
         public void Start()
         {
             Torrent.Start();
+            QueueState = QueueState.Unprocessed;
         }
 
         public void UpdateGraphData()
@@ -311,6 +333,7 @@ namespace ByteFlood
         public void Pause()
         {
             Torrent.Pause();
+            QueueState = QueueState.Unprocessed;
         }
 
         public void OffMyself() // Dispose

@@ -93,6 +93,13 @@ namespace ByteFlood
             return path.StartsWith("magnet:"); // not a good criteria but it works
         }
 
+        public static object GetDefault(Type t)
+        {
+            if (t == typeof(string))
+                return "";
+            return Activator.CreateInstance(t);
+        }
+
         public static Label GenerateLabel(string text, Thickness margin)
         {
             Label l = new Label();

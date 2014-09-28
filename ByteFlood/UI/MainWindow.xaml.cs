@@ -228,6 +228,7 @@ namespace ByteFlood
                     {
                         ticks++;
                     }
+                    state.UpdateQueue();
                 }
                 catch
                 {
@@ -972,6 +973,12 @@ namespace ByteFlood
                     break;
                 case "Stop":
                     f = new Action<TorrentInfo>(t => t.Stop());
+                    break;
+                case "ForcePause":
+                    f = new Action<TorrentInfo>(t => t.ForcePause());
+                    break;
+                case "ForceStart":
+                    f = new Action<TorrentInfo>(t => t.ForceStart());
                     break;
             }
             foreach (TorrentInfo ti in arr)

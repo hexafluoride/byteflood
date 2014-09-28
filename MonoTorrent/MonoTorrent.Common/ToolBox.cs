@@ -56,11 +56,17 @@ namespace MonoTorrent.Common
 		}
 
 		public static long Accumulate<T>(IEnumerable<T> enumerable, Operation<T> action)
-		{
+        {
             long count = 0;
 
-			foreach (T t in enumerable)
-				count += action(t);
+            try
+            {
+                foreach (T t in enumerable)
+                    count += action(t);
+            }
+            catch
+            {
+            }
 		
 			return count;
 		}

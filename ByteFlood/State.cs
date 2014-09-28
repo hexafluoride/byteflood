@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
 using MonoTorrent;
 using MonoTorrent.Client;
@@ -463,6 +464,54 @@ namespace ByteFlood
                 return new State();
 
             }
+        }
+
+        public void UpdateQueue()
+        {
+            //if (Torrents.Count(t => t.Torrent.State == TorrentState.Downloading) > App.Settings.QueueSize)
+            //{
+            //    Torrents.Where(t => t.Torrent.State == TorrentState.Downloading).Skip(App.Settings.QueueSize).ToList().ForEach(t =>
+            //    {
+            //        t.Pause();
+            //    });
+            //}
+            //else if (Torrents.Count(t => t.Torrent.State == TorrentState.Downloading) < App.Settings.QueueSize)
+            //{
+            //    while (this.DownloadingTorrentCount < App.Settings.QueueSize && Torrents.Any(t => t.Queued))
+            //    {
+            //        TorrentInfo ti = Torrents.First(t => t.Queued);
+            //        ti.Start();
+            //        ti.Queued = false;
+            //    }
+            //}
+            try
+            {
+                var applicable = Torrents.Where(t => t.QueueState != QueueState.Forced);
+                var active = applicable.Where(t => t.Torrent.State == TorrentState.Downloading);
+                active = active.Reverse();
+                var inactive = applicable.Where(t => t.Torrent.State != TorrentState.Downloading);
+                if (active.Count() > App.Settings.QueueSize) // we need to reduce the number of active torrents
+                {
+                    while (ActiveTorrentCount > App.Settings.QueueSize)
+                    {
+                        TorrentInfo ti = active.First(t => t.QueueState == QueueState.Queued);
+                        ti.Pause();
+                    }
+                }
+                else if (inactive.Count() > App.Settings.QueueSize) // we need to increase the number of active torrents
+                {
+                    while (ActiveTorrentCount < App.Settings.QueueSize)
+                    {
+                        TorrentInfo ti = inactive.First(t => t.QueueState == QueueState.Queued);
+                        ti.Start();
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            Torrents.Where(t => t.QueueState == QueueState.Unprocessed).ToList().ForEach(t => t.QueueState = QueueState.Queued);
         }
 
         public void NotifyChanged(params string[] props)
