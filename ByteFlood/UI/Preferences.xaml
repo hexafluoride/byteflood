@@ -7,7 +7,7 @@
         Height="521" 
         Width="629" 
         Loaded="Window_Loaded" 
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Window.Resources>
         <formatters:ObjectToIntConverter x:Key="ObjectToInt" />
         <formatters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
@@ -15,7 +15,7 @@
     <Grid>
         <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
             <TreeViewItem Header="General" Name="general_tree" IsSelected="True" />
-            <TreeViewItem Header="RSS" Name="rss_tree" />
+            <!--<TreeViewItem Header="RSS" Name="rss_tree" />-->
             <TreeViewItem Header="UI" Name="ui_tree" />
             <TreeViewItem Header="Network" Name="conn_tree"  />
         </TreeView>
@@ -76,14 +76,14 @@
                     <CheckBox Canvas.Left="6" Canvas.Top="222" Content="Show a notification when ByteFlood minimizes to tray" Height="16" IsChecked="{Binding NotifyOnTray}" Name="checkBox8" />
                 </Canvas>
             </TabItem>
-            <TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
+            <!--<TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
                 <Canvas>
                     <RadioButton Content="Download all new content" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="rss_all_selector" VerticalAlignment="Top" IsChecked="{Binding DownloadAllRSS}" GroupName="rss_content_selectors" />
                     <RadioButton Content="Download content matching regex: " Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="rss_regex_selector" VerticalAlignment="Top" GroupName="rss_content_selectors" />
                     <TextBox Height="23" HorizontalAlignment="Left" Margin="220,26,0,0" Name="rss_regex" VerticalAlignment="Top" Width="205" Text="{Binding RSSRegex}" IsEnabled="{Binding ElementName=rss_regex_selector, Path=IsChecked}"/>
                     <CheckBox Content="Check for duplicates" Height="16" HorizontalAlignment="Left" Margin="6,50,0,0" Name="dupes" IsChecked="{Binding RSSCheckForDuplicates}" VerticalAlignment="Top" />
                 </Canvas>
-            </TabItem>
+            </TabItem>-->
             <TabItem Name="conn" IsSelected="{Binding IsSelected, ElementName=conn_tree}" Height="0">
                 <Canvas>
                     <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing" Height="77" Width="414">
