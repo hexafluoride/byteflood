@@ -79,6 +79,8 @@ namespace ByteFlood
             Utility.SetItemsSource<ComboBox>(WindowComboBoxes, WindowBehaviorsReadable);
             enctype.ItemsSource = EncryptionTypesReadable;
             LoadNetworkInterfaces();
+            styleCombox.SelectedIndex = local.ApplicationStyle;
+            styleCombox.SelectionChanged += this.ReloadStyle;
         }
 
         private void LoadNetworkInterfaces() 
@@ -221,6 +223,16 @@ namespace ByteFlood
             interfaces.SelectionChanged -= interfaces_SelectionChanged;
             interfaces.Items.Clear();
             LoadNetworkInterfaces();
+        }
+
+        private void ReloadStyle(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox s = (sender as ComboBox);
+            if (s != null)
+            {
+                (App.Current.MainWindow as MainWindow).UpdateAppStyle(s.SelectedIndex);
+                local.ApplicationStyle = s.SelectedIndex;
+            }
         }
 
     }
