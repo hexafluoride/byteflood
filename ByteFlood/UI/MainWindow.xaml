@@ -103,7 +103,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
-            <TreeView Grid.Column="0" Visibility="{Binding TreeViewVisibility}" Name="left_treeview" Width="180">
+            <TreeView Grid.Column="0" Visibility="{Binding TreeViewVisibility}" Name="left_treeview" Width="170" Margin="5">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
                     <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
@@ -148,6 +148,7 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0"
+                            Margin="5"
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
 
@@ -185,8 +186,8 @@
                 </StackPanel>
 
                 <ListView Grid.Row="1" Name="mainlist"
-                          BorderThickness="0,1,1,0"
                           SelectionMode="Extended" 
+                          Margin="5"
                           SelectionChanged="mainlist_SelectionChanged"
                           MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
 
@@ -263,13 +264,13 @@
                 </ListView>
 
                 <GridSplitter Grid.Row="2"
-                              Background="Black"
-                              Height="1"
+                              Height="5"
+                              Margin="5 0 0 5"
                               VerticalAlignment="Top"
                               HorizontalAlignment="Stretch"
                               ResizeDirection="Rows"/>
 
-                <TabControl Grid.Row="2" Name="info_canvas" Visibility="{Binding BottomCanvasVisibility}">
+                <TabControl Grid.Row="2" Name="info_canvas" Visibility="{Binding BottomCanvasVisibility}" Margin="5">
                     <TabItem Header="Overview" Name="overview">
                         <ScrollViewer>
                             <Canvas Name="overview_canvas">
