@@ -98,6 +98,13 @@ namespace ByteFlood
 
         public string NetworkInterfaceID { get; set; }
 
+        /// <summary>
+        /// For the "wide" and "compact" style
+        /// wide = 0
+        /// compact = 1
+        /// </summary>
+        public int ApplicationStyle { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -140,7 +147,8 @@ namespace ByteFlood
                     AssociationAsked = false,
                     UpdateSourceEtag = null,
                     OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                    NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId()
+                    NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId(),
+                    ApplicationStyle = 0
                 };
             }
         }
