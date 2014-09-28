@@ -823,7 +823,7 @@ namespace ByteFlood
                 splitter.ClearValue(TreeView.MarginProperty);
                 splitter.SetValue(Panel.ZIndexProperty, 5);
 
-                info_canvas.Margin = new Thickness(-1, 0, 0, 0);
+                info_canvas.Margin = new Thickness(-1, -1, 0, 0);
             }
         }
 
