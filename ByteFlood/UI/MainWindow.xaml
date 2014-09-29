@@ -493,7 +493,7 @@
             </Grid>
         </Grid>
 
-        <StatusBar Grid.Row="1" Name="StatusBar" Height="25">
+        <StatusBar Grid.Row="1" Name="StatusBar" Height="25" Visibility="{Binding StatusBarVisibility}">
 
             <StatusBar.Resources>
                 <Style TargetType="Separator">

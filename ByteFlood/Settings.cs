@@ -75,8 +75,11 @@ namespace ByteFlood
         public Visibility TreeViewVisibility { get { return TreeViewVisible ? Visibility.Visible : Visibility.Collapsed; } }
         [XmlIgnore]
         public Visibility BottomCanvasVisibility { get { return BottomCanvasVisible ? Visibility.Visible : Visibility.Collapsed; } }
+        [XmlIgnore]
+        public Visibility StatusBarVisibility { get { return StatusBarVisible ? Visibility.Visible : Visibility.Collapsed; } }
         public bool TreeViewVisible { get; set; }
         public bool BottomCanvasVisible { get; set; }
+        public bool StatusBarVisible { get; set; }
         public bool ShowFileIcons { get; set; }
         public bool EnableQueue { get; set; }
         public bool ShowClientIcons { get; set; }

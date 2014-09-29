@@ -57,6 +57,15 @@ namespace MonoTorrent.Client
             get { return this.hashPassed; }
         }
         private bool hashPassed;
+        
+        /// <summary>
+        /// The value of whether the piece passed or failed the hash check
+        /// </summary>
+        public bool AddToCheckedBytes
+        {
+            get { return this.addToCheckedBytes; }
+        }
+        private bool addToCheckedBytes;
         #endregion
 
 
@@ -66,11 +75,13 @@ namespace MonoTorrent.Client
         /// </summary>
         /// <param name="pieceIndex">The index of the piece that was hashed</param>
         /// <param name="hashPassed">True if the piece passed the hashcheck, false otherwise</param>
-        public PieceHashedEventArgs(TorrentManager manager, int pieceIndex, bool hashPassed)
+        /// <param name="addToCheckedBytes">True if the newly checked bytes should be counted as a pre-checked byte</param>
+        public PieceHashedEventArgs(TorrentManager manager, int pieceIndex, bool hashPassed, bool addToCheckedBytes)
             : base(manager)
         {
             this.pieceIndex = pieceIndex;
             this.hashPassed = hashPassed;
+            this.addToCheckedBytes = addToCheckedBytes;
         }
         #endregion
     }

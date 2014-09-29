@@ -61,22 +61,23 @@
                         </ComboBox.Items>
                     </ComboBox>
 
-                    <CheckBox Canvas.Left="6" Canvas.Top="112" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="134" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="156" Content="Show file icons throughout the UI" Height="16" IsChecked="{Binding ShowFileIcons}" Name="checkBox5" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="178" Content="Show torrent client icons" Height="16" IsChecked="{Binding ShowClientIcons}" Name="checkBox6" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="244" Height="23" Text="Tray icon click behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="273" Height="23" Text="Tray icon double click behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="302" Height="23" Text="Tray icon right click behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="331" Height="23" Text="Minimize behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="360" Height="23" Text="Close behavior" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="200" Content="Show relative paths instead of absolute ones" Height="16" IsChecked="{Binding ShowRelativePaths}" Name="checkBox7" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="244" Height="23" SelectedIndex="{Binding TrayIconClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tcb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="273" Height="23" SelectedIndex="{Binding TrayIconDoubleClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tdcb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="302" Height="23" SelectedIndex="{Binding TrayIconRightClickBehavior, Converter={StaticResource ObjectToInt}}" Name="trcb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="331" Height="23" SelectedIndex="{Binding MinimizeBehavior, Converter={StaticResource ObjectToInt}}" Name="mb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="360" Height="23" SelectedIndex="{Binding ExitBehavior, Converter={StaticResource ObjectToInt}}" Name="cb" Width="120" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="222" Content="Show a notification when ByteFlood minimizes to tray" Height="16" IsChecked="{Binding NotifyOnTray}" Name="checkBox8" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="111" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="133" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="177" Content="Show file icons throughout the UI" Height="16" IsChecked="{Binding ShowFileIcons}" Name="checkBox5" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="199" Content="Show torrent client icons" Height="16" IsChecked="{Binding ShowClientIcons}" Name="checkBox6" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="265" Height="23" Text="Tray icon click behavior" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="294" Height="23" Text="Tray icon double click behavior" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="323" Height="23" Text="Tray icon right click behavior" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="352" Height="23" Text="Minimize behavior" />
+                    <TextBlock Canvas.Left="6" Canvas.Top="381" Height="23" Text="Close behavior" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="221" Content="Show relative paths instead of absolute ones" Height="16" IsChecked="{Binding ShowRelativePaths}" Name="checkBox7" />
+                    <ComboBox Canvas.Left="305" Canvas.Top="265" Height="23" SelectedIndex="{Binding TrayIconClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tcb" Width="120" />
+                    <ComboBox Canvas.Left="305" Canvas.Top="294" Height="23" SelectedIndex="{Binding TrayIconDoubleClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tdcb" Width="120" />
+                    <ComboBox Canvas.Left="305" Canvas.Top="323" Height="23" SelectedIndex="{Binding TrayIconRightClickBehavior, Converter={StaticResource ObjectToInt}}" Name="trcb" Width="120" />
+                    <ComboBox Canvas.Left="305" Canvas.Top="352" Height="23" SelectedIndex="{Binding MinimizeBehavior, Converter={StaticResource ObjectToInt}}" Name="mb" Width="120" />
+                    <ComboBox Canvas.Left="305" Canvas.Top="381" Height="23" SelectedIndex="{Binding ExitBehavior, Converter={StaticResource ObjectToInt}}" Name="cb" Width="120" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="243" Content="Show a notification when ByteFlood minimizes to tray" Height="16" IsChecked="{Binding NotifyOnTray}" Name="checkBox8" />
+                    <CheckBox Canvas.Left="6" Canvas.Top="155" Content="Status bar visible" Height="16" IsChecked="{Binding StatusBarVisible}" Name="checkBox1" />
                 </Canvas>
             </TabItem>
             <!--<TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
