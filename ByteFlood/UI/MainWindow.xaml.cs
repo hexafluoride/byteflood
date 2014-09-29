@@ -357,6 +357,7 @@ namespace ByteFlood
             t.UpdateList("Invisible", "ShowOnList");
             ThreadPool.QueueUserWorkItem(delegate
             {
+                t.QueueState = QueueState.Forced;
                 t.Torrent.Stop();
                 while (t.Torrent.State != TorrentState.Stopped) ;
                 state.ce.Unregister(t.Torrent);
@@ -764,13 +765,17 @@ namespace ByteFlood
             //App.Settings.NotifyChanged("TreeViewVisibility", "BottomCanvasVisibility");
             left_treeview.DataContext = App.Settings;
             info_canvas.DataContext = App.Settings;
+            StatusBar.DataContext = App.Settings;
             UpdateGridLength();
             BindingExpression exp1 = left_treeview.GetBindingExpression(TreeView.VisibilityProperty);
             BindingExpression exp2 = info_canvas.GetBindingExpression(Canvas.VisibilityProperty);
+            BindingExpression exp3 = StatusBar.GetBindingExpression(System.Windows.Controls.Primitives.StatusBar.VisibilityProperty);
             exp1.UpdateTarget();
             exp1.UpdateSource();
             exp2.UpdateTarget();
             exp2.UpdateSource();
+            exp3.UpdateTarget();
+            exp3.UpdateSource();
             foreach (Image img in FindVisualChildren<Image>(this))
             {
                 try
@@ -805,7 +810,7 @@ namespace ByteFlood
                 splitter.Height = 5d;
                 splitter.Margin = new Thickness(5,0,0,5);
 
-                info_canvas.Margin = new Thickness(5);
+                info_canvas.Margin = new Thickness(0,5,5,5);
             }
             else 
             {
