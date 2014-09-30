@@ -762,20 +762,12 @@ namespace ByteFlood
         }
         public void UpdateVisibility()
         {
-            //App.Settings.NotifyChanged("TreeViewVisibility", "BottomCanvasVisibility");
-            left_treeview.DataContext = App.Settings;
-            info_canvas.DataContext = App.Settings;
-            StatusBar.DataContext = App.Settings;
             UpdateGridLength();
-            BindingExpression exp1 = left_treeview.GetBindingExpression(TreeView.VisibilityProperty);
-            BindingExpression exp2 = info_canvas.GetBindingExpression(Canvas.VisibilityProperty);
-            BindingExpression exp3 = StatusBar.GetBindingExpression(System.Windows.Controls.Primitives.StatusBar.VisibilityProperty);
-            exp1.UpdateTarget();
-            exp1.UpdateSource();
-            exp2.UpdateTarget();
-            exp2.UpdateSource();
-            exp3.UpdateTarget();
-            exp3.UpdateSource();
+
+            left_treeview.Visibility = App.Settings.TreeViewVisibility;
+            info_canvas.Visibility = App.Settings.BottomCanvasVisibility;
+            StatusBar.Visibility = App.Settings.StatusBarVisibility;
+
             foreach (Image img in FindVisualChildren<Image>(this))
             {
                 try
