@@ -103,7 +103,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
-            <TreeView Grid.Column="0" Visibility="{Binding TreeViewVisibility}" Name="left_treeview" Width="170" Margin="5">
+            <TreeView Grid.Column="0" Name="left_treeview" Width="170" Margin="5">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
                     <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
@@ -273,7 +273,7 @@
                               HorizontalAlignment="Stretch"
                               ResizeDirection="Rows"/>
 
-                <TabControl Grid.Row="2" Name="info_canvas" Visibility="{Binding BottomCanvasVisibility}" Margin="5">
+                <TabControl Grid.Row="2" Name="info_canvas" Margin="5">
                     <TabItem Header="Overview" Name="overview">
                         <ScrollViewer>
                             <Canvas Name="overview_canvas">
@@ -493,7 +493,7 @@
             </Grid>
         </Grid>
 
-        <StatusBar Grid.Row="1" Name="StatusBar" Height="25" Visibility="{Binding StatusBarVisibility}">
+        <StatusBar Grid.Row="1" Name="StatusBar" Height="25">
 
             <StatusBar.Resources>
                 <Style TargetType="Separator">
