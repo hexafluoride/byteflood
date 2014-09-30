@@ -195,22 +195,25 @@
                     <ListView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
                         <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
+                            <Separator />
                             <MenuItem Header="Force Start" Tag="ForceStart" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Force Pause" Tag="ForcePause" Click="OperationOnSelectedTorrents" />
                             <MenuItem Header="Stop" Tag="Stop" Click="OperationOnSelectedTorrents" />
-                            <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
                             <Separator />
-                            <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
+                            <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
+                            <MenuItem Header="Download movie data" Click="Torrent_RetrieveMovieInfo" />
+                            <Separator />
                             <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrents" />
                             <MenuItem Header="Remove and" Background="WhiteSmoke">
                                 <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrents" />
                                 <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrents" />
                                 <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrents" />
                             </MenuItem>
-                            <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
-                            <MenuItem Header="Download movie data" Click="Torrent_RetrieveMovieInfo" />
+                            <Separator />
+                            <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
                         </ContextMenu>
                     </ListView.Resources>
 
