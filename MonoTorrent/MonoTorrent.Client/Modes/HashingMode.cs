@@ -52,7 +52,7 @@ namespace MonoTorrent.Client
                 if (hash != null)
                     valid = Manager.Torrent.Pieces.IsValid((byte[])hash, index);
                 Manager.Bitfield[index] = valid;
-				Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, index, Manager.Bitfield[index]));
+				Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, index, Manager.Bitfield[index], true));
                 if (valid)
                 {
                     
@@ -70,7 +70,7 @@ namespace MonoTorrent.Client
 			{
 				Manager.Bitfield.SetAll(false);
 				for (int i = 0; i < Manager.Torrent.Pieces.Count; i++)
-					Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, i, false));
+					Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, i, false, false));
 			}
 
 			if (Manager.Engine != null && filesExist)
@@ -102,7 +102,7 @@ namespace MonoTorrent.Client
             {
                 Manager.Bitfield.SetAll(false);
                 for (int i = 0; i < Manager.Torrent.Pieces.Count; i++)
-                    Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, i, false));
+                    Manager.RaisePieceHashed(new PieceHashedEventArgs(Manager, i, false, false));
                 index = Manager.Torrent.Pieces.Count;
                 HashingComplete();
             }

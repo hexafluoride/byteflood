@@ -120,7 +120,7 @@ namespace MonoTorrent.Client
 					    {
 						    id.TorrentManager.PieceManager.UnhashedPieces[piece.Index] = false;
 
-						    id.TorrentManager.HashedPiece(new PieceHashedEventArgs(id.TorrentManager, piece.Index, result));
+						    id.TorrentManager.HashedPiece(new PieceHashedEventArgs(id.TorrentManager, piece.Index, result, false));
 						    List<PeerId> peers = new List<PeerId>(piece.Blocks.Length);
 						    for (int i = 0; i < piece.Blocks.Length; i++)
 							    if (piece.Blocks[i].RequestedOff != null && !peers.Contains(piece.Blocks[i].RequestedOff))
