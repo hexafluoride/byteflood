@@ -229,7 +229,6 @@ namespace ByteFlood
                     {
                         ticks++;
                     }
-                    state.UpdateQueue();
                 }
                 catch
                 {
@@ -357,7 +356,7 @@ namespace ByteFlood
             t.UpdateList("Invisible", "ShowOnList");
             ThreadPool.QueueUserWorkItem(delegate
             {
-                t.QueueState = QueueState.Forced;
+                //t.QueueState = QueueState.Forced;
                 t.Torrent.Stop();
                 while (t.Torrent.State != TorrentState.Stopped) ;
                 state.ce.Unregister(t.Torrent);

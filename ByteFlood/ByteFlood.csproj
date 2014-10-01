@@ -117,6 +117,30 @@
     <Compile Include="InfoClasses\PeerInfo.cs" />
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
+    <Compile Include="Libs\SmartThreadPool\CallerThreadContext.cs" />
+    <Compile Include="Libs\SmartThreadPool\CanceledWorkItemsGroup.cs" />
+    <Compile Include="Libs\SmartThreadPool\EventWaitHandle.cs" />
+    <Compile Include="Libs\SmartThreadPool\EventWaitHandleFactory.cs" />
+    <Compile Include="Libs\SmartThreadPool\Exceptions.cs" />
+    <Compile Include="Libs\SmartThreadPool\Interfaces.cs" />
+    <Compile Include="Libs\SmartThreadPool\InternalInterfaces.cs" />
+    <Compile Include="Libs\SmartThreadPool\PriorityQueue.cs" />
+    <Compile Include="Libs\SmartThreadPool\SmartThreadPool.cs" />
+    <Compile Include="Libs\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
+    <Compile Include="Libs\SmartThreadPool\Stopwatch.cs" />
+    <Compile Include="Libs\SmartThreadPool\STPEventWaitHandle.cs" />
+    <Compile Include="Libs\SmartThreadPool\STPPerformanceCounter.cs" />
+    <Compile Include="Libs\SmartThreadPool\STPStartInfo.cs" />
+    <Compile Include="Libs\SmartThreadPool\SynchronizedDictionary.cs" />
+    <Compile Include="Libs\SmartThreadPool\WIGStartInfo.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItem.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItem.WorkItemResult.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItemFactory.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItemInfo.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItemResultTWrapper.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItemsGroup.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItemsGroupBase.cs" />
+    <Compile Include="Libs\SmartThreadPool\WorkItemsQueue.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
@@ -170,6 +194,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TorrentProperties.cs" />
+    <Compile Include="TorrentQueue.cs" />
     <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
       <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
     </Compile>
@@ -294,6 +319,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Libs\SmartThreadPool\Info.txt" />
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
