@@ -11,10 +11,6 @@ namespace ByteFlood
      * Notes:
      * All of the following torrent states {Paused,Downloading,Seeding*,Metadata,Hashing} are considered active.
      * Unless {Seeding} is not considered active.
-     * 
-     * Still todo: 
-     * - Do appropriate action when App.Settings.QueueSize is changed
-     * - The current implementation can seperate torrents from the queuing system, but this isn't implemented yet.
      */
 
     public class TorrentQueue
@@ -23,61 +19,217 @@ namespace ByteFlood
 
         private State AppState = null;
 
-        public bool SeedingTorrentsAreActive { get; set; }
-
         private Dictionary<string, QueueCake> queue_info_store = new Dictionary<string, QueueCake>();
+
+        //used to check if the queue was initially disabled, and then it was enabled later
+        private bool? last_queue_enable_setting = null;
 
         public TorrentQueue(State st)
         {
-            this.SeedingTorrentsAreActive = false;
-
             this.AppState = st;
 
             this.slots = new Amib.Threading.SmartThreadPool();
-            this.slots.MaxThreads = App.Settings.QueueSize;
+            this.set_queue_size(App.Settings.QueueSize);
+            this.last_queue_enable_setting = App.Settings.EnableQueue;
+        }
+
+        public void ReloadSettings()
+        {
+            if (App.Settings.EnableQueue)
+            {
+                #region Queue Size Change handling
+                if (App.Settings.QueueSize > this.slots.MinThreads)
+                {
+                    this.set_queue_size(App.Settings.QueueSize);
+                }
+                else if (this.slots.MinThreads < App.Settings.QueueSize)
+                {
+                    this.set_queue_size(App.Settings.QueueSize);
+
+                    //then we need to stop x amount of torrents
+                    int how_much_to_stop = App.Settings.QueueSize - this.slots.MaxThreads;
+
+                    int stopped_count = 0;
+
+                    if (how_much_to_stop > queue_info_store.Count)
+                    {
+                        //count backwards from [n-1] element to [0]
+                        for (int i = queue_info_store.Count - 1; i >= 0; i--)
+                        {
+                            try
+                            {
+                                var kvp = queue_info_store.ElementAt(i);
+
+                                //check if the torrent is active so we don't "stop" already stopped/inactive torrents
+                                if (!is_inactive(kvp.Value.Torrent))
+                                {  //stop the torrent
+                                    kvp.Value.Torrent.Stop();
+                                    //requeue it, but since the queue is full a "Queued" status will show up
+                                    this.QueueTorrent(kvp.Value.Torrent);
+                                    stopped_count++;
+                                    if (stopped_count == how_much_to_stop)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            catch (System.IndexOutOfRangeException)
+                            {
+                                break;
+                            }
+                            catch (System.Exception) { }
+                        }
+                    }
+                }
+                #endregion
+
+                if (this.last_queue_enable_setting == false)
+                {
+                    this.last_queue_enable_setting = App.Settings.EnableQueue;
+                    for (int i = 0; i < this.AppState.Torrents.Count; i++)
+                    {
+                        try
+                        {
+                            TorrentInfo ti = this.AppState.Torrents[i];
+
+                            //ignore forced torrents
+                            if (ti.QueueState == QueueState.Queued)
+                            {
+                                this.QueueTorrent(ti);
+                            }
+                        }
+                        catch (System.IndexOutOfRangeException)
+                        {
+                            break;
+                        }
+                        catch (System.Exception) { }
+                    }
+                }
+            }
+            else //queue was disabled
+            {
+                //force all queued items to be processed
+                this.set_queue_size(this.AppState.Torrents.Count);
+
+                string[] keys = queue_info_store.Keys.ToArray();
+                foreach (string k in keys)
+                {
+                    QueueCake cake = queue_info_store[k];
+
+                    //this will only kill the uncessary queue thread.
+                    //it won't change the torrent state (downloading, paused, etc)
+                    cake.Dequeue();
+                    queue_info_store.Remove(k);
+                }
+            }
+        }
+
+        private void set_queue_size(int size)
+        {
+            if (size <= 0)
+            {
+                this.slots.MinThreads = 0;
+                this.slots.MaxThreads = 1;
+            }
+            else
+            {
+                this.slots.MaxThreads = Int32.MaxValue;
+                this.slots.MinThreads = size;
+                this.slots.MaxThreads = size;
+            }
         }
 
         public void QueueTorrent(TorrentInfo ti)
         {
-            if (!queue_info_store.ContainsKey(ti.InfoHash))
+            if (!App.Settings.SeedingTorrentsAreActive && ti.IsComplete)
             {
-                QueueCake cake = new QueueCake();
-                cake.Torrent = ti;
+                //simply start it
                 ti.QueueState = QueueState.Queued;
-
-                cake.WorkerThread = new Amib.Threading.Action(() =>
-                {
-                    ti.Torrent.Start();
-                    ti.is_going_to_start = false;
-
-                    while (ti.QueueState == QueueState.Queued)
-                    {
-                        if (is_inactive(ti))
-                        {
-                            // The torrent is either:
-                            // stopped or has an error.
-                            // or is complete
-                            break;
-                        }
-                        else
-                        {
-                            //wait until something happen, while keeping the queue busy
-                            Thread.Sleep(1000);
-                        }
-                    }
-                    //if we get here, then either the torrent was dequeued, or it is inactive
-                    //if (ti.IsComplete) { return; }
-                });
-
-                ti.is_going_to_start = true;
-                cake.ThreadBG = this.slots.QueueWorkItem(cake.WorkerThread);
-             
-                this.queue_info_store.Add(ti.InfoHash, cake);
+                ti.Torrent.Start();
+                return;
             }
-            else
+
+            if (App.Settings.EnableQueue)
             {
-                ti.Start();
+                if (!queue_info_store.ContainsKey(ti.InfoHash))
+                {
+                    QueueCake cake = new QueueCake();
+                    cake.Torrent = ti;
+                    ti.QueueState = QueueState.Queued;
+                    ti.Torrent.Stop();
+
+                    cake.WorkerThread = new Amib.Threading.Action(() =>
+                    {
+                        cake.ThreadBGRunning = true;
+
+                        ti.Torrent.Start();
+                        ti.is_going_to_start = false;
+                        ti.UpdateList("Status");
+                        while (ti.QueueState == QueueState.Queued)
+                        {
+                            if (is_inactive(ti))
+                            {
+                                // The torrent is either:
+                                // stopped or has an error.
+                                // or is complete
+                                break;
+                            }
+                            else
+                            {
+                                //wait until something happen, while keeping the queue busy
+                                Thread.Sleep(1000);
+                            }
+                        }
+
+                        cake.ThreadBGRunning = false;
+                        //if we get here, then either the torrent was dequeued, or it is inactive
+                        //if (ti.IsComplete) { return; }
+                    });
+
+                    ti.is_going_to_start = true;
+                    cake.ThreadBG = this.slots.QueueWorkItem(cake.WorkerThread);
+
+                    this.queue_info_store.Add(ti.InfoHash, cake);
+                    ti.UpdateList("Status");
+                }
+                else
+                {
+                    //torrent is inside the queue store
+                    var cake = queue_info_store[ti.InfoHash];
+
+                    if (cake.ThreadBGRunning)
+                    {
+                        //this happen if the torrent was {downloading} and it was {paused}.
+                        //in this case, we start it.
+                        //in other words, the torrent still have a slot inside the queue, so we can start it
+                        ti.Torrent.Start();
+                    }
+                    else
+                    {
+                        //let's seen how can this happen:
+                        //- if the user has stopped the torrent, the TorrentInfo class will dequeue the torrent, so the queue_info_store doesn't
+                        //  contain this torrent, so this should never happen.
+                        //- if the user hasn't stopped the torrent but an error has been occured, the torrent queue thread will be stopped, but
+                        //  the torrent cake will remain inside the queue_info_store. 
+                        //- if the torrent entered seeding state, and seeding is configured as inactive.
+
+                        //tl;dr torrent either has an error or it is seeding
+                        if (ti.Torrent.State == MonoTorrent.Common.TorrentState.Error)
+                        {
+                            //Attempt to start it again
+                            this.queue_info_store.Remove(ti.InfoHash);
+                            this.QueueTorrent(ti);
+                        }
+
+                        //if (ti.Torrent.State == MonoTorrent.Common.TorrentState.Seeding) 
+                        //{
+                        //    //the torrent is seeding and the user clicked start, so do nothing
+                        //    //except maybe remove the torrent cake, but I am not sure yet.
+                        //}
+                    }
+                }
             }
+            else { ti.Torrent.Start(); }
         }
 
         /// <summary>
@@ -97,11 +249,11 @@ namespace ByteFlood
             }
         }
 
-        public int GetTorrentIndex(TorrentInfo ti) 
+        public int GetTorrentIndex(TorrentInfo ti)
         {
-            if (queue_info_store.ContainsKey(ti.InfoHash)) 
+            if (App.Settings.EnableQueue && queue_info_store.ContainsKey(ti.InfoHash))
             {
-               return Array.IndexOf(queue_info_store.Keys.ToArray(), ti.InfoHash);
+                return Array.IndexOf(queue_info_store.Keys.ToArray(), ti.InfoHash);
             }
             return -1;
         }
@@ -119,7 +271,7 @@ namespace ByteFlood
                      ti.Torrent.State == MonoTorrent.Common.TorrentState.Stopped ||
                      ti.Torrent.State == MonoTorrent.Common.TorrentState.Error ||
                      ti.Torrent.State == MonoTorrent.Common.TorrentState.Stopping ||
-                     !this.SeedingTorrentsAreActive && ti.Torrent.State == MonoTorrent.Common.TorrentState.Seeding;
+                     !App.Settings.SeedingTorrentsAreActive && ti.Torrent.State == MonoTorrent.Common.TorrentState.Seeding;
             }
             return false;
         }
@@ -132,11 +284,13 @@ namespace ByteFlood
         public Amib.Threading.Action WorkerThread { get; set; }
 
         public Amib.Threading.IWorkItemResult ThreadBG { get; set; }
+        public bool ThreadBGRunning { get; set; }
 
         public void Dequeue()
         {
             this.Torrent.QueueState = QueueState.NotQueued;
-            ThreadBG.Cancel(true);
+            this.ThreadBG.Cancel(true);
+            this.ThreadBGRunning = false;
         }
     }
 }

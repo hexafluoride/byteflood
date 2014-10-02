@@ -240,7 +240,7 @@
                     </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Width="20" Header="#" DisplayMemberBinding="{Binding QueueNumber}" />
+                            <!--<GridViewColumn Width="20" Header="#" DisplayMemberBinding="{Binding QueueNumber}" />-->
                             <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
 
                             <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
