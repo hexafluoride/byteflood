@@ -72,12 +72,13 @@ namespace ByteFlood
         public long Downloaded { get { return this.Torrent.Monitor.DataBytesDownloaded; } }
         public long Uploaded { get; set; }
         public QueueState QueueState { get; set; }
-        [XmlIgnore]
+
+        /*[XmlIgnore]
         public string QueueNumber 
         {
             get 
             {
-                try 
+                try
                 {
                     return this.QueueManager.GetTorrentIndex(this).ToString();
                 }
@@ -85,6 +86,7 @@ namespace ByteFlood
                 return null;
             }
         } // set by the state
+        */
 
         [XmlIgnore]
         public bool is_going_to_start = false;
@@ -94,28 +96,35 @@ namespace ByteFlood
         {
             get
             {
-                if (this.QueueState == ByteFlood.QueueState.Queued)
+                if (App.Settings.EnableQueue)
                 {
-                    if (is_going_to_start)
+                    if (this.QueueState == ByteFlood.QueueState.Queued)
                     {
-                        return "Queued";
+                        if (is_going_to_start)
+                        {
+                            return "Queued";
+                        }
+                        else
+                        {
+                            return this.Torrent.State.ToString();
+                        }
                     }
                     else
                     {
-                        return this.Torrent.State.ToString();
+                        //only in paused we show the [F] signe
+                        if (this.Torrent.State == TorrentState.Paused || this.Torrent.State == TorrentState.Downloading)
+                        {
+                            return string.Format("[F] {0}", this.Torrent.State.ToString());
+                        }
+                        else
+                        {
+                            return this.Torrent.State.ToString();
+                        }
                     }
                 }
                 else
                 {
-                    //only in paused we show the [F] signe
-                    if (this.Torrent.State == TorrentState.Paused || this.Torrent.State == TorrentState.Downloading) 
-                    {
-                        return string.Format("[F] {0}", this.Torrent.State.ToString());
-                    }
-                    else 
-                    {
-                        return this.Torrent.State.ToString();
-                    }
+                    return this.Torrent.State.ToString();
                 }
             }
         }
@@ -308,7 +317,7 @@ namespace ByteFlood
                 {
                     try
                     {
-                        (App.Current.MainWindow as MainWindow).NotifyIcon.ShowBalloonTip(
+                        this.MainAppWindow.NotifyIcon.ShowBalloonTip(
                             "ByteFlood", string.Format("'{0}' has been completed.", this.Name), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
                         string command = CompletionCommand.Replace("%s", this.Name)
                                                           .Replace("%p", System.IO.Path.GetFullPath(this.Path))
@@ -322,10 +331,7 @@ namespace ByteFlood
                         // Let's keep this secret to our graves
                     }
                 }
-                if (PropertyChanged != null)
-                {
-                    UpdateList("ETA", "Status");
-                }
+                UpdateList("ETA", "Status");
             }));
         }
 
@@ -385,6 +391,7 @@ namespace ByteFlood
             this.QueueManager.DeQueueTorrent(this);
             this.Torrent.Stop();
             this.Peers.Clear();
+            UpdateList("Status");
         }
 
         public void ForcePause()
