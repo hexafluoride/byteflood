@@ -67,7 +67,8 @@ namespace ByteFlood
             this.Torrents.CollectionChanged += Torrents_CollectionChanged;
             this.Initialize();
         }
-
+        [XmlIgnore]
+        public TorrentQueue tq = null;
         public void Initialize()
         {
             UpdateConnectionSettings();
@@ -102,6 +103,7 @@ namespace ByteFlood
             }
             listener = new Listener(this);
             listener.State = this;
+            tq = new TorrentQueue(this);
         }
 
         /// <summary>
@@ -458,7 +460,7 @@ namespace ByteFlood
                     return new State();
                 return Utility.Deserialize<State>(path);
             }
-            catch
+            catch (Exception ex)
             {
                 MessageBox.Show("An error occurred while loading the program state. You may need to re-add your torrents.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new State();
@@ -466,7 +468,7 @@ namespace ByteFlood
             }
         }
 
-        public void UpdateQueue()
+        /*public void UpdateQueue()
         {
             try
             {
@@ -506,7 +508,7 @@ namespace ByteFlood
                     ti.QueueNumber = (++i).ToString();
                 ti.UpdateList("QueueNumber");
             }
-        }
+        }*/
 
         public void NotifyChanged(params string[] props)
         {

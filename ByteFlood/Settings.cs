@@ -103,6 +103,8 @@ namespace ByteFlood
 
         public string NetworkInterfaceID { get; set; }
 
+        public bool SeedingTorrentsAreActive { get; set; }
+
         /// <summary>
         /// For the "wide" and "compact" style
         /// wide = 0
@@ -155,7 +157,8 @@ namespace ByteFlood
                     UpdateSourceEtag = null,
                     OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                     NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId(),
-                    ApplicationStyle = 0
+                    ApplicationStyle = 0,
+                    SeedingTorrentsAreActive = false
                 };
             }
         }
