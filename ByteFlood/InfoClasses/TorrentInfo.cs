@@ -22,9 +22,13 @@ namespace ByteFlood
     // A paused/resumed torrent has the "Unprocessed" state for the queue manager to ignore it.
     // All "Unprocessed" torrents are turned into "Queued" ones in the next queue manager tick.
     // A force pause/force resume means that the queue manager should completely ignore this torrent.
+    //
+    // diantahoc: I suggest a new terminology:
+    // Queued = The queue control the torrent.
+    // NotQueed = The TorrentInfo control itself.
     public enum QueueState
     {
-        Queued, NotQueued, Forced, Unprocessed
+        Queued, NotQueued//, Forced, Unprocessed
     }
     public class TorrentInfo : INotifyPropertyChanged
     {
@@ -68,8 +72,63 @@ namespace ByteFlood
         public long Downloaded { get { return this.Torrent.Monitor.DataBytesDownloaded; } }
         public long Uploaded { get; set; }
         public QueueState QueueState { get; set; }
-        public string QueueNumber { get; set; } // set by the state
-        public string Status { get { return (QueueState == ByteFlood.QueueState.Queued && Torrent.State == TorrentState.Paused) ? "Queued" : Torrent.State.ToString(); } }
+
+        /*[XmlIgnore]
+        public string QueueNumber 
+        {
+            get 
+            {
+                try
+                {
+                    return this.QueueManager.GetTorrentIndex(this).ToString();
+                }
+                catch { }
+                return null;
+            }
+        } // set by the state
+        */
+
+        [XmlIgnore]
+        public bool is_going_to_start = false;
+
+        [XmlIgnore]
+        public string Status
+        {
+            get
+            {
+                if (App.Settings.EnableQueue)
+                {
+                    if (this.QueueState == ByteFlood.QueueState.Queued)
+                    {
+                        if (is_going_to_start)
+                        {
+                            return "Queued";
+                        }
+                        else
+                        {
+                            return this.Torrent.State.ToString();
+                        }
+                    }
+                    else
+                    {
+                        //only in paused we show the [F] signe
+                        if (this.Torrent.State == TorrentState.Paused || this.Torrent.State == TorrentState.Downloading)
+                        {
+                            return string.Format("[F] {0}", this.Torrent.State.ToString());
+                        }
+                        else
+                        {
+                            return this.Torrent.State.ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    return this.Torrent.State.ToString();
+                }
+            }
+        }
+
         public TorrentState SavedTorrentState { get; set; }
         public int PeerCount { get { return Seeders + Leechers; } }
         public string CompletionCommand { get; set; }
@@ -153,6 +212,34 @@ namespace ByteFlood
 
         public IMDBSRSerializeable<IMovieDBSearchResult> PickedMovieData { get; set; }
 
+        [XmlIgnore]
+        public bool IsComplete
+        {
+            get
+            {
+                if (this.Torrent != null)
+                {
+                    return this.Torrent.ActuallyComplete;
+                }
+                return false;
+            }
+        }
+
+        [XmlIgnore]
+        public string InfoHash
+        {
+            get
+            {
+                if (this.Torrent != null)
+                {
+                    return this.Torrent.Torrent.InfoHash.ToHex();
+                }
+                return null;
+            }
+        }
+
+        [XmlIgnore]
+        private TorrentQueue QueueManager = null;
 
         #endregion
 
@@ -172,6 +259,7 @@ namespace ByteFlood
             this.Torrent = tm;
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
+            this.QueueManager = this.MainAppWindow.state.tq;
 
             TryHookEvents();
             PopulateFileList();
@@ -229,7 +317,7 @@ namespace ByteFlood
                 {
                     try
                     {
-                        (App.Current.MainWindow as MainWindow).NotifyIcon.ShowBalloonTip(
+                        this.MainAppWindow.NotifyIcon.ShowBalloonTip(
                             "ByteFlood", string.Format("'{0}' has been completed.", this.Name), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
                         string command = CompletionCommand.Replace("%s", this.Name)
                                                           .Replace("%p", System.IO.Path.GetFullPath(this.Path))
@@ -243,10 +331,7 @@ namespace ByteFlood
                         // Let's keep this secret to our graves
                     }
                 }
-                if (PropertyChanged != null)
-                {
-                    UpdateList("ETA", "Status");
-                }
+                UpdateList("ETA", "Status");
             }));
         }
 
@@ -303,38 +388,42 @@ namespace ByteFlood
 
         public void Stop()
         {
-            Torrent.Stop();
+            this.QueueManager.DeQueueTorrent(this);
+            this.Torrent.Stop();
             this.Peers.Clear();
+            UpdateList("Status");
         }
 
         public void ForcePause()
         {
-            Pause();
-            QueueState = QueueState.Forced;
+            QueueManager.DeQueueTorrent(this);
+            this.Torrent.Pause();
         }
 
         public void ForceStart()
         {
-            Start();
-            QueueState = QueueState.Forced;
+            QueueManager.DeQueueTorrent(this);
+            this.Torrent.Start();
         }
 
+        /// <summary>
+        /// Queue-start
+        /// </summary>
         public void Start()
         {
-            Torrent.Start();
-            QueueState = QueueState.Unprocessed;
+            //queuing the torrent WILL start it.
+            this.QueueManager.QueueTorrent(this);
+        }
+
+        public void Pause()
+        {
+            this.Torrent.Pause();
         }
 
         public void UpdateGraphData()
         {
             downspeeds.Add(Torrent.Monitor.DownloadSpeed);
             upspeeds.Add(Torrent.Monitor.UploadSpeed);
-        }
-
-        public void Pause()
-        {
-            Torrent.Pause();
-            QueueState = QueueState.Unprocessed;
         }
 
         public void OffMyself() // Dispose
@@ -371,6 +460,7 @@ namespace ByteFlood
                 App.Current.Dispatcher.Invoke(new Action(() =>
                 {
                     t = this.MainAppWindow.state;
+                    this.QueueManager = t.tq;
                 }));
 
                 //Load torrrent in the background, while not locking up the UI thread
@@ -466,13 +556,13 @@ namespace ByteFlood
                                     System.IO.File.WriteAllBytes(save_path, data);
                                 }
                             }
-                            catch (System.Net.WebException wex) 
+                            catch (System.Net.WebException wex)
                             {
-                                if (wex.Status == System.Net.WebExceptionStatus.NameResolutionFailure) 
+                                if (wex.Status == System.Net.WebExceptionStatus.NameResolutionFailure)
                                 {
                                     break;
                                 }
-                                else 
+                                else
                                 {
                                     if (retry_count > 5) { break; }
                                     retry_count++;

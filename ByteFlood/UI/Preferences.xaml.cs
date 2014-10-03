@@ -188,14 +188,20 @@ namespace ByteFlood
             local.MinimizeBehavior = WindowBehaviors[mb.SelectedIndex];
             local.ExitBehavior = WindowBehaviors[cb.SelectedIndex];
             local.EncryptionType = EncryptionTypes[enctype.SelectedIndex];
+            local.SeedingTorrentsAreActive = this.seedingTorrentsInac.IsChecked == true;
             MainWindow mw = (App.Current.MainWindow as MainWindow);
             mw.state.ce.Settings.Force = local.EncryptionType;
             local.Theme = (Theme)themeCombox.SelectedItem;
             bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
+            bool queue_settings_changed = App.Settings.EnableQueue != local.EnableQueue || App.Settings.QueueSize != local.QueueSize;
             App.Settings = (Settings)Utility.CloneObject(local);
             if (iface_changed) 
             {
                 mw.state.ChangeNetworkInterface();
+            }
+            if (queue_settings_changed) 
+            {
+                mw.state.tq.ReloadSettings();
             }
             this.Close();
         }
