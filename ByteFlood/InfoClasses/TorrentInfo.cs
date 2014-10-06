@@ -568,7 +568,7 @@ namespace ByteFlood
                                     retry_count++;
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 break;
                             }
@@ -589,7 +589,7 @@ namespace ByteFlood
                 {
                     TorrentFile[] files = this.Torrent.Torrent.Files;
 
-                    DirectoryKey base_dir = new DirectoryKey("/");
+                    DirectoryKey base_dir = new DirectoryKey("/", this);
 
                     foreach (var file in files)
                     {

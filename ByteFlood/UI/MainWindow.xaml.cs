@@ -101,8 +101,8 @@ namespace ByteFlood
 
         public static readonly DependencyProperty TotalUploadedProperty =
             DependencyProperty.Register("TotalUploaded", typeof(long), typeof(MainWindow), new PropertyMetadata(0L));
-        #endregion 
-        
+        #endregion
+
         #endregion
 
         public MainWindow()
@@ -113,7 +113,7 @@ namespace ByteFlood
         }
 
         bool disposed = false;
-        public void Dispose() 
+        public void Dispose()
         {
             if (!disposed)
             {
@@ -591,14 +591,43 @@ namespace ByteFlood
                     {
                         MessageBox.Show("File doesn't exist", "Error");
                     }
-
                 }
+                else
+                {
+                    DirectoryKey dk = item.Tag as DirectoryKey;
+                    if (dk != null)
+                    {
+                        string partial_path = this.GetDirectoryKeyRelativePath(item);
+                        string full_path = System.IO.Path.Combine(dk.OwnerTorrent.SavePath, partial_path);
+                        System.IO.Directory.CreateDirectory(full_path);
+                        Process.Start("explorer.exe", string.Format("\"{0}\"", full_path));
+                    }
+                }
+
+            }
+        }
+
+        private string GetDirectoryKeyRelativePath(Aga.Controls.Tree.TreeNode item_node)
+        {
+            List<string> dirs = new List<string>();
+            _recursive_resolve(item_node, dirs);
+            dirs.Reverse();
+            string res = System.IO.Path.Combine(dirs.ToArray());
+            return res;
+        }
+
+        private void _recursive_resolve(Aga.Controls.Tree.TreeNode node, List<string> dirs)
+        {
+            DirectoryKey dk = node.Tag as DirectoryKey;
+            if (dk != null)
+            {
+                dirs.Add(dk.Name);
+                _recursive_resolve(node.Parent, dirs);
             }
         }
 
         public void TorrentCommands_OpenFileLocation(object sender, RoutedEventArgs e)
         {
-            // TODO: Add support to open DirectoryKeys
             Aga.Controls.Tree.TreeNode item = files_tree.SelectedItem as Aga.Controls.Tree.TreeNode;
 
             if (item != null)
@@ -607,16 +636,30 @@ namespace ByteFlood
                 if (fi != null)
                 {
                     System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.FullPath);
+                    System.IO.Directory.CreateDirectory(fifo.Directory.FullName);
+                    Process.Start("explorer.exe", string.Format("\"{0}\"",  fifo.Directory.FullName));
+                    return;
+                }
 
-                    if (fifo.Directory.Exists)
+                //we must have hit a directory then
+                //if it's a directory residing inside the torrent folder (root folder), we simply
+                //open the torrent save dir
+                DirectoryKey dk = item.Tag as DirectoryKey;
+                if (dk != null)
+                {
+                    if (item.Parent != null && item.Parent.Tag != null)
                     {
-                        Process.Start("explorer.exe", "\"" + fifo.Directory.FullName + "\"");
+                        //it's a subdirectory
+                        string partial_path = GetDirectoryKeyRelativePath(item.Parent);
+                        string full_path = System.IO.Path.Combine(dk.OwnerTorrent.SavePath, partial_path);
+                        System.IO.Directory.CreateDirectory(full_path);
+                        Process.Start("explorer.exe", string.Format("\"{0}\"", full_path));
                     }
                     else
                     {
-                        Process.Start("explorer.exe", "\"" + fi.Owner.SavePath + "\"");
+                        //it's a root dir
+                        Process.Start("explorer.exe", string.Format("\"{0}\"", dk.OwnerTorrent.SavePath));
                     }
-
                 }
             }
         }
@@ -779,15 +822,15 @@ namespace ByteFlood
             }
         }
 
-        public void UpdateAppStyle(int _override = -1) 
+        public void UpdateAppStyle(int _override = -1)
         {
             int style = App.Settings.ApplicationStyle;
-            if (_override > -1) 
+            if (_override > -1)
             {
                 style = _override;
             }
 
-            if (style == 0) 
+            if (style == 0)
             {
                 left_treeview.Width = 170d;
                 left_treeview.Margin = new Thickness(5);
@@ -799,12 +842,12 @@ namespace ByteFlood
 
                 splitter.ClearValue(GridSplitter.BackgroundProperty);
                 splitter.Height = 5d;
-                splitter.Margin = new Thickness(5,0,0,5);
+                splitter.Margin = new Thickness(5, 0, 0, 5);
                 splitter.ClearValue(Panel.ZIndexProperty);
 
-                info_canvas.Margin = new Thickness(0,5,5,5);
+                info_canvas.Margin = new Thickness(0, 5, 5, 5);
             }
-            else 
+            else
             {
                 left_treeview.Width = 180d;
                 left_treeview.ClearValue(TreeView.MarginProperty);
