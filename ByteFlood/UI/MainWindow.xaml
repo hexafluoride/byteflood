@@ -356,7 +356,7 @@
 
                                 <ContextMenu x:Key="FileItemContextMenu">
                                     <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
-                                    <MenuItem Header="Open file location" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
+                                    <MenuItem Header="Open containing folder" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
                                     <MenuItem Header="Set priority" Background="WhiteSmoke">
                                         <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
                                         <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
