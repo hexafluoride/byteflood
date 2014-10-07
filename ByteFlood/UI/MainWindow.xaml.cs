@@ -191,21 +191,24 @@ namespace ByteFlood
             {
                 try
                 {
-                    foreach (TorrentInfo ti in state.Torrents)
-                        ti.Update();
+                    //foreach (TorrentInfo ti in state.Torrents)
+                    //    ti.Update();
                     uiContext.Send(x =>
                     {
                         if (mainlist.SelectedIndex == -1)
                             ResetDataContext();
-                        if (updategraph)
+                        if (info_canvas.SelectedIndex == 1)
                         {
-                            if (updategraph)
-                                ReDrawGraph();
-                            foreach (TorrentInfo ti in state.Torrents)
-                                if (ti.Torrent != null && ti.Torrent.State != TorrentState.Paused)
-                                    ti.UpdateGraphData();
+                            ReDrawGraph();
                         }
-                        updategraph = !updategraph;
+                        //if (updategraph)
+                        //{
+                        //        ReDrawGraph();
+                        //    foreach (TorrentInfo ti in state.Torrents)
+                        //        if (ti.Torrent != null && ti.Torrent.State != TorrentState.Paused)
+                        //            ti.UpdateGraphData();
+                        //}
+                        //updategraph = !updategraph;
                     }, null);
 
                     // TODO: Update theses values only when they are really changed.
@@ -230,9 +233,7 @@ namespace ByteFlood
                         ticks++;
                     }
                 }
-                catch
-                {
-                }
+                catch { }
                 System.Threading.Thread.Sleep(500);
             }
         }
@@ -412,6 +413,7 @@ namespace ByteFlood
             TorrentInfo t;
             if (!GetSelectedTorrent(out t))
                 return;
+            System.IO.Directory.CreateDirectory(t.SavePath);
             Process.Start("explorer.exe", "\"" + t.SavePath + "\"");
         }
         public bool GetSelectedTorrent(out TorrentInfo ti)
@@ -637,7 +639,7 @@ namespace ByteFlood
                 {
                     System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.FullPath);
                     System.IO.Directory.CreateDirectory(fifo.Directory.FullName);
-                    Process.Start("explorer.exe", string.Format("\"{0}\"",  fifo.Directory.FullName));
+                    Process.Start("explorer.exe", string.Format("\"{0}\"", fifo.Directory.FullName));
                     return;
                 }
 
