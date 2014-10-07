@@ -94,7 +94,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition MaxHeight="25"/>
+            <RowDefinition Name="statusbar_gridrow" MaxHeight="25"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">

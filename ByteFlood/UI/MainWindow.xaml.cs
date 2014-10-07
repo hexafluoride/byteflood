@@ -872,6 +872,7 @@ namespace ByteFlood
             GridLength zero = new GridLength(0);
             this.left_tree_colum.Width = App.Settings.TreeViewVisible ? new GridLength(180d) : zero;
             this.info_tabs_row.Height = App.Settings.BottomCanvasVisible ? auto : zero;
+            this.statusbar_gridrow.Height = App.Settings.StatusBarVisible ? auto : zero;
         }
 
         private void CopyMagnetLink(object sender, RoutedEventArgs e)
