@@ -248,6 +248,8 @@ namespace ByteFlood
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.context = this.MainAppWindow.uiContext;
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
+
+            InitUpdateThread();
         }
 
         public TorrentInfo(SynchronizationContext c, TorrentManager tm)
@@ -268,6 +270,44 @@ namespace ByteFlood
             this.Path = Torrent.Torrent.TorrentPath;
             this.SavePath = Torrent.SavePath;
             this.TorrentSettings = Torrent.Settings;
+
+            InitUpdateThread();
+        }
+
+        Thread bg = null;
+        Thread graph_updater = null;
+        private void InitUpdateThread() 
+        {
+            bg = new Thread(() => 
+            {
+                while (true) 
+                {
+                    this.Update();
+
+                    Thread.Sleep(650);
+                }
+            });
+            bg.IsBackground = true;
+            bg.Priority = ThreadPriority.BelowNormal;
+            bg.Start();
+
+            //start a new thread that refresh each 1 second
+            //for the graph data of course
+            graph_updater = new Thread(() => 
+            {
+                try 
+                {
+                    if (this.Torrent.State != TorrentState.Paused)
+                    {
+                        this.UpdateGraphData();
+                    }
+                }
+                catch { }
+                Thread.Sleep(1000);
+            });
+            graph_updater.IsBackground = true;
+            graph_updater.Priority = ThreadPriority.Lowest;
+            graph_updater.Start();
         }
 
         #region Event Handling
@@ -431,6 +471,8 @@ namespace ByteFlood
             if (Torrent.State != TorrentState.Stopped)
                 Torrent.Stop();
             Torrent.Dispose();
+            bg.Abort();
+            graph_updater.Abort();
         }
 
         public string GetMagnetLink()
