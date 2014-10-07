@@ -102,7 +102,7 @@
                 <ColumnDefinition Name="left_tree_colum" Width="180"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            
+
             <TreeView Grid.Column="0" Name="left_treeview" Width="170" Margin="5">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
@@ -190,7 +190,8 @@
                           SelectionMode="Extended" 
                           Margin="5"
                           SelectionChanged="mainlist_SelectionChanged"
-                          MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
+                          MouseLeftButtonDown="mainlist_MouseLeftButtonDown"
+                          AlternationCount="2">
 
                     <ListView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
@@ -230,6 +231,12 @@
                                     <Setter Property="BorderThickness" Value="0,0.4"/>
                                     <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}"/>
                                 </Trigger>
+                                <!-- Stripped Style -->
+                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="#19000000"/>
+                                </Trigger>
+                                <!-- Note: The mouse over style should be the last style
+                                            since triggers are applied in order -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <!--<Setter Property="BorderBrush" Value="Blue"/>
                                 <Setter Property="BorderThickness" Value="0"/>-->
