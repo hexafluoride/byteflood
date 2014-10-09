@@ -60,6 +60,8 @@ namespace MonoTorrent.Client
         public EncryptionForceType Force = EncryptionForceType.DoesntMatter; // If encrypted and unencrypted connections are enabled, specifies if encryption should be chosen first
         private IPEndPoint reportedEndpoint;            // The IPEndpoint reported to the tracker
         private string savePath;                        // The path that torrents will be downloaded to by default
+        private int minimumSpeedToNotUseWebSeeds =      // The minimum download speed that prevent the engine from using webseeds (ie if the torrent has a download speed below this one, webseeds will be used).  
+            DefautMinimumDownloadSpeedToSkipWebseeds;         
 
         #endregion Private Fields
 
@@ -150,6 +152,12 @@ namespace MonoTorrent.Client
             set { this.savePath = value; }
         }
 
+        public int MinimumDownloadSpeedToSkipWebseeds
+        {
+            get { return this.minimumSpeedToNotUseWebSeeds; }
+            set { this.minimumSpeedToNotUseWebSeeds = value; }
+        }
+
         #endregion Properties
 
 
@@ -163,6 +171,7 @@ namespace MonoTorrent.Client
         private const int DefaultMaxHalfOpenConnections = 5;
         private const EncryptionTypes DefaultAllowedEncryption = EncryptionTypes.All;
         private const int DefaultListenPort = 52138;
+        private const int DefautMinimumDownloadSpeedToSkipWebseeds = 20 * 1024;
 
         #endregion
 

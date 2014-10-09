@@ -271,6 +271,7 @@
     <Compile Include="MonoTorrent.Common\Check.cs" />
     <Compile Include="MonoTorrent.Common\Enums.cs" />
     <Compile Include="MonoTorrent.Common\FileMapping.cs" />
+    <Compile Include="MonoTorrent.Common\GetRightHttpSeed.cs" />
     <Compile Include="MonoTorrent.Common\HashAlgoFactory.cs" />
     <Compile Include="MonoTorrent.Common\Hashes.cs" />
     <Compile Include="MonoTorrent.Common\ICacheable.cs" />
