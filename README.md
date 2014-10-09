@@ -1,4 +1,4 @@
-byteflood
+byteflood [![Build status](https://ci.appveyor.com/api/projects/status/nar117j2jl0qk7q7?svg=true)](https://ci.appveyor.com/project/hexafluoride/byteflood)
 =========
 
 A free as in freedom BitTorrent client, designed for everyone.
