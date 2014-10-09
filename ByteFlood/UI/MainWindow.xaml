@@ -284,7 +284,7 @@
                               ResizeDirection="Rows"/>
 
                 <TabControl Grid.Row="2" Name="info_canvas" Margin="5">
-                    <TabItem Header="Overview" Name="overview">
+                    <TabItem Header="Overview">
                         <ScrollViewer>
                             <Canvas Name="overview_canvas">
                                 <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
@@ -350,7 +350,7 @@
                             </ComboBox>
                         </Canvas>
                     </TabItem>
-                    <TabItem Header="Pieces" Name="pieces">
+                    <TabItem Header="Pieces">
                         <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <controls:PieceView/>
@@ -453,7 +453,7 @@
                         </aga:TreeList>
 
                     </TabItem>
-                    <TabItem Header="Peers" Name="peers">
+                    <TabItem Header="Peers">
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
@@ -485,7 +485,7 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Trackers" Name="trackers" >
+                    <TabItem Header="Trackers">
                         <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
@@ -495,6 +495,16 @@
                                     <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding State}" />
                                     <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
                                     <GridViewColumn Width="190" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Web seeds">
+                        <ListView Name="webseeds_list">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="300" Header="Url" DisplayMemberBinding="{Binding Url}" />
+                                    <GridViewColumn Width="100" Header="Has been used" DisplayMemberBinding="{Binding HasBeenAdded}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
