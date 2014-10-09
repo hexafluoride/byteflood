@@ -1,4 +1,4 @@
-byteflood
+byteflood ![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/nar117j2jl0qk7q7?svg=true)
 =========
 
 A free as in freedom BitTorrent client, designed for everyone.
