@@ -68,7 +68,7 @@ namespace MonoTorrent.Common
         private string source;
         protected TorrentFile[] torrentFiles;
         protected string torrentPath;
-        private List<string> getRightHttpSeeds;
+        private List<GetRightHttpSeed> getRightHttpSeeds;
         private byte[] metadata;
 
         #endregion Private Fields
@@ -282,9 +282,12 @@ namespace MonoTorrent.Common
         /// <summary>
         /// This is the http-based seeding (getright protocole)
         /// </summary>
-        public List<string> GetRightHttpSeeds
+        public List<GetRightHttpSeed> GetRightHttpSeeds
         {
-            get { return this.getRightHttpSeeds; }
+            get
+            {
+                return this.getRightHttpSeeds;
+            }
         }
 
         #endregion Properties
@@ -294,7 +297,7 @@ namespace MonoTorrent.Common
 
         protected Torrent()
         {
-            this.announceUrls = new RawTrackerTiers ();
+            this.announceUrls = new RawTrackerTiers();
             this.comment = string.Empty;
             this.createdBy = string.Empty;
             this.creationDate = new DateTime(1970, 1, 1, 0, 0, 0);
@@ -303,7 +306,7 @@ namespace MonoTorrent.Common
             this.publisher = string.Empty;
             this.publisherUrl = string.Empty;
             this.source = string.Empty;
-            this.getRightHttpSeeds = new List<string>();
+            this.getRightHttpSeeds = new List<GetRightHttpSeed>();
         }
 
         #endregion
@@ -329,15 +332,15 @@ namespace MonoTorrent.Common
             return infoHash.GetHashCode();
         }
 
-        internal byte [] ToBytes ()
+        internal byte[] ToBytes()
         {
-            return originalDictionary.Encode ();
+            return originalDictionary.Encode();
         }
 
-        internal BEncodedDictionary ToDictionary ()
+        internal BEncodedDictionary ToDictionary()
         {
             // Give the user a copy of the original dictionary.
-            return BEncodedValue.Clone (originalDictionary);
+            return BEncodedValue.Clone(originalDictionary);
         }
 
         public override string ToString()
@@ -454,7 +457,7 @@ namespace MonoTorrent.Common
                 else
                 {
                     startIndex = (int)(size / pieceLength);
-                    endIndex = (int)((size  + length) / pieceLength);
+                    endIndex = (int)((size + length) / pieceLength);
                     if ((size + length) % pieceLength == 0)
                         endIndex--;
                 }
@@ -682,7 +685,7 @@ namespace MonoTorrent.Common
         public static bool TryLoad(Stream stream, out Torrent torrent)
         {
             Check.Stream(stream);
-            
+
             try
             {
                 torrent = Torrent.Load(stream);
@@ -707,7 +710,7 @@ namespace MonoTorrent.Common
         {
             Check.Url(url);
             Check.Location(location);
-            
+
             try
             {
                 torrent = Torrent.Load(url, location);
@@ -733,7 +736,7 @@ namespace MonoTorrent.Common
 
             try
             {
-                Torrent t = Torrent.LoadCore ((BEncodedDictionary) BEncodedDictionary.Decode(stream));
+                Torrent t = Torrent.LoadCore((BEncodedDictionary)BEncodedDictionary.Decode(stream));
                 t.torrentPath = path;
                 return t;
             }
@@ -745,7 +748,7 @@ namespace MonoTorrent.Common
 
         public static Torrent Load(BEncodedDictionary torrentInformation)
         {
-            return LoadCore ((BEncodedDictionary)BEncodedValue.Decode (torrentInformation.Encode ()));
+            return LoadCore((BEncodedDictionary)BEncodedValue.Decode(torrentInformation.Encode()));
         }
 
         internal static Torrent LoadCore(BEncodedDictionary torrentInformation)
@@ -774,7 +777,7 @@ namespace MonoTorrent.Common
                             // Ignore this if we have an announce-list
                             if (torrentInformation.ContainsKey("announce-list"))
                                 break;
-                            announceUrls.Add(new RawTrackerTier ());
+                            announceUrls.Add(new RawTrackerTier());
                             announceUrls[0].Add(keypair.Value.ToString());
                             break;
 
@@ -841,7 +844,7 @@ namespace MonoTorrent.Common
 
                         case ("info"):
                             using (SHA1 s = HashAlgoFactory.Create<SHA1>())
-                                infoHash = new InfoHash (s.ComputeHash(keypair.Value.Encode()));
+                                infoHash = new InfoHash(s.ComputeHash(keypair.Value.Encode()));
                             ProcessInfo(((BEncodedDictionary)keypair.Value));
                             break;
 
@@ -865,7 +868,7 @@ namespace MonoTorrent.Common
 
                                     Toolbox.Randomize<string>(tier);
 
-                                    RawTrackerTier collection = new RawTrackerTier ();
+                                    RawTrackerTier collection = new RawTrackerTier();
                                     for (int k = 0; k < tier.Count; k++)
                                         collection.Add(tier[k]);
 
@@ -887,15 +890,18 @@ namespace MonoTorrent.Common
                         case ("url-list"):
                             if (keypair.Value is BEncodedString)
                             {
-                                getRightHttpSeeds.Add(((BEncodedString)keypair.Value).Text);
+                                this.getRightHttpSeeds.Add(new GetRightHttpSeed() { Url = ((BEncodedString)keypair.Value).Text });
                             }
                             else if (keypair.Value is BEncodedList)
                             {
                                 foreach (BEncodedString str in (BEncodedList)keypair.Value)
-                                    GetRightHttpSeeds.Add(str.Text);
+                                    this.getRightHttpSeeds.Add(new GetRightHttpSeed() { Url = str.Text });
                             }
                             break;
-
+                        case "duration":
+                        case "encoded rate":
+                            //these are used for single file, mp3 torrents (at least BitTorrent client do).
+                            break;
                         default:
                             break;
                     }
