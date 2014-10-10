@@ -276,11 +276,11 @@ namespace ByteFlood
 
         Thread bg = null;
         Thread graph_updater = null;
-        private void InitUpdateThread() 
+        private void InitUpdateThread()
         {
-            bg = new Thread(() => 
+            bg = new Thread(() =>
             {
-                while (true) 
+                while (true)
                 {
                     this.Update();
 
@@ -293,17 +293,20 @@ namespace ByteFlood
 
             //start a new thread that refresh each 1 second
             //for the graph data of course
-            graph_updater = new Thread(() => 
+            graph_updater = new Thread(() =>
             {
-                try 
+                while (true)
                 {
-                    if (this.Torrent.State != TorrentState.Paused)
+                    try
                     {
-                        this.UpdateGraphData();
+                        if (this.Torrent.State != TorrentState.Paused)
+                        {
+                            this.UpdateGraphData();
+                        }
                     }
+                    catch { }
+                    Thread.Sleep(1000);
                 }
-                catch { }
-                Thread.Sleep(1000);
             });
             graph_updater.IsBackground = true;
             graph_updater.Priority = ThreadPriority.Lowest;
