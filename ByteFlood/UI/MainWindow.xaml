@@ -499,7 +499,7 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Web seeds">
+                    <TabItem Header="Web seeds" Name="webseeds_tab">
                         <ListView Name="webseeds_list">
                             <ListView.View>
                                 <GridView>

@@ -680,7 +680,11 @@ namespace ByteFlood
             pieces_list.ItemsSource = ti.Pieces;
             trackers_list.ItemsSource = ti.Trackers;
             overview_canvas.DataContext = ti;
-            webseeds_list.ItemsSource = ti.Torrent.Torrent.GetRightHttpSeeds;
+            if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
+            {
+                webseeds_tab.Visibility = Visibility.Visible;
+                webseeds_list.ItemsSource = ti.Torrent.Torrent.GetRightHttpSeeds;
+            }
         }
 
         private void ResetDataContext()
@@ -691,6 +695,7 @@ namespace ByteFlood
             trackers_list.ItemsSource = null;
             overview_canvas.DataContext = null;
             webseeds_list.ItemsSource = null;
+            webseeds_tab.Visibility = Visibility.Collapsed;
         }
 
         private void mainlist_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
