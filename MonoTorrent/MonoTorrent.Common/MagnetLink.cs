@@ -55,6 +55,8 @@ namespace MonoTorrent
                             throw new FormatException ("More than one infohash in magnet link is not allowed.");
 
                         string val = keyval[1].Substring(9);
+                        //TODO: Support more hash encoding scheme
+                        //https://en.wikipedia.org/wiki/Magnet_URI_scheme#URN.2C_containing_hash_.28xt.29
                         switch (keyval[1].Substring(0, 9))
                         {
                             case "urn:sha1:"://base32 hash

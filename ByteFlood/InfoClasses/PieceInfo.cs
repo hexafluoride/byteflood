@@ -25,13 +25,13 @@ namespace ByteFlood
         }
        
         public int ID { get; set; }
-
+        public string Tooltip { get; set; }
         public PieceInfo() { }
         public void SetSelf(PieceInfo pi)
         {
             this.Finished = pi.Finished;
             this.ID = pi.ID;
-            UpdateList("Finished", "ID");
+            UpdateList("Finished", "ID", "Tooltip");
         }
         public void UpdateList(params string[] columns)
         {

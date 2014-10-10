@@ -424,7 +424,43 @@ namespace ByteFlood
             PieceInfo pi = new PieceInfo();
             pi.ID = e.PieceIndex;
             pi.Finished = e.HashPassed;
+            pi.Tooltip = get_pieceinfo_tooltip(e.PieceIndex);
             context.Send(x => Pieces.Add(pi), null);
+        }
+
+        private string get_pieceinfo_tooltip(int pieceindex) 
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("Piece#: {0}\n", pieceindex);
+            TorrentFile[] files = get_piece_files(pieceindex);
+            if (files.Length > 1) 
+            {
+                sb.Append("Files:\n");
+                foreach (var f in files) 
+                {
+                    sb.AppendFormat("- {0} ({1})\n", System.IO.Path.GetFileName(f.FullPath), Utility.PrettifyAmount(f.Length));
+                }
+            }
+            else 
+            {
+                sb.AppendFormat("File: {0} ({1})", System.IO.Path.GetFileName(files[0].FullPath), Utility.PrettifyAmount(files[0].Length));
+            }
+            return sb.ToString();
+        }
+
+        private TorrentFile[] get_piece_files(int pieceindex)
+        {
+            List<TorrentFile> files = new List<TorrentFile>();
+            foreach (TorrentFile file in this.Torrent.Torrent.Files)
+            {
+                // startIndex <= pieceIndex <= endIndex
+                if (pieceindex >= file.StartPieceIndex 
+                    && pieceindex <= file.EndPieceIndex) 
+                {
+                    files.Add(file);
+                }
+            }
+            return files.ToArray();
         }
 
         #endregion

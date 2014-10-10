@@ -89,7 +89,7 @@
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <Rectangle Height="20" Width="20" Fill="{Binding Finished, Converter={StaticResource PieceViewConverter}}"/>
+                    <Rectangle Height="20" Width="20" Fill="{Binding Finished, Converter={StaticResource PieceViewConverter}}" ToolTip="{Binding Tooltip}"/>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
