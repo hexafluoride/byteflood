@@ -45,10 +45,10 @@ namespace MonoTorrent.Client
         int webseedCount;
         private TorrentManager manager;
 
-		public abstract TorrentState State
-		{
-			get;
-		}
+        public abstract TorrentState State
+        {
+            get;
+        }
 
         protected TorrentManager Manager
         {
@@ -120,7 +120,8 @@ namespace MonoTorrent.Client
 
         public bool CanAcceptConnections
         {
-            get; protected set;
+            get;
+            protected set;
         }
 
         public bool ShouldConnect(PeerId peer)
@@ -128,16 +129,16 @@ namespace MonoTorrent.Client
             return ShouldConnect(peer.Peer);
         }
 
-		public virtual bool ShouldConnect(Peer peer)
+        public virtual bool ShouldConnect(Peer peer)
         {
             return true;
         }
 
-		public virtual bool CanHashCheck
-		{
-			get { return false; }
-		}
-		
+        public virtual bool CanHashCheck
+        {
+            get { return false; }
+        }
+
         protected virtual void HandleGenericExtensionMessage(PeerId id, ExtensionMessage extensionMessage)
         {
             // Do nothing
@@ -318,7 +319,7 @@ namespace MonoTorrent.Client
                     id.PeerExchangeManager = new PeerExchangeManager(id);
             }
         }
-        
+
         protected virtual void HandleKeepAliveMessage(PeerId id, KeepAliveMessage message)
         {
             id.LastMessageReceived = DateTime.Now;
@@ -451,7 +452,7 @@ namespace MonoTorrent.Client
             else if (manager.State == TorrentState.Seeding)
                 SeedingLogic(counter);
             PostLogicTick(counter);
-            
+
         }
 
         void PreLogicTick(int counter)
@@ -459,9 +460,10 @@ namespace MonoTorrent.Client
             PeerId id;
 
             //Execute iniitial logic for individual peers
-            if (counter % (1000 / ClientEngine.TickLength) == 0) {   // Call it every second... ish
+            if (counter % (1000 / ClientEngine.TickLength) == 0)
+            {   // Call it every second... ish
                 manager.Monitor.Tick();
-                manager.UpdateLimiters ();
+                manager.UpdateLimiters();
             }
 
             if (manager.finishedPieces.Count > 0)
@@ -543,35 +545,37 @@ namespace MonoTorrent.Client
 
         void DownloadLogic(int counter)
         {
-            // FIXME: Hardcoded 15kB/sec - is this ok?
-            if ((DateTime.Now - manager.StartTime) > TimeSpan.FromMinutes(1) && manager.Monitor.DownloadSpeed < 15 * 1024)
+            // Explanation: If 30 seconds has passed since we started the torrent, and the download speed
+            // is below the minimum speed, we connect to the webseeds
+            if ((DateTime.Now - manager.StartTime) > TimeSpan.FromSeconds(30) &&
+                manager.Monitor.DownloadSpeed < manager.Engine.Settings.MinimumDownloadSpeedToSkipWebseeds)
             {
-                foreach (string s in manager.Torrent.GetRightHttpSeeds)
+                foreach (GetRightHttpSeed webseed in manager.Torrent.GetRightHttpSeeds)
                 {
-                    string peerId = "-WebSeed-";
-                    peerId = peerId + (webseedCount++).ToString().PadLeft(20 - peerId.Length, '0');
+                    if (!webseed.HasBeenAdded)
+                    {
+                        string peerId = "-WebSeed-";
+                        peerId = peerId + (webseedCount++).ToString().PadLeft(20 - peerId.Length, '0');
 
-                    Uri uri = new Uri(s);
-                    Peer peer = new Peer(peerId, uri);
-                    PeerId id = new PeerId(peer, manager);
-                    HttpConnection connection = new HttpConnection(new Uri(s));
-                    connection.Manager = this.manager;
-                    peer.IsSeeder = true;
-                    id.BitField.SetAll(true);
-                    id.Encryptor = new PlainTextEncryption();
-                    id.Decryptor = new PlainTextEncryption();
-                    id.IsChoking = false;
-					id.AmInterested = !manager.Complete;
-                    id.Connection = connection;
-					id.ClientApp = new Software(id.PeerID);
-                    manager.Peers.ConnectedPeers.Add(id);
-					manager.RaisePeerConnected(new PeerConnectionEventArgs(manager, id, Direction.Outgoing));
-                    PeerIO.EnqueueReceiveMessage (id.Connection, id.Decryptor, Manager.DownloadLimiter, id.Monitor, id.TorrentManager, id.ConnectionManager.messageReceivedCallback, id);
+                        Uri uri = new Uri(webseed.Url);
+                        Peer peer = new Peer(peerId, uri);
+                        PeerId id = new PeerId(peer, manager);
+                        HttpConnection connection = new HttpConnection(uri);
+                        connection.Manager = this.manager;
+                        peer.IsSeeder = true;
+                        id.BitField.SetAll(true);
+                        id.Encryptor = new PlainTextEncryption();
+                        id.Decryptor = new PlainTextEncryption();
+                        id.IsChoking = false;
+                        id.AmInterested = !manager.Complete;
+                        id.Connection = connection;
+                        id.ClientApp = new Software(id.PeerID);
+                        manager.Peers.ConnectedPeers.Add(id);
+                        manager.RaisePeerConnected(new PeerConnectionEventArgs(manager, id, Direction.Outgoing));
+                        PeerIO.EnqueueReceiveMessage(id.Connection, id.Decryptor, Manager.DownloadLimiter, id.Monitor, id.TorrentManager, id.ConnectionManager.messageReceivedCallback, id);
+                        webseed.HasBeenAdded = true;
+                    }
                 }
-
-                // FIXME: In future, don't clear out this list. It may be useful to keep the list of HTTP seeds
-                // Add a boolean or something so that we don't add them twice.
-                manager.Torrent.GetRightHttpSeeds.Clear();
             }
 
             // Remove inactive peers we haven't heard from if we're downloading

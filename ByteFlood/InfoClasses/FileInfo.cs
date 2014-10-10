@@ -102,13 +102,13 @@ namespace ByteFlood
     public class DirectoryKey : System.Collections.Hashtable, Aga.Controls.Tree.ITreeModel
     {
 
-        public DirectoryKey(string name)
+        public DirectoryKey(string name, TorrentInfo ti)
         {
-            this.Name = name;
+            this.Name = name; this.OwnerTorrent = ti;
         }
 
         public string Name { get; private set; }
-
+        public TorrentInfo OwnerTorrent { get; private set; }
         public System.Collections.IEnumerable GetChildren(object parent)
         {
             if (parent == null)
@@ -152,7 +152,7 @@ namespace ByteFlood
 
                 if (!trunk.ContainsKey(node))
                 {
-                    trunk[node] = new DirectoryKey(node);
+                    trunk[node] = new DirectoryKey(node, owner);
                 }
                 ProcessFile(other, (DirectoryKey)trunk[node], owner, f);
             }

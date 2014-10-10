@@ -94,7 +94,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition MaxHeight="25"/>
+            <RowDefinition Name="statusbar_gridrow" MaxHeight="25"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -102,7 +102,7 @@
                 <ColumnDefinition Name="left_tree_colum" Width="180"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            
+
             <TreeView Grid.Column="0" Name="left_treeview" Width="170" Margin="5">
                 <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
@@ -190,7 +190,8 @@
                           SelectionMode="Extended" 
                           Margin="5"
                           SelectionChanged="mainlist_SelectionChanged"
-                          MouseLeftButtonDown="mainlist_MouseLeftButtonDown">
+                          MouseLeftButtonDown="mainlist_MouseLeftButtonDown"
+                          AlternationCount="2">
 
                     <ListView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
@@ -230,6 +231,12 @@
                                     <Setter Property="BorderThickness" Value="0,0.4"/>
                                     <Setter Property="Foreground" Value="{x:Static SystemColors.ActiveCaptionTextBrush}"/>
                                 </Trigger>
+                                <!-- Stripped Style -->
+                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="#19000000"/>
+                                </Trigger>
+                                <!-- Note: The mouse over style should be the last style
+                                            since triggers are applied in order -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <!--<Setter Property="BorderBrush" Value="Blue"/>
                                 <Setter Property="BorderThickness" Value="0"/>-->
@@ -277,7 +284,7 @@
                               ResizeDirection="Rows"/>
 
                 <TabControl Grid.Row="2" Name="info_canvas" Margin="5">
-                    <TabItem Header="Overview" Name="overview">
+                    <TabItem Header="Overview">
                         <ScrollViewer>
                             <Canvas Name="overview_canvas">
                                 <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
@@ -343,7 +350,7 @@
                             </ComboBox>
                         </Canvas>
                     </TabItem>
-                    <TabItem Header="Pieces" Name="pieces">
+                    <TabItem Header="Pieces">
                         <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <controls:PieceView/>
@@ -356,7 +363,7 @@
 
                                 <ContextMenu x:Key="FileItemContextMenu">
                                     <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
-                                    <MenuItem Header="Open file location" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
+                                    <MenuItem Header="Open containing folder" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
                                     <MenuItem Header="Set priority" Background="WhiteSmoke">
                                         <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
                                         <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
@@ -446,7 +453,7 @@
                         </aga:TreeList>
 
                     </TabItem>
-                    <TabItem Header="Peers" Name="peers">
+                    <TabItem Header="Peers">
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
@@ -478,7 +485,7 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Trackers" Name="trackers" >
+                    <TabItem Header="Trackers">
                         <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
@@ -488,6 +495,16 @@
                                     <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding State}" />
                                     <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
                                     <GridViewColumn Width="190" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Web seeds" Name="webseeds_tab">
+                        <ListView Name="webseeds_list">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="300" Header="Url" DisplayMemberBinding="{Binding Url}" />
+                                    <GridViewColumn Width="100" Header="Has been used" DisplayMemberBinding="{Binding HasBeenAdded}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

@@ -248,6 +248,8 @@ namespace ByteFlood
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.context = this.MainAppWindow.uiContext;
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
+
+            InitUpdateThread();
         }
 
         public TorrentInfo(SynchronizationContext c, TorrentManager tm)
@@ -268,6 +270,47 @@ namespace ByteFlood
             this.Path = Torrent.Torrent.TorrentPath;
             this.SavePath = Torrent.SavePath;
             this.TorrentSettings = Torrent.Settings;
+
+            InitUpdateThread();
+        }
+
+        Thread bg = null;
+        Thread graph_updater = null;
+        private void InitUpdateThread()
+        {
+            bg = new Thread(() =>
+            {
+                while (true)
+                {
+                    this.Update();
+
+                    Thread.Sleep(650);
+                }
+            });
+            bg.IsBackground = true;
+            bg.Priority = ThreadPriority.BelowNormal;
+            bg.Start();
+
+            //start a new thread that refresh each 1 second
+            //for the graph data of course
+            graph_updater = new Thread(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        if (this.Torrent.State != TorrentState.Paused)
+                        {
+                            this.UpdateGraphData();
+                        }
+                    }
+                    catch { }
+                    Thread.Sleep(1000);
+                }
+            });
+            graph_updater.IsBackground = true;
+            graph_updater.Priority = ThreadPriority.Lowest;
+            graph_updater.Start();
         }
 
         #region Event Handling
@@ -381,7 +424,43 @@ namespace ByteFlood
             PieceInfo pi = new PieceInfo();
             pi.ID = e.PieceIndex;
             pi.Finished = e.HashPassed;
+            pi.Tooltip = get_pieceinfo_tooltip(e.PieceIndex);
             context.Send(x => Pieces.Add(pi), null);
+        }
+
+        private string get_pieceinfo_tooltip(int pieceindex) 
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("Piece#: {0}\n", pieceindex);
+            TorrentFile[] files = get_piece_files(pieceindex);
+            if (files.Length > 1) 
+            {
+                sb.Append("Files:\n");
+                foreach (var f in files) 
+                {
+                    sb.AppendFormat("- {0} ({1})\n", System.IO.Path.GetFileName(f.FullPath), Utility.PrettifyAmount(f.Length));
+                }
+            }
+            else 
+            {
+                sb.AppendFormat("File: {0} ({1})", System.IO.Path.GetFileName(files[0].FullPath), Utility.PrettifyAmount(files[0].Length));
+            }
+            return sb.ToString();
+        }
+
+        private TorrentFile[] get_piece_files(int pieceindex)
+        {
+            List<TorrentFile> files = new List<TorrentFile>();
+            foreach (TorrentFile file in this.Torrent.Torrent.Files)
+            {
+                // startIndex <= pieceIndex <= endIndex
+                if (pieceindex >= file.StartPieceIndex 
+                    && pieceindex <= file.EndPieceIndex) 
+                {
+                    files.Add(file);
+                }
+            }
+            return files.ToArray();
         }
 
         #endregion
@@ -431,6 +510,8 @@ namespace ByteFlood
             if (Torrent.State != TorrentState.Stopped)
                 Torrent.Stop();
             Torrent.Dispose();
+            bg.Abort();
+            graph_updater.Abort();
         }
 
         public string GetMagnetLink()
@@ -568,7 +649,7 @@ namespace ByteFlood
                                     retry_count++;
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 break;
                             }
@@ -589,7 +670,7 @@ namespace ByteFlood
                 {
                     TorrentFile[] files = this.Torrent.Torrent.Files;
 
-                    DirectoryKey base_dir = new DirectoryKey("/");
+                    DirectoryKey base_dir = new DirectoryKey("/", this);
 
                     foreach (var file in files)
                     {
