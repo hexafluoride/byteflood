@@ -143,6 +143,7 @@
     <Compile Include="MonoTorrent.Client\NetworkIO.cs" />
     <Compile Include="MonoTorrent.Client\NullDhtEngine.cs" />
     <Compile Include="MonoTorrent.Client\PeerConnections\HttpRequestData.cs" />
+    <Compile Include="MonoTorrent.Client\PeerConnections\HTTPSeedConnection.cs" />
     <Compile Include="MonoTorrent.Client\PeerConnections\IPV6Connection.cs" />
     <Compile Include="MonoTorrent.Client\PeerConnections\PeerId.cs" />
     <Compile Include="MonoTorrent.Client\Piece.cs" />
