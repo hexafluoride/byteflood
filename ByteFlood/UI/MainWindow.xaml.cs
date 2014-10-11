@@ -44,7 +44,6 @@ namespace ByteFlood
     {
         bool ignoreclose = true;
         Thread thr;
-        bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
         public Func<TorrentInfo, bool> ShowAll = new Func<TorrentInfo, bool>((t) => { return true; });
@@ -110,6 +109,7 @@ namespace ByteFlood
             InitializeComponent();
             UpdateGridLength();
             UpdateAppStyle();
+            UpdateMiscUISettings();
         }
 
         bool disposed = false;
@@ -814,6 +814,7 @@ namespace ByteFlood
         public void UpdateVisibility()
         {
             UpdateGridLength();
+            UpdateMiscUISettings();
 
             left_treeview.Visibility = App.Settings.TreeViewVisibility;
             info_canvas.Visibility = App.Settings.BottomCanvasVisibility;
@@ -882,6 +883,14 @@ namespace ByteFlood
             this.left_tree_colum.Width = App.Settings.TreeViewVisible ? new GridLength(180d) : zero;
             this.info_tabs_row.Height = App.Settings.BottomCanvasVisible ? auto : zero;
             this.statusbar_gridrow.Height = App.Settings.StatusBarVisible ? auto : zero;
+        }
+
+        private void UpdateMiscUISettings() 
+        {
+            if (App.Settings.DisplayStripsOnTorrentList)
+                mainlist.SetValue(ListView.AlternationCountProperty, 2);
+            else
+                mainlist.ClearValue(ListView.AlternationCountProperty);
         }
 
         private void CopyMagnetLink(object sender, RoutedEventArgs e)
