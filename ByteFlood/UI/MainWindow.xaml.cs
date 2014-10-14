@@ -816,9 +816,11 @@ namespace ByteFlood
             UpdateGridLength();
             UpdateMiscUISettings();
 
-            left_treeview.Visibility = App.Settings.TreeViewVisibility;
-            info_canvas.Visibility = App.Settings.BottomCanvasVisibility;
-            StatusBar.Visibility = App.Settings.StatusBarVisibility;
+            this.left_treeview.Visibility = App.Settings.TreeViewVisibility;
+            this.info_canvas.Visibility = App.Settings.BottomCanvasVisibility;
+            this.splitter.Visibility = this.info_canvas.Visibility;
+
+            this.StatusBar.Visibility = App.Settings.StatusBarVisibility;
 
             foreach (Image img in FindVisualChildren<Image>(this))
             {
@@ -826,9 +828,7 @@ namespace ByteFlood
                 {
                     img.GetBindingExpression(Image.VisibilityProperty).UpdateTarget();
                 }
-                catch
-                {
-                }
+                catch { }
             }
         }
 
@@ -883,9 +883,10 @@ namespace ByteFlood
             this.left_tree_colum.Width = App.Settings.TreeViewVisible ? new GridLength(180d) : zero;
             this.info_tabs_row.Height = App.Settings.BottomCanvasVisible ? auto : zero;
             this.statusbar_gridrow.Height = App.Settings.StatusBarVisible ? auto : zero;
+            this.torrent_list_row.Height = App.Settings.BottomCanvasVisible ? new GridLength(250d) : auto;
         }
 
-        private void UpdateMiscUISettings() 
+        private void UpdateMiscUISettings()
         {
             if (App.Settings.DisplayStripsOnTorrentList)
                 mainlist.SetValue(ListView.AlternationCountProperty, 2);

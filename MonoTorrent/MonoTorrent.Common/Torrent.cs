@@ -898,9 +898,14 @@ namespace MonoTorrent.Common
                                     this.getRightHttpSeeds.Add(new GetRightHttpSeed() { Url = str.Text });
                             }
                             break;
+                        //these are used for single file, mp3 torrents (at least BitTorrent client do).
                         case "duration":
                         case "encoded rate":
-                            //these are used for single file, mp3 torrents (at least BitTorrent client do).
+                        //these are found in some yify torrents
+                        case "height":
+                        case "width":
+                           // found in some movies torrents
+                        case "publisher":
                             break;
                         default:
                             break;

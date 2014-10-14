@@ -143,7 +143,7 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition MaxHeight="35" Height="35"/>
-                    <RowDefinition Height="250"/>
+                    <RowDefinition Name="torrent_list_row" Height="250"/>
                     <RowDefinition Name="info_tabs_row" Height="200"/>
                 </Grid.RowDefinitions>
 
