@@ -163,10 +163,12 @@ namespace ByteFlood
         /// <returns>true if successful.</returns>
         public bool ImportTorrents()
         {
-            if (ByteFlood.ImportTorrents.ResumeExist())
+            ImportTorrents it = new ImportTorrents() { Icon = this.Icon, Owner = this };
+            it.Load(true);
+            if (it.list.Count > 0)
             {
-                ImportTorrents it = new ImportTorrents() { Icon = this.Icon };
-                it.ShowDialog();
+                it.ShowDialog(); // calling show dialog will call window_loaded and therfore the real Load() statement
+
                 foreach (TorrentInfo ti in it.selected)
                 {
                     state.Torrents.Add(ti);

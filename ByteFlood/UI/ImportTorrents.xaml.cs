@@ -38,9 +38,10 @@ namespace ByteFlood
         public ImportTorrents()
         {
             InitializeComponent();
+            this.torrents.ItemsSource = list;
         }
 
-        public static bool ResumeExist()
+        /*private static bool ResumeExist()
         {
             foreach (string dir in uTorrentDirs)
             {
@@ -50,10 +51,12 @@ namespace ByteFlood
             }
 
             return false;
-        }
+        }*/
 
-        public void Load()
+        /// <param name="fast_load">Indicate wither to stop loading at the first torrent found</param>
+        public void Load(bool fast_load = false)
         {
+            list.Clear();
             foreach (string dir in uTorrentDirs)
             {
                 string p = Path.Combine(dir, "resume.dat");
@@ -75,6 +78,10 @@ namespace ByteFlood
                                 tl.SavePath = values[new BEncodedString("path")].ToString();
                                 tl.Import = true;
                                 list.Add(tl);
+                                if (fast_load)
+                                {
+                                    return;
+                                }
                             }
                         }
                         catch
@@ -87,8 +94,7 @@ namespace ByteFlood
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            torrents.ItemsSource = list;
-            Task.Factory.StartNew(new Action(Load));
+            Task.Factory.StartNew(new Action(() => { Load(); }));
         }
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
