@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   id="svg3001"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="active.svg">
+  <metadata
+     id="metadata3015">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3013" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="694"
+     inkscape:window-height="480"
+     id="namedview3011"
+     showgrid="false"
+     inkscape:zoom="1.84375"
+     inkscape:cx="-24.40678"
+     inkscape:cy="64"
+     inkscape:window-x="90"
+     inkscape:window-y="277"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g3005" />
+  <g
+     style="fill:#859900;fill-opacity:1"
+     id="g3005">
+    <path
+       d="M 102.980469 48.042969 C 96.222656 33.402344 81.117188 24 64.085938 24 C 46.671875 24 30.757812 34.289062 24.488281 49.597656 L 37.6875 54.402344 C 41.863281 44.191406 52.476562 37.335938 64.085938 37.335938 C 75.292969 37.335938 85.203125 43.464844 89.792969 53.003906 L 80.164062 56.628906 L 104.789062 70.023438 L 111.988281 44.652344 Z "
+       id="path3007"
+       style="fill:#6eb900;fill-opacity:1" />
+    <path
+       d="M 64.085938 90.675781 C 52.984375 90.675781 42.859375 84.359375 38.332031 74.882812 L 47.824219 71.425781 L 23.457031 58.324219 L 16 83.019531 L 25.085938 79.707031 C 31.710938 94.292969 47.179688 104.007812 64.085938 104.007812 C 81.566406 104.007812 97.042969 94.121094 103.515625 78.824219 L 90.378906 73.882812 C 86.058594 84.082031 75.742188 90.675781 64.085938 90.675781 Z "
+       id="path3009"
+       style="fill:#2eb5d6;fill-opacity:1" />
+  </g>
+</svg>
