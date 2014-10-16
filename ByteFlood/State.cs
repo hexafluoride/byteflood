@@ -122,13 +122,13 @@ namespace ByteFlood
         {
             var new_iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
             ce.ChangeListenEndpoint(new IPEndPoint(new_iface.GetIPv4(), ce.Listener.Endpoint.Port));
-            
+
             //stop the current dht engine
             ce.DhtEngine.Stop();
             ce.DhtEngine.Dispose();
             ce.DhtEngine.PeersFound -= PeersFound;
             this.DHTPeers = 0;
-           
+
             //registering a new dht engine will overrides the old one
             ce.RegisterDht(get_dht_engine(new_iface.GetIPv4()));
             ce.DhtEngine.Start();
@@ -217,7 +217,7 @@ namespace ByteFlood
                 atd.ShowDialog();
                 if (atd.UserOK)
                 {
-                    TorrentInfo ti = CreateTorrentInfo(atd.tm);
+                    TorrentInfo ti = CreateTorrentInfo(new TorrentManager(atd.t, atd.TorrentSavePath, new TorrentSettings()));
                     ti.Name = atd.TorrentName;
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
@@ -257,7 +257,7 @@ namespace ByteFlood
                 {
                     if (atd.UserOK)
                     {
-                        TorrentInfo ti = CreateTorrentInfo(atd.tm);
+                        TorrentInfo ti = CreateTorrentInfo(new TorrentManager(atd.t, atd.TorrentSavePath, new TorrentSettings()));
                         ti.Name = atd.TorrentName;
                         if (atd.AutoStartTorrent)
                         { ti.Start(); }
