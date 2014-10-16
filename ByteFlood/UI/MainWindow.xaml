@@ -205,39 +205,48 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
 
-                    <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}">
+                    <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}"
+                            ToolTip="Add torrent(s) from file">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/add.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}"
+                            ToolTip="Add torrent from a URL">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/link.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}"
+                            ToolTip="Add a new RSS feed">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/rss.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}"
+                            ToolTip="Search for torrents on the internet">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/search.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}"
+                            ToolTip="Modify and change ByteFlood settings">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/settings.png" />
                     </Button>
 
                     <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
 
-                    <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Start" Click="OperationOnSelectedTorrents">
+                    <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Start" Click="OperationOnSelectedTorrents"
+                            ToolTip="Start selected torrent(s)">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/start.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Stop" Click="OperationOnSelectedTorrents">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Stop" Click="OperationOnSelectedTorrents"
+                            ToolTip="Stop selected torrent(s)">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents"
+                            ToolTip="Pause selected torrent(s)">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents"
+                            ToolTip="Remove selected torrent(s) from the list">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
                 </StackPanel>
