@@ -57,7 +57,6 @@ namespace ByteFlood
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
         public int QueueSize { get; set; }
-        //public NetworkInterface Interface { get; set; }
         public bool ImportedTorrents { get; set; }
         public List<string> PreviousPaths { get; set; }
         public WindowBehavior MinimizeBehavior { get; set; }
@@ -105,6 +104,8 @@ namespace ByteFlood
 
         public bool SeedingTorrentsAreActive { get; set; }
 
+        public bool DisplayStripsOnTorrentList { get; set; }
+
         /// <summary>
         /// For the "wide" and "compact" style
         /// wide = 0
@@ -118,7 +119,7 @@ namespace ByteFlood
             {
                 return new Settings()
                 {
-                    Theme = Theme.Aero2,
+                    Theme = GetDefaultTheme(),
                     DrawGrid = true,
                     DownloadColor = Colors.Green,
                     UploadColor = Colors.Red,
@@ -158,8 +159,31 @@ namespace ByteFlood
                     OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                     NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId(),
                     ApplicationStyle = 0,
-                    SeedingTorrentsAreActive = false
+                    SeedingTorrentsAreActive = false,
+                    DisplayStripsOnTorrentList = false
                 };
+            }
+        }
+
+        private static Theme GetDefaultTheme() 
+        {
+            switch (Environment.OSVersion.Version.Major) 
+            {
+                case 5:
+                    return Theme.Luna;
+                case 6:
+                    if (Environment.OSVersion.Version.Minor < 2)
+                    {
+                        //vista and 7
+                        return Theme.Aero;
+                    }
+                    else 
+                    {
+                        // win8 and newer
+                        return Theme.Aero2;
+                    }
+                default:
+                    return default(Theme);
             }
         }
 

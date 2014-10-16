@@ -104,15 +104,67 @@
             </Grid.ColumnDefinitions>
 
             <TreeView Grid.Column="0" Name="left_treeview" Width="170" Margin="5">
-                <TreeViewItem Header="{Binding TorrentCount}" HeaderStringFormat="Torrents ({0})" Name="torrents_treeview" Selected="SwitchTorrentDisplay">
-                    <TreeViewItem Header="{Binding DownloadingTorrentCount}" Tag="downloading" HeaderStringFormat="Downloading ({0})" Selected="SwitchTorrentDisplay" />
-                    <TreeViewItem Header="{Binding SeedingTorrentCount}" Tag="seeding" HeaderStringFormat="Seeding ({0})" Selected="SwitchTorrentDisplay" />
-                    <TreeViewItem Header="{Binding InactiveTorrentCount}" Tag="inactive" HeaderStringFormat="Inactive ({0})" Selected="SwitchTorrentDisplay" />
-                    <TreeViewItem Header="{Binding ActiveTorrentCount}" Tag="active" HeaderStringFormat="Active ({0})" Selected="SwitchTorrentDisplay" />
-                    <TreeViewItem Header="{Binding FinishedTorrentCount}" Tag="finished" HeaderStringFormat="Finished ({0})" Selected="SwitchTorrentDisplay" />
+                <TreeViewItem Name="torrents_treeview" Selected="SwitchTorrentDisplay">
+                    <TreeViewItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/torrents_all.png" Height="16" Width="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="{Binding TorrentCount, StringFormat='Torrents ({0})', FallbackValue='Torrents'}"/>
+                        </StackPanel>
+                    </TreeViewItem.Header>
+
+                    <TreeViewItem Tag="downloading" Selected="SwitchTorrentDisplay">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/downloading.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <TextBlock Text="{Binding DownloadingTorrentCount, StringFormat='Downloading ({0})', FallbackValue='Downloading'}"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+
+                    <TreeViewItem Tag="seeding" Selected="SwitchTorrentDisplay">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/seeding.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <TextBlock Text="{Binding SeedingTorrentCount, StringFormat='Seeding ({0})', FallbackValue='Seeding'}"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+
+                    <TreeViewItem Tag="finished" Selected="SwitchTorrentDisplay">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/complete.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <TextBlock Text="{Binding FinishedTorrentCount, StringFormat='Finished ({0})', FallbackValue='Finished'}"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+
+                    <TreeViewItem Tag="active" Selected="SwitchTorrentDisplay">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/active.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <TextBlock Text="{Binding ActiveTorrentCount, StringFormat='Active ({0})', FallbackValue='Active'}"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+
+                    <TreeViewItem Tag="inactive" Selected="SwitchTorrentDisplay">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/inactive.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <TextBlock Text="{Binding InactiveTorrentCount, StringFormat='Inactive ({0})', FallbackValue='Inactive'}"/>
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                    </TreeViewItem>
+
                 </TreeViewItem>
-                <TreeViewItem Header="{Binding ElementName=feeds_tree_item, Path=ItemsSource.Count}"
-                              HeaderStringFormat="Feeds ({0})" Name="feeds_tree_item" Selected="SwitchTorrentDisplay">
+                <TreeViewItem Name="feeds_tree_item" Selected="SwitchTorrentDisplay">
+                    <TreeViewItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/rss.png" Height="16" Width="13" Margin="0,0,3,0"/>
+                            <TextBlock Text="{Binding ElementName=feeds_tree_item, Path=ItemsSource.Count, StringFormat='Feeds ({0})', FallbackValue='Feeds'}"/>
+                        </StackPanel>
+                    </TreeViewItem.Header>
                     <TreeViewItem.Resources>
                         <ContextMenu x:Key="RssItemContextMenu">
                             <MenuItem Header="Refresh" Tag="Refresh" DataContext="{Binding}" Click="OperationOnRssItem" />
@@ -143,7 +195,7 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition MaxHeight="35" Height="35"/>
-                    <RowDefinition Height="250"/>
+                    <RowDefinition Name="torrent_list_row" Height="250"/>
                     <RowDefinition Name="info_tabs_row" Height="200"/>
                 </Grid.RowDefinitions>
 
@@ -154,35 +206,39 @@
                             HorizontalAlignment="Left">
 
                     <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}">
-                        <Image Source="pack://siteoforigin:,,,/Assets/add.png" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/add.png" />
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
-                        <Image Source="pack://siteoforigin:,,,/Assets/magnet.png" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/link.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}" Content="{StaticResource Appbar.Rss}" />
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}">
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/rss.png" />
+                    </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}" Content="{StaticResource Appbar.Search}" />
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}">
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/search.png" />
+                    </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
-                        <Image Source="pack://siteoforigin:,,,/Assets/settings.png" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/settings.png" />
                     </Button>
 
                     <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
 
                     <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Start" Click="OperationOnSelectedTorrents">
-                        <Image Source="pack://siteoforigin:,,,/Assets/resume.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/start.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Stop" Click="OperationOnSelectedTorrents">
-                        <Image Source="pack://siteoforigin:,,,/Assets/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents">
-                        <Image Source="pack://siteoforigin:,,,/Assets/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents">
-                        <Image Source="pack://siteoforigin:,,,/Assets/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
                 </StackPanel>
 
@@ -284,7 +340,13 @@
                               ResizeDirection="Rows"/>
 
                 <TabControl Grid.Row="2" Name="info_canvas" Margin="5">
-                    <TabItem Header="Overview">
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/info.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                <TextBlock Text="Overview"/>
+                            </StackPanel>
+                        </TabItem.Header>
                         <ScrollViewer>
                             <Canvas Name="overview_canvas">
                                 <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
@@ -350,14 +412,26 @@
                             </ComboBox>
                         </Canvas>
                     </TabItem>
-                    <TabItem Header="Pieces">
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/pieces.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                <TextBlock Text="Pieces"/>
+                            </StackPanel>
+                        </TabItem.Header>
                         <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <controls:PieceView/>
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Files">
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/files.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                <TextBlock Text="Files"/>
+                            </StackPanel>
+                        </TabItem.Header>
                         <aga:TreeList x:Name="files_tree">
                             <aga:TreeList.Resources>
 
@@ -453,7 +527,13 @@
                         </aga:TreeList>
 
                     </TabItem>
-                    <TabItem Header="Peers">
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/peers.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                <TextBlock Text="Peers"/>
+                            </StackPanel>
+                        </TabItem.Header>
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
@@ -485,7 +565,13 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Trackers">
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/trackers.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                <TextBlock Text="Trackers"/>
+                            </StackPanel>
+                        </TabItem.Header>
                         <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
@@ -499,7 +585,13 @@
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Header="Web seeds" Name="webseeds_tab">
+                    <TabItem Name="webseeds_tab">
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/webseeds.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                <TextBlock Text="Web seeds"/>
+                            </StackPanel>
+                        </TabItem.Header>
                         <ListView Name="webseeds_list">
                             <ListView.View>
                                 <GridView>
