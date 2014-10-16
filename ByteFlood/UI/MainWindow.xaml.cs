@@ -44,7 +44,6 @@ namespace ByteFlood
     {
         bool ignoreclose = true;
         Thread thr;
-        bool updategraph = false;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
         public Func<TorrentInfo, bool> ShowAll = new Func<TorrentInfo, bool>((t) => { return true; });
@@ -110,6 +109,7 @@ namespace ByteFlood
             InitializeComponent();
             UpdateGridLength();
             UpdateAppStyle();
+            UpdateMiscUISettings();
         }
 
         bool disposed = false;
@@ -163,10 +163,12 @@ namespace ByteFlood
         /// <returns>true if successful.</returns>
         public bool ImportTorrents()
         {
-            if (ByteFlood.ImportTorrents.ResumeExist())
+            ImportTorrents it = new ImportTorrents() { Icon = this.Icon, Owner = this };
+            it.Load(true);
+            if (it.list.Count > 0)
             {
-                ImportTorrents it = new ImportTorrents() { Icon = this.Icon };
-                it.ShowDialog();
+                it.ShowDialog(); // calling show dialog will call window_loaded and therfore the real Load() statement
+
                 foreach (TorrentInfo ti in it.selected)
                 {
                     state.Torrents.Add(ti);
@@ -814,10 +816,13 @@ namespace ByteFlood
         public void UpdateVisibility()
         {
             UpdateGridLength();
+            UpdateMiscUISettings();
 
-            left_treeview.Visibility = App.Settings.TreeViewVisibility;
-            info_canvas.Visibility = App.Settings.BottomCanvasVisibility;
-            StatusBar.Visibility = App.Settings.StatusBarVisibility;
+            this.left_treeview.Visibility = App.Settings.TreeViewVisibility;
+            this.info_canvas.Visibility = App.Settings.BottomCanvasVisibility;
+            this.splitter.Visibility = this.info_canvas.Visibility;
+
+            this.StatusBar.Visibility = App.Settings.StatusBarVisibility;
 
             foreach (Image img in FindVisualChildren<Image>(this))
             {
@@ -825,9 +830,7 @@ namespace ByteFlood
                 {
                     img.GetBindingExpression(Image.VisibilityProperty).UpdateTarget();
                 }
-                catch
-                {
-                }
+                catch { }
             }
         }
 
@@ -882,6 +885,15 @@ namespace ByteFlood
             this.left_tree_colum.Width = App.Settings.TreeViewVisible ? new GridLength(180d) : zero;
             this.info_tabs_row.Height = App.Settings.BottomCanvasVisible ? auto : zero;
             this.statusbar_gridrow.Height = App.Settings.StatusBarVisible ? auto : zero;
+            this.torrent_list_row.Height = App.Settings.BottomCanvasVisible ? new GridLength(250d) : auto;
+        }
+
+        private void UpdateMiscUISettings()
+        {
+            if (App.Settings.DisplayStripsOnTorrentList)
+                mainlist.SetValue(ListView.AlternationCountProperty, 2);
+            else
+                mainlist.ClearValue(ListView.AlternationCountProperty);
         }
 
         private void CopyMagnetLink(object sender, RoutedEventArgs e)
