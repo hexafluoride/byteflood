@@ -2,10 +2,10 @@
 There's still loads of work to be done to make this a fully fledged Bittorrent Client. I've divided the work into three sections (for the moment). Features to be added, features to be improved and sections of code that need rearchitecting. I've also put a difficulty estimation for anyone interested in picking an item and completing it.
 
 -- FEATURES TO BE ADDED --
-    01) HTTP Seeding - The ability to use a normal HTTP/FTP download as a "seed". [MEDIUM-HIGH]
-    04) Implement DHT/Peer Exchange. [MEDIUM-LOW]
-    14) Support SOCKS proxies
-    29) Algorithm to allow for automatic scheduling of torrents based on rules is being implemented. Should allow for people to select "seed for 30 mins after completion or a ratio of 1.4 us reached and total bandwidth is below 150kB/sec" etc.
+    [PARTLY DONE] 01) HTTP Seeding - The ability to use a normal HTTP/FTP download as a "seed". [MEDIUM-HIGH]
+    [       DONE] 04) Implement DHT/Peer Exchange. [MEDIUM-LOW]
+    [   NOT DONE] 14) Support SOCKS proxies
+    [       DONE] 29) Algorithm to allow for automatic scheduling of torrents based on rules is being implemented. Should allow for people to select "seed for 30 mins after completion or a ratio of 1.4 us reached and total bandwidth is below 150kB/sec" etc.
 
 -- FEATURES TO BE IMPROVED --
     01) Allow editing of .torrent information EXCEPT for the infohash section [MEDIUM]
