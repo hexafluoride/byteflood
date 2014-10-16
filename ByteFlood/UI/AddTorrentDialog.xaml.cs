@@ -48,7 +48,8 @@ namespace ByteFlood
     /// </summary>
     public partial class AddTorrentDialog : Window
     {
-        public TorrentManager tm;
+
+        public Torrent t;
 
         public bool AutoStartTorrent = true;
         public bool UserOK = false;
@@ -87,11 +88,14 @@ namespace ByteFlood
         public string TorrentSavePath
         {
             get { return (string)GetValue(TorrentSavePathProperty); }
-            set { SetValue(TorrentSavePathProperty, value); ChangeSavePath(value); }
+            set { SetValue(TorrentSavePathProperty, value); }
         }
 
         public static readonly DependencyProperty TorrentSavePathProperty =
-            DependencyProperty.Register("TorrentSavePath", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(null));
+            DependencyProperty.Register("TorrentSavePath", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(new PropertyChangedCallback((Do, des) => 
+            {
+                (Do as AddTorrentDialog).UpdateSize();
+            })));
 
         public List<string> SavedPathList
         {
@@ -107,44 +111,39 @@ namespace ByteFlood
                 Load(path);
             else
                 loading.Visibility = Visibility.Visible;
-
         }
 
         public void UpdateSize()
         {
-            DirectoryInfo dir = new DirectoryInfo(this.TorrentSavePath);
-            DriveInfo drive = new DriveInfo(dir.Root.FullName);
-            size.Content = Utility.PrettifyAmount(tm.Torrent.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
+            try
+            {
+                DriveInfo drive = new DriveInfo(System.IO.Path.GetPathRoot(this.TorrentSavePath));
+                size.Content = Utility.PrettifyAmount(t.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
+            }
+            catch { }
         }
 
         public void Load(string path)
         {
-            loading.Visibility = Visibility.Collapsed;
+            t = Torrent.Load(path);
 
-            this.tm = new TorrentManager(Torrent.Load(path), App.Settings.DefaultDownloadPath, new TorrentSettings());
-
-            this.Torrent = tm.Torrent;
+            this.Torrent = t;
 
             this.RatioLimit = 0f;
 
-            foreach (TorrentFile file in tm.Torrent.Files)
+            foreach (TorrentFile file in t.Files)
             {
                 FileInfo fi = new FileInfo(null, file);
                 fi.DownloadFile = !(App.Settings.EnableFileRegex && Regex.IsMatch(fi.Name, App.Settings.FileRegex));
                 this.FileList.Add(fi);
             }
 
-            this.TorrentName = tm.Torrent.Name;
+            this.TorrentName = t.Name;
 
-            this.TorrentSavePath = tm.SavePath;
+            this.TorrentSavePath = App.Settings.DefaultDownloadPath;
+            UpdateSize();
 
             this.Activate();
-        }
-
-        public void ChangeSavePath(string newpath)
-        {
-            tm = new TorrentManager(tm.Torrent, newpath, new TorrentSettings());
-            UpdateSize();
         }
 
         #region Commands
@@ -153,10 +152,7 @@ namespace ByteFlood
         {
             string path = Utility.PromptFolderSelection("Choose torrent save directory", null, this);
             if (path != null)
-            {
-                tm = new TorrentManager(tm.Torrent, path, new TorrentSettings());
-                this.TorrentSavePath = tm.SavePath;
-            }
+                this.TorrentSavePath = path;
         }
 
         private void Commands_OK(object sender, ExecutedRoutedEventArgs e)
@@ -199,12 +195,5 @@ namespace ByteFlood
             FileInfo fi = s.Tag as FileInfo;
             fi.DownloadFile = s.IsChecked == true;
         }
-
-        private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            ChangeSavePath(TorrentSavePath);
-        }
-
-
     }
 }

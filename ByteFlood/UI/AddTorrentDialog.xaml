@@ -52,7 +52,7 @@
 
         <GroupBox Header="Save in" Height="77" Width="327" Canvas.Left="10" Canvas.Top="10">
             <Grid Margin="2,0,-2,0" Width="309">
-                <ComboBox Height="23" HorizontalAlignment="Left" Margin="6,14,0,0" ItemsSource="{Binding SavedPathList}" Text="{Binding TorrentSavePath}" SelectedIndex="0" VerticalAlignment="Top" Width="251" IsEditable="True" LostFocus="ComboBox_LostFocus" />
+                <ComboBox Height="23" HorizontalAlignment="Left" Margin="6,14,0,0" ItemsSource="{Binding SavedPathList}" Text="{Binding TorrentSavePath}" SelectedIndex="0" VerticalAlignment="Top" Width="251" IsEditable="True" />
                 <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="263,14,0,0" VerticalAlignment="Top" Width="43" Command="{StaticResource Commands.Browse}" />
             </Grid>
         </GroupBox>
