@@ -1050,6 +1050,9 @@ namespace ByteFlood
                 case "ForceStart":
                     f = new Action<TorrentInfo>(t => t.ForceStart());
                     break;
+                case "Recheck":
+                    f = new Action<TorrentInfo>(t => t.Recheck());
+                    break;
             }
             foreach (TorrentInfo ti in arr)
             {

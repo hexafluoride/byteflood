@@ -428,20 +428,20 @@ namespace ByteFlood
             context.Send(x => Pieces.Add(pi), null);
         }
 
-        private string get_pieceinfo_tooltip(int pieceindex) 
+        private string get_pieceinfo_tooltip(int pieceindex)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Piece#: {0}\n", pieceindex);
             TorrentFile[] files = get_piece_files(pieceindex);
-            if (files.Length > 1) 
+            if (files.Length > 1)
             {
                 sb.Append("Files:\n");
-                foreach (var f in files) 
+                foreach (var f in files)
                 {
                     sb.AppendFormat("- {0} ({1})\n", System.IO.Path.GetFileName(f.FullPath), Utility.PrettifyAmount(f.Length));
                 }
             }
-            else 
+            else
             {
                 sb.AppendFormat("File: {0} ({1})", System.IO.Path.GetFileName(files[0].FullPath), Utility.PrettifyAmount(files[0].Length));
             }
@@ -454,8 +454,8 @@ namespace ByteFlood
             foreach (TorrentFile file in this.Torrent.Torrent.Files)
             {
                 // startIndex <= pieceIndex <= endIndex
-                if (pieceindex >= file.StartPieceIndex 
-                    && pieceindex <= file.EndPieceIndex) 
+                if (pieceindex >= file.StartPieceIndex
+                    && pieceindex <= file.EndPieceIndex)
                 {
                     files.Add(file);
                 }
@@ -503,6 +503,29 @@ namespace ByteFlood
         {
             downspeeds.Add(Torrent.Monitor.DownloadSpeed);
             upspeeds.Add(Torrent.Monitor.UploadSpeed);
+        }
+
+        private bool _is_rechecking = false;
+        public void Recheck()
+        {
+            if (_is_rechecking || this.Torrent.State == TorrentState.Hashing) { return; }
+            Task.Factory.StartNew(new Action(() =>
+            {
+                _is_rechecking = true;
+                if (this.Torrent != null)
+                {
+                    this.Torrent.Monitor.PreviousDataBytesDownloaded = 0;
+                    bool autostart = this.Torrent.State == TorrentState.Downloading || this.Torrent.State == TorrentState.Seeding;
+                    this.Torrent.Stop();
+                    while (this.Torrent.State != TorrentState.Stopped)
+                    {
+                        this.Torrent.Stop();
+                        Thread.Sleep(100);
+                    }
+                    this.Torrent.HashCheck(autostart);
+                }
+                _is_rechecking = false;
+            }));
         }
 
         public void OffMyself() // Dispose
