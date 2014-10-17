@@ -247,6 +247,7 @@ namespace MonoTorrent.Client
                         current += tf.BytesDownloaded;
                     }
                 }
+                if (total == 0) { return 100d; }
                 return ((double)current / (double)total) * 100d;
             }
         }
@@ -926,12 +927,13 @@ namespace MonoTorrent.Client
 
         void VerifyHashState ()
         {
-            // FIXME: I should really just ensure that zero length files always exist on disk. If the first file is
+            // [FIXED]: I should really just ensure that zero length files always exist on disk. If the first file is
             // a zero length file and someone deletes it after the first piece has been written to disk, it will
             // never be recreated. If the downloaded data requires this file to exist, we have an issue.
+            // ^^ The above issue has been fixed in the CheckFileExist method. 
             if (HasMetadata) {
                 foreach (var file in Torrent.Files)
-                    if (!file.BitField.AllFalse && hashChecked && file.Length > 0)
+                    if (!file.BitField.AllFalse && hashChecked)//&& file.Length > 0)
                         hashChecked &= Engine.DiskManager.CheckFileExists (this, file);
             }
         }

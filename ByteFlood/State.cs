@@ -165,8 +165,14 @@ namespace ByteFlood
             SaveSettings();
             SaveState();
             mainthread.Abort();
-            ce.DiskManager.Flush();
+
+            //Shouldn't we pause before attempting to dispose everything?
             ce.PauseAll();
+
+            ce.DiskManager.Flush();
+            ce.DiskManager.Dispose();
+            ce.Dispose();
+
             listener.Shutdown();
         }
 
