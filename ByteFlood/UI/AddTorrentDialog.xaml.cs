@@ -125,6 +125,7 @@ namespace ByteFlood
 
         public void Load(string path)
         {
+            loading.Visibility = Visibility.Hidden;
             t = Torrent.Load(path);
 
             this.Torrent = t;
