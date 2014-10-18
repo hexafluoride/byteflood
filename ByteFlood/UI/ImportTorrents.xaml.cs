@@ -115,7 +115,31 @@ namespace ByteFlood
                     if (!listing.Import)
                         continue;
                     Torrent t = Torrent.Load(AppState.BackupTorrent(listing.Path));
-                    string savepath = t.Files.Length == 1 ? new System.IO.FileInfo(listing.SavePath).Directory.FullName : listing.SavePath;
+
+                    string savepath = null;
+
+                    if (t.Files.Length > 1)
+                    {
+                        if (listing.SavePath.EndsWith(t.Name)) 
+                        {
+                             // then we should download in the parent directory
+                            DirectoryInfo di = new DirectoryInfo(listing.SavePath);
+                            savepath = di.Parent.FullName;
+                        }
+                        else 
+                        {
+                            savepath = listing.SavePath;
+                        }
+                    }
+                    else if (t.Files.Length == 1)
+                    {
+                        savepath = Path.GetDirectoryName(listing.SavePath);
+                    }
+                    else 
+                    {
+                        savepath = listing.SavePath;
+                    }
+                    
                     TorrentManager tm = new TorrentManager(t, savepath, App.Settings.DefaultTorrentProperties.ToTorrentSettings());
                     TorrentInfo ti = AppState.CreateTorrentInfo(tm);
                     ti.Name = listing.Name;
