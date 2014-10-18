@@ -198,6 +198,9 @@
     <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
       <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\AddNewPeerDialog.xaml.cs">
+      <DependentUpon>AddNewPeerDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AddRSSFeed.xaml.cs">
       <DependentUpon>AddRSSFeed.xaml</DependentUpon>
     </Compile>
@@ -254,6 +257,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\AddMagnetTextInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\AddNewPeerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
