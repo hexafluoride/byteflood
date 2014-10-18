@@ -1105,5 +1105,26 @@ namespace ByteFlood
                     break;
             }
         }
+
+        private void PeersCommands_AddPeer(object sender, RoutedEventArgs e)
+        {
+            TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
+            if (ti != null)
+            {
+                if (ti.Torrent.Torrent.IsPrivate)
+                {
+                    MessageBox.Show("You cannot add external peers to a private torrent", "Add peer");
+                }
+                else
+                {
+                    var p = new UI.AddNewPeerDialog() { Owner = this, Icon = this.Icon };
+
+                    if (p.ShowDialog() == true)
+                    {
+                        ti.Torrent.ManualAddPeer(p.IP.Split(':').First(), Convert.ToInt32(p.IP.Split(':').Last()));
+                    }
+                }
+            }
+        }
     }
 }

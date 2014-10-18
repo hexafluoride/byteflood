@@ -542,6 +542,11 @@
                             </StackPanel>
                         </TabItem.Header>
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add peer" Click="PeersCommands_AddPeer"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="180" Header="IP">

@@ -732,7 +732,64 @@ namespace MonoTorrent.Client
 
         #endregion
 
+        public void ManualAddPeer(string host, int port)
+        {
+            ClientEngine.MainLoop.QueueWait (() =>
+            {
+                //First, we connect to the target peer
+                try
+                {
+                    System.Net.Sockets.TcpClient tc = new System.Net.Sockets.TcpClient(host, port);
 
+                    //Prepare the handshake message, so we can send it
+
+                    List<byte> data = new List<byte>();
+
+                    byte[] protocol_message = Encoding.UTF8.GetBytes("BitTorrent protocol");
+                    data.Add(Convert.ToByte(protocol_message.Length));
+                    data.AddRange(protocol_message);
+                    data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+                    data.AddRange(this.torrent.InfoHash.ToArray());
+                    data.AddRange(Encoding.UTF8.GetBytes(this.Engine.PeerId));
+
+                    tc.Client.Send(data.ToArray());
+
+                    byte[] receive_buffer = new byte[data.Count * 2];
+
+                    tc.Client.Receive(receive_buffer);
+                    tc.Close();
+
+                    byte[] info_hash = new byte[20];
+                    byte[] peer_id = new byte[20];
+
+                    if (receive_buffer[0] == Convert.ToByte(19))
+                    {
+                        //this is a valid bittorrent client
+
+                        for (int i = 0; i < 20; i++)
+                        {
+                            info_hash[i] = receive_buffer[i + 28];
+                            peer_id[i] = receive_buffer[i + 48];
+                        }
+                    }
+
+                    // We should check if the received info hash math this manager info hash
+                    if (Toolbox.ByteMatch(info_hash, this.torrent.infoHash.ToArray()))
+                    {
+                        // We got the client peer id!
+                        string peer_id_str = Encoding.UTF8.GetString(peer_id);
+                        Peer a = new Peer(peer_id_str, new Uri(string.Format("tcp://{0}:{1}", host, port)));
+                        
+                        this.AddPeersCore(a);
+                    }
+                }
+                catch 
+                {
+                    //whatever the error is, it's not worth it
+                }
+            });
+        }
+       
         #region Internal Methods
 
         public void AddPeers (Peer peer)
