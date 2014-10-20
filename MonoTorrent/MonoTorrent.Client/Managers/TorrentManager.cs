@@ -646,12 +646,14 @@ namespace MonoTorrent.Client
                 if (State == TorrentState.Seeding || State == TorrentState.Downloading)
                     return;
 
-                if (TrackerManager.CurrentTracker != null)
-                {
-                    //if (this.trackerManager.CurrentTracker.CanScrape)
-                    //    this.TrackerManager.Scrape();
-                    this.trackerManager.Announce(TorrentEvent.Started); // Tell server we're starting
-                }
+                this.trackerManager.CheckAndAnnounceAll(TorrentEvent.Started); // Tell server we're starting
+
+                //if (TrackerManager.CurrentTracker != null)
+                //{
+                //    //if (this.trackerManager.CurrentTracker.CanScrape)
+                //    //    this.TrackerManager.Scrape();
+                //    this.trackerManager.Announce(TorrentEvent.Started); // Tell server we're starting
+                //}
 
                 if (this.Complete && this.settings.InitialSeedingEnabled && ClientEngine.SupportsInitialSeed) {
 					Mode = new InitialSeedingMode(this);
@@ -736,13 +738,12 @@ namespace MonoTorrent.Client
         {
             ClientEngine.MainLoop.QueueWait (() =>
             {
-                //First, we connect to the target peer
                 try
                 {
-                    System.Net.Sockets.TcpClient tc = new System.Net.Sockets.TcpClient(host, port);
+                    //First, we connect to the target peer
+                    var tc = new System.Net.Sockets.TcpClient(host, port);
 
                     //Prepare the handshake message, so we can send it
-
                     List<byte> data = new List<byte>();
 
                     byte[] protocol_message = Encoding.UTF8.GetBytes("BitTorrent protocol");
@@ -779,11 +780,15 @@ namespace MonoTorrent.Client
                         // We got the client peer id!
                         string peer_id_str = Encoding.UTF8.GetString(peer_id);
                         Peer a = new Peer(peer_id_str, new Uri(string.Format("tcp://{0}:{1}", host, port)));
-                        
+
                         this.AddPeersCore(a);
+                        this.RaisePeersFound(new PeerExchangePeersAdded(this, 1, 1, new PeerId(a, this)
+                        {
+                            ClientApp = new Software(peer_id_str)
+                        }));
                     }
                 }
-                catch 
+                catch
                 {
                     //whatever the error is, it's not worth it
                 }
