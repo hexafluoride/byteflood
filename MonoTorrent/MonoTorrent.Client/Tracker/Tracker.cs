@@ -38,16 +38,17 @@ namespace MonoTorrent.Client.Tracker
     {
         public event EventHandler BeforeAnnounce;
         public event EventHandler<AnnounceResponseEventArgs> AnnounceComplete;
-        public event EventHandler BeforeScrape; 
+        public event EventHandler BeforeScrape;
         public event EventHandler<ScrapeResponseEventArgs> ScrapeComplete;
 
         bool canAnnounce;
         bool canScrape;
         int complete;
         int downloaded;
-        string failureMessage;
         int incomplete;
+
         TimeSpan minUpdateInterval;
+
         TrackerState status;
         TimeSpan updateInterval;
         Uri uri;
@@ -73,11 +74,37 @@ namespace MonoTorrent.Client.Tracker
             get { return downloaded; }
             protected set { downloaded = value; }
         }
+
         public string FailureMessage
         {
-            get { return failureMessage ?? ""; }
-            protected set { failureMessage = value; }
+            get
+            {
+                if (this._fail_messages.Count > 1)
+                {
+                    return this._fail_messages[_fail_messages.Count - 1].Value;
+                }
+                return string.Empty;
+            }
+            protected set 
+            {
+                this.AppendFailure(value, false);
+            }
         }
+
+        private List<KeyValuePair<DateTime, string>> _fail_messages = new List<KeyValuePair<DateTime, string>>();
+
+        public int FailureCount
+        {
+            get;
+            private set;
+        }
+
+        public void AppendFailure(string message, bool count)
+        {
+            if (count) { FailureCount++; }
+            _fail_messages.Add(new KeyValuePair<DateTime, string>(DateTime.Now, message));
+        }
+
         public int Incomplete
         {
             get { return incomplete; }
@@ -93,11 +120,15 @@ namespace MonoTorrent.Client.Tracker
             get { return status; }
             protected set { status = value; }
         }
+
         public TimeSpan UpdateInterval
         {
             get { return updateInterval; }
-            protected set { updateInterval = value; }
+            set { updateInterval = value; }
         }
+
+        public DateTime LastUpdated { get; set; }
+
         public Uri Uri
         {
             get { return uri; }
@@ -111,9 +142,10 @@ namespace MonoTorrent.Client.Tracker
         protected Tracker(Uri uri)
         {
             Check.Uri(uri);
-            MinUpdateInterval = TimeSpan.FromMinutes(3);
-            UpdateInterval = TimeSpan.FromMinutes(30);
+            this.UpdateInterval = TimeSpan.FromMinutes(20);
+            this.MinUpdateInterval = TimeSpan.FromMinutes(3);
             this.uri = uri;
+            this.LastUpdated = DateTime.Now.Subtract(TimeSpan.FromHours(1));
         }
 
         public abstract void Announce(AnnounceParameters parameters, object state);
