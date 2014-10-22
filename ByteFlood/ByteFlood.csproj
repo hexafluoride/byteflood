@@ -83,9 +83,7 @@
     <Compile Include="Controls\PhotoLoader\Loader.cs" />
     <Compile Include="Controls\PhotoLoader\Manager.cs" />
     <Compile Include="Controls\PhotoLoader\Types.cs" />
-    <Compile Include="Controls\PieceBar.xaml.cs">
-      <DependentUpon>PieceBar.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Controls\PieceBar.cs" />
     <Compile Include="Controls\PieceView.cs" />
     <Compile Include="Controls\RssFiltersView.cs" />
     <Compile Include="Controls\TreeList\Collection.cs" />
@@ -247,10 +245,6 @@
     <Page Include="Controls\PhotoLoader\Resources.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\PieceBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <SubType>Designer</SubType>

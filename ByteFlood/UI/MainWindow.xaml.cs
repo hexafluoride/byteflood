@@ -679,7 +679,7 @@ namespace ByteFlood
         {
             peers_list.ItemsSource = ti.Peers;
             files_tree.Model = ti.FilesTree;
-            pieces_list.ItemsSource = ti.Pieces;
+            //piece_bar.AttachTorrent(ti);
             trackers_list.ItemsSource = ti.Trackers;
             overview_canvas.DataContext = ti;
             if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
@@ -693,7 +693,7 @@ namespace ByteFlood
         {
             peers_list.ItemsSource = null;
             files_tree.Model = null;
-            pieces_list.ItemsSource = null;
+            //piece_bar.DetachTorrent();
             trackers_list.ItemsSource = null;
             overview_canvas.DataContext = null;
             webseeds_list.ItemsSource = null;
@@ -731,8 +731,9 @@ namespace ByteFlood
             }
 
             left_treeview.DataContext = App.Settings;
-            info_canvas.DataContext = App.Settings;
+         
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
+
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);

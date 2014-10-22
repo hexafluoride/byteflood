@@ -105,6 +105,8 @@ namespace MonoTorrent.Client.Tracker
             _fail_messages.Add(new KeyValuePair<DateTime, string>(DateTime.Now, message));
         }
 
+        public bool IsUpdating { get; set; }
+
         public int Incomplete
         {
             get { return incomplete; }

@@ -117,22 +117,67 @@ namespace MonoTorrent.Client.Tracker
         #region Methods
 
         //Ideally, we should check tiers, instead of individual trackers.
+
+        private int ticks = 101;
+
+        // This method is called by the following:
+        // manager.TrackerManager.CheckAndAnnounceAll();    Mode.cs - (547, 40)
+        // this.trackerManager.CheckAndAnnounceAll(TorrentEvent.Started);   TorrentManager.cs - (649, 37)
+        // manager.TrackerManager.CheckAndAnnounceAll(TorrentEvent.Stopped);	StoppingMode.cs - (28, 36)
+        // Manager.TrackerManager.CheckAndAnnounceAll(TorrentEvent.Completed);	DownloadMode.cs - (42, 44)
         public void CheckAndAnnounceAll(TorrentEvent ev = TorrentEvent.None)
+        {
+            if (this._trackers.Count > 0)
+            {
+                if (ev == TorrentEvent.None)
+                {
+                    if (this.ticks > 100)
+                    {
+                        // Find and announce the first announceable tarcker. 
+                        // Subsequent announces are triggered by the OnAnnounceComplete
+                        foreach (Tracker t in this._trackers)
+                        {
+                            if (CanAnnounce(t))
+                            {
+                                _announce_t(t, ev, true);
+                                break;
+                            }
+                        }
+                        this.ticks = 0;
+                    }
+                    ticks++;
+                }
+                else 
+                {
+                    // The TorrentEvent.Started, TorrentEvent.Stopped, TorrentEvent.Complete are only called once.
+                    // Only TorrentEvent.None is called periodically.
+                    _announce_t(this._trackers[0], ev, true);
+                }
+            }
+        }
+
+        private void AnnouceNext(TorrentEvent ev)
         {
             foreach (Tracker t in this._trackers)
             {
                 if (CanAnnounce(t))
                 {
-                    _announce_t(t, ev);
+                    _announce_t(t, ev, true);
+                    break;
                 }
             }
         }
 
+        /// <summary>
+        /// Announce a single tracker without starting the announce chain.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="ev"></param>
         public void AnnounceTracker(Tracker t, TorrentEvent ev = TorrentEvent.None)
         {
             if (CanAnnounce(t))
             {
-                _announce_t(t, ev);
+                _announce_t(t, ev, false);
             }
         }
 
@@ -149,7 +194,7 @@ namespace MonoTorrent.Client.Tracker
             return a;
         }
 
-        private void _announce_t(Tracker t, TorrentEvent ev)
+        private void _announce_t(Tracker t, TorrentEvent ev, bool tryNext)
         {
             EncryptionTypes e = this.manager.Engine.Settings.AllowedEncryption;
             bool requireEncryption = !Toolbox.HasEncryption(e, EncryptionTypes.PlainText);
@@ -184,8 +229,9 @@ namespace MonoTorrent.Client.Tracker
                 parameters.Port = this.manager.Engine.Listener.Endpoint.Port;
             }
 
-            var connection_id = new TrackerConnectionID(t, false, ev, null);
+            var connection_id = new TrackerConnectionID(t, tryNext, ev, new ManualResetEvent(false));
 
+            t.IsUpdating = true;
             t.Announce(parameters, connection_id);
         }
 
@@ -316,16 +362,21 @@ namespace MonoTorrent.Client.Tracker
 
         private void OnAnnounceComplete(object sender, AnnounceResponseEventArgs e)
         {
-            //add tracker.lastupdated field
-
+            e.Tracker.IsUpdating = false;
             e.Tracker.LastUpdated = DateTime.Now;
+
+            if (manager.Engine == null) // the torrent have been unregistered
+            {
+                e.Id.WaitHandle.Set();
+                return;
+            }
 
             if (e.Successful)
             {
                 manager.Peers.BusyPeers.Clear();
                 int count = manager.AddPeersCore(e.Peers);
                 manager.RaisePeersFound(new TrackerPeersAdded(manager, count, e.Peers.Count, e.Tracker));
-                
+
                 // If the announce was successful, the server should have provided the appropriate update interval,
                 // the value of e.Tracker.UpdateInterval is then set by the corresponding Tracker class
 
@@ -340,6 +391,11 @@ namespace MonoTorrent.Client.Tracker
                  */
             }
 
+            e.Id.WaitHandle.Set();
+            if (e.Id.TrySubsequent)
+            {
+                AnnouceNext(e.Id.TorrentEvent);
+            }
             /*
             this.updateSucceeded = e.Successful;
             if (manager.Engine == null)

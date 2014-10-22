@@ -380,7 +380,7 @@ namespace MonoTorrent.Client.Tracker
             else
             {
                 //response.Scrapes not used for moment
-                //ScrapeResponseMessage response = (ScrapeResponseMessage)message;
+                ScrapeResponseMessage response = (ScrapeResponseMessage)message;
                 DoScrapeComplete(true, state);
             }
         }
@@ -477,7 +477,7 @@ namespace MonoTorrent.Client.Tracker
 
         public override string ToString()
         {
-            return "udptracker:" + connectionId;
+            return string.Format("udptracker: {0}", this.Uri) ;
         }
 
         #region async state
