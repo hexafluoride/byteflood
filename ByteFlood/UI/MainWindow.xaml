@@ -66,7 +66,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-   </Window.Resources>
+    </Window.Resources>
 
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource Commands.AddTorrent}" Executed="Commands_AddTorrent" />
@@ -419,19 +419,22 @@
                             </ComboBox>
                         </Canvas>
                     </TabItem>
-                    <TabItem>
+                    <!--<TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/pieces.png" Height="13" Width="13" Margin="0,0,5,0"/>
                                 <TextBlock Text="Pieces"/>
                             </StackPanel>
                         </TabItem.Header>
-                        <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        --><!--<ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <controls:PieceView/>
                             </ListView.View>
-                        </ListView>
-                    </TabItem>
+                        </ListView>--><!--
+                        <Canvas>
+                            <controls:PieceBar x:Name="piece_bar" Height="28" Width="927" Canvas.Left="10" Canvas.Top="10"/>
+                        </Canvas>
+                    </TabItem>-->
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
@@ -518,10 +521,10 @@
 
                             <aga:TreeList.View>
                                 <GridView>
-                                    <GridViewColumn Width="170" Header="Path" CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
+                                    <GridViewColumn Width="260" Header="Path" CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
                                     <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress" CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"/>
                                     <GridViewColumn Width="130" Header="Priority" CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}" />
-                                    <GridViewColumn Width="50" Header="Size" CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
+                                    <GridViewColumn Width="80" Header="Size" CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
                                 </GridView>
                             </aga:TreeList.View>
 
@@ -588,11 +591,11 @@
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
-                                    <GridViewColumn Width="100" Header="Update In" 
+                                    <GridViewColumn Width="130" Header="Update In" 
                                                     DisplayMemberBinding="{Binding UpdateInString}" />
-                                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding State}" />
+                                    <GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding State}" />
                                     <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
-                                    <GridViewColumn Width="190" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
+                                    <GridViewColumn Width="260" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

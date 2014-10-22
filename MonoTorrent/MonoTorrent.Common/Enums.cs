@@ -90,7 +90,8 @@ namespace MonoTorrent.Common
     {
         Ok,
         Offline,
-        InvalidResponse
+        InvalidResponse,
+        Error
     }
 
     public enum TorrentEvent

@@ -63,7 +63,7 @@ namespace MonoTorrent.Client.Tracker
         public HTTPTracker(Uri announceUrl)
             : base(announceUrl)
         {
-            if (Toolbox.CheckInternetConnection()) 
+            if (Toolbox.CheckInternetConnection())
             {
                 // If there was a working internet connection, I want this following statement to throw exceptions
                 // if it's an invalid tracker host. This way, the tracker factory won't load it.
@@ -126,18 +126,26 @@ namespace MonoTorrent.Client.Tracker
             try
             {
                 BEncodedDictionary dict = DecodeResponse(request, result);
-                HandleAnnounce(dict, peers);
-                Status = TrackerState.Ok;
+                if (dict != null)
+                {
+                    HandleAnnounce(dict, peers);
+                    Status = TrackerState.Ok;
+                }
+                else 
+                {
+                    Status = TrackerState.InvalidResponse;
+                    FailureMessage = "The tracker returned an invalid or incomplete response.";
+                }
             }
-            catch (WebException)
+            catch (WebException wex)
             {
                 Status = TrackerState.Offline;
-                FailureMessage = "The tracker could not be contacted";
+                FailureMessage = string.Format("The tracker could not be contacted (.NET error: {0})", wex.Message);
             }
-            catch
+            catch (Exception ex)
             {
-                Status = TrackerState.InvalidResponse;
-                FailureMessage = "The tracker returned an invalid or incomplete response";
+                Status = TrackerState.Error;
+                FailureMessage = string.Format(".NET error: {0}", ex.Message);
             }
             finally
             {
@@ -145,26 +153,26 @@ namespace MonoTorrent.Client.Tracker
             }
         }
 
-        Uri CreateAnnounceString (AnnounceParameters parameters)
+        Uri CreateAnnounceString(AnnounceParameters parameters)
         {
-            UriQueryBuilder b = new UriQueryBuilder (Uri);
-            b.Add ("info_hash", parameters.InfoHash.UrlEncode ())
-             .Add ("peer_id", parameters.PeerId)
-             .Add ("port", parameters.Port)
-             .Add ("uploaded", parameters.BytesUploaded)
-             .Add ("downloaded", parameters.BytesDownloaded)
-             .Add ("left", parameters.BytesLeft)
-             .Add ("compact", 1)
-             .Add ("numwant", 100);
+            UriQueryBuilder b = new UriQueryBuilder(Uri);
+            b.Add("info_hash", parameters.InfoHash.UrlEncode())
+             .Add("peer_id", parameters.PeerId)
+             .Add("port", parameters.Port)
+             .Add("uploaded", parameters.BytesUploaded)
+             .Add("downloaded", parameters.BytesDownloaded)
+             .Add("left", parameters.BytesLeft)
+             .Add("compact", 1)
+             .Add("numwant", 100);
 
             if (parameters.SupportsEncryption)
-                b.Add ("supportcrypto", 1);
+                b.Add("supportcrypto", 1);
             if (parameters.RequireEncryption)
-                b.Add ("requirecrypto", 1);
-            if (!b.Contains ("key"))
-                b.Add ("key", Key);
-            if (!string.IsNullOrEmpty (parameters.Ipaddress))
-                b.Add ("ip", parameters.Ipaddress);
+                b.Add("requirecrypto", 1);
+            if (!b.Contains("key"))
+                b.Add("key", Key);
+            if (!string.IsNullOrEmpty(parameters.Ipaddress))
+                b.Add("ip", parameters.Ipaddress);
 
             // If we have not successfully sent the started event to this tier, override the passed in started event
             // Otherwise append the event if it is not "none"
@@ -174,12 +182,12 @@ namespace MonoTorrent.Client.Tracker
             //    parameters.Id.Tracker.Tier.SendingStartedEvent = true;
             //}
             if (parameters.ClientEvent != TorrentEvent.None)
-                b.Add ("event", parameters.ClientEvent.ToString ().ToLower ());
+                b.Add("event", parameters.ClientEvent.ToString().ToLower());
 
-            if (!string.IsNullOrEmpty (TrackerId))
-                b.Add ("trackerid", TrackerId);
+            if (!string.IsNullOrEmpty(TrackerId))
+                b.Add("trackerid", TrackerId);
 
-            return b.ToUri ();
+            return b.ToUri();
         }
 
         BEncodedDictionary DecodeResponse(WebRequest request, IAsyncResult result)
@@ -190,7 +198,7 @@ namespace MonoTorrent.Client.Tracker
 
             WebResponse response = null;
             try { response = request.EndGetResponse(result); }
-            catch 
+            catch
             {
                 return null;
             }
@@ -299,9 +307,9 @@ namespace MonoTorrent.Client.Tracker
 
                 // If you want to scrape the tracker for *all* torrents, don't append the info_hash.
                 if (url.IndexOf('?') == -1)
-                    url += "?info_hash=" + parameters.InfoHash.UrlEncode ();
+                    url += "?info_hash=" + parameters.InfoHash.UrlEncode();
                 else
-                    url += "&info_hash=" + parameters.InfoHash.UrlEncode ();
+                    url += "&info_hash=" + parameters.InfoHash.UrlEncode();
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.UserAgent = MonoTorrent.Common.VersionInfo.ClientVersion;

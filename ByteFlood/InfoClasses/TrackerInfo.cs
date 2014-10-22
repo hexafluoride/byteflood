@@ -21,18 +21,25 @@ namespace ByteFlood
         {
             get
             {
-                if (this.Parent.Torrent.State == TorrentState.Downloading || 
+                if (this.Parent.Torrent.State == TorrentState.Downloading ||
                     this.Parent.Torrent.State == TorrentState.Seeding ||
                     this.Parent.Torrent.State == TorrentState.Paused)
                 {
-                    TimeSpan ts = this.NextAnnounce - DateTime.Now;
-                    if (ts.TotalSeconds <= 0)
+                    if (this.Tracker.IsUpdating)
                     {
                         return "Updating...";
                     }
                     else
                     {
-                        return HMSFormatter.GetReadableTimespan(ts);
+                        TimeSpan ts = this.NextAnnounce - DateTime.Now;
+                        if (ts.TotalSeconds <= 0)
+                        {
+                            return "Update Queued";
+                        }
+                        else
+                        {
+                            return HMSFormatter.GetReadableTimespan(ts);
+                        }
                     }
                 }
                 else { return ""; }
@@ -57,6 +64,7 @@ namespace ByteFlood
         {
             get { return this.Tracker.FailureMessage; }
         }
+
         public TorrentInfo Parent { get; set; }
 
         public TrackerInfo(Tracker t, TorrentInfo parent)
@@ -78,7 +86,7 @@ namespace ByteFlood
             {
                 this.PeersCount = e.Peers.Count;
             }
-            else 
+            else
             {
                 return;
             }
