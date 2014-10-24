@@ -242,7 +242,7 @@ namespace ByteFlood
             {
                 using (XmlWriter xw = XmlWriter.Create(temp_file, new XmlWriterSettings()
                 {
-                    Indent = true
+                    Indent = false
                 }))
                 {
                     new XmlSerializer(typeof(T)).Serialize(xw, t);
