@@ -728,7 +728,8 @@ namespace MonoTorrent.Client
             // for the *next* message asynchronously and then add it to the queue.
             // While this is happening, we send data from the second PieceMessage in
             // the queue, thus the queue should rarely be empty.
-            int existingReads = 0;
+            
+            /*int existingReads = 0;
             if (currentlySendingMessage is PieceMessage)
                 existingReads++;
 
@@ -761,6 +762,7 @@ namespace MonoTorrent.Client
                     TryProcessAsyncReads();
                 });
             });
+            */
         }
     }
 }
