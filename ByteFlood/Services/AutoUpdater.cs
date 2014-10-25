@@ -94,12 +94,12 @@ namespace ByteFlood.Services
                     }
                 }
             }
-            catch (WebException wex) 
+            catch (WebException) 
             {
                 //{"The remote server returned an error: (304) Not Modified."}
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
