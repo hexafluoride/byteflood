@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.ComponentModel;
 using MonoTorrent;
 using MonoTorrent.Client;
@@ -190,20 +189,25 @@ namespace ByteFlood
         {
             foreach (string str in paths)
             {
-                AddTorrentByPath(str);
+                AddTorrentByPath(str, false);
             }
         }
 
-        public void AddTorrentByPath(string path)
+        public void AddTorrentByPath(string path, bool notifyIfAdded = true)
         {
             try
             {
-                //Torrent t = Torrent.Load(path);
-                //string newfile = t.InfoHash.ToHex() + ".torrent";
-                //string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
-                //if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
-                //    File.Copy(path, newpath, true);
-                path = BackupTorrent(path);
+                Torrent t = Torrent.Load(path);
+
+                if (this.ce.Contains(t.InfoHash)) 
+                {
+                    if (notifyIfAdded) 
+                    {
+                        MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    return;
+                }
+                path = BackupTorrent(path, t);
             }
             catch (TorrentException)
             {
@@ -240,9 +244,8 @@ namespace ByteFlood
         /// </summary>
         /// <param name="path">The path of the torrent file to be copied.</param>
         /// <returns>The new path of the torrent file.</returns>
-        public string BackupTorrent(string path)
+        public string BackupTorrent(string path, Torrent t)
         {
-            Torrent t = Torrent.Load(path);
             string newfile = t.InfoHash.ToHex() + ".torrent";
             string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
             if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
@@ -253,7 +256,7 @@ namespace ByteFlood
         /// <summary>
         /// Like AddTorrentByPath, but uses a provided AddTorrentDialog
         /// </summary>
-        public void AddTorrentByPath(string path, AddTorrentDialog atd)
+        private void AddTorrentByPath(string path, AddTorrentDialog atd)
         {
             uiContext.Send(x =>
             {
@@ -289,7 +292,7 @@ namespace ByteFlood
             bool success = true;
             uiContext.Send(x =>
             {
-                if (Torrents.Any(tinf => tinf.Torrent.Torrent.InfoHash == t.InfoHash))
+                if (this.ce.Contains(t.InfoHash)) 
                 {
                     success = false;
                     return;
@@ -306,12 +309,21 @@ namespace ByteFlood
             return success;
         }
 
-        public void AddTorrentByMagnet(string magnet)
+        public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
             MagnetLink mg = null;
 
             try { mg = new MagnetLink(magnet); }
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
+
+            if (this.ce.Contains(mg.InfoHash))
+            {
+                if (notifyIfAdded)
+                {
+                    MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                return;
+            }
 
             if (!Directory.Exists(App.Settings.TorrentFileSavePath))
                 Directory.CreateDirectory(App.Settings.TorrentFileSavePath);

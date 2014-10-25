@@ -390,9 +390,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\add.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="Assets\add.png" />
     <Content Include="Assets\folder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -459,24 +457,12 @@
     <Content Include="Assets\Icons\toolbar\stop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\magnet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\pause.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\remove.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\resume.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\settings.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\stop.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="Assets\magnet.png" />
+    <None Include="Assets\pause.png" />
+    <None Include="Assets\remove.png" />
+    <None Include="Assets\resume.png" />
+    <None Include="Assets\settings.png" />
+    <None Include="Assets\stop.png" />
     <None Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
     <None Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
     <None Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />

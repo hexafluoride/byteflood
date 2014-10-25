@@ -54,6 +54,7 @@ namespace ByteFlood
         {
             InitializeComponent();
             ti = t;
+            this.Title = string.Format("{0} - ({1})", this.Title, t.Name);
         }
         public void PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
@@ -70,9 +71,11 @@ namespace ByteFlood
             peerex.IsChecked = tp.EnablePeerExchange;
             uploadslots.Text = tp.UploadSlots.ToString();
         }
+
+        static Regex regex = new Regex("[^0-9]+", RegexOptions.Compiled);
+
         private static bool IsTextAllowed(string text)
-        {
-            Regex regex = new Regex("[^0-9]+");
+        {  
             return !regex.IsMatch(text);
         }
 

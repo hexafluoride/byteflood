@@ -114,7 +114,9 @@ namespace ByteFlood
                 {
                     if (!listing.Import)
                         continue;
-                    Torrent t = Torrent.Load(AppState.BackupTorrent(listing.Path));
+                    Torrent t = Torrent.Load(listing.Path);
+
+                    AppState.BackupTorrent(listing.Path, t);
 
                     string savepath = null;
 

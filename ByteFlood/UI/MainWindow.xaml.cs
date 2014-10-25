@@ -181,20 +181,10 @@ namespace ByteFlood
 
         public void Update()
         {
-            //string[] torrentstates = new string[] 
-            //{ 
-            //    "Downloading",
-            //    "Seeding",
-            //    "Inactive",
-            //    "Active",
-            //   "Finished"
-            //};
             while (true)
             {
                 try
                 {
-                    //foreach (TorrentInfo ti in state.Torrents)
-                    //    ti.Update();
                     uiContext.Send(x =>
                     {
                         if (mainlist.SelectedIndex == -1)
@@ -203,14 +193,6 @@ namespace ByteFlood
                         {
                             ReDrawGraph();
                         }
-                        //if (updategraph)
-                        //{
-                        //        ReDrawGraph();
-                        //    foreach (TorrentInfo ti in state.Torrents)
-                        //        if (ti.Torrent != null && ti.Torrent.State != TorrentState.Paused)
-                        //            ti.UpdateGraphData();
-                        //}
-                        //updategraph = !updategraph;
                     }, null);
 
                     // TODO: Update theses values only when they are really changed.
@@ -294,36 +276,6 @@ namespace ByteFlood
         #endregion
 
         #region ContextMenu Handlers
-        // I'd like to have a better way to handle these
-        public void StopSelectedTorrent(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            t.Stop();
-        }
-        public void StartSelectedTorrent(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            t.Start();
-        }
-        public void PauseSelectedTorrent(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            t.Pause();
-        }
-        public void OpenTorrentProperties(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            TorrentPropertiesForm tp = new TorrentPropertiesForm(t) { Owner = this, Icon = this.Icon };
-            tp.ShowDialog();
-        }
 
         public void ActionOnAllTorrents(object sender, RoutedEventArgs e)
         {
@@ -339,92 +291,6 @@ namespace ByteFlood
                         ti.Start();
                     break;
             }
-
-        }
-
-        public void RemoveSelectedTorrents(object sender, RoutedEventArgs e)
-        {
-            if (mainlist.SelectedIndex == -1)
-                return;
-            string tag = ((FrameworkElement)e.Source).Tag.ToString();
-            TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
-            mainlist.SelectedItems.CopyTo(arr, 0);
-            foreach (TorrentInfo ti in arr)
-                RemoveTorrent(ti, tag);
-        }
-
-        public void RemoveTorrent(TorrentInfo t, string action)
-        {
-            t.Invisible = true;
-            t.UpdateList("Invisible", "ShowOnList");
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-                //t.QueueState = QueueState.Forced;
-                t.Torrent.Stop();
-                while (t.Torrent.State != TorrentState.Stopped) ;
-                state.ce.Unregister(t.Torrent);
-                uiContext.Send(x =>
-                {
-                    state.Torrents.Remove(t);
-                }, null);
-                switch (action)
-                {
-                    case "torrentonly":
-                        DeleteTorrent(t);
-                        break;
-                    case "dataonly":
-                        DeleteData(t);
-                        break;
-                    case "both":
-                        DeleteData(t);
-                        DeleteTorrent(t);
-                        break;
-                    default:
-                        break;
-                }
-            });
-        }
-
-        public void DeleteTorrent(TorrentInfo t)
-        {
-            System.IO.File.Delete(t.Torrent.Torrent.TorrentPath);
-        }
-
-        public void DeleteData(TorrentInfo t)
-        {
-            List<string> directories = new List<string>();
-            foreach (TorrentFile file in t.Torrent.Torrent.Files)
-            {
-                if (System.IO.File.Exists(file.FullPath))
-                {
-                    directories.Add(new System.IO.FileInfo(file.FullPath).Directory.FullName);
-                    System.IO.File.Delete(file.FullPath);
-                }
-            }
-            directories = directories.Distinct().ToList();
-            foreach (string str in directories)
-            {
-                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(str);
-                if (dir.GetFiles().Length == 0)
-                    dir.Delete();
-            }
-        }
-
-        public void OpenSelectedTorrentLocation(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo t;
-            if (!GetSelectedTorrent(out t))
-                return;
-            System.IO.Directory.CreateDirectory(t.SavePath);
-            Process.Start("explorer.exe", "\"" + t.SavePath + "\"");
-        }
-        public bool GetSelectedTorrent(out TorrentInfo ti)
-        {
-            ti = null;
-            if (mainlist.SelectedIndex == -1)
-                return false;
-            ti = state.Torrents[mainlist.SelectedIndex];
-            return true;
         }
 
         #endregion
@@ -731,7 +597,7 @@ namespace ByteFlood
             }
 
             left_treeview.DataContext = App.Settings;
-         
+
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
 
             if (!App.Settings.ImportedTorrents)
@@ -972,6 +838,8 @@ namespace ByteFlood
             this.Close();
         }
 
+        #region NotifyIcon
+
         private void ExecuteTrayBehavior(TrayIconBehavior behavior)
         {
             switch (behavior)
@@ -1005,6 +873,8 @@ namespace ByteFlood
             }
         }
 
+       
+
         private void NotifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
             ExecuteTrayBehavior(App.Settings.TrayIconClickBehavior);
@@ -1026,40 +896,7 @@ namespace ByteFlood
                 ExecuteWindowBehavior(App.Settings.MinimizeBehavior);
         }
 
-        private void OperationOnSelectedTorrents(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
-            mainlist.SelectedItems.CopyTo(arr, 0);
-            if (arr.Length == 0)
-                return;
-            string tag = ((FrameworkElement)e.Source).Tag.ToString();
-            Action<TorrentInfo> f = new Action<TorrentInfo>(t => { });
-            switch (tag)
-            {
-                case "Start":
-                    f = new Action<TorrentInfo>(t => t.Start());
-                    break;
-                case "Pause":
-                    f = new Action<TorrentInfo>(t => t.Pause());
-                    break;
-                case "Stop":
-                    f = new Action<TorrentInfo>(t => t.Stop());
-                    break;
-                case "ForcePause":
-                    f = new Action<TorrentInfo>(t => t.ForcePause());
-                    break;
-                case "ForceStart":
-                    f = new Action<TorrentInfo>(t => t.ForceStart());
-                    break;
-                case "Recheck":
-                    f = new Action<TorrentInfo>(t => t.Recheck());
-                    break;
-            }
-            foreach (TorrentInfo ti in arr)
-            {
-                f(ti);
-            }
-        }
+        #endregion
 
         private void OperationOnRssItem(object sender, RoutedEventArgs e)
         {
@@ -1127,5 +964,126 @@ namespace ByteFlood
                 }
             }
         }
+
+        #region Torrent List Commands
+
+        private void TorrentListCommands_ActionOnSelectedTorrents(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (mainlist.SelectedItems.Count > 0)
+            {
+                TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
+                mainlist.SelectedItems.CopyTo(arr, 0);
+                Action<TorrentInfo> f = new Action<TorrentInfo>(t => { });
+
+                string action = Convert.ToString(e.Parameter);
+                switch (action)
+                {
+                    case "OpenDownloadDirectory":
+                        f = new Action<TorrentInfo>(t =>
+                        {
+                            System.IO.Directory.CreateDirectory(t.SavePath);
+                            Process.Start("explorer.exe", "\"" + t.SavePath + "\"");
+                        });
+                        break;
+                    case "EditProperties":
+                        f = new Action<TorrentInfo>(t => 
+                        {
+                            TorrentPropertiesForm tp = new TorrentPropertiesForm(t) { Owner = this, Icon = this.Icon };
+                            tp.ShowDialog();
+                        });
+                        break;
+                    case "Start":
+                        f = new Action<TorrentInfo>(t => t.Start());
+                        break;
+                    case "Pause":
+                        f = new Action<TorrentInfo>(t => t.Pause());
+                        break;
+                    case "Stop":
+                        f = new Action<TorrentInfo>(t => t.Stop());
+                        break;
+                    case "ForcePause":
+                        f = new Action<TorrentInfo>(t => t.ForcePause());
+                        break;
+                    case "ForceStart":
+                        f = new Action<TorrentInfo>(t => t.ForceStart());
+                        break;
+                    case "Recheck":
+                        f = new Action<TorrentInfo>(t => t.Recheck());
+                        break;
+
+                    case "remove_torrent_unlist":
+                    case "remove_torrent_torrentonly":
+                    case "remove_torrent_dataonly":
+                    case "remove_torrent_both":
+                        f = new Action<TorrentInfo>(t => { RemoveTorrent(t, action); });
+                        break;
+                    default:
+                        break;
+                }
+                foreach (TorrentInfo ti in arr)
+                {
+                    f(ti);
+                }
+            }
+        }
+
+        private void RemoveTorrent(TorrentInfo t, string action)
+        {
+            t.Invisible = true;
+            t.UpdateList("Invisible", "ShowOnList");
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                t.Torrent.Stop();
+                while (t.Torrent.State != TorrentState.Stopped) ;
+                state.ce.Unregister(t.Torrent);
+                uiContext.Send(x =>
+                {
+                    state.Torrents.Remove(t);
+                }, null);
+                switch (action)
+                {
+                    case "remove_torrent_torrentonly":
+                        DeleteTorrent(t);
+                        break;
+                    case "remove_torrent_dataonly":
+                        DeleteData(t);
+                        break;
+                    case "remove_torrent_both":
+                        DeleteData(t);
+                        DeleteTorrent(t);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
+
+        private void DeleteTorrent(TorrentInfo t)
+        {
+            System.IO.File.Delete(t.Torrent.Torrent.TorrentPath);
+        }
+
+        private void DeleteData(TorrentInfo t)
+        {
+            List<string> directories = new List<string>();
+            foreach (TorrentFile file in t.Torrent.Torrent.Files)
+            {
+                if (System.IO.File.Exists(file.FullPath))
+                {
+                    directories.Add(new System.IO.FileInfo(file.FullPath).Directory.FullName);
+                    System.IO.File.Delete(file.FullPath);
+                }
+            }
+            directories = directories.Distinct().ToList();
+            foreach (string str in directories)
+            {
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(str);
+                if (dir.GetFiles().Length == 0)
+                    dir.Delete();
+            }
+        }
+
+        #endregion
+
     }
 }
