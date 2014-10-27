@@ -6,8 +6,6 @@ using System.ComponentModel;
 using MonoTorrent;
 using MonoTorrent.Client;
 using System.Xml.Serialization;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using MonoTorrent.Client.Connections;
 using System.Threading;
@@ -23,8 +21,7 @@ namespace ByteFlood
         public event PropertyChangedEventHandler PropertyChanged;
         [XmlIgnore]
         public MainWindow window = (MainWindow)App.Current.MainWindow;
-        [XmlIgnore]
-        public ClientEngine ce;
+
         [XmlIgnore]
         public SynchronizationContext uiContext;
         public int DownloadingTorrentCount { get { return Torrents.Count(window.Downloading); } set { } }
@@ -32,55 +29,86 @@ namespace ByteFlood
         public int ActiveTorrentCount { get { return Torrents.Count(window.Active); } set { } }
         public int InactiveTorrentCount { get { return TorrentCount - ActiveTorrentCount; } set { } }
         public int FinishedTorrentCount { get { return Torrents.Count(window.Finished); } set { } }
+
         [XmlIgnore]
         public int TorrentCount { get { return Torrents.Count; } }
 
         [XmlIgnore]
         public Thread mainthread;
-        [XmlIgnore]
-        public DhtListener dhtl;
+
         [XmlIgnore]
         public Listener listener;
-        [XmlIgnore]
-        private int _dht_peers_count = 0;
+
         [XmlIgnore]
         public int DHTPeers
         {
-            get { return _dht_peers_count; }
-            set
+            get
             {
-                if (value != _dht_peers_count)
+                if (this.LibtorrentSession.IsDhtRunning)
                 {
-                    this._dht_peers_count = value;
-                    NotifySinglePropertyChanged("DHTPeers");
+                    return this.LibtorrentSession.QueryStatus().DhtNodes;
                 }
+                return 0;
             }
         }
 
-        public int GlobalMaxDownloadSpeed { get { return ce.Settings.GlobalMaxDownloadSpeed; } set { ce.Settings.GlobalMaxDownloadSpeed = value; } }
-        public int GlobalMaxUploadSpeed { get { return ce.Settings.GlobalMaxUploadSpeed; } set { ce.Settings.GlobalMaxUploadSpeed = value; } }
+        public int GlobalMaxDownloadSpeed
+        {
+            get { return this.LibtorrentSession.QuerySettings().DownloadRateLimit; }
+            set
+            {
+                var settings = this.LibtorrentSession.QuerySettings();
+                settings.DownloadRateLimit = value;
+                this.LibtorrentSession.SetSettings(settings);
+            }
+        }
 
+        public int GlobalMaxUploadSpeed
+        {
+            get { return this.LibtorrentSession.QuerySettings().UploadRateLimit; }
+            set
+            {
+                var settings = this.LibtorrentSession.QuerySettings();
+                settings.UploadRateLimit = value;
+                this.LibtorrentSession.SetSettings(settings);
+            }
+        }
 
         public State()
         {
             this.Torrents.CollectionChanged += Torrents_CollectionChanged;
             this.Initialize();
         }
-        [XmlIgnore]
-        public TorrentQueue tq = null;
+
+        public Ragnar.Session LibtorrentSession { get; private set; }
+
         public void Initialize()
         {
             UpdateConnectionSettings();
             IPV4Connection.ExceptionThrown += Utility.LogException;
             IPV4Connection.LocalAddress = IPAddress.Any;
 
-            var iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
-            ce = new ClientEngine(new EngineSettings());
-            ce.ChangeListenEndpoint(new IPEndPoint(iface.GetIPv4(), ce.Listener.Endpoint.Port));
-            ce.Settings.Force = App.Settings.EncryptionType;
+            this.LibtorrentSession = new Ragnar.Session();
 
-            ce.RegisterDht(get_dht_engine(iface.GetIPv4()));
-            ce.DhtEngine.Start();
+            this.LibtorrentSession.ListenOn(App.Settings.ListeningPort, App.Settings.ListeningPort);
+
+            this.LibtorrentSession.StartDht();
+            this.LibtorrentSession.StartLsd();
+            this.LibtorrentSession.StartNatPmp();
+            this.LibtorrentSession.StartUpnp();
+
+            if (File.Exists(LtSessionFilePath))
+            {
+                this.LibtorrentSession.LoadState(File.ReadAllBytes(LtSessionFilePath));
+
+                var torrents = this.LibtorrentSession.GetTorrents();
+
+                foreach (var torrent in torrents) 
+                {
+                    this.Torrents.Add(new TorrentInfo(torrent));
+                }
+            }
+
 
             if (!App.Settings.AssociationAsked)
             {
@@ -100,52 +128,22 @@ namespace ByteFlood
                         App.Settings.AssociationAsked = false;
                 }
             }
+
             listener = new Listener(this);
             listener.State = this;
-            tq = new TorrentQueue(this);
         }
 
-        /// <summary>
-        /// return a new dht engine with ByteFlood settings
-        /// </summary>
-        /// <returns></returns>
-        private DhtEngine get_dht_engine(IPAddress ip)
-        {
-            dhtl = new DhtListener(new IPEndPoint(ip, App.Settings.ListeningPort));
-            DhtEngine dht = new DhtEngine(dhtl);
-            dht.PeersFound += new EventHandler<PeersFoundEventArgs>(PeersFound);
-            return dht;
-        }
 
         public void ChangeNetworkInterface()
         {
-            var new_iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
-            ce.ChangeListenEndpoint(new IPEndPoint(new_iface.GetIPv4(), ce.Listener.Endpoint.Port));
-
-            //stop the current dht engine
-            ce.DhtEngine.Stop();
-            ce.DhtEngine.Dispose();
-            ce.DhtEngine.PeersFound -= PeersFound;
-            this.DHTPeers = 0;
-
-            //registering a new dht engine will overrides the old one
-            ce.RegisterDht(get_dht_engine(new_iface.GetIPv4()));
-            ce.DhtEngine.Start();
+            throw new NotImplementedException();
+            // var new_iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
         }
 
         private void Torrents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             NotifySinglePropertyChanged("TorrentCount");
         }
-
-        #region DHT Engine Events
-
-        void PeersFound(object sender, PeersFoundEventArgs e)
-        {
-            DHTPeers += e.Peers.Count;
-        }
-
-        #endregion
 
         public void UpdateConnectionSettings()
         {
@@ -154,23 +152,14 @@ namespace ByteFlood
                 IPV4Connection.LocalPorts = Enumerable.Range(App.Settings.OutgoingPortsStart, App.Settings.OutgoingPortsEnd - App.Settings.OutgoingPortsStart).ToArray();
         }
 
-        public static void Save(State s, string path)
-        {
-            Utility.Serialize<State>(s, path);
-        }
-
         public void Shutdown()
         {
             SaveSettings();
             SaveState();
             mainthread.Abort();
 
-            //Shouldn't we pause before attempting to dispose everything?
-            ce.PauseAll();
-
-            ce.DiskManager.Flush();
-            ce.DiskManager.Dispose();
-            ce.Dispose();
+            this.LibtorrentSession.StopDht();
+            this.LibtorrentSession.Dispose();
 
             listener.Shutdown();
         }
@@ -180,9 +169,34 @@ namespace ByteFlood
             Settings.Save(App.Settings, "./config.xml");
         }
 
+        private string StateSaveDirectory
+        {
+            get { return Path.Combine(".", "state"); }
+        }
+
+        private string LtSessionFilePath 
+        {
+            get 
+            {
+                return Path.Combine(this.StateSaveDirectory, "ltsession.bin");
+            }
+        }
+
         public void SaveState()
         {
-            State.Save(this, "./state.xml");
+            Directory.CreateDirectory(this.StateSaveDirectory);
+
+            File.WriteAllBytes(LtSessionFilePath, this.LibtorrentSession.SaveState());
+
+            var torrents = this.LibtorrentSession.GetTorrents();
+
+            foreach (var torrent in torrents)
+            {
+                if (torrent.NeedSaveResumeData())
+                {
+                    torrent.SaveResumeData();
+                }
+            }
         }
 
         public void AddTorrentsByPath(string[] paths)
@@ -199,9 +213,9 @@ namespace ByteFlood
             {
                 Torrent t = Torrent.Load(path);
 
-                if (this.ce.Contains(t.InfoHash)) 
+                if (this.ContainTorrent(t.InfoHash.ToHex()))
                 {
-                    if (notifyIfAdded) 
+                    if (notifyIfAdded)
                     {
                         MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
@@ -220,64 +234,59 @@ namespace ByteFlood
                 return;
             }
 
+            var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams() 
+            {
+                TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path)),
+                SavePath = App.Settings.DefaultDownloadPath,
+            });
+
+            handle.AutoManaged = false;
+            handle.Pause();
+
+            TorrentInfo ti = new TorrentInfo(handle);
+
             uiContext.Send(x =>
             {
                 App.Current.MainWindow.Activate();
-                AddTorrentDialog atd = new AddTorrentDialog(path) { Owner = App.Current.MainWindow, Icon = App.Current.MainWindow.Icon };
+                AddTorrentDialog atd = new AddTorrentDialog(ti) { Owner = App.Current.MainWindow, Icon = App.Current.MainWindow.Icon };
                 atd.ShowDialog();
                 if (atd.UserOK)
                 {
-                    TorrentInfo ti = CreateTorrentInfo(new TorrentManager(atd.t, atd.TorrentSavePath, new TorrentSettings()));
+                    handle.AutoManaged = true;
                     ti.Name = atd.TorrentName;
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
                     ti.RatioLimit = atd.RatioLimit;
-                    TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
-                    ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
                     Torrents.Add(ti);
+                }
+                else 
+                {
+                    ti.OffMyself();
+                    this.LibtorrentSession.RemoveTorrent(handle);
+                    handle.Dispose();
                 }
             }, null);
         }
 
+        public bool ContainTorrent(string infoHash)
+        {
+            return false;
+            //this.LibtorrentSession.FindTorrent(infoHash).
+        }
+
         /// <summary>
-        /// Copies a torrent to ./Torrents(or whatever Settings.TorrentFileSavePath is set to).
+        /// Copies a torrent to ./torrents-bkp
         /// </summary>
         /// <param name="path">The path of the torrent file to be copied.</param>
         /// <returns>The new path of the torrent file.</returns>
         public string BackupTorrent(string path, Torrent t)
         {
-            string newfile = t.InfoHash.ToHex() + ".torrent";
-            string newpath = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, newfile);
+            string directory = "./torrents-bkp";
+            Directory.CreateDirectory(directory);
+            string newpath = System.IO.Path.Combine(directory, t.InfoHash.ToHex() + ".torrent");
             if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
                 File.Copy(path, newpath, true);
             return newpath;
-        }
-
-        /// <summary>
-        /// Like AddTorrentByPath, but uses a provided AddTorrentDialog
-        /// </summary>
-        private void AddTorrentByPath(string path, AddTorrentDialog atd)
-        {
-            uiContext.Send(x =>
-            {
-                App.Current.MainWindow.Activate();
-                atd.Load(path);
-                atd.Closed += (e, s) =>
-                {
-                    if (atd.UserOK)
-                    {
-                        TorrentInfo ti = CreateTorrentInfo(new TorrentManager(atd.t, atd.TorrentSavePath, new TorrentSettings()));
-                        ti.Name = atd.TorrentName;
-                        if (atd.AutoStartTorrent)
-                        { ti.Start(); }
-                        ti.RatioLimit = atd.RatioLimit;
-                        TorrentProperties.Apply(ti.Torrent, App.Settings.DefaultTorrentProperties);
-                        ti.Torrent.Settings.InitialSeedingEnabled = atd.initial.IsChecked == true;
-                        Torrents.Add(ti);
-                    }
-                };
-            }, null);
-
         }
 
         public bool AddTorrentRss(string path, Services.RSS.RssUrlEntry entry)
@@ -292,18 +301,19 @@ namespace ByteFlood
             bool success = true;
             uiContext.Send(x =>
             {
-                if (this.ce.Contains(t.InfoHash)) 
+                if (this.ContainTorrent(t.InfoHash.ToHex()))
                 {
                     success = false;
                     return;
                 }
                 Directory.CreateDirectory(entry.DownloadDirectory);
-                TorrentManager tm = new TorrentManager(t, entry.DownloadDirectory, entry.DefaultSettings);
-                TorrentInfo ti = CreateTorrentInfo(tm);
-                ti.Name = t.Name;
-                if (entry.AutoDownload)
-                { ti.Start(); }
-                Torrents.Add(ti);
+
+                var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams() 
+                {
+                    SavePath = entry.DownloadDirectory,
+                    TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path))
+                });
+                Torrents.Add(new TorrentInfo(handle));
 
             }, null);
             return success;
@@ -311,121 +321,94 @@ namespace ByteFlood
 
         public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
-            MagnetLink mg = null;
+            MessageBox.Show("Not supported", "Info");
+            return;
 
-            try { mg = new MagnetLink(magnet); }
-            catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
+            //MagnetLink mg = null;
 
-            if (this.ce.Contains(mg.InfoHash))
-            {
-                if (notifyIfAdded)
-                {
-                    MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                return;
-            }
+            //try { mg = new MagnetLink(magnet); }
+            //catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
 
-            if (!Directory.Exists(App.Settings.TorrentFileSavePath))
-                Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
+            //if (this.ContainTorrent(mg.InfoHash.ToHex()))
+            //{
+            //    if (notifyIfAdded)
+            //    {
+            //        MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    }
+            //    return;
+            //}
 
-            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex() + ".torrent");
+            //if (!Directory.Exists(App.Settings.TorrentFileSavePath))
+            //    Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
 
-            AddTorrentDialog atd = new AddTorrentDialog("") { Icon = App.Current.MainWindow.Icon };
-            atd.Show();
+            //string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex() + ".torrent");
 
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-                byte[] data = GetMagnetFromCache(mg);
-                if (data != null)
-                {
-                    File.WriteAllBytes(path, data);
-                    this.AddTorrentByPath(path, atd);
-                    return;
-                }
+            //AddTorrentDialog atd = new AddTorrentDialog("") { Icon = App.Current.MainWindow.Icon };
+            //atd.Show();
+            //bool use_cache_services = false;
+            //ThreadPool.QueueUserWorkItem(delegate
+            //{
 
-                TorrentManager tm = new TorrentManager(mg, "./", new TorrentSettings(), path);
+            //    if (use_cache_services)
+            //    {
+            //        byte[] data = GetMagnetFromCache(mg);
+            //        if (data != null)
+            //        {
+            //            File.WriteAllBytes(path, data);
+            //            this.AddTorrentByPath(path, atd);
+            //            return;
+            //        }
+            //    }
 
-                ce.Register(tm);
-                tm.Start();
+            //    this.LibtorrentSession.AsyncAddTorrent(new Ragnar.AddTorrentParams() 
+            //    {
+            //        SavePath = App.Settings.DefaultDownloadPath,
+            //        Url = magnet
+            //    });
 
-                System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
-                {
-                    ce.DhtEngine.GetPeers(mg.InfoHash);
-                    int i = 0;
-
-                    while (tm.State == TorrentState.Stopped)
-                        Thread.Sleep(100);
-                    while (tm.State == TorrentState.Metadata)
-                    {
-                        Thread.Sleep(10);
-                        if ((i++) % 1000 == 0)
-                            ce.DhtEngine.GetPeers(mg.InfoHash);
-                        if (atd.WindowClosed) //user cancelled the adding
-                        {
-                            tm.Stop();
-                            while (tm.State == TorrentState.Stopping)
-                                Thread.Sleep(10);
-                            ce.Unregister(tm);
-                            return;
-                        }
-                    }
-
-                    tm.Stop();
-                    tm.Dispose();
-                    ce.Unregister(tm);
-
-                    App.Current.Dispatcher.Invoke(new Action(() => { this.AddTorrentByPath(path, atd); }));
-                }));
-            });
-            // return; why?
+           
+            //});
         }
 
-        public byte[] MagnetLinkTorrentFile(string magnet)
-        {
-            MagnetLink mg = null;
+        //public byte[] MagnetLinkTorrentFile(string magnet)
+        //{
+        //    return null;
 
-            try { mg = new MagnetLink(magnet); }
-            catch
-            {
-                return null;
-            }
+        //    MagnetLink mg = null;
 
-            string hash = mg.InfoHash.ToHex();
-            string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, hash + ".torrent");
-            string temp_save = System.IO.Path.Combine(System.IO.Path.GetTempPath(), hash);
-            Directory.CreateDirectory(temp_save);
-            TorrentManager tm = new TorrentManager(mg, temp_save, new TorrentSettings(), path);
+        //    try { mg = new MagnetLink(magnet); }
+        //    catch
+        //    {
+        //        return null;
+        //    }
 
-            ce.Register(tm);
-            tm.Start();
+        //    string hash = mg.InfoHash.ToHex();
+        //    string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, hash + ".torrent");
+        //    string temp_save = System.IO.Path.Combine(System.IO.Path.GetTempPath(), hash);
+        //    Directory.CreateDirectory(temp_save);
+        //    TorrentManager tm = new TorrentManager(mg, temp_save, new TorrentSettings(), path);
 
-            ce.DhtEngine.GetPeers(mg.InfoHash);
-            int i = 0;
+           
+        //    tm.Start();
 
-            while (tm.State == TorrentState.Stopped)
-                Thread.Sleep(100);
-            while (tm.State == TorrentState.Metadata)
-            {
-                Thread.Sleep(100);
-                if ((i++) % 100 == 0)
-                    ce.DhtEngine.GetPeers(mg.InfoHash);
-            }
+          
+        //    int i = 0;
 
-            tm.Stop();
-            tm.Dispose();
-            ce.Unregister(tm);
+        //    tm.Stop();
+        //    tm.Dispose();
+           
 
-            byte[] data = null;
+        //    byte[] data = null;
 
-            if (File.Exists(path))
-            {
-                data = File.ReadAllBytes(path);
-                File.Delete(path);
-            }
+        //    if (File.Exists(path))
+        //    {
+        //        data = File.ReadAllBytes(path);
+        //        File.Delete(path);
+        //    }
 
-            Directory.Delete(temp_save, true);
-            return data;
-        }
+        //    Directory.Delete(temp_save, true);
+        //    return data;
+        //}
 
         #region Magnets From Cache Websites
 
@@ -461,72 +444,6 @@ namespace ByteFlood
         }
 
         #endregion
-
-        public TorrentInfo CreateTorrentInfo(TorrentManager tm)
-        {
-            ce.Register(tm);
-            TorrentInfo t = new TorrentInfo(uiContext, tm);
-            t.Update();
-            return t;
-        }
-
-        public static State Load(string path)
-        {
-            try
-            {
-                if (!File.Exists(path))
-                    return new State();
-                return Utility.Deserialize<State>(path);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error occurred while loading the program state. You may need to re-add your torrents.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return new State();
-
-            }
-        }
-
-        /*public void UpdateQueue()
-        {
-            try
-            {
-                var applicable = Torrents.Where(t => t.QueueState != QueueState.Forced);
-                var active = applicable.Where(t => t.Torrent.State == TorrentState.Downloading);
-                active = active.Reverse();
-                var inactive = applicable.Where(t => t.Torrent.State != TorrentState.Downloading);
-                if (active.Count() > App.Settings.QueueSize) // we need to reduce the number of active torrents
-                {
-                    while (active.Count() > App.Settings.QueueSize)
-                    {
-                        TorrentInfo ti = active.First(t => t.QueueState == QueueState.Queued);
-                        ti.Pause();
-                    }
-                }
-                else if (active.Count() < App.Settings.QueueSize) // we need to increase the number of active torrents
-                {
-                    while (active.Count() < App.Settings.QueueSize)
-                    {
-                        TorrentInfo ti = inactive.First(t => t.QueueState == QueueState.Queued);
-                        ti.Start();
-                    }
-                }
-            }
-            catch
-            {
-            }
-
-            Torrents.Where(t => t.QueueState == QueueState.Unprocessed).ToList().ForEach(t => t.QueueState = QueueState.Queued);
-
-            int i = 0;
-            foreach (TorrentInfo ti in Torrents)
-            {
-                if (ti.QueueState == QueueState.Forced || ti.QueueState == QueueState.NotQueued)
-                    ti.QueueNumber = "-";
-                else
-                    ti.QueueNumber = (++i).ToString();
-                ti.UpdateList("QueueNumber");
-            }
-        }*/
 
         public void NotifyChanged(params string[] props)
         {

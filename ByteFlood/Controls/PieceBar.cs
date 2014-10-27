@@ -35,15 +35,15 @@ namespace ByteFlood.Controls
         {
             this.ti = ti;
             CleanUP();
-            this.bit = ti.Torrent.Bitfield;
-            ti.Torrent.PieceHashed += Torrent_PieceHashed;
+            //this.bit = ti.Torrent.Bitfield;
+            //ti.Torrent.PieceHashed += Torrent_PieceHashed;
         }
 
         public void DetachTorrent()
         {
             CleanUP();
             this.bit = null;
-            if (ti != null) { ti.Torrent.PieceHashed -= this.Torrent_PieceHashed; }
+            //if (ti != null) { ti.Torrent.PieceHashed -= this.Torrent_PieceHashed; }
         }
 
         void Torrent_PieceHashed(object sender, MonoTorrent.Client.PieceHashedEventArgs e)

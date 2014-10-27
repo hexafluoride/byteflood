@@ -234,10 +234,12 @@ namespace ByteFlood.Services.RSS
 
                     byte[] data = State.GetMagnetFromCache(url);
 
-                    if (data == null)
-                    {
-                        data = AppState.MagnetLinkTorrentFile(url);
-                    }
+                    //TODO: Use libtorrent magnets support
+
+                    //if (data == null)
+                    //{
+                    //    data = AppState.MagnetLinkTorrentFile(url);
+                    //}
 
                     return new DownloadRssResponse()
                     {

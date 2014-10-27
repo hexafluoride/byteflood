@@ -116,19 +116,19 @@ namespace ByteFlood
                         continue;
                     Torrent t = Torrent.Load(listing.Path);
 
-                    AppState.BackupTorrent(listing.Path, t);
+                    string torrent_file_path = AppState.BackupTorrent(listing.Path, t);
 
                     string savepath = null;
 
                     if (t.Files.Length > 1)
                     {
-                        if (listing.SavePath.EndsWith(t.Name)) 
+                        if (listing.SavePath.EndsWith(t.Name))
                         {
-                             // then we should download in the parent directory
+                            // then we should download in the parent directory
                             DirectoryInfo di = new DirectoryInfo(listing.SavePath);
                             savepath = di.Parent.FullName;
                         }
-                        else 
+                        else
                         {
                             savepath = listing.SavePath;
                         }
@@ -137,14 +137,22 @@ namespace ByteFlood
                     {
                         savepath = Path.GetDirectoryName(listing.SavePath);
                     }
-                    else 
+                    else
                     {
                         savepath = listing.SavePath;
                     }
-                    
-                    TorrentManager tm = new TorrentManager(t, savepath, App.Settings.DefaultTorrentProperties.ToTorrentSettings());
-                    TorrentInfo ti = AppState.CreateTorrentInfo(tm);
+
+                    Ragnar.AddTorrentParams param = new Ragnar.AddTorrentParams()
+                    {
+                        SavePath = savepath,
+                        TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(torrent_file_path))
+                    };
+
+                    var handle = AppState.LibtorrentSession.AddTorrent(param);
+
+                    TorrentInfo ti = new TorrentInfo(handle);
                     ti.Name = listing.Name;
+
                     selected.Add(ti);
                 }
                 catch

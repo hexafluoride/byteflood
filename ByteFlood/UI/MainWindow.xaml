@@ -347,7 +347,7 @@
                             <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ProgressBar Maximum="100" Value="{Binding Progress}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                        <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWayToSource}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -482,13 +482,13 @@
                                     <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
                                     <MenuItem Header="Open containing folder" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
                                     <MenuItem Header="Set priority" Background="WhiteSmoke">
-                                        <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
-                                        <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
-                                        <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="High" />
-                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Normal" />
-                                        <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Low" />
-                                        <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Lowest" />
-                                        <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Skip" />
+                                        <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="6" />
+                                        <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="5" />
+                                        <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="4" />
+                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="3" />
+                                        <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="2" />
+                                        <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="1" />
+                                        <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="0" />
                                     </MenuItem>
                                 </ContextMenu>
 
@@ -570,7 +570,7 @@
                         </aga:TreeList>
 
                     </TabItem>
-                    <TabItem>
+                    <TabItem Visibility="Collapsed">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/peers.png" Height="13" Width="13" Margin="0,0,5,0"/>
@@ -626,14 +626,14 @@
                                     <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
                                     <GridViewColumn Width="130" Header="Update In" 
                                                     DisplayMemberBinding="{Binding UpdateInString}" />
-                                    <GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding State}" />
-                                    <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
+                                    <!--<GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding State}" />
+                                    <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />-->
                                     <GridViewColumn Width="260" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Name="webseeds_tab">
+                    <TabItem Name="webseeds_tab" Visibility="Collapsed">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/webseeds.png" Height="13" Width="13" Margin="0,0,5,0"/>

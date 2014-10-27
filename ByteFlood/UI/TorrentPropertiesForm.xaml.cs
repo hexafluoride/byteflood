@@ -63,7 +63,7 @@ namespace ByteFlood
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if(!fake)
-                tp = TorrentProperties.FromTorrentSettings(ti.Torrent.Settings);
+                //tp = TorrentProperties.FromTorrentSettings(ti.Torrent.Settings);
             maxcons.Text = tp.MaxConnections.ToString();
             maxdown.Text = (tp.MaxDownloadSpeed / 1024).ToString();
             maxup.Text = (tp.MaxUploadSpeed / 1024).ToString();
@@ -89,7 +89,7 @@ namespace ByteFlood
             tp.UploadSlots = int.Parse(uploadslots.Text);
             if (!fake)
             {
-                TorrentProperties.Apply(ti.Torrent, tp);
+                //TorrentProperties.Apply(ti.Torrent, tp);
                 ti.CompletionCommand = comp.Text;
             }
             success = true;
