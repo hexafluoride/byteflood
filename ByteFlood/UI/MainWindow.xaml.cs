@@ -47,11 +47,11 @@ namespace ByteFlood
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
         public Func<TorrentInfo, bool> ShowAll = new Func<TorrentInfo, bool>((t) => { return true; });
-        public Func<TorrentInfo, bool> Downloading = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.State == TorrentState.Downloading; });
-        public Func<TorrentInfo, bool> Seeding = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.State == TorrentState.Seeding; });
-        public Func<TorrentInfo, bool> Active = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : (t.Torrent.State == TorrentState.Seeding || t.Torrent.State == TorrentState.Downloading) || t.Torrent.State == TorrentState.Hashing; });
-        public Func<TorrentInfo, bool> Inactive = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : (t.Torrent.State != TorrentState.Seeding && t.Torrent.State != TorrentState.Downloading) && t.Torrent.State != TorrentState.Hashing; });
-        public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent == null ? false : t.Torrent.Progress == 100; });
+        public Func<TorrentInfo, bool> Downloading = new Func<TorrentInfo, bool>((t) => { return t.Torrent.QueryStatus().State == Ragnar.TorrentState.Downloading; });
+        public Func<TorrentInfo, bool> Seeding = new Func<TorrentInfo, bool>((t) => { return t.Torrent.QueryStatus().State == Ragnar.TorrentState.Seeding; });
+        public Func<TorrentInfo, bool> Active = new Func<TorrentInfo, bool>((t) => { return  !t.Torrent.IsPaused; });
+        public Func<TorrentInfo, bool> Inactive = new Func<TorrentInfo, bool>((t) => { return t.Torrent.IsPaused || !string.IsNullOrEmpty(t.Torrent.QueryStatus().Error); });
+        public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent.IsFinished; });
         GraphDrawer graph;
         public State state;
         int ticks = 0;
@@ -183,6 +183,8 @@ namespace ByteFlood
         {
             while (true)
             {
+                var status = this.state.LibtorrentSession.QueryStatus();
+
                 try
                 {
                     uiContext.Send(x =>
@@ -193,22 +195,21 @@ namespace ByteFlood
                         {
                             ReDrawGraph();
                         }
+
+
+                        this.TotalDownSpeed = status.DownloadRate;
+                        this.TotalUpSpeed = status.UploadRate;
+                        this.TotalDownloaded = status.TotalDownload;
+                        this.TotalUploaded = status.TotalUpload;
+
                     }, null);
 
                     // TODO: Update theses values only when they are really changed.
                     state.NotifyChanged("DownloadingTorrentCount", "SeedingTorrentCount",
                         "InactiveTorrentCount", "ActiveTorrentCount", "FinishedTorrentCount");
 
-                    if (ticks >= 120) //1 min
+                    if (ticks >= 60) //1 min
                     {
-                        // find DHT peers
-                        if (state.DHTPeers < App.Settings.MaxDHTPeers)
-                        {
-                            foreach (TorrentInfo ti in state.Torrents)
-                                if (state.DHTPeers < App.Settings.MaxDHTPeers // we don't know if there are a lot of torrents, so let's check every time
-                                    && ti.Torrent.State == TorrentState.Downloading || ti.Torrent.State == TorrentState.Seeding)
-                                    state.ce.DhtEngine.GetPeers(ti.Torrent.InfoHash);
-                        }
                         state.SaveState();
                         ticks = 0;
                     }
@@ -218,7 +219,7 @@ namespace ByteFlood
                     }
                 }
                 catch { }
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(1000);
             }
         }
         #region Event Handlers
@@ -395,25 +396,25 @@ namespace ByteFlood
         {
             if (files_tree.SelectedItems.Count > 0)
             {
-                Priority p = (Priority)Enum.Parse(typeof(Priority), e.Parameter.ToString());
+                int priority = Convert.ToInt32(e.Parameter);
 
                 foreach (Aga.Controls.Tree.TreeNode item in files_tree.SelectedItems)
                 {
                     if (item.Tag is FileInfo)
                     {
                         FileInfo fi = item.Tag as FileInfo;
-                        fi.ChangePriority(p);
+                        fi.ChangePriority(priority);
                     }
                     else if (item.Tag is DirectoryKey)
                     {
                         DirectoryKey dk = item.Tag as DirectoryKey;
-                        ApplyPriority_DirectoryTree(dk, p);
+                        ApplyPriority_DirectoryTree(dk, priority);
                     }
                 }
             }
         }
 
-        private void ApplyPriority_DirectoryTree(DirectoryKey dk, Priority p)
+        private void ApplyPriority_DirectoryTree(DirectoryKey dk, int p)
         {
             foreach (object ob in dk.Values)
             {
@@ -437,11 +438,11 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.FullPath);
+                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.Path);
 
                     if (fifo.Exists)
                     {
-                        string[] dangerous_file_types = { ".exe", ".scr", ".pif", ".com", ".bat", ".cmd", ".vbs", ".hta" };
+                        string[] dangerous_file_types = { ".exe", ".scr", ".pif", ".js", ".com", ".bat", ".cmd", ".vbs", ".hta" };
 
                         if (dangerous_file_types.Contains(fifo.Extension.ToLower()))
                         {
@@ -505,7 +506,7 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.FullPath);
+                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.Path);
                     System.IO.Directory.CreateDirectory(fifo.Directory.FullName);
                     Process.Start("explorer.exe", string.Format("\"{0}\"", fifo.Directory.FullName));
                     return;
@@ -548,11 +549,11 @@ namespace ByteFlood
             //piece_bar.AttachTorrent(ti);
             trackers_list.ItemsSource = ti.Trackers;
             overview_canvas.DataContext = ti;
-            if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
-            {
-                webseeds_tab.Visibility = Visibility.Visible;
-                webseeds_list.ItemsSource = ti.Torrent.Torrent.GetRightHttpSeeds;
-            }
+            //if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
+            //{
+            //    webseeds_tab.Visibility = Visibility.Visible;
+            //    webseeds_list.ItemsSource = ti.Torrent.Torrent.GetRightHttpSeeds;
+            //}
         }
 
         private void ResetDataContext()
@@ -577,11 +578,13 @@ namespace ByteFlood
             NotifyIcon.Icon = new System.Drawing.Icon("Assets/icon-16.ico");
             this.Icon = new BitmapImage(new Uri("Assets/icon-allsizes.ico", UriKind.Relative));
             thr = new Thread(new ThreadStart(Update));
-            state = State.Load("./state.xml");
+
+            state = new State();
+
             state.uiContext = uiContext;
             state.mainthread = thr;
             thr.Start();
-            state.ce.StatsUpdate += ce_StatsUpdate;
+
             mainlist.ItemsSource = state.Torrents;
             mainlist.DataContext = App.Settings;
             torrents_treeview.DataContext = state;
@@ -608,17 +611,6 @@ namespace ByteFlood
 
             Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
             Services.AutoUpdater.StartMonitoring();
-        }
-
-        private void ce_StatsUpdate(object sender, StatsUpdateEventArgs e)
-        {
-            this.uiContext.Send(x =>
-            {
-                this.TotalDownSpeed = this.state.ce.TotalDownloadSpeed;
-                this.TotalUpSpeed = this.state.ce.TotalUploadSpeed;
-                this.TotalDownloaded = this.state.ce.TotalDownloaded;
-                this.TotalUploaded = this.state.ce.TotalUploaded;
-            }, null);
         }
 
         bool notify_later_clicked = false;
@@ -873,7 +865,7 @@ namespace ByteFlood
             }
         }
 
-       
+
 
         private void NotifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
@@ -949,18 +941,21 @@ namespace ByteFlood
             TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
             if (ti != null)
             {
-                if (ti.Torrent.Torrent.IsPrivate)
+                if (ti.Torrent.TorrentFile.Private)
                 {
                     MessageBox.Show("You cannot add external peers to a private torrent", "Add peer");
                 }
                 else
                 {
+                    MessageBox.Show("Not implemented yet");
+                    /*
                     var p = new UI.AddNewPeerDialog() { Owner = this, Icon = this.Icon };
 
                     if (p.ShowDialog() == true)
                     {
+
                         ti.Torrent.ManualAddPeer(p.IP.Split(':').First(), Convert.ToInt32(p.IP.Split(':').Last()));
-                    }
+                    }*/
                 }
             }
         }
@@ -986,7 +981,8 @@ namespace ByteFlood
                         });
                         break;
                     case "EditProperties":
-                        f = new Action<TorrentInfo>(t => 
+                        break;
+                        f = new Action<TorrentInfo>(t =>
                         {
                             TorrentPropertiesForm tp = new TorrentPropertiesForm(t) { Owner = this, Icon = this.Icon };
                             tp.ShowDialog();
@@ -1033,13 +1029,16 @@ namespace ByteFlood
             t.UpdateList("Invisible", "ShowOnList");
             ThreadPool.QueueUserWorkItem(delegate
             {
-                t.Torrent.Stop();
-                while (t.Torrent.State != TorrentState.Stopped) ;
-                state.ce.Unregister(t.Torrent);
+                t.Torrent.AutoManaged = false;
+                t.Torrent.Pause();
+
+                this.state.LibtorrentSession.RemoveTorrent(t.Torrent);
+
                 uiContext.Send(x =>
                 {
                     state.Torrents.Remove(t);
                 }, null);
+
                 switch (action)
                 {
                     case "remove_torrent_torrentonly":
@@ -1060,12 +1059,14 @@ namespace ByteFlood
 
         private void DeleteTorrent(TorrentInfo t)
         {
-            System.IO.File.Delete(t.Torrent.Torrent.TorrentPath);
+            System.IO.File.Delete(t.TorrentFilePath);
         }
 
         private void DeleteData(TorrentInfo t)
         {
-            List<string> directories = new List<string>();
+            return;
+            /*List<string> directories = new List<string>();
+           
             foreach (TorrentFile file in t.Torrent.Torrent.Files)
             {
                 if (System.IO.File.Exists(file.FullPath))
@@ -1080,7 +1081,7 @@ namespace ByteFlood
                 System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(str);
                 if (dir.GetFiles().Length == 0)
                     dir.Delete();
-            }
+            }*/
         }
 
         #endregion

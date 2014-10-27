@@ -32,8 +32,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using MonoTorrent;
 using MonoTorrent.Client;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
+
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
@@ -49,7 +48,7 @@ namespace ByteFlood
     public partial class AddTorrentDialog : Window
     {
 
-        public Torrent t;
+        public TorrentInfo TorrentInfo { get; private set; }
 
         public bool AutoStartTorrent = true;
         public bool UserOK = false;
@@ -92,7 +91,7 @@ namespace ByteFlood
         }
 
         public static readonly DependencyProperty TorrentSavePathProperty =
-            DependencyProperty.Register("TorrentSavePath", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(new PropertyChangedCallback((Do, des) => 
+            DependencyProperty.Register("TorrentSavePath", typeof(string), typeof(AddTorrentDialog), new PropertyMetadata(new PropertyChangedCallback((Do, des) =>
             {
                 (Do as AddTorrentDialog).UpdateSize();
             })));
@@ -102,15 +101,13 @@ namespace ByteFlood
             get { return App.Settings.PreviousPaths; }
         }
 
-        public AddTorrentDialog(string path)
+        public AddTorrentDialog(TorrentInfo torrent)
         {
             InitializeComponent();
             this.Closed += (s, e) => { this.WindowClosed = true; };
             this.FileList = new ObservableCollection<FileInfo>();
-            if (!string.IsNullOrWhiteSpace(path))
-                Load(path);
-            else
-                loading.Visibility = Visibility.Visible;
+            this.TorrentInfo = torrent;
+            Load();
         }
 
         public void UpdateSize()
@@ -118,33 +115,41 @@ namespace ByteFlood
             try
             {
                 DriveInfo drive = new DriveInfo(System.IO.Path.GetPathRoot(this.TorrentSavePath));
-                size.Content = Utility.PrettifyAmount(t.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
+                size.Content = Utility.PrettifyAmount(this.TorrentInfo.Size) + string.Format(" (Available disk space: {0})", Utility.PrettifyAmount(drive.AvailableFreeSpace));
             }
             catch { }
         }
 
-        public void Load(string path)
+        public void Load()
         {
             loading.Visibility = Visibility.Hidden;
-            t = Torrent.Load(path);
-
-            this.Torrent = t;
 
             this.RatioLimit = 0f;
 
-            foreach (TorrentFile file in t.Files)
-            {
-                FileInfo fi = new FileInfo(null, file);
-                fi.DownloadFile = !(App.Settings.EnableFileRegex && Regex.IsMatch(fi.Name, App.Settings.FileRegex));
-                this.FileList.Add(fi);
-            }
-
-            this.TorrentName = t.Name;
+            this.TorrentName = this.TorrentInfo.Torrent.TorrentFile.Name;
 
             this.TorrentSavePath = App.Settings.DefaultDownloadPath;
+            
+            load_files(this.TorrentInfo.FilesTree);
+
             UpdateSize();
 
             this.Activate();
+        }
+
+        private void load_files(DirectoryKey dk)
+        {
+            foreach (var item in dk.Values)
+            {
+                if (item.GetType() == typeof(FileInfo))
+                {
+                    this.FileList.Add((FileInfo)item);
+                }
+                else if (item.GetType() == typeof(DirectoryKey))
+                {
+                    load_files((DirectoryKey)item);
+                }
+            }
         }
 
         #region Commands

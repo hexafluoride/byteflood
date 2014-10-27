@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ByteFlood</RootNamespace>
     <AssemblyName>ByteFlood</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -35,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Assets\icon-allsizes.ico</ApplicationIcon>
@@ -49,6 +51,9 @@
     <Reference Include="PresentationFramework.Aero2, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\Framework\v4.0.30319\WPF\PresentationFramework.Aero2.dll</HintPath>
+    </Reference>
+    <Reference Include="Ragnar">
+      <HintPath>.\Ragnar.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -115,30 +120,6 @@
     <Compile Include="InfoClasses\PeerInfo.cs" />
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
-    <Compile Include="Libs\SmartThreadPool\CallerThreadContext.cs" />
-    <Compile Include="Libs\SmartThreadPool\CanceledWorkItemsGroup.cs" />
-    <Compile Include="Libs\SmartThreadPool\EventWaitHandle.cs" />
-    <Compile Include="Libs\SmartThreadPool\EventWaitHandleFactory.cs" />
-    <Compile Include="Libs\SmartThreadPool\Exceptions.cs" />
-    <Compile Include="Libs\SmartThreadPool\Interfaces.cs" />
-    <Compile Include="Libs\SmartThreadPool\InternalInterfaces.cs" />
-    <Compile Include="Libs\SmartThreadPool\PriorityQueue.cs" />
-    <Compile Include="Libs\SmartThreadPool\SmartThreadPool.cs" />
-    <Compile Include="Libs\SmartThreadPool\SmartThreadPool.ThreadEntry.cs" />
-    <Compile Include="Libs\SmartThreadPool\Stopwatch.cs" />
-    <Compile Include="Libs\SmartThreadPool\STPEventWaitHandle.cs" />
-    <Compile Include="Libs\SmartThreadPool\STPPerformanceCounter.cs" />
-    <Compile Include="Libs\SmartThreadPool\STPStartInfo.cs" />
-    <Compile Include="Libs\SmartThreadPool\SynchronizedDictionary.cs" />
-    <Compile Include="Libs\SmartThreadPool\WIGStartInfo.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItem.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItem.WorkItemResult.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItemFactory.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItemInfo.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItemResultTWrapper.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItemsGroup.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItemsGroupBase.cs" />
-    <Compile Include="Libs\SmartThreadPool\WorkItemsQueue.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
@@ -192,7 +173,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TorrentProperties.cs" />
-    <Compile Include="TorrentQueue.cs" />
     <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
       <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
     </Compile>
@@ -320,7 +300,21 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Resource Include="Libs\SmartThreadPool\Info.txt" />
+    <None Include="torrent.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="boost_chrono-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="boost_date_time-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="boost_system-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="boost_thread-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
     <Content Include="Assets\Icons\lefttree\active.svg" />
@@ -375,10 +369,6 @@
     <ProjectReference Include="..\Jayrock\Jayrock.csproj">
       <Project>{A178A4BB-CE12-4BF3-8B17-6DF0D82120C8}</Project>
       <Name>Jayrock</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MonoTorrent.Dht\MonoTorrent.Dht.csproj">
-      <Project>{7A2A7E73-FD43-4171-AA34-DA413D35459E}</Project>
-      <Name>MonoTorrent.Dht</Name>
     </ProjectReference>
     <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
       <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
