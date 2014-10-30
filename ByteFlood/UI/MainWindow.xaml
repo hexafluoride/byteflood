@@ -693,8 +693,8 @@
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="DHTStatus" Text="{Binding Path=DHTPeers, StringFormat=DHT: {0} peers,FallbackValue='DHT peers'}">
-                </TextBlock>
+                <TextBlock Name="DHTStatus" Text="DHT Peers"/>
+
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem />

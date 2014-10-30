@@ -201,6 +201,7 @@ namespace ByteFlood
                         this.TotalUpSpeed = status.UploadRate;
                         this.TotalDownloaded = status.TotalDownload;
                         this.TotalUploaded = status.TotalUpload;
+                        this.DHTStatus.Text = string.Format("DHT Peers: {0}", this.state.DHTPeers);
 
                     }, null);
 

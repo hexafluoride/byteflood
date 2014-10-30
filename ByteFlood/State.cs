@@ -103,7 +103,7 @@ namespace ByteFlood
 
                 var torrents = this.LibtorrentSession.GetTorrents();
 
-                foreach (var torrent in torrents) 
+                foreach (var torrent in torrents)
                 {
                     this.Torrents.Add(new TorrentInfo(torrent));
                 }
@@ -155,12 +155,17 @@ namespace ByteFlood
         public void Shutdown()
         {
             SaveSettings();
-            SaveState();
             mainthread.Abort();
 
-            this.LibtorrentSession.StopDht();
-            this.LibtorrentSession.Dispose();
+            SaveState();
 
+            this.LibtorrentSession.StopDht();
+            this.LibtorrentSession.StartLsd();
+            this.LibtorrentSession.StartNatPmp();
+            this.LibtorrentSession.StartUpnp();
+           
+            this.LibtorrentSession.Dispose();
+     
             listener.Shutdown();
         }
 
@@ -174,9 +179,9 @@ namespace ByteFlood
             get { return Path.Combine(".", "state"); }
         }
 
-        private string LtSessionFilePath 
+        private string LtSessionFilePath
         {
-            get 
+            get
             {
                 return Path.Combine(this.StateSaveDirectory, "ltsession.bin");
             }
@@ -228,13 +233,13 @@ namespace ByteFlood
                 MessageBox.Show(string.Format("Invalid torrent file {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Could not load torrent {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format("Could not load torrent {0}\n{1}", path, ex.Message), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams() 
+            var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
             {
                 TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path)),
                 SavePath = App.Settings.DefaultDownloadPath,
@@ -259,7 +264,7 @@ namespace ByteFlood
                     ti.RatioLimit = atd.RatioLimit;
                     Torrents.Add(ti);
                 }
-                else 
+                else
                 {
                     ti.OffMyself();
                     this.LibtorrentSession.RemoveTorrent(handle);
@@ -270,8 +275,8 @@ namespace ByteFlood
 
         public bool ContainTorrent(string infoHash)
         {
-            return false;
-            //this.LibtorrentSession.FindTorrent(infoHash).
+            var handle = this.LibtorrentSession.FindTorrent(infoHash);
+            return handle != null;
         }
 
         /// <summary>
@@ -308,7 +313,7 @@ namespace ByteFlood
                 }
                 Directory.CreateDirectory(entry.DownloadDirectory);
 
-                var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams() 
+                var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
                 {
                     SavePath = entry.DownloadDirectory,
                     TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path))
@@ -366,7 +371,7 @@ namespace ByteFlood
             //        Url = magnet
             //    });
 
-           
+
             //});
         }
 
@@ -388,15 +393,15 @@ namespace ByteFlood
         //    Directory.CreateDirectory(temp_save);
         //    TorrentManager tm = new TorrentManager(mg, temp_save, new TorrentSettings(), path);
 
-           
+
         //    tm.Start();
 
-          
+
         //    int i = 0;
 
         //    tm.Stop();
         //    tm.Dispose();
-           
+
 
         //    byte[] data = null;
 
