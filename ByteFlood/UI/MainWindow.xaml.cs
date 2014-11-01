@@ -545,7 +545,7 @@ namespace ByteFlood
 
         private void SetDataContext(TorrentInfo ti)
         {
-            peers_list.ItemsSource = ti.Peers;
+            //peers_list.ItemsSource = ti.Peers;
             files_tree.Model = ti.FilesTree;
             //piece_bar.AttachTorrent(ti);
             trackers_list.ItemsSource = ti.Trackers;
@@ -559,7 +559,7 @@ namespace ByteFlood
 
         private void ResetDataContext()
         {
-            peers_list.ItemsSource = null;
+            //peers_list.ItemsSource = null;
             files_tree.Model = null;
             //piece_bar.DetachTorrent();
             trackers_list.ItemsSource = null;

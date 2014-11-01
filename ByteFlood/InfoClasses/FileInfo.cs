@@ -18,10 +18,34 @@ namespace ByteFlood
 
         public string FileName
         {
-            get { return this.File.Path.Split(System.IO.Path.DirectorySeparatorChar).Last(); }
+            get { return System.IO.Path.GetFileName(this.File.Path); }
         }
 
-        public double Progress { get { return this.Owner.Torrent.GetFileProgresses()[0]; } }
+        private long _downloaded_bytes = 0;
+        public long DownloadedBytes 
+        {
+            get { return this._downloaded_bytes; }
+            set 
+            {
+                if (value != this._downloaded_bytes) 
+                {
+                    this._downloaded_bytes = value;
+                    UpdateList("DownloadedBytes", "Progress");
+                }
+            }
+        }
+
+        public double Progress 
+        {
+            get 
+            {
+                if (this.RawSize > 0) 
+                {
+                    return Convert.ToDouble(this.DownloadedBytes) / Convert.ToDouble(this.RawSize);
+                }
+                return 100d;
+            } 
+        }
 
         public string Priority
         {
@@ -35,7 +59,7 @@ namespace ByteFlood
         public void ChangePriority(int pr)
         {
             this.Owner.Torrent.SetFilePriority(this.FileIndex, pr);
-            UpdateList("Priority");
+            UpdateSingle("Priority");
         }
 
         public bool DownloadFile
@@ -51,7 +75,7 @@ namespace ByteFlood
                 {
                     this.Owner.Torrent.SetFilePriority(this.FileIndex, 0);
                 }
-                UpdateList("DownloadFile");
+                UpdateSingle("DownloadFile");
             }
         }
 
@@ -78,17 +102,19 @@ namespace ByteFlood
             }
         }
 
-        public void Update()
-        {
-            UpdateList("Progress");
-        }
-
         #region INotifyPropertyChanged implementation
 
-        public void UpdateList(string str)
+        public void UpdateSingle(string str)
         {
             if (PropertyChanged == null) { return; }
             PropertyChanged(this, new PropertyChangedEventArgs(str));
+        }
+
+        public void UpdateList(params string[] str)
+        {
+            if (PropertyChanged == null) { return; }
+            foreach(string s in str)
+                PropertyChanged(this, new PropertyChangedEventArgs(s));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

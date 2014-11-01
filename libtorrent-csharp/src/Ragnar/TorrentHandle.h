@@ -63,7 +63,9 @@ namespace Ragnar
 
         cli::array<long long>^ GetFileProgresses();
 
-        void ClearError();
+		cli::array<long long>^ GetFileProgressesFast(cli::array<long long>^ result);
+        
+		void ClearError();
 
         void AddTracker(AnnounceEntry^ entry);
 
