@@ -98,7 +98,7 @@ namespace ByteFlood.Services.RSS
         {
             get
             {
-                return items.Count(rt => FeedsManager.AppState.Torrents.Any(ti => ti.Path == rt.Value.TorrentFilePath));
+                return items.Count(rt => FeedsManager.AppState.Torrents.Any(ti => ti.OriginalTorrentFilePath == rt.Value.TorrentFilePath));
             }
         }
 

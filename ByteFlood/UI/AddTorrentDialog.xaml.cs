@@ -15,30 +15,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using MonoTorrent;
-using MonoTorrent.Client;
 
 using MonoTorrent.Common;
-using Microsoft.Win32;
-using System.Threading;
-using System.Net;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace ByteFlood
 {
@@ -47,32 +31,12 @@ namespace ByteFlood
     /// </summary>
     public partial class AddTorrentDialog : Window
     {
-
         public TorrentInfo TorrentInfo { get; private set; }
 
         public bool AutoStartTorrent = true;
         public bool UserOK = false;
         public bool WindowClosed = false;
         public float RatioLimit { get; set; }
-
-        public Torrent Torrent
-        {
-            get { return (Torrent)GetValue(TorrentProperty); }
-            set { SetValue(TorrentProperty, value); }
-        }
-
-        public static readonly DependencyProperty TorrentProperty =
-            DependencyProperty.Register("Torrent", typeof(Torrent), typeof(AddTorrentDialog), new PropertyMetadata(null));
-
-
-        public ObservableCollection<FileInfo> FileList
-        {
-            get { return (ObservableCollection<FileInfo>)GetValue(FileListProperty); }
-            set { SetValue(FileListProperty, value); }
-        }
-
-        public static readonly DependencyProperty FileListProperty =
-            DependencyProperty.Register("FileList", typeof(ObservableCollection<FileInfo>), typeof(AddTorrentDialog), new PropertyMetadata(null));
 
         public string TorrentName
         {
@@ -105,7 +69,6 @@ namespace ByteFlood
         {
             InitializeComponent();
             this.Closed += (s, e) => { this.WindowClosed = true; };
-            this.FileList = new ObservableCollection<FileInfo>();
             this.TorrentInfo = torrent;
             Load();
         }
@@ -129,27 +92,12 @@ namespace ByteFlood
             this.TorrentName = this.TorrentInfo.Torrent.TorrentFile.Name;
 
             this.TorrentSavePath = App.Settings.DefaultDownloadPath;
-            
-            load_files(this.TorrentInfo.FilesTree);
+
+            this.fileList.ItemsSource = this.TorrentInfo.FileInfoList;
 
             UpdateSize();
 
             this.Activate();
-        }
-
-        private void load_files(DirectoryKey dk)
-        {
-            foreach (var item in dk.Values)
-            {
-                if (item.GetType() == typeof(FileInfo))
-                {
-                    this.FileList.Add((FileInfo)item);
-                }
-                else if (item.GetType() == typeof(DirectoryKey))
-                {
-                    load_files((DirectoryKey)item);
-                }
-            }
         }
 
         #region Commands
@@ -178,7 +126,7 @@ namespace ByteFlood
 
         private void Commands_SelectAll(object sender, ExecutedRoutedEventArgs e)
         {
-            foreach (FileInfo file in this.FileList)
+            foreach (FileInfo file in this.TorrentInfo.FileInfoList)
             {
                 file.DownloadFile = true;
             }
@@ -186,14 +134,13 @@ namespace ByteFlood
 
         private void Commands_DeselectAll(object sender, ExecutedRoutedEventArgs e)
         {
-            foreach (FileInfo file in this.FileList)
+            foreach (FileInfo file in this.TorrentInfo.FileInfoList)
             {
                 file.DownloadFile = false;
             }
         }
 
         #endregion
-
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {

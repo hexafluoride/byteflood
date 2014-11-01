@@ -1034,6 +1034,7 @@ namespace ByteFlood
                 t.Torrent.Pause();
 
                 this.state.LibtorrentSession.RemoveTorrent(t.Torrent);
+                this.state.DeleteTorrentStateData(t.InfoHash);
 
                 uiContext.Send(x =>
                 {
@@ -1060,7 +1061,7 @@ namespace ByteFlood
 
         private void DeleteTorrent(TorrentInfo t)
         {
-            System.IO.File.Delete(t.TorrentFilePath);
+            System.IO.File.Delete(t.OriginalTorrentFilePath);
         }
 
         private void DeleteData(TorrentInfo t)

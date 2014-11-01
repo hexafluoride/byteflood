@@ -11,6 +11,8 @@ using MonoTorrent.Client.Connections;
 using System.Threading;
 using System.Net;
 using System.IO;
+using Jayrock.Json;
+using Jayrock.Json.Conversion;
 
 namespace ByteFlood
 {
@@ -18,28 +20,16 @@ namespace ByteFlood
     {
         public ObservableCollection<TorrentInfo> Torrents = new ObservableCollection<TorrentInfo>();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        [XmlIgnore]
         public MainWindow window = (MainWindow)App.Current.MainWindow;
 
-        [XmlIgnore]
         public SynchronizationContext uiContext;
-        public int DownloadingTorrentCount { get { return Torrents.Count(window.Downloading); } set { } }
-        public int SeedingTorrentCount { get { return Torrents.Count(window.Seeding); } set { } }
-        public int ActiveTorrentCount { get { return Torrents.Count(window.Active); } set { } }
-        public int InactiveTorrentCount { get { return TorrentCount - ActiveTorrentCount; } set { } }
-        public int FinishedTorrentCount { get { return Torrents.Count(window.Finished); } set { } }
 
-        [XmlIgnore]
-        public int TorrentCount { get { return Torrents.Count; } }
-
-        [XmlIgnore]
         public Thread mainthread;
 
-        [XmlIgnore]
         public Listener listener;
 
-        [XmlIgnore]
+        #region Global Statistics Properties
+
         public int DHTPeers
         {
             get
@@ -74,21 +64,42 @@ namespace ByteFlood
             }
         }
 
+        #endregion
+
+        #region Torrents Counters
+
+        public int DownloadingTorrentCount { get { return Torrents.Count(window.Downloading); } }
+
+        public int SeedingTorrentCount { get { return Torrents.Count(window.Seeding); } }
+
+        public int ActiveTorrentCount { get { return Torrents.Count(window.Active); } }
+
+        public int InactiveTorrentCount { get { return TorrentCount - ActiveTorrentCount; } }
+
+        public int FinishedTorrentCount { get { return Torrents.Count(window.Finished); } }
+
+        public int TorrentCount { get { return Torrents.Count; } }
+
+        #endregion
+
         public State()
         {
-            this.Torrents.CollectionChanged += Torrents_CollectionChanged;
+            this.Torrents.CollectionChanged += (s, e) => { NotifySinglePropertyChanged("TorrentCount"); };
             this.Initialize();
         }
 
         public Ragnar.Session LibtorrentSession { get; private set; }
 
+        public LibTorrentAlertsWatcher LibTorrentAlerts { get; private set; }
+
         public void Initialize()
         {
-            UpdateConnectionSettings();
-            IPV4Connection.ExceptionThrown += Utility.LogException;
-            IPV4Connection.LocalAddress = IPAddress.Any;
+            Directory.CreateDirectory(State.StateSaveDirectory);
+            Directory.CreateDirectory(State.TorrentsStateSaveDirectory);
 
             this.LibtorrentSession = new Ragnar.Session();
+
+            this.LibtorrentSession.SetAlertMask(Ragnar.SessionAlertCategory.All);
 
             this.LibtorrentSession.ListenOn(App.Settings.ListeningPort, App.Settings.ListeningPort);
 
@@ -97,19 +108,60 @@ namespace ByteFlood
             this.LibtorrentSession.StartNatPmp();
             this.LibtorrentSession.StartUpnp();
 
+            this.LibTorrentAlerts = new LibTorrentAlertsWatcher(this.LibtorrentSession);
+
+            this.LibTorrentAlerts.ResumeDataArrived += LibTorrentAlerts_ResumeDataArrived;
+            this.LibTorrentAlerts.TorrentAdded += LibTorrentAlerts_TorrentAdded;
+            this.LibTorrentAlerts.TorrentStateChanged += LibTorrentAlerts_TorrentStateChanged;
+            this.LibTorrentAlerts.TorrentStatsUpdated += LibTorrentAlerts_TorrentStatsUpdated;
+            this.LibTorrentAlerts.TorrentFinished += LibTorrentAlerts_TorrentFinished;
+
             if (File.Exists(LtSessionFilePath))
             {
                 this.LibtorrentSession.LoadState(File.ReadAllBytes(LtSessionFilePath));
 
-                var torrents = this.LibtorrentSession.GetTorrents();
-
-                foreach (var torrent in torrents)
+                foreach (string file in Directory.GetFiles(State.TorrentsStateSaveDirectory, "*.torrent"))
                 {
-                    this.Torrents.Add(new TorrentInfo(torrent));
+                    Ragnar.AddTorrentParams para = new Ragnar.AddTorrentParams();
+
+                    para.TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(file));
+
+                    string tjson_file = Path.ChangeExtension(file, "tjson");
+
+                    if (File.Exists(tjson_file))
+                    {
+                        using (var reader = File.OpenText(tjson_file))
+                        {
+                            JsonObject data = JsonConvert.Import<JsonObject>(reader);
+                            para.SavePath = Convert.ToString(data["SavePath"]);
+                        }
+                    }
+                    else
+                    {
+                        para.SavePath = App.Settings.DefaultDownloadPath;
+                    }
+
+                    string resume_file = Path.ChangeExtension(file, "resume");
+
+                    if (File.Exists(resume_file))
+                    {
+                        // Loading the resume data will load all torrents settings,
+                        // with the exception of byteflood settings {RatioLimit, RanCommand, PickedMovieData}
+                        para.ResumeData = File.ReadAllBytes(resume_file);
+                    }
+
+                    this.LibtorrentSession.AsyncAddTorrent(para);
                 }
             }
 
+            CheckByteFloodAssociation();
 
+            listener = new Listener(this);
+            listener.State = this;
+        }
+
+        private void CheckByteFloodAssociation()
+        {
             if (!App.Settings.AssociationAsked)
             {
                 bool assoc = Utility.Associated();
@@ -128,11 +180,52 @@ namespace ByteFlood
                         App.Settings.AssociationAsked = false;
                 }
             }
-
-            listener = new Listener(this);
-            listener.State = this;
         }
 
+        #region LibTorrent Alerts Handling
+
+        void LibTorrentAlerts_TorrentFinished(Ragnar.TorrentHandle handle)
+        {
+            var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
+            if (results.Count() > 1)
+            {
+                results.First().DoTorrentComplete();
+            }
+        }
+
+        void LibTorrentAlerts_TorrentStatsUpdated(Ragnar.TorrentStatus status)
+        {
+            return;
+        }
+
+        void LibTorrentAlerts_TorrentStateChanged(Ragnar.TorrentHandle handle, Ragnar.TorrentState oldstate, Ragnar.TorrentState newstate)
+        {
+            var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
+            if (results.Count() > 1)
+            {
+                results.First().DoStateChanged(oldstate, newstate);
+            }
+        }
+
+        void LibTorrentAlerts_TorrentAdded(Ragnar.TorrentHandle handle)
+        {
+            App.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                if (this.Torrents.Where(t => t.Torrent.InfoHash.ToHex() == handle.InfoHash.ToHex()).Count() == 0)
+                {
+                    this.Torrents.Add(new TorrentInfo(handle));
+                }
+            }));
+        }
+
+        void LibTorrentAlerts_ResumeDataArrived(Ragnar.TorrentHandle handle, byte[] data)
+        {
+            string path = Path.Combine(State.TorrentsStateSaveDirectory, handle.InfoHash.ToHex() + ".resume");
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            File.WriteAllBytes(path, data);
+        }
+
+        #endregion
 
         public void ChangeNetworkInterface()
         {
@@ -140,32 +233,26 @@ namespace ByteFlood
             // var new_iface = Utility.GetNetworkInterface(App.Settings.NetworkInterfaceID);
         }
 
-        private void Torrents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            NotifySinglePropertyChanged("TorrentCount");
-        }
-
-        public void UpdateConnectionSettings()
-        {
-            IPV4Connection.UseRandomPorts = App.Settings.OutgoingPortsRandom;
-            if (!IPV4Connection.UseRandomPorts)
-                IPV4Connection.LocalPorts = Enumerable.Range(App.Settings.OutgoingPortsStart, App.Settings.OutgoingPortsEnd - App.Settings.OutgoingPortsStart).ToArray();
-        }
-
         public void Shutdown()
         {
             SaveSettings();
             mainthread.Abort();
 
-            SaveState();
+            SaveState(true);
 
             this.LibtorrentSession.StopDht();
-            this.LibtorrentSession.StartLsd();
-            this.LibtorrentSession.StartNatPmp();
-            this.LibtorrentSession.StartUpnp();
-           
+            this.LibtorrentSession.StopLsd();
+            this.LibtorrentSession.StopNatPmp();
+            this.LibtorrentSession.StopUpnp();
+
+            this.LibtorrentSession.Pause();
+
+            this.LibTorrentAlerts.StopWatching();
+
+            while (this.LibTorrentAlerts.IsRunning) ;
+
             this.LibtorrentSession.Dispose();
-     
+
             listener.Shutdown();
         }
 
@@ -174,32 +261,82 @@ namespace ByteFlood
             Settings.Save(App.Settings, "./config.xml");
         }
 
-        private string StateSaveDirectory
+        public static string StateSaveDirectory
         {
             get { return Path.Combine(".", "state"); }
+        }
+
+        /// <summary>
+        /// This is the directory where .torrent file, resume data (.resume) and
+        /// misc settings (.tjson) are saved.
+        /// </summary>
+        public static string TorrentsStateSaveDirectory
+        {
+            get
+            {
+                return Path.Combine(StateSaveDirectory, "torrents-bkp");
+            }
         }
 
         private string LtSessionFilePath
         {
             get
             {
-                return Path.Combine(this.StateSaveDirectory, "ltsession.bin");
+                return Path.Combine(StateSaveDirectory, "ltsession.bin");
             }
         }
 
-        public void SaveState()
+        public void SaveState(bool is_shuttingdown = false)
         {
-            Directory.CreateDirectory(this.StateSaveDirectory);
+            Directory.CreateDirectory(StateSaveDirectory);
 
-            File.WriteAllBytes(LtSessionFilePath, this.LibtorrentSession.SaveState());
+            File.WriteAllBytes(this.LtSessionFilePath, this.LibtorrentSession.SaveState());
 
-            var torrents = this.LibtorrentSession.GetTorrents();
-
-            foreach (var torrent in torrents)
+            for (int index = 0; index < this.Torrents.Count; index++)
             {
-                if (torrent.NeedSaveResumeData())
+                try
                 {
-                    torrent.SaveResumeData();
+                    TorrentInfo ti = this.Torrents[index];
+                    Ragnar.TorrentHandle handle = ti.Torrent;
+
+                    if (handle.NeedSaveResumeData())
+                    {
+                        handle.SaveResumeData();
+                    }
+
+                    if (is_shuttingdown)
+                    {
+                        //save misc settings
+
+                        JsonObject jo = new JsonObject();
+                        jo.Add("SavePath", handle.QueryStatus().SavePath);
+
+                        //jo.Add("PickedMovieData", ti.PickedMovieData.ToString());
+
+                        jo.Add("RanCommand", ti.RanCommand);
+
+                        jo.Add("RatioLimit", ti.RatioLimit);
+
+                        jo.Add("CompletionCommand", ti.CompletionCommand);
+
+                        jo.Add("CustomName", ti.Name);
+
+                        jo.Add("OriginalTorrentFilePath", ti.OriginalTorrentFilePath);
+
+                        using (TextWriter tw = File.CreateText(
+                            Path.Combine(State.TorrentsStateSaveDirectory, ti.InfoHash + ".tjson")))
+                        {
+                            JsonConvert.Export(jo, tw);
+                        }
+                    }
+                }
+                catch (System.IndexOutOfRangeException)
+                {
+                    break;
+                }
+                catch (Exception)
+                {
+                    continue;
                 }
             }
         }
@@ -248,7 +385,9 @@ namespace ByteFlood
             handle.AutoManaged = false;
             handle.Pause();
 
+
             TorrentInfo ti = new TorrentInfo(handle);
+            ti.OriginalTorrentFilePath = path;
 
             uiContext.Send(x =>
             {
@@ -257,20 +396,34 @@ namespace ByteFlood
                 atd.ShowDialog();
                 if (atd.UserOK)
                 {
-                    handle.AutoManaged = true;
                     ti.Name = atd.TorrentName;
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
                     ti.RatioLimit = atd.RatioLimit;
-                    Torrents.Add(ti);
+
+                    if (!this.Torrents.Contains(ti))
+                    {
+                        this.Torrents.Add(ti);
+                    }
                 }
                 else
                 {
-                    ti.OffMyself();
                     this.LibtorrentSession.RemoveTorrent(handle);
-                    handle.Dispose();
+                    this.DeleteTorrentStateData(ti.InfoHash);
+                    ti.OffMyself();
+                    this.Torrents.Remove(ti);
                 }
             }, null);
+        }
+
+        public void DeleteTorrentStateData(string infohash)
+        {
+            foreach (string e in (new string[] { ".torrent", ".tjson", ".resume" }))
+            {
+                string path = Path.Combine(State.TorrentsStateSaveDirectory, infohash + e);
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
         }
 
         public bool ContainTorrent(string infoHash)
@@ -286,9 +439,7 @@ namespace ByteFlood
         /// <returns>The new path of the torrent file.</returns>
         public string BackupTorrent(string path, Torrent t)
         {
-            string directory = "./torrents-bkp";
-            Directory.CreateDirectory(directory);
-            string newpath = System.IO.Path.Combine(directory, t.InfoHash.ToHex() + ".torrent");
+            string newpath = System.IO.Path.Combine(State.TorrentsStateSaveDirectory, t.InfoHash.ToHex() + ".torrent");
             if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
                 File.Copy(path, newpath, true);
             return newpath;
@@ -450,6 +601,8 @@ namespace ByteFlood
 
         #endregion
 
+        #region INotifyPropertyChanged implementation
+
         public void NotifyChanged(params string[] props)
         {
             if (PropertyChanged == null)
@@ -465,5 +618,9 @@ namespace ByteFlood
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
     }
 }
