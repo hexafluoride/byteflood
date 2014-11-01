@@ -187,7 +187,7 @@ namespace ByteFlood
         void LibTorrentAlerts_TorrentFinished(Ragnar.TorrentHandle handle)
         {
             var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
-            if (results.Count() > 1)
+            if (results.Count() != 0)
             {
                 results.First().DoTorrentComplete();
             }
@@ -195,13 +195,17 @@ namespace ByteFlood
 
         void LibTorrentAlerts_TorrentStatsUpdated(Ragnar.TorrentStatus status)
         {
-            return;
+            var results = this.Torrents.Where(t => t.InfoHash == status.InfoHash.ToHex());
+            if (results.Count() != 0)
+            {
+                results.First().DoStatsUpdate(status);
+            }
         }
 
         void LibTorrentAlerts_TorrentStateChanged(Ragnar.TorrentHandle handle, Ragnar.TorrentState oldstate, Ragnar.TorrentState newstate)
         {
             var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
-            if (results.Count() > 1)
+            if (results.Count() != 0)
             {
                 results.First().DoStateChanged(oldstate, newstate);
             }
@@ -322,6 +326,8 @@ namespace ByteFlood
                         jo.Add("CustomName", ti.Name);
 
                         jo.Add("OriginalTorrentFilePath", ti.OriginalTorrentFilePath);
+
+                        jo.Add("IsStopped", ti.IsStopped);
 
                         using (TextWriter tw = File.CreateText(
                             Path.Combine(State.TorrentsStateSaveDirectory, ti.InfoHash + ".tjson")))

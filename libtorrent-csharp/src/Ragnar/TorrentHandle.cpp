@@ -127,6 +127,19 @@ namespace Ragnar
         return result;
     }
 
+	cli::array<long long>^ TorrentHandle::GetFileProgressesFast(cli::array<long long>^ result)
+	{
+		std::vector<libtorrent::size_type> fp;
+		this->_handle->file_progress(fp, libtorrent::torrent_handle::piece_granularity);
+
+		for (int i = 0; i < fp.size(); i++)
+		{
+			result[i] = fp[i];
+		}
+
+		return result;
+	}
+
     void TorrentHandle::ClearError()
     {
         this->_handle->clear_error();
