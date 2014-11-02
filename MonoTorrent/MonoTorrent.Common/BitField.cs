@@ -67,6 +67,14 @@ namespace MonoTorrent.Common
             get { return (double)this.trueCount / this.length * 100.0; }
         }
 
+        /// <summary>
+        /// The same as PercentComplete, except we aren't multiplying by 100
+        /// </summary>
+        public double PerOneComplete 
+        {
+            get { return (double)this.trueCount / this.length; }
+        }
+
         #endregion
 
 

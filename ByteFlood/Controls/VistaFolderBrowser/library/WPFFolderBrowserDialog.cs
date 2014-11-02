@@ -69,7 +69,6 @@ namespace WPFFolderBrowser
         {
             IShellItemArray resultsArray;
             uint count;
-            IShellItem directory;
             if (names != null)
             {
                 openDialogCoClass.GetResults(out resultsArray);

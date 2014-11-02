@@ -524,7 +524,7 @@ namespace MonoTorrent.Client
                 }
             }
 
-            Tracker.Tracker tracker = manager.TrackerManager.CurrentTracker;
+            /*Tracker.Tracker tracker = manager.TrackerManager.CurrentTracker;
             if (tracker != null && (manager.State == TorrentState.Seeding || manager.State == TorrentState.Downloading))
             {
                 // If the last connection succeeded, then update at the regular interval
@@ -540,6 +540,11 @@ namespace MonoTorrent.Client
                 {
                     manager.TrackerManager.Announce(TorrentEvent.None);
                 }
+            }*/
+
+            if (manager.State == TorrentState.Seeding || manager.State == TorrentState.Downloading)
+            {
+                manager.TrackerManager.CheckAndAnnounceAll();
             }
         }
 

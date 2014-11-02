@@ -54,6 +54,7 @@ namespace ByteFlood
         {
             InitializeComponent();
             ti = t;
+            this.Title = string.Format("{0} - ({1})", this.Title, t.Name);
         }
         public void PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
@@ -62,7 +63,7 @@ namespace ByteFlood
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if(!fake)
-                tp = TorrentProperties.FromTorrentSettings(ti.Torrent.Settings);
+                //tp = TorrentProperties.FromTorrentSettings(ti.Torrent.Settings);
             maxcons.Text = tp.MaxConnections.ToString();
             maxdown.Text = (tp.MaxDownloadSpeed / 1024).ToString();
             maxup.Text = (tp.MaxUploadSpeed / 1024).ToString();
@@ -70,9 +71,11 @@ namespace ByteFlood
             peerex.IsChecked = tp.EnablePeerExchange;
             uploadslots.Text = tp.UploadSlots.ToString();
         }
+
+        static Regex regex = new Regex("[^0-9]+", RegexOptions.Compiled);
+
         private static bool IsTextAllowed(string text)
-        {
-            Regex regex = new Regex("[^0-9]+");
+        {  
             return !regex.IsMatch(text);
         }
 
@@ -86,7 +89,7 @@ namespace ByteFlood
             tp.UploadSlots = int.Parse(uploadslots.Text);
             if (!fake)
             {
-                TorrentProperties.Apply(ti.Torrent, tp);
+                //TorrentProperties.Apply(ti.Torrent, tp);
                 ti.CompletionCommand = comp.Text;
             }
             success = true;

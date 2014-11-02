@@ -12,79 +12,83 @@ namespace ByteFlood
     {
         public string URL
         {
-            get { return this.Tracker.Uri.ToString(); }
+            get { return this.Tracker.Url; }
         }
 
-        public Tracker Tracker { get; private set; }
+        public Ragnar.AnnounceEntry Tracker { get; private set; }
 
         public string UpdateInString
         {
             get
             {
-                if (this.Parent.Torrent.State == TorrentState.Downloading || 
-                    this.Parent.Torrent.State == TorrentState.Seeding ||
-                    this.Parent.Torrent.State == TorrentState.Paused)
+                if (this.Tracker.Updating)
                 {
-                    TimeSpan ts = this.NextAnnounce - DateTime.Now;
-                    if (ts.TotalSeconds <= 0)
-                    {
-                        return "Updating...";
-                    }
-                    else
-                    {
-                        return HMSFormatter.GetReadableTimespan(ts);
-                    }
+                    return "Updating...";
                 }
-                else { return ""; }
+                else
+                {
+                    return "";
+
+                    //TimeSpan ts = this.NextAnnounce - DateTime.Now;
+                    //if (ts.TotalSeconds <= 0)
+                    //{
+                    //    return "Update Queued";
+                    //}
+                    //else
+                    //{
+                    //    return HMSFormatter.GetReadableTimespan(ts);
+                    //}
+                }
             }
         }
 
-        public int PeersCount
-        {
-            get;
-            private set;
-        }
+        //public int PeersCount
+        //{
+        //    get 
+        //    {
+        //        return 0;
+        //    }
+        //}
 
-        public TrackerState State
-        {
-            get
-            {
-                return this.Tracker.Status;
-            }
-        }
+        //public TrackerState State
+        //{
+        //    get
+        //    {
+        //        return this.Tracker.s;
+        //    }
+        //}
 
         public string FailureMessage
         {
-            get { return this.Tracker.FailureMessage; }
+            get { return this.Tracker.Message; }
         }
+
         public TorrentInfo Parent { get; set; }
 
-        public TrackerInfo(Tracker t, TorrentInfo parent)
+        public TrackerInfo(Ragnar.AnnounceEntry t, TorrentInfo parent)
         {
             this.Tracker = t;
             this.Parent = parent;
-
-            t.AnnounceComplete += t_AnnounceComplete;
         }
 
-        private DateTime LastAnnounce = DateTime.Now;
-        private DateTime NextAnnounce = DateTime.Now;
+        //private DateTime LastAnnounce = DateTime.Now;
+        //private DateTime NextAnnounce = DateTime.Now;
 
-        void t_AnnounceComplete(object sender, AnnounceResponseEventArgs e)
-        {
-            this.LastAnnounce = DateTime.Now;
-            this.NextAnnounce = DateTime.Now + this.Tracker.UpdateInterval;
-            if (e.Successful)
-            {
-                this.PeersCount = e.Peers.Count;
-            }
-            else 
-            {
-                return;
-            }
-            //Insert here things that updates after an announce
-            UpdateList("PeersCount", "State");
-        }
+        //void t_AnnounceComplete(object sender, AnnounceResponseEventArgs e)
+        //{
+        //    this.LastAnnounce = DateTime.Now;
+        //    this.NextAnnounce = DateTime.Now + this.Tracker.UpdateInterval;
+        //    if (e.Successful)
+        //    {
+        //        this.PeersCount = e.Peers.Count;
+        //    }
+        //    else
+        //    {
+        //        return;
+        //    }
+        //    //Insert here things that updates after an announce
+        //    UpdateList("PeersCount", "State");
+        //}
 
         public void Update()
         {
@@ -92,6 +96,7 @@ namespace ByteFlood
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("UpdateInString"));
+                PropertyChanged(this, new PropertyChangedEventArgs("FailureMessage"));
             }
         }
 

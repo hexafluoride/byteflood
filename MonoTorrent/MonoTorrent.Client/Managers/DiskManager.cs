@@ -311,7 +311,14 @@ namespace MonoTorrent.Client
             IOLoop.QueueWait(delegate {
                 try
                 {
-                    result = writer.Exists (file);
+                    if (file.Length == 0)
+                    {
+                        if (!File.Exists(file.FullPath)) {
+                            File.Create(file.FullPath).Close();
+                        }
+                        result = true;
+                    }
+                    else { result = writer.Exists(file); }
                 }
                 catch (Exception ex)
                 {

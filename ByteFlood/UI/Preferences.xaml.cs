@@ -83,20 +83,20 @@ namespace ByteFlood
             styleCombox.SelectionChanged += this.ReloadStyle;
         }
 
-        private void LoadNetworkInterfaces() 
+        private void LoadNetworkInterfaces()
         {
-            foreach (var iface in Utility.GetValidNetworkInterfaces()) 
+            foreach (var iface in Utility.GetValidNetworkInterfaces())
             {
                 ComboBoxItem bi = new ComboBoxItem();
                 bi.Content = iface.Name;
                 bi.Tag = iface;
                 interfaces.Items.Add(bi);
-                if (iface.Id == local.NetworkInterfaceID) 
+                if (iface.Id == local.NetworkInterfaceID)
                 {
                     interfaces.SelectedItem = bi;
                 }
             }
-            if (interfaces.SelectedIndex == -1) 
+            if (interfaces.SelectedIndex == -1)
             {
                 interfaces.SelectedIndex = 0;
             }
@@ -108,11 +108,11 @@ namespace ByteFlood
             ComboBoxItem bi = interfaces.SelectedItem as ComboBoxItem;
             var iface = bi.Tag as System.Net.NetworkInformation.NetworkInterface;
             local.NetworkInterfaceID = iface.Id;
-            if (iface.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) 
+            if (iface.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up)
             {
                 iface_error.Visibility = Visibility.Visible;
             }
-            else 
+            else
             {
                 iface_error.Visibility = Visibility.Collapsed;
             }
@@ -190,19 +190,18 @@ namespace ByteFlood
             local.EncryptionType = EncryptionTypes[enctype.SelectedIndex];
             local.SeedingTorrentsAreActive = this.seedingTorrentsInac.IsChecked == true;
             MainWindow mw = (App.Current.MainWindow as MainWindow);
-            mw.state.ce.Settings.Force = local.EncryptionType;
+           
+            //mw.state.ce.Settings.Force = local.EncryptionType;
+            
             local.Theme = (Theme)themeCombox.SelectedItem;
-            bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
-            bool queue_settings_changed = App.Settings.EnableQueue != local.EnableQueue || App.Settings.QueueSize != local.QueueSize;
+
+            //bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
+           
             App.Settings = (Settings)Utility.CloneObject(local);
-            if (iface_changed) 
-            {
-                mw.state.ChangeNetworkInterface();
-            }
-            if (queue_settings_changed) 
-            {
-                mw.state.tq.ReloadSettings();
-            }
+            //if (iface_changed)
+            //{
+            //    mw.state.ChangeNetworkInterface();
+            //}
             this.Close();
         }
 
