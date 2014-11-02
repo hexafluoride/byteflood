@@ -187,7 +187,7 @@ namespace ByteFlood
                 var dialog = title == null ? new WPFFolderBrowser.WPFFolderBrowserDialog() : new WPFFolderBrowser.WPFFolderBrowserDialog(title);
                 dialog.ShowPlacesList = true;
 
-                if (initialDir != null) 
+                if (initialDir != null)
                 {
                     dialog.FileName = initialDir;
                 }
@@ -207,7 +207,7 @@ namespace ByteFlood
                 {
                     fd.SelectedPath = initialDir;
                 }
-                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK) 
+                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     link = fd.SelectedPath;
                 };
@@ -242,7 +242,7 @@ namespace ByteFlood
             {
                 using (XmlWriter xw = XmlWriter.Create(temp_file, new XmlWriterSettings()
                 {
-                    Indent = true
+                    Indent = false
                 }))
                 {
                     new XmlSerializer(typeof(T)).Serialize(xw, t);
@@ -394,7 +394,7 @@ namespace ByteFlood
             return c;
         }
 
-        public static Brush GetBrushFromTorrentState(TorrentState s, bool finished)
+        public static Brush GetBrushFromTorrentState(Ragnar.TorrentStatus s)
         {
             Style pstyle = (Style)Application.Current.TryFindResource(typeof(ProgressBar));
             Brush def = Brushes.Gray; ;
@@ -411,26 +411,36 @@ namespace ByteFlood
                 }
             }
             Brush yellow = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFe5e500")); // we need a better color for this
-            switch (s)
+
+            if (s.IsFinished)
             {
-                case TorrentState.Downloading:
-                case TorrentState.Seeding:
+                if (s.IsSeeding)
+                {
                     return def;
-                case TorrentState.Stopped:
-                case TorrentState.Stopping:
-                    if (finished)
-                        return Brushes.Green;
-                    else
-                        return Brushes.Red;
-                case TorrentState.Error:
-                    return Brushes.Red;
-                case TorrentState.Paused:
-                    return Brushes.Orange;
-                case TorrentState.Hashing:
-                    return Brushes.DarkOrange;
-                default:
-                    return def;
+                }
+                return Brushes.Green;
             }
+            else
+            {
+                if (s.State == Ragnar.TorrentState.Downloading)
+                {
+                    if (s.Paused)
+                    {
+                        return Brushes.Orange;
+                    }
+                    else
+                    {
+                        return def;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(s.Error))
+                {
+                    return Brushes.Red;
+                }
+            }
+
+            return def;
         }
 
         // TODO: Tidy this up

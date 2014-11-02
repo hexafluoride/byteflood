@@ -247,6 +247,7 @@ namespace MonoTorrent.Client
                         current += tf.BytesDownloaded;
                     }
                 }
+                if (total == 0) { return 100d; }
                 return ((double)current / (double)total) * 100d;
             }
         }
@@ -645,12 +646,14 @@ namespace MonoTorrent.Client
                 if (State == TorrentState.Seeding || State == TorrentState.Downloading)
                     return;
 
-                if (TrackerManager.CurrentTracker != null)
-                {
-                    //if (this.trackerManager.CurrentTracker.CanScrape)
-                    //    this.TrackerManager.Scrape();
-                    this.trackerManager.Announce(TorrentEvent.Started); // Tell server we're starting
-                }
+                this.trackerManager.CheckAndAnnounceAll(TorrentEvent.Started); // Tell server we're starting
+
+                //if (TrackerManager.CurrentTracker != null)
+                //{
+                //    //if (this.trackerManager.CurrentTracker.CanScrape)
+                //    //    this.TrackerManager.Scrape();
+                //    this.trackerManager.Announce(TorrentEvent.Started); // Tell server we're starting
+                //}
 
                 if (this.Complete && this.settings.InitialSeedingEnabled && ClientEngine.SupportsInitialSeed) {
 					Mode = new InitialSeedingMode(this);
@@ -731,7 +734,67 @@ namespace MonoTorrent.Client
 
         #endregion
 
+        public void ManualAddPeer(string host, int port)
+        {
+            ClientEngine.MainLoop.QueueWait (() =>
+            {
+                try
+                {
+                    //First, we connect to the target peer
+                    var tc = new System.Net.Sockets.TcpClient(host, port);
 
+                    //Prepare the handshake message, so we can send it
+                    List<byte> data = new List<byte>();
+
+                    byte[] protocol_message = Encoding.UTF8.GetBytes("BitTorrent protocol");
+                    data.Add(Convert.ToByte(protocol_message.Length));
+                    data.AddRange(protocol_message);
+                    data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+                    data.AddRange(this.torrent.InfoHash.ToArray());
+                    data.AddRange(Encoding.UTF8.GetBytes(this.Engine.PeerId));
+
+                    tc.Client.Send(data.ToArray());
+
+                    byte[] receive_buffer = new byte[data.Count * 2];
+
+                    tc.Client.Receive(receive_buffer);
+                    tc.Close();
+
+                    byte[] info_hash = new byte[20];
+                    byte[] peer_id = new byte[20];
+
+                    if (receive_buffer[0] == Convert.ToByte(19))
+                    {
+                        //this is a valid bittorrent client
+
+                        for (int i = 0; i < 20; i++)
+                        {
+                            info_hash[i] = receive_buffer[i + 28];
+                            peer_id[i] = receive_buffer[i + 48];
+                        }
+                    }
+
+                    // We should check if the received info hash math this manager info hash
+                    if (Toolbox.ByteMatch(info_hash, this.torrent.infoHash.ToArray()))
+                    {
+                        // We got the client peer id!
+                        string peer_id_str = Encoding.UTF8.GetString(peer_id);
+                        Peer a = new Peer(peer_id_str, new Uri(string.Format("tcp://{0}:{1}", host, port)));
+
+                        this.AddPeersCore(a);
+                        this.RaisePeersFound(new PeerExchangePeersAdded(this, 1, 1, new PeerId(a, this)
+                        {
+                            ClientApp = new Software(peer_id_str)
+                        }));
+                    }
+                }
+                catch
+                {
+                    //whatever the error is, it's not worth it
+                }
+            });
+        }
+       
         #region Internal Methods
 
         public void AddPeers (Peer peer)
@@ -926,12 +989,13 @@ namespace MonoTorrent.Client
 
         void VerifyHashState ()
         {
-            // FIXME: I should really just ensure that zero length files always exist on disk. If the first file is
+            // [FIXED]: I should really just ensure that zero length files always exist on disk. If the first file is
             // a zero length file and someone deletes it after the first piece has been written to disk, it will
             // never be recreated. If the downloaded data requires this file to exist, we have an issue.
+            // ^^ The above issue has been fixed in the CheckFileExist method. 
             if (HasMetadata) {
                 foreach (var file in Torrent.Files)
-                    if (!file.BitField.AllFalse && hashChecked && file.Length > 0)
+                    if (!file.BitField.AllFalse && hashChecked)//&& file.Length > 0)
                         hashChecked &= Engine.DiskManager.CheckFileExists (this, file);
             }
         }

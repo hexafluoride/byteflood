@@ -39,7 +39,8 @@ namespace MonoTorrent.Client
                 state = TorrentState.Seeding;
                 Manager.RaiseTorrentStateChanged(new TorrentStateChangedEventArgs(Manager, TorrentState.Downloading, TorrentState.Seeding));
                 if (Manager.ActuallyComplete)
-                    Manager.TrackerManager.Announce(TorrentEvent.Completed); // make sure we only do this if we downloaded all pieces
+                    Manager.TrackerManager.CheckAndAnnounceAll(TorrentEvent.Completed);
+                    //Manager.TrackerManager.Announce(TorrentEvent.Completed); // make sure we only do this if we downloaded all pieces
             }
             else if (!Manager.Complete && state == TorrentState.Seeding)
             {

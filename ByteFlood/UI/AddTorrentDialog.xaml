@@ -52,7 +52,7 @@
 
         <GroupBox Header="Save in" Height="77" Width="327" Canvas.Left="10" Canvas.Top="10">
             <Grid Margin="2,0,-2,0" Width="309">
-                <ComboBox Height="23" HorizontalAlignment="Left" Margin="6,14,0,0" ItemsSource="{Binding SavedPathList}" Text="{Binding TorrentSavePath}" SelectedIndex="0" VerticalAlignment="Top" Width="251" IsEditable="True" LostFocus="ComboBox_LostFocus" />
+                <ComboBox Height="23" HorizontalAlignment="Left" Margin="6,14,0,0" ItemsSource="{Binding SavedPathList}" Text="{Binding TorrentSavePath}" SelectedIndex="0" VerticalAlignment="Top" Width="251" IsEditable="True" />
                 <Button Content="..." Height="23" HorizontalAlignment="Left" Margin="263,14,0,0" VerticalAlignment="Top" Width="43" Command="{StaticResource Commands.Browse}" />
             </Grid>
         </GroupBox>
@@ -63,12 +63,11 @@
                 <Label Content="Comment:" Height="28" HorizontalAlignment="Left" Margin="6,29,0,0" VerticalAlignment="Top" />
                 <Label Content="Size:" Height="28" HorizontalAlignment="Left" Margin="6,52,0,0" VerticalAlignment="Top" />
                 <Label Content="Date:" Height="28" HorizontalAlignment="Left" Margin="6,75,0,0" VerticalAlignment="Top" />
-                <Label Content="{Binding Torrent.Name}" Height="28" HorizontalAlignment="Left" Margin="76,6,0,0" VerticalAlignment="Top" />
-                <Label Content="{Binding Torrent.Comment}" Height="28" HorizontalAlignment="Left" Margin="76,29,0,0" VerticalAlignment="Top" />
+                <Label Content="{Binding TorrentInfo.Torrent.TorrentFile.Name}" Height="28" HorizontalAlignment="Left" Margin="76,6,0,0" VerticalAlignment="Top" />
+                <Label Content="{Binding TorrentInfo.Torrent.TorrentFile.Comment}" Height="28" HorizontalAlignment="Left" Margin="76,29,0,0" VerticalAlignment="Top" />
                 <Label Height="28" HorizontalAlignment="Left" Margin="76,52,0,0" VerticalAlignment="Top" Name="size" />
-                <Label Content="{Binding Torrent.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" VerticalAlignment="Top" />
-                <ListView HorizontalAlignment="Left" Margin="6,133,0,6" Width="345" SelectionMode="Single" SelectedIndex="0"
-                          ItemsSource="{Binding FileList}">
+                <Label Content="{Binding TorrentInfo.Torrent.TorrentFile.CreationDate}" Height="28" HorizontalAlignment="Left" Margin="76,75,0,0" VerticalAlignment="Top" />
+                <ListView Name="fileList" HorizontalAlignment="Left" Margin="6,133,0,6" Width="345" SelectionMode="Single" SelectedIndex="0">
                     <!--<ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Style.Triggers>

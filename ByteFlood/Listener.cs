@@ -15,8 +15,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using MonoTorrent;
 using MonoTorrent.Client;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
 using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
@@ -32,6 +30,9 @@ namespace ByteFlood
     {
         Error, Info, Warning
     }
+    /// <summary>
+    /// RPC listener
+    /// </summary>
     public class Listener
     {
         public State State;

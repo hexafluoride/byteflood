@@ -52,6 +52,8 @@
         <RoutedUICommand x:Key="TorrentCommands.OpenFile" />
         <RoutedUICommand x:Key="TorrentCommands.OpenFileLocation" />
 
+        <RoutedUICommand x:Key="TorrentListCommands.ActionOnSelectedTorrents" />
+
         <Style x:Key="SelectedItemCheckerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
                 <DataTrigger Value="-1" Binding="{Binding ElementName=mainlist, Path=SelectedIndex}">
@@ -66,10 +68,6 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
-        <Path x:Key="Appbar.Rss" Stretch="Uniform" Fill="#FF000000" Data="F1 M 19,19C 39.9868,19 57,36.0132 57,57L 49.0833,57C 49.0833,40.3854 35.969,26.9167 19.7917,26.9167L 19,26.9274L 19,19 Z M 19,31.6667C 32.9912,31.6667 44.3333,43.0088 44.3333,57L 36.4167,57C 36.4167,47.3811 28.619,39.5834 19,39.5834L 19,31.6667 Z M 24.5417,45.9167C 27.6022,45.9167 30.0833,48.3978 30.0833,51.4583C 30.0833,54.5189 27.6022,57 24.5417,57C 21.4811,57 19,54.5189 19,51.4583C 19,48.3978 21.4811,45.9167 24.5417,45.9167 Z "/>
-
-        <Path x:Key="Appbar.Search" Stretch="Uniform" Fill="#FF000000" Data="F1 M 20,17L 43.25,17L 56,29.75L 56,40L 52,37.5L 52,34L 39,34L 39,21L 24,21L 24,55L 36,55L 32,59L 20,59L 20,17 Z M 43,22.25L 43,30L 50.75,30L 43,22.25 Z M 48,38C 53.5228,38 58,42.4772 58,48C 58,53.5229 53.5228,58 48,58C 46.1455,58 44.4089,57.4952 42.9201,56.6155L 36.1213,63.4142C 35.3403,64.1953 34.0739,64.1953 33.2929,63.4142L 32.5858,62.7071C 31.8047,61.9261 31.8047,60.6597 32.5858,59.8787L 39.3845,53.0799C 38.5048,51.5911 38,49.8545 38,48C 38,42.4772 42.4771,38 48,38 Z M 48,42C 44.6863,42 42,44.6863 42,48C 42,51.3137 44.6863,54 48,54C 51.3137,54 54,51.3137 54,48C 54,44.6863 51.3137,42 48,42 Z "/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -77,10 +75,13 @@
         <CommandBinding Command="{StaticResource Commands.AddMagnet}" Executed="Commands_AddMagnet" />
         <CommandBinding Command="{StaticResource Commands.AddRssFeed}" Executed="Commands_AddRssFeed" />
         <CommandBinding Command="{StaticResource Commands.OpenPreferences}" Executed="Commands_OpenPreferences" />
+        <CommandBinding Command="{StaticResource Commands.SearchOnlineTorrents}" Executed="Commands_SearchOnlineTorrents" />
+
         <CommandBinding Command="{StaticResource TorrentCommands.ChangeFilePriority}" Executed="TorrentCommands_ChangeFilePriority" />
         <CommandBinding Command="{StaticResource TorrentCommands.OpenFile}" Executed="TorrentCommands_OpenFile" />
         <CommandBinding Command="{StaticResource TorrentCommands.OpenFileLocation}" Executed="TorrentCommands_OpenFileLocation" />
-        <CommandBinding Command="{StaticResource Commands.SearchOnlineTorrents}" Executed="Commands_SearchOnlineTorrents" />
+
+        <CommandBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" Executed="TorrentListCommands_ActionOnSelectedTorrents" />
     </Window.CommandBindings>
 
     <Window.Title>
@@ -89,6 +90,14 @@
             <Binding Path="TotalUpSpeed" Converter="{StaticResource SpeedFormatter}" />
         </MultiBinding>
     </Window.Title>
+
+    <Window.InputBindings>
+        <KeyBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist" Key="Delete"/>
+        <KeyBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_both" Gesture="Shift+Delete" />
+
+        <KeyBinding Command="{StaticResource Commands.AddTorrent}" Gesture="Ctrl+O"/>
+        <KeyBinding Command="{StaticResource Commands.AddMagnet}" Gesture="Ctrl+Shift+O"/>
+    </Window.InputBindings>
 
     <Grid>
 
@@ -205,39 +214,52 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
 
-                    <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}">
+                    <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}"
+                            ToolTip="Add torrent(s) from file">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/add.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}"
+                            ToolTip="Add torrent from a URL">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/link.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}"
+                            ToolTip="Add a new RSS feed">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/rss.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}"
+                            ToolTip="Search for torrents on the internet">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/search.png" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}" >
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}"
+                            ToolTip="Modify and change ByteFlood settings">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/settings.png" />
                     </Button>
 
                     <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
 
-                    <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Start" Click="OperationOnSelectedTorrents">
+                    <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
+                            Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"
+                            ToolTip="Start selected torrent(s)">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/start.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
 
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Stop" Click="OperationOnSelectedTorrents">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
+                            Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"
+                            ToolTip="Stop selected torrent(s)">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="Pause" Click="OperationOnSelectedTorrents">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
+                            Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause"
+                            ToolTip="Pause selected torrent(s)">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
-                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" Tag="unlist" Click="RemoveSelectedTorrents">
+                    <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
+                            Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist"
+                            ToolTip="Remove selected torrent(s) from the list">
                         <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
                     </Button>
                 </StackPanel>
@@ -252,26 +274,42 @@
                     <ListView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
                         <ContextMenu x:Key="ItemContextMenu">
-                            <MenuItem Header="Open containing folder" Click="OpenSelectedTorrentLocation" />
+                            <MenuItem Header="Open containing folder" 
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="OpenDownloadDirectory" />
                             <Separator />
-                            <MenuItem Header="Force Start" Tag="ForceStart" Click="OperationOnSelectedTorrents" />
-                            <MenuItem Header="Start" Tag="Start" Click="OperationOnSelectedTorrents" />
-                            <MenuItem Header="Pause" Tag="Pause" Click="OperationOnSelectedTorrents" />
-                            <MenuItem Header="Force Pause" Tag="ForcePause" Click="OperationOnSelectedTorrents" />
-                            <MenuItem Header="Stop" Tag="Stop" Click="OperationOnSelectedTorrents" />
+
+                            <MenuItem Header="Force Start" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="ForceStart" />
+                            <MenuItem Header="Start" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"/>
+                            <MenuItem Header="Pause" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause" />
+                            <MenuItem Header="Force Pause" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="ForcePause"/>
+                            <MenuItem Header="Stop" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"/>
                             <Separator />
+
+                            <MenuItem Header="Force Hash Re-check" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Recheck" />
+                            <Separator />
+
                             <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
                             <MenuItem Header="Download movie data" Click="Torrent_RetrieveMovieInfo" />
                             <Separator />
-                            <MenuItem Header="Remove" Tag="unlist" Click="RemoveSelectedTorrents" />
+
+                            <MenuItem Header="Remove" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+                                      CommandParameter="remove_torrent_unlist" />
+
                             <MenuItem Header="Remove and" Background="WhiteSmoke">
-                                <MenuItem Header="Delete data" Tag="dataonly" Click="RemoveSelectedTorrents" />
-                                <MenuItem Header="Delete .torrent" Tag="torrentonly" Click="RemoveSelectedTorrents" />
-                                <MenuItem Header="Delete data + .torrent" Tag="both" Click="RemoveSelectedTorrents" />
+                                <MenuItem Header="Delete data" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+                                      CommandParameter="remove_torrent_dataonly" />
+                                <MenuItem Header="Delete .torrent" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+                                      CommandParameter="remove_torrent_torrentonly"/>
+                                <MenuItem Header="Delete data + .torrent" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+                                      CommandParameter="remove_torrent_both" />
                             </MenuItem>
+
                             <Separator />
-                            <MenuItem Header="Change torrent options" Click="OpenTorrentProperties" />
+
+                            <MenuItem Header="Change torrent options"
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="EditProperties"  />
                         </ContextMenu>
+
                     </ListView.Resources>
 
                     <ListView.ItemContainerStyle>
@@ -309,7 +347,7 @@
                             <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ProgressBar Maximum="100" Value="{Binding Progress}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
+                                        <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWayToSource}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -412,19 +450,24 @@
                             </ComboBox>
                         </Canvas>
                     </TabItem>
-                    <TabItem>
+                    <!--<TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/pieces.png" Height="13" Width="13" Margin="0,0,5,0"/>
                                 <TextBlock Text="Pieces"/>
                             </StackPanel>
                         </TabItem.Header>
-                        <ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        -->
+                    <!--<ListView Name="pieces_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <controls:PieceView/>
                             </ListView.View>
-                        </ListView>
-                    </TabItem>
+                        </ListView>-->
+                    <!--
+                        <Canvas>
+                            <controls:PieceBar x:Name="piece_bar" Height="28" Width="927" Canvas.Left="10" Canvas.Top="10"/>
+                        </Canvas>
+                    </TabItem>-->
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
@@ -439,13 +482,13 @@
                                     <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
                                     <MenuItem Header="Open containing folder" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
                                     <MenuItem Header="Set priority" Background="WhiteSmoke">
-                                        <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Immediate" />
-                                        <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Highest" />
-                                        <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="High" />
-                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Normal" />
-                                        <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Low" />
-                                        <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Lowest" />
-                                        <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="Skip" />
+                                        <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="6" />
+                                        <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="5" />
+                                        <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="4" />
+                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="3" />
+                                        <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="2" />
+                                        <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="1" />
+                                        <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="0" />
                                     </MenuItem>
                                 </ContextMenu>
 
@@ -511,10 +554,10 @@
 
                             <aga:TreeList.View>
                                 <GridView>
-                                    <GridViewColumn Width="170" Header="Path" CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
+                                    <GridViewColumn Width="260" Header="Path" CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
                                     <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress" CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"/>
                                     <GridViewColumn Width="130" Header="Priority" CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}" />
-                                    <GridViewColumn Width="50" Header="Size" CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
+                                    <GridViewColumn Width="80" Header="Size" CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
                                 </GridView>
                             </aga:TreeList.View>
 
@@ -527,7 +570,7 @@
                         </aga:TreeList>
 
                     </TabItem>
-                    <TabItem>
+                    <TabItem Visibility="Collapsed">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/peers.png" Height="13" Width="13" Margin="0,0,5,0"/>
@@ -535,6 +578,11 @@
                             </StackPanel>
                         </TabItem.Header>
                         <ListView Name="peers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add peer" Click="PeersCommands_AddPeer"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="180" Header="IP">
@@ -576,16 +624,16 @@
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
-                                    <GridViewColumn Width="100" Header="Update In" 
+                                    <GridViewColumn Width="130" Header="Update In" 
                                                     DisplayMemberBinding="{Binding UpdateInString}" />
-                                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding State}" />
-                                    <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />
-                                    <GridViewColumn Width="190" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
+                                    <!--<GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding State}" />
+                                    <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />-->
+                                    <GridViewColumn Width="260" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Name="webseeds_tab">
+                    <TabItem Name="webseeds_tab" Visibility="Collapsed">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/webseeds.png" Height="13" Width="13" Margin="0,0,5,0"/>
@@ -645,8 +693,8 @@
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="DHTStatus" Text="{Binding Path=DHTPeers, StringFormat=DHT: {0} peers}">
-                </TextBlock>
+                <TextBlock Name="DHTStatus" Text="DHT Peers"/>
+
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem />

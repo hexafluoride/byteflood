@@ -114,11 +114,45 @@ namespace ByteFlood
                 {
                     if (!listing.Import)
                         continue;
-                    Torrent t = Torrent.Load(AppState.BackupTorrent(listing.Path));
-                    string savepath = t.Files.Length == 1 ? new System.IO.FileInfo(listing.SavePath).Directory.FullName : listing.SavePath;
-                    TorrentManager tm = new TorrentManager(t, savepath, App.Settings.DefaultTorrentProperties.ToTorrentSettings());
-                    TorrentInfo ti = AppState.CreateTorrentInfo(tm);
+                    Torrent t = Torrent.Load(listing.Path);
+
+                    string torrent_file_path = AppState.BackupTorrent(listing.Path, t);
+
+                    string savepath = null;
+
+                    if (t.Files.Length > 1)
+                    {
+                        if (listing.SavePath.EndsWith(t.Name))
+                        {
+                            // then we should download in the parent directory
+                            DirectoryInfo di = new DirectoryInfo(listing.SavePath);
+                            savepath = di.Parent.FullName;
+                        }
+                        else
+                        {
+                            savepath = listing.SavePath;
+                        }
+                    }
+                    else if (t.Files.Length == 1)
+                    {
+                        savepath = Path.GetDirectoryName(listing.SavePath);
+                    }
+                    else
+                    {
+                        savepath = listing.SavePath;
+                    }
+
+                    Ragnar.AddTorrentParams param = new Ragnar.AddTorrentParams()
+                    {
+                        SavePath = savepath,
+                        TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(torrent_file_path))
+                    };
+
+                    var handle = AppState.LibtorrentSession.AddTorrent(param);
+
+                    TorrentInfo ti = new TorrentInfo(handle);
                     ti.Name = listing.Name;
+
                     selected.Add(ti);
                 }
                 catch

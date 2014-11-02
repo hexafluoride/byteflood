@@ -12,86 +12,109 @@ namespace ByteFlood
         {
             get
             {
-                return App.Settings.ShowRelativePaths ? this.File.Path : this.File.FullPath;
+                return this.File.Path.Replace(this.Owner.SavePath, "");
             }
         }
 
         public string FileName
         {
-            get { return this.File.Path.Split(System.IO.Path.DirectorySeparatorChar).Last(); }
+            get { return System.IO.Path.GetFileName(this.File.Path); }
         }
 
-        public double Progress { get { return this.File.BitField.PercentComplete; } }
+        private long _downloaded_bytes = 0;
+        public long DownloadedBytes 
+        {
+            get { return this._downloaded_bytes; }
+            set 
+            {
+                if (value != this._downloaded_bytes) 
+                {
+                    this._downloaded_bytes = value;
+                    UpdateList("DownloadedBytes", "Progress");
+                }
+            }
+        }
+
+        public double Progress 
+        {
+            get 
+            {
+                if (this.RawSize > 0) 
+                {
+                    return Convert.ToDouble(this.DownloadedBytes) / Convert.ToDouble(this.RawSize);
+                }
+                return 100d;
+            } 
+        }
 
         public string Priority
         {
-            get { return this.File.Priority.ToString(); }
+            get 
+            {
+                int a = this.Owner.Torrent.GetFilePriority(this.FileIndex);
+                return a.ToString();
+            }
         }
 
-        public void ChangePriority(Priority pr)
+        public void ChangePriority(int pr)
         {
-            if (this.File.Priority != pr)
-            {
-                this.File.Priority = pr;
-                UpdateList("Priority");
-            }
-            if (this.Owner != null)
-            {
-                this.Owner.SetSavedFilePriority(this, pr);
-            }
+            this.Owner.Torrent.SetFilePriority(this.FileIndex, pr);
+            UpdateSingle("Priority");
         }
 
         public bool DownloadFile
         {
-            get { return this.File.Priority != MonoTorrent.Common.Priority.Skip; }
+            get { return this.Owner.Torrent.GetFilePriority(this.FileIndex) != 0; }
             set
             {
                 if (value)
                 {
-                    this.File.Priority = MonoTorrent.Common.Priority.Normal;
+                    this.Owner.Torrent.SetFilePriority(this.FileIndex, 3);
                 }
                 else
                 {
-                    this.File.Priority = MonoTorrent.Common.Priority.Skip;
+                    this.Owner.Torrent.SetFilePriority(this.FileIndex, 0);
                 }
-                UpdateList("DownloadFile");
+                UpdateSingle("DownloadFile");
             }
         }
 
-        public string Size { get { return Utility.PrettifyAmount(this.File.Length); } }
+        public string Size { get { return Utility.PrettifyAmount(this.File.Size); } }
 
-        public TorrentFile File { get; private set; }
+        public Ragnar.FileEntry File { get; private set; }
 
-        public long RawSize { get { return this.File.Length; } }
+        public long RawSize { get { return this.File.Size; } }
 
         public FileInfo() { }
 
         public TorrentInfo Owner { get; private set; }
 
-        public FileInfo(TorrentInfo owner, TorrentFile file)
+        public int FileIndex { get; private set; }
+
+        public FileInfo(TorrentInfo owner, Ragnar.FileEntry file, int file_index)
         {
             this.File = file;
             this.Owner = owner;
+            this.FileIndex = file_index;
             if (this.Owner != null)
             {
                 this.Owner.FileInfoList.Add(this);
-                var saved_pr = this.Owner.GetSavedFilePriority(this);
-
-                this.ChangePriority(saved_pr);
             }
-        }
-
-        public void Update()
-        {
-            UpdateList("Progress");
         }
 
         #region INotifyPropertyChanged implementation
 
-        public void UpdateList(string str)
+        public void UpdateSingle(string str)
         {
             if (PropertyChanged == null) { return; }
             PropertyChanged(this, new PropertyChangedEventArgs(str));
+        }
+
+        public void UpdateList(params string[] str)
+        {
+            if (PropertyChanged == null) { return; }
+            foreach(string s in str)
+                PropertyChanged(this, new PropertyChangedEventArgs(s));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -137,13 +160,13 @@ namespace ByteFlood
         /// </summary>
         /// <param name="branch"></param>
         /// <param name="trunk"></param>
-        public static void ProcessFile(string branch, DirectoryKey trunk, TorrentInfo owner, TorrentFile f)
+        public static void ProcessFile(string branch, DirectoryKey trunk, TorrentInfo owner, Ragnar.FileEntry f, int index)
         {
             string[] parts = branch.Split('\\');
             if (parts.Length == 1)
             {
                 //((FileList)trunk[DirectoryKey.FILE_MARKER]).Add(new FileInfo(owner, f));
-                trunk.Add(f.FullPath, new FileInfo(owner, f));
+                trunk.Add(f.Path, new FileInfo(owner, f, index));
             }
             else
             {
@@ -154,7 +177,7 @@ namespace ByteFlood
                 {
                     trunk[node] = new DirectoryKey(node, owner);
                 }
-                ProcessFile(other, (DirectoryKey)trunk[node], owner, f);
+                ProcessFile(other, (DirectoryKey)trunk[node], owner, f, index);
             }
         }
 

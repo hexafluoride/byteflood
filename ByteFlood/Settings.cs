@@ -1,25 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Xml.Serialization;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Runtime.Serialization;
 using System.Reflection;
 using MonoTorrent.Client;
+using System.Runtime.InteropServices;
 
 namespace ByteFlood
 {
@@ -123,7 +111,7 @@ namespace ByteFlood
                     DrawGrid = true,
                     DownloadColor = Colors.Green,
                     UploadColor = Colors.Red,
-                    DefaultDownloadPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads"),
+                    DefaultDownloadPath = GetDefaultDownloadDirectory(),
                     TorrentFileSavePath = "./Torrents",
                     EncryptionType = EncryptionForceType.DoesntMatter,
                     ListeningPort = 1025,
@@ -147,7 +135,7 @@ namespace ByteFlood
                     OutgoingPortsRandom = true,
                     OutgoingPortsStart = 10000,
                     OutgoingPortsEnd = 20000,
-                    PreviousPaths = new List<string>() { System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads") },
+                    PreviousPaths = new List<string>() { GetDefaultDownloadDirectory() },
                     MinimizeBehavior = WindowBehavior.MinimizeToTaskbar,
                     ExitBehavior = WindowBehavior.MinimizeToTray,
                     TrayIconClickBehavior = TrayIconBehavior.ContextMenu,
@@ -158,16 +146,37 @@ namespace ByteFlood
                     UpdateSourceEtag = null,
                     OpenTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                     NetworkInterfaceID = Utility.GetDefaultNetworkInterfaceId(),
-                    ApplicationStyle = 0,
+                    ApplicationStyle = 1,
                     SeedingTorrentsAreActive = false,
-                    DisplayStripsOnTorrentList = false
+                    DisplayStripsOnTorrentList = false,
+                    StatusBarVisible = true
                 };
             }
         }
 
-        private static Theme GetDefaultTheme() 
+        public static string GetDefaultDownloadDirectory()
         {
-            switch (Environment.OSVersion.Version.Major) 
+            if (Utility.IsWindowsVistaOrNewer)
+            {
+                Guid DownloadsFolder = new Guid("374DE290-123F-4565-9164-39C4925E467B");
+                string path = null;
+                SHGetKnownFolderPath(DownloadsFolder, 0, IntPtr.Zero, out path);
+
+                if (!string.IsNullOrWhiteSpace(path)) 
+                {
+                    return path;
+                }
+            }
+
+            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        static extern int SHGetKnownFolderPath([MarshalAs(UnmanagedType.LPStruct)] Guid rfid, uint dwFlags, IntPtr hToken, out string pszPath);
+
+        private static Theme GetDefaultTheme()
+        {
+            switch (Environment.OSVersion.Version.Major)
             {
                 case 5:
                     return Theme.Luna;
@@ -177,7 +186,7 @@ namespace ByteFlood
                         //vista and 7
                         return Theme.Aero;
                     }
-                    else 
+                    else
                     {
                         // win8 and newer
                         return Theme.Aero2;
