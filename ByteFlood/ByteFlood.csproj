@@ -219,8 +219,8 @@
     <Compile Include="UI\SearchOnlineTorrents.xaml.cs">
       <DependentUpon>SearchOnlineTorrents.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\TorrentPropertiesForm.xaml.cs">
-      <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
+    <Compile Include="UI\TorrentPropertiesEditor.xaml.cs">
+      <DependentUpon>TorrentPropertiesEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
     <Page Include="Controls\PhotoLoader\Resources.xaml">
@@ -287,7 +287,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\TorrentPropertiesForm.xaml">
+    <Page Include="UI\TorrentPropertiesEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

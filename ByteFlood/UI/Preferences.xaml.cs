@@ -174,10 +174,8 @@ namespace ByteFlood
 
         private void ChangeDefaultSettings(object sender, RoutedEventArgs e)
         {
-            TorrentPropertiesForm tpf = new TorrentPropertiesForm(local.DefaultTorrentProperties) { Owner = this, Icon = this.Icon };
-            tpf.ShowDialog();
-            if (tpf.success)
-                local.DefaultTorrentProperties = tpf.tp;
+            var editor = new TorrentPropertiesEditor(local.DefaultTorrentProperties) { Owner = this, Icon = this.Icon };
+            editor.ShowDialog();
         }
 
         private void SaveSettings(object sender, RoutedEventArgs e)
@@ -190,13 +188,13 @@ namespace ByteFlood
             local.EncryptionType = EncryptionTypes[enctype.SelectedIndex];
             local.SeedingTorrentsAreActive = this.seedingTorrentsInac.IsChecked == true;
             MainWindow mw = (App.Current.MainWindow as MainWindow);
-           
+
             //mw.state.ce.Settings.Force = local.EncryptionType;
-            
+
             local.Theme = (Theme)themeCombox.SelectedItem;
 
             //bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
-           
+
             App.Settings = (Settings)Utility.CloneObject(local);
             //if (iface_changed)
             //{
