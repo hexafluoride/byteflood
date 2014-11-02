@@ -119,8 +119,8 @@ namespace ByteFlood
                     FileRegex = "",
                     EnableFileRegex = false,
                     DownloadAllRSS = false,
-                    RSSRegex = "",
-                    RSSCheckForDuplicates = false,
+                    /*RSSRegex = "",
+                    RSSCheckForDuplicates = false,*/
                     MetroStyleHover = false,
                     EnableQueue = true,
                     BottomCanvasVisible = true,

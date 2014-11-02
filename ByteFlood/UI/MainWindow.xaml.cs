@@ -20,14 +20,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
 using MonoTorrent.Client;
-using MonoTorrent.Common;
 using Microsoft.Win32;
 using System.Threading;
 using System.Diagnostics;
@@ -348,7 +346,7 @@ namespace ByteFlood
                     DownloadDirectory = string.IsNullOrWhiteSpace(query.DownloadPath) ? App.Settings.DefaultDownloadPath : query.DownloadPath,
                     IsCustomtUpdateInterval = query.UpdateIntervalType == 1,
                     CustomUpdateInterval = new TimeSpan(0, 0, query.CustomIntervalSeconds),
-                    DefaultSettings = new TorrentSettings()
+                    DefaultSettings = App.Settings.DefaultTorrentProperties
                 };
 
                 Task.Factory.StartNew(new Action(() =>
@@ -982,11 +980,10 @@ namespace ByteFlood
                         });
                         break;
                     case "EditProperties":
-                        break;
                         f = new Action<TorrentInfo>(t =>
                         {
-                            TorrentPropertiesForm tp = new TorrentPropertiesForm(t) { Owner = this, Icon = this.Icon };
-                            tp.ShowDialog();
+                            var editor = new TorrentPropertiesEditor(t) { Owner = this, Icon = this.Icon };
+                            editor.ShowDialog();
                         });
                         break;
                     case "Start":

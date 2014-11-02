@@ -28,7 +28,7 @@ namespace ByteFlood.Services.RSS
 
         public bool AutoDownload { get; set; }
 
-        public MonoTorrent.Client.TorrentSettings DefaultSettings { get; set; }
+        public TorrentProperties DefaultSettings { get; set; }
 
         public string DownloadDirectory { get; set; }
 
