@@ -106,6 +106,7 @@
     <Compile Include="Controls\VistaFolderBrowser\interop\shellcominterfaces.cs" />
     <Compile Include="Controls\VistaFolderBrowser\interop\shellwrapperdefinitions.cs" />
     <Compile Include="Controls\VistaFolderBrowser\library\WPFFolderBrowserDialog.cs" />
+    <Compile Include="Formatters\ColorsFormatter.cs" />
     <Compile Include="Formatters\InvertBooleanConverter.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
@@ -303,30 +304,6 @@
     </Compile>
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
-    <Content Include="Assets\Icons\lefttree\active.svg" />
-    <Content Include="Assets\Icons\lefttree\complete.svg" />
-    <Content Include="Assets\Icons\lefttree\downloading.svg" />
-    <Content Include="Assets\Icons\lefttree\inactive.svg" />
-    <Content Include="Assets\Icons\lefttree\seeding.svg" />
-    <Content Include="Assets\Icons\lefttree\torrents_all.svg" />
-    <Content Include="Assets\Icons\tabs\files.svg" />
-    <Content Include="Assets\Icons\tabs\info.svg" />
-    <Content Include="Assets\Icons\tabs\peers.svg" />
-    <Content Include="Assets\Icons\tabs\pieces.svg" />
-    <Content Include="Assets\Icons\tabs\trackers.svg" />
-    <Content Include="Assets\Icons\tabs\webseeds.svg" />
-    <Content Include="Assets\Icons\toolbar\add.svg" />
-    <Content Include="Assets\Icons\toolbar\link.svg" />
-    <Content Include="Assets\Icons\toolbar\pause.svg" />
-    <Content Include="Assets\Icons\toolbar\remove.svg" />
-    <Content Include="Assets\Icons\toolbar\rss.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\search.svg" />
-    <Content Include="Assets\Icons\toolbar\settings.svg" />
-    <Content Include="Assets\Icons\toolbar\start.svg" />
-    <Content Include="Assets\Icons\toolbar\stop.svg" />
-    <Content Include="Assets\Icons\toolbar\rss.svg" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -366,79 +343,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\add.png" />
     <Content Include="Assets\folder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\icon-16.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Icons\lefttree\active.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\lefttree\complete.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\lefttree\downloading.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\lefttree\inactive.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\lefttree\seeding.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\lefttree\torrents_all.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\tabs\files.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\tabs\info.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\tabs\peers.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\tabs\pieces.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\tabs\trackers.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\tabs\webseeds.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\add.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\link.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\pause.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\remove.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\search.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\settings.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\start.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\stop.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="Assets\magnet.png" />
-    <None Include="Assets\pause.png" />
-    <None Include="Assets\remove.png" />
-    <None Include="Assets\resume.png" />
-    <None Include="Assets\settings.png" />
-    <None Include="Assets\stop.png" />
     <None Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
     <None Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
     <None Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
