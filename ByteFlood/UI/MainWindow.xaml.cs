@@ -47,7 +47,7 @@ namespace ByteFlood
         public Func<TorrentInfo, bool> ShowAll = new Func<TorrentInfo, bool>((t) => { return true; });
         public Func<TorrentInfo, bool> Downloading = new Func<TorrentInfo, bool>((t) => { return t.Torrent.QueryStatus().State == Ragnar.TorrentState.Downloading; });
         public Func<TorrentInfo, bool> Seeding = new Func<TorrentInfo, bool>((t) => { return t.Torrent.QueryStatus().State == Ragnar.TorrentState.Seeding; });
-        public Func<TorrentInfo, bool> Active = new Func<TorrentInfo, bool>((t) => { return  !t.Torrent.IsPaused; });
+        public Func<TorrentInfo, bool> Active = new Func<TorrentInfo, bool>((t) => { return !t.Torrent.IsPaused; });
         public Func<TorrentInfo, bool> Inactive = new Func<TorrentInfo, bool>((t) => { return t.Torrent.IsPaused || !string.IsNullOrEmpty(t.Torrent.QueryStatus().Error); });
         public Func<TorrentInfo, bool> Finished = new Func<TorrentInfo, bool>((t) => { return t.Torrent.IsFinished; });
         GraphDrawer graph;
@@ -101,6 +101,18 @@ namespace ByteFlood
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// Color used to paint the toolbar and info tabs buttons
+        /// </summary>
+        public Color ElementsColor
+        {
+            get { return (Color)GetValue(ElementsColorProperty); }
+            set { SetValue(ElementsColorProperty, value); }
+        }
+
+        public static readonly DependencyProperty ElementsColorProperty =
+            DependencyProperty.Register("ElementsColor", typeof(Color), typeof(MainWindow), new PropertyMetadata(Color.FromArgb(255, 38, 139, 210)));
 
         public MainWindow()
         {
@@ -165,7 +177,7 @@ namespace ByteFlood
             it.Load(true);
             if (it.list.Count > 0)
             {
-                it.ShowDialog(); // calling show dialog will call window_loaded and therfore the real Load() statement
+                it.ShowDialog(); // calling show dialog will call window_loaded and therefore the real Load() statement
 
                 foreach (TorrentInfo ti in it.selected)
                 {
@@ -200,6 +212,7 @@ namespace ByteFlood
                         this.TotalDownloaded = status.TotalDownload;
                         this.TotalUploaded = status.TotalUpload;
                         this.DHTStatus.Text = string.Format("DHT Peers: {0}", this.state.DHTPeers);
+                        this.ElementsColor = Utility.WindowsAero.ColorizationColor.ToWPFColor();
 
                     }, null);
 
