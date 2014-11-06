@@ -327,7 +327,7 @@ namespace ByteFlood
         {
             get
             {
-                if (this.Torrent.IsValid)
+                if (true) // TODO: Find a way to make Ragnar work as a project/implement IsValid
                 {
                     return this.Torrent.InfoHash.ToHex();
                 }
@@ -350,26 +350,6 @@ namespace ByteFlood
             PopulateFileList();
             PopulateTrackerList();
             LoadMiscSettings();
-
-            //InitUpdateThread();
-        }
-
-        Thread bg = null;
-        private void InitUpdateThread()
-        {
-            bg = new Thread(() =>
-            {
-                while (true)
-                {
-                    this.Update();
-
-                    this.UpdateGraphData();
-                    Thread.Sleep(1000);
-                }
-            });
-            bg.IsBackground = true;
-            bg.Priority = ThreadPriority.BelowNormal;
-            bg.Start();
         }
 
         private void LoadMiscSettings()
@@ -399,6 +379,18 @@ namespace ByteFlood
                 this._otfp = null;
                 this.IsStopped = false;
             }
+
+            this.TorrentSettings = new TorrentProperties() 
+            {
+                EnablePeerExchange = true,
+                UploadSlots = this.Torrent.MaxUploads,
+                UseDHT = true,
+                MaxConnections = this.Torrent.MaxConnections,
+                MaxDownloadSpeed = this.Torrent.DownloadLimit,
+                MaxUploadSpeed = this.Torrent.UploadLimit,
+                OnFinish = this.CompletionCommand,
+                RatioLimit = this.RatioLimit
+            };
         }
 
         #region Event Handling
@@ -439,8 +431,23 @@ namespace ByteFlood
 
         #endregion
 
-        /*
+        public TorrentProperties TorrentSettings { get; private set; }
 
+        public void ApplyTorrentSettings(TorrentProperties props) 
+        {
+            this.TorrentSettings = props;
+
+            this.Torrent.MaxUploads = props.UploadSlots;
+            this.Torrent.MaxConnections = props.MaxConnections;
+            this.Torrent.DownloadLimit = props.MaxDownloadSpeed;
+            this.Torrent.UploadLimit = props.MaxUploadSpeed;
+            this.CompletionCommand = props.OnFinish;
+            this.RatioLimit = props.RatioLimit;
+
+            this.UpdateList("TorrentSettings");
+        }
+
+        /*
         private void Torrent_PeerConnected(object sender, PeerConnectionEventArgs e)
         {
             if (!Peers.ContainsKey(e.PeerID.PeerID))
@@ -583,9 +590,7 @@ namespace ByteFlood
 
         public void OffMyself() // Dispose
         {
-            this.Torrent.Pause();
             this.Torrent.Dispose();
-            //bg.Abort();
         }
 
         public string GetMagnetLink()
@@ -622,12 +627,9 @@ namespace ByteFlood
                     "Uploaded", "Progress",
                     "Ratio", "ETA",
                     "Size", "Elapsed",
-                    //"TorrentSettings",
                     "WastedBytes",
                     //"HashFails",
                     "AverageDownloadSpeed", "AverageUploadSpeed",
-                    //"MaxDownloadSpeed",
-                    //"MaxUploadSpeed",
                     "ShowOnList", "ProgressBarColor",
                     "Status");
             }
@@ -638,7 +640,6 @@ namespace ByteFlood
             }
         }
 
-        [XmlIgnore]
         private bool is_lmdif_loading_data = false;
         public void LoadMovieDataIntoFolder()
         {
@@ -751,7 +752,7 @@ namespace ByteFlood
         {
             if (this.files_progresses != null)
             {
-                this.Torrent.GetFileProgressesFast(this.files_progresses);
+                this.files_progresses = this.Torrent.GetFileProgresses();
 
                 for (int i = 0; i < this.files_progresses.Length; i++)
                 {

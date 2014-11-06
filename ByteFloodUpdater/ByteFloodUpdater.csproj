@@ -57,10 +57,6 @@
       <Project>{f10a6a7d-b8e4-4f8b-8bd9-5b42ace5520e}</Project>
       <Name>Jayrock.Json</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Jayrock\Jayrock.csproj">
-      <Project>{a178a4bb-ce12-4bf3-8b17-6df0d82120c8}</Project>
-      <Name>Jayrock</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
