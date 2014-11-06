@@ -324,30 +324,6 @@
     </Content>
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
-    <Content Include="Assets\Icons\lefttree\active.svg" />
-    <Content Include="Assets\Icons\lefttree\complete.svg" />
-    <Content Include="Assets\Icons\lefttree\downloading.svg" />
-    <Content Include="Assets\Icons\lefttree\inactive.svg" />
-    <Content Include="Assets\Icons\lefttree\seeding.svg" />
-    <Content Include="Assets\Icons\lefttree\torrents_all.svg" />
-    <Content Include="Assets\Icons\tabs\files.svg" />
-    <Content Include="Assets\Icons\tabs\info.svg" />
-    <Content Include="Assets\Icons\tabs\peers.svg" />
-    <Content Include="Assets\Icons\tabs\pieces.svg" />
-    <Content Include="Assets\Icons\tabs\trackers.svg" />
-    <Content Include="Assets\Icons\tabs\webseeds.svg" />
-    <Content Include="Assets\Icons\toolbar\add.svg" />
-    <Content Include="Assets\Icons\toolbar\link.svg" />
-    <Content Include="Assets\Icons\toolbar\pause.svg" />
-    <Content Include="Assets\Icons\toolbar\remove.svg" />
-    <Content Include="Assets\Icons\toolbar\rss.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Icons\toolbar\search.svg" />
-    <Content Include="Assets\Icons\toolbar\settings.svg" />
-    <Content Include="Assets\Icons\toolbar\start.svg" />
-    <Content Include="Assets\Icons\toolbar\stop.svg" />
-    <Content Include="Assets\Icons\toolbar\rss.svg" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
