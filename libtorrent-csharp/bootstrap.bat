@@ -1,1 +1,0 @@
-powershell -ExecutionPolicy ByPass -File run-bootstrap.ps1

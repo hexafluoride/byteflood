@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -21,7 +22,7 @@ namespace ByteFlood
 
         public SynchronizationContext uiContext;
 
-        public Thread mainthread;
+        public CancellationTokenSource MainTaskCancellationTokenSource;
 
         public Listener listener;
 
@@ -210,13 +211,13 @@ namespace ByteFlood
 
         void LibTorrentAlerts_TorrentAdded(Ragnar.TorrentHandle handle)
         {
-            App.Current.Dispatcher.Invoke(new Action(() =>
+            uiContext.Post(_ =>
             {
-                if (this.Torrents.Where(t => t.Torrent.InfoHash.ToHex() == handle.InfoHash.ToHex()).Count() == 0)
+                if (!Torrents.Any(t => t.Torrent.InfoHash.ToHex() == handle.InfoHash.ToHex()))
                 {
-                    this.Torrents.Add(new TorrentInfo(handle));
+                    Torrents.Add(new TorrentInfo(handle));
                 }
-            }));
+            }, null);
         }
 
         void LibTorrentAlerts_ResumeDataArrived(Ragnar.TorrentHandle handle, byte[] data)
@@ -237,7 +238,7 @@ namespace ByteFlood
         public void Shutdown()
         {
             SaveSettings();
-            mainthread.Abort();
+            MainTaskCancellationTokenSource.Cancel();
 
             SaveState(true);
 
