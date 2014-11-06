@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using ByteFlood.Services.WebSearch;
@@ -41,31 +42,25 @@ namespace ByteFlood.UI
         public static readonly DependencyProperty ControlsEnabledProperty =
             DependencyProperty.Register("ControlsEnabled", typeof(bool), typeof(SearchOnlineTorrents), new PropertyMetadata(true));
 
-        public bool SearchCancelled { get; set; }
+		private CancellationTokenSource SearchCancellationTokenSource { get; set; }
 
         public SearchOnlineTorrents()
         {
             InitializeComponent();
         }
 
-        private void Commands_Search(object sender, ExecutedRoutedEventArgs e)
+        private async void Commands_Search(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(this.SearchQuery))
-            {
-                DisableControls();
-                SearchCancelled = false;
-                Task.Factory.StartNew(new Action(() =>
-                {
-                    var res = TorrentzEu.Search(this.SearchQuery);
+	        if (!string.IsNullOrWhiteSpace(SearchQuery))
+	        {
+		        DisableControls();
+		        SearchCancellationTokenSource = new CancellationTokenSource();
 
-                    App.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        if (SearchCancelled) { return; }
-                        this.Items = res;
-                        EnableControls();
-                    }));
-                }));
-            }
+		        var res = await TorrentzEu.SearchAsync(SearchQuery, SearchCancellationTokenSource.Token);
+
+		        Items = res;
+		        EnableControls();
+	        }
         }
 
         private void DisableControls()
@@ -90,7 +85,9 @@ namespace ByteFlood.UI
 
         private void Commands_CancelSearch(object sender, ExecutedRoutedEventArgs e)
         {
-            this.SearchCancelled = true;
+            if (SearchCancellationTokenSource != null)
+				SearchCancellationTokenSource.Cancel();
+
             EnableControls();
         }
 
