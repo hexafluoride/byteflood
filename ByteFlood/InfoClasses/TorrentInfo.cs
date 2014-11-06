@@ -270,8 +270,6 @@ namespace ByteFlood
 
         public DirectoryKey FilesTree { get; private set; }
 
-        private SynchronizationContext context;
-
         public List<float> DownSpeeds
         {
             get
@@ -345,7 +343,6 @@ namespace ByteFlood
 
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
-            this.context = this.MainAppWindow.uiContext;
 
             PopulateFileList();
             PopulateTrackerList();

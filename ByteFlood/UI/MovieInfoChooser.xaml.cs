@@ -63,25 +63,23 @@ namespace ByteFlood.UI
             //this.Commands_Search(null, null);
         }
 
-        private void Commands_Search(object sender, ExecutedRoutedEventArgs e)
+        private async void Commands_Search(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(this.SearchQuery))
-            {
-                DisableControls();
-                SearchCancelled = false;
-                string sq = this.SearchQuery;
-                Task.Factory.StartNew(new Action(() =>
-                {
-                    var res = UniversalSearch.Search(sq);
+	        if (!string.IsNullOrWhiteSpace(this.SearchQuery))
+	        {
+		        DisableControls();
+		        SearchCancelled = false;
+		        string sq = this.SearchQuery;
 
-                    App.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        if (SearchCancelled) { return; }
-                        this.Items = res;
-                        EnableControls();
-                    }));
-                }));
-            }
+		        var res = await Task.Run(() => UniversalSearch.Search(sq));
+
+				// this kind of cancellation does not make much sense
+		        if (SearchCancelled)
+			        return;
+
+		        this.Items = res;
+		        EnableControls();
+	        }
         }
 
         private void DisableControls()
