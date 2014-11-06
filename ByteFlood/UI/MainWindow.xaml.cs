@@ -41,7 +41,6 @@ namespace ByteFlood
     public partial class MainWindow : Window, IDisposable
     {
         bool ignoreclose = true;
-        Thread thr;
         public SynchronizationContext uiContext = SynchronizationContext.Current;
         public Func<TorrentInfo, bool> itemselector;
         public Func<TorrentInfo, bool> ShowAll = new Func<TorrentInfo, bool>((t) => { return true; });
@@ -189,10 +188,13 @@ namespace ByteFlood
             return false;
         }
 
-        public void Update()
+        public void Update(CancellationToken cancellationToken)
         {
             while (true)
             {
+	            if (cancellationToken.IsCancellationRequested)
+		            break;
+
                 var status = this.state.LibtorrentSession.QueryStatus();
 
                 try
@@ -231,7 +233,7 @@ namespace ByteFlood
                     }
                 }
                 catch { }
-                System.Threading.Thread.Sleep(1000);
+                Thread.Sleep(1000);
             }
         }
         #region Event Handlers
@@ -339,7 +341,7 @@ namespace ByteFlood
             }
         }
 
-        private void Commands_AddRssFeed(object sender, ExecutedRoutedEventArgs e)
+        private async void Commands_AddRssFeed(object sender, ExecutedRoutedEventArgs e)
         {
             var query = new UI.AddRSSFeed() { Icon = this.Icon, Owner = this };
             if (query.ShowDialog() == true)
@@ -362,27 +364,14 @@ namespace ByteFlood
                     DefaultSettings = App.Settings.DefaultTorrentProperties
                 };
 
-                Task.Factory.StartNew(new Action(() =>
-                {
-                    if (rss_entry.Test())
-                    {
-                        App.Current.Dispatcher.Invoke(new Action(() =>
-                        {
-                            FeedsManager.Add(rss_entry);
-                        }));
-                    }
-                    else
-                    {
-                        App.Current.Dispatcher.Invoke(new Action(() =>
-                        {
-                            MessageBox.Show(this,
-                             "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
-                             "Error",
-                             MessageBoxButton.OK, MessageBoxImage.Error);
-                        }));
-                    }
-
-                }));
+	            if (await rss_entry.TestAsync())
+		            FeedsManager.Add(rss_entry);
+	            else
+		            MessageBox.Show(
+						this,
+			            "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
+			            "Error",
+			            MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -589,13 +578,16 @@ namespace ByteFlood
         {
             NotifyIcon.Icon = new System.Drawing.Icon("Assets/icon-16.ico");
             this.Icon = new BitmapImage(new Uri("Assets/icon-allsizes.ico", UriKind.Relative));
-            thr = new Thread(new ThreadStart(Update));
 
-            state = new State();
+	        var cts = new CancellationTokenSource();
+	        
+            state = new State
+            {
+	            uiContext = uiContext,
+				MainTaskCancellationTokenSource = cts
+            };
 
-            state.uiContext = uiContext;
-            state.mainthread = thr;
-            thr.Start();
+	        Task.Run(() => Update(cts.Token), cts.Token);
 
             mainlist.ItemsSource = state.Torrents;
             mainlist.DataContext = App.Settings;
@@ -629,7 +621,7 @@ namespace ByteFlood
         void AutoUpdater_NewUpdate(Services.NewUpdateInfo info)
         {
             if (notify_later_clicked) { return; }
-            App.Current.Dispatcher.Invoke(new Action(() =>
+            Dispatcher.Invoke(() =>
             {
                 UI.NewUpdateWindow nuw = new UI.NewUpdateWindow()
                 {
@@ -662,7 +654,7 @@ namespace ByteFlood
                 }
 
                 notify_later_clicked = res == false;
-            }));
+            });
         }
 
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject

@@ -7,14 +7,18 @@ If you're looking to contribute, see [this](https://github.com/hexafluoride/byte
 
 [Binaries](https://github.com/hexafluoride/byteflood/releases)
 
-System requirements
-=========
-Windows XP or up(GNU/Linux will be supported soon!)
-.NET Framework 4.0 or up
+####Try the latest build
 
+Please follow these instructions to try out the latest features (and possibly **bugs**)
 
-Screenshots
-=========
+![tut](http://i.imgur.com/TqnUtFe.png)
+
+#System requirements
+- Windows Vista SP2 and later (this is a requirement by the .NET 4.5 framework).
+
+- .NET Framework 4.5 and later.
+
+#Screenshots
 
 ![Screenshot 1](http://i.imgur.com/pESz0NW.png)
 ![Screenshot 2](http://i.imgur.com/t6uejeJ.png)

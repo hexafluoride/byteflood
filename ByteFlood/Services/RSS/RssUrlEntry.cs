@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using System.ServiceModel.Syndication;
@@ -234,24 +235,17 @@ namespace ByteFlood.Services.RSS
             tick = Convert.ToInt32(this.UpdateInterval.TotalSeconds + 1);
         }
 
-        public bool Test()
+        public async Task<bool> TestAsync()
         {
             // TODO: Add more tests to check feed validity
             try
             {
-                Rss.RssFeed.Read(this.Url);
+                await Task.Run(() => Rss.RssFeed.Read(Url));
                 return true;
             }
             catch (WebException wex)
             {
-                if (wex.Message.Contains("404"))
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                return !wex.Message.Contains("404");
             }
             catch (Exception ex)
             {

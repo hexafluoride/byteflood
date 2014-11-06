@@ -270,8 +270,6 @@ namespace ByteFlood
 
         public DirectoryKey FilesTree { get; private set; }
 
-        private SynchronizationContext context;
-
         public List<float> DownSpeeds
         {
             get
@@ -327,7 +325,7 @@ namespace ByteFlood
         {
             get
             {
-                if (this.Torrent.IsValid)
+                if (true) // TODO: Find a way to make Ragnar work as a project/implement IsValid
                 {
                     return this.Torrent.InfoHash.ToHex();
                 }
@@ -345,7 +343,6 @@ namespace ByteFlood
 
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
-            this.context = this.MainAppWindow.uiContext;
 
             PopulateFileList();
             PopulateTrackerList();
@@ -754,7 +751,7 @@ namespace ByteFlood
         {
             if (this.files_progresses != null)
             {
-                this.Torrent.GetFileProgressesFast(this.files_progresses);
+                this.files_progresses = this.Torrent.GetFileProgresses();
 
                 for (int i = 0; i < this.files_progresses.Length; i++)
                 {
