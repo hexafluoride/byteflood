@@ -88,7 +88,10 @@ namespace ByteFlood
                     }
                 }
             }
-            torrents.Items.Refresh();
+            App.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                torrents.Items.Refresh();
+            }));
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
