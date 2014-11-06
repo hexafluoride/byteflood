@@ -106,7 +106,7 @@ namespace ByteFlood
 
                         case typeof(Ragnar.ScrapeReplyAlert):
 
-                        case typeof(Ragnar.StateUpdateAlert):
+
                         case typeof(Ragnar.StorageMovedAlert):
 
                         case typeof(Ragnar.TorrentCheckedAlert):

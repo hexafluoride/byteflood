@@ -46,6 +46,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Services\WebSearch\HAP\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="Jayrock">
+      <HintPath>..\packages\jayrock.0.9.16530\lib\net40\Jayrock.dll</HintPath>
+    </Reference>
+    <Reference Include="Jayrock.Json">
+      <HintPath>..\packages\jayrock-json.0.9.16530\lib\net40\Jayrock.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="PresentationFramework.Aero2, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -53,7 +59,7 @@
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\Framework\v4.0.30319\WPF\PresentationFramework.Aero2.dll</HintPath>
     </Reference>
     <Reference Include="Ragnar">
-      <HintPath>..\libtorrent-csharp\Debug\Ragnar.dll</HintPath>
+      <HintPath>..\packages\Ragnar.0.6.0\lib\net45\Ragnar.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -219,8 +225,8 @@
     <Compile Include="UI\SearchOnlineTorrents.xaml.cs">
       <DependentUpon>SearchOnlineTorrents.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\TorrentPropertiesForm.xaml.cs">
-      <DependentUpon>TorrentPropertiesForm.xaml</DependentUpon>
+    <Compile Include="UI\TorrentPropertiesEditor.xaml.cs">
+      <DependentUpon>TorrentPropertiesEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
     <Page Include="Controls\PhotoLoader\Resources.xaml">
@@ -287,7 +293,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\TorrentPropertiesForm.xaml">
+    <Page Include="UI\TorrentPropertiesEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -301,6 +307,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="boost_chrono-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="boost_date_time-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="boost_system-vc120-mt-1_55.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="torrent.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
     <Content Include="Assets\Icons\lefttree\active.svg" />
@@ -327,6 +345,7 @@
     <Content Include="Assets\Icons\toolbar\start.svg" />
     <Content Include="Assets\Icons\toolbar\stop.svg" />
     <Content Include="Assets\Icons\toolbar\rss.svg" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -348,20 +367,12 @@
       <Project>{aeada459-a688-4bc5-8160-845f5f9d8ca4}</Project>
       <Name>ByteFloodUpdater</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Jayrock.Json\Jayrock.Json.csproj">
-      <Project>{F10A6A7D-B8E4-4F8B-8BD9-5B42ACE5520E}</Project>
-      <Name>Jayrock.Json</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Jayrock\Jayrock.csproj">
-      <Project>{A178A4BB-CE12-4BF3-8B17-6DF0D82120C8}</Project>
-      <Name>Jayrock</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
-      <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
+      <Project>{411a9e0e-fdc6-4e25-828a-0c2cd1cd96f8}</Project>
       <Name>MonoTorrent</Name>
     </ProjectReference>
     <ProjectReference Include="..\NotifyIconWpf\NotifyIconWpf.csproj">
-      <Project>{7AC63864-7638-41C4-969C-D3197EF2BED9}</Project>
+      <Project>{7ac63864-7638-41c4-969c-d3197ef2bed9}</Project>
       <Name>NotifyIconWpf</Name>
     </ProjectReference>
   </ItemGroup>
@@ -716,28 +727,6 @@
     <Resource Include="Graphics\ClientIcons\ZipTorrent.png" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Content Include="..\libtorrent-csharp\packages\boost_1_55_0\stage\lib\boost_chrono-vc120-mt-gd-1_55.dll">
-      <Link>boost_chrono-vc120-mt-gd-1_55.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\libtorrent-csharp\packages\boost_1_55_0\stage\lib\boost_date_time-vc120-mt-gd-1_55.dll">
-      <Link>boost_date_time-vc120-mt-gd-1_55.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\libtorrent-csharp\packages\boost_1_55_0\stage\lib\boost_system-vc120-mt-gd-1_55.dll">
-      <Link>boost_system-vc120-mt-gd-1_55.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\libtorrent-csharp\packages\boost_1_55_0\stage\lib\boost_thread-vc120-mt-gd-1_55.dll">
-      <Link>boost_thread-vc120-mt-gd-1_55.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\libtorrent-csharp\packages\libtorrent-rasterbar-1.0.2\bin\msvc-12.0\debug\boost-link-shared\boost-source\threading-multi\torrent.dll">
-      <Link>torrent.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

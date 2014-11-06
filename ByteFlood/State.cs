@@ -4,12 +4,9 @@ using System.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using MonoTorrent;
-using MonoTorrent.Client;
 using System.Xml.Serialization;
 using MonoTorrent.Common;
-using MonoTorrent.Client.Connections;
 using System.Threading;
-using System.Net;
 using System.IO;
 using Jayrock.Json;
 using Jayrock.Json.Conversion;
@@ -394,6 +391,7 @@ namespace ByteFlood
 
             TorrentInfo ti = new TorrentInfo(handle);
             ti.OriginalTorrentFilePath = path;
+            ti.ApplyTorrentSettings(App.Settings.DefaultTorrentProperties);
 
             uiContext.Send(x =>
             {
@@ -470,20 +468,26 @@ namespace ByteFlood
                 }
                 Directory.CreateDirectory(entry.DownloadDirectory);
 
-                var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
+                this.Torrents.Add(new TorrentInfo(
+                 this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
                 {
                     SavePath = entry.DownloadDirectory,
-                    TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path))
-                });
-                Torrents.Add(new TorrentInfo(handle));
+                    TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path)),
 
+                    DownloadLimit = entry.DefaultSettings.MaxDownloadSpeed,
+                    MaxConnections = entry.DefaultSettings.MaxConnections,
+                    MaxUploads = entry.DefaultSettings.UploadSlots,
+                    UploadLimit = entry.DefaultSettings.MaxUploadSpeed
+                })));
+
+             
             }, null);
             return success;
         }
 
         public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
-            MessageBox.Show("Not supported", "Info");
+            MessageBox.Show("Not supported yet", "Info");
             return;
 
             //MagnetLink mg = null;
