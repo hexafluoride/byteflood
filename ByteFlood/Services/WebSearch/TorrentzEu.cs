@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.Net;
 using System.Web;
@@ -10,7 +12,7 @@ namespace ByteFlood.Services.WebSearch
 {
     public static class TorrentzEu
     {
-        public static SearchResult[] Search(string query)
+        public static async Task<SearchResult[]> SearchAsync(string query, CancellationToken token)
         {
             List<SearchResult> results = new List<SearchResult>();
             using (WebClient nc = new WebClient())
@@ -20,9 +22,19 @@ namespace ByteFlood.Services.WebSearch
                 nc.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 6.1; rv:31.0) Firefox/31.0");
                 nc.Headers.Add(HttpRequestHeader.Referer, "https://torrentz.eu/");
 
-                string data = nc.DownloadString(string.Format("https://torrentz.eu/search?f={0}", f_query));
+	            string data;
+	            try
+	            {
+		            var task = nc.DownloadStringTaskAsync(string.Format("https://torrentz.eu/search?f={0}", f_query));
+		            token.Register(nc.CancelAsync);
+		            data = await task;
+	            }
+	            catch (WebException)
+	            {
+		            return results.ToArray();
+	            }
 
-                if (!string.IsNullOrWhiteSpace(data))
+	            if (!string.IsNullOrWhiteSpace(data))
                 {
                     HtmlDocument doc = new HtmlDocument(); doc.LoadHtml(data);
 

@@ -33,7 +33,6 @@ namespace ByteFlood
         public List<TorrentInfo> selected = new List<TorrentInfo>();
         public MainWindow MainWindow = (App.Current.MainWindow as MainWindow);
         public State AppState = (App.Current.MainWindow as MainWindow).state;
-        public SynchronizationContext context = SynchronizationContext.Current;
 
         public ImportTorrents()
         {
@@ -89,14 +88,14 @@ namespace ByteFlood
                     }
                 }
             }
-            context.Send(t => torrents.Items.Refresh(), null);
+            torrents.Items.Refresh();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.torrents.ItemsSource = list;
+            torrents.ItemsSource = list;
             list.Clear();
-            Task.Factory.StartNew(new Action(() => { Load(); }));
+            await Task.Run(() => Load());
         }
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
