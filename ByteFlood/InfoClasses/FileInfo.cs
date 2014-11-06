@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using MonoTorrent.Common;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -75,7 +76,7 @@ namespace ByteFlood
                 {
                     this.Owner.Torrent.SetFilePriority(this.FileIndex, 0);
                 }
-                UpdateSingle("DownloadFile");
+                UpdateSingle();
             }
         }
 
@@ -104,20 +105,20 @@ namespace ByteFlood
 
         #region INotifyPropertyChanged implementation
 
-        public void UpdateSingle(string str)
+        public void UpdateSingle([CallerMemberName]string name = null)
         {
-            if (PropertyChanged == null) { return; }
-            PropertyChanged(this, new PropertyChangedEventArgs(str));
+	        var handler = PropertyChanged;
+            if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
         }
 
-        public void UpdateList(params string[] str)
-        {
-            if (PropertyChanged == null) { return; }
-            foreach(string s in str)
-                PropertyChanged(this, new PropertyChangedEventArgs(s));
-        }
+	    public void UpdateList(params string[] str)
+	    {
+		    foreach (string s in str)
+			    UpdateSingle(s);
+	    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+	    public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
     }

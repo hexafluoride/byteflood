@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using System.ComponentModel;
 using System.Windows;
@@ -218,13 +219,18 @@ namespace ByteFlood
                 return Settings.DefaultSettings;
             }
         }
-        public void NotifyChanged(params string[] props)
+        protected void UpdateList(params string[] props)
         {
-            if (PropertyChanged == null)
-                return;
             foreach (string str in props)
-                PropertyChanged(this, new PropertyChangedEventArgs(str));
+                OnPropertyChanged(str);
         }
+
+		protected void OnPropertyChanged([CallerMemberName]string name = null)
+		{
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
+		}
 
         public static Settings CompleteNullProperties(Settings s)
         {

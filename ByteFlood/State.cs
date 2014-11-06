@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections.ObjectModel;
@@ -616,18 +617,15 @@ namespace ByteFlood
 
         public void NotifyChanged(params string[] props)
         {
-            if (PropertyChanged == null)
-                return;
             foreach (string str in props)
-                PropertyChanged(this, new PropertyChangedEventArgs(str));
+                NotifySinglePropertyChanged(str);
         }
 
-        public void NotifySinglePropertyChanged(string name)
+        protected void NotifySinglePropertyChanged([CallerMemberName]string name = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+	        var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

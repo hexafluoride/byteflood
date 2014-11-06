@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using MonoTorrent.Client;
 using System.ComponentModel;
@@ -22,11 +23,9 @@ namespace ByteFlood
             {
                 if (value != client) 
                 {
-                    this.client = value;
-                    if (this.PropertyChanged != null)
-                    {
-                        this.PropertyChanged(this, new PropertyChangedEventArgs("Client"));
-                    }
+                    client = value;
+
+					OnPropertyChanged();
                 }
             }
         }
@@ -40,10 +39,8 @@ namespace ByteFlood
                 if (value != this.pi_info) 
                 {
                     this.pi_info = value;
-                    if (this.PropertyChanged != null) 
-                    {
-                        this.PropertyChanged(this, new PropertyChangedEventArgs("PieceInfo"));
-                    }
+
+					OnPropertyChanged();
                 }
             }
         }
@@ -52,10 +49,15 @@ namespace ByteFlood
 
         public void UpdateList(params string[] columns)
         {
-            if (PropertyChanged == null)
-                return;
             foreach (string str in columns)
-                PropertyChanged(this, new PropertyChangedEventArgs(str));
+                OnPropertyChanged(str);
         }
+
+		public void OnPropertyChanged([CallerMemberName]string name = null)
+		{
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
+		}
     }
 }

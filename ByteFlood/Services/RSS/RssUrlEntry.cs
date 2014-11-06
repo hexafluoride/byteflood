@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -128,7 +129,7 @@ namespace ByteFlood.Services.RSS
         public RssTorrent[] Update()
         {
             tick++;
-            NotifyPropertyChanged("Count");
+            UpdateList("Count");
 
             if (tick >= UpdateInterval.TotalSeconds)
             {
@@ -167,7 +168,7 @@ namespace ByteFlood.Services.RSS
                     }
 
                     TryLoadIcon();
-                    NotifyPropertyChanged("Name");
+                    UpdateList("Name");
 
                     if (!this.IsCustomtUpdateInterval)
                     {
@@ -181,7 +182,7 @@ namespace ByteFlood.Services.RSS
                     if (new_item_list.Count > 0)
                     {
                         Debug.WriteLine("[Feed '{0}']: {1} new item found.", this.Url, new_item_list.Count);
-                        NotifyPropertyChanged("Count");
+                        UpdateList("Count");
                         return new_item_list.ToArray();
                     }
                 }
@@ -222,7 +223,7 @@ namespace ByteFlood.Services.RSS
                             bi.Freeze();
 
                             this.Icon = bi;
-                            NotifyPropertyChanged("Icon");
+                            UpdateList("Icon");
                         }
                     }
                 }
@@ -302,21 +303,25 @@ namespace ByteFlood.Services.RSS
         /// </summary>
         public void NotifyUpdate()
         {
-            NotifyPropertyChanged("Name", "Count");
+            UpdateList("Name", "Count");
         }
 
         #region INotifyPropertyChanged Implementation
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged(params string[] propnames)
-        {
-            if (PropertyChanged != null)
-            {
-                foreach (string propname in propnames)
-                    PropertyChanged(this, new PropertyChangedEventArgs(propname));
-            }
-        }
+	    private void UpdateList(params string[] propnames)
+	    {
+		    foreach (string propname in propnames)
+			    OnPropertyChanged(propname);
+	    }
+
+	    protected void OnPropertyChanged([CallerMemberName]string name = null)
+		{
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
+		}
 
         #endregion
     }
