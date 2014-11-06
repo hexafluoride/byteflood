@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.ComponentModel;
 
@@ -39,7 +40,7 @@ namespace ByteFlood.Services.RSS
                 if (value != _success) 
                 {
                     _success = value;
-                    NotifyPropertyChanged("Success");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -62,7 +63,7 @@ namespace ByteFlood.Services.RSS
                 if (value != _lrt)
                 {
                     _lrt = value;
-                    NotifyPropertyChanged("LastResponseType");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -76,7 +77,7 @@ namespace ByteFlood.Services.RSS
                 if (value != _lrm)
                 {
                     _lrm = value;
-                    NotifyPropertyChanged("LastResponseMessage");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -85,12 +86,11 @@ namespace ByteFlood.Services.RSS
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged(string propname)
+        private void NotifyPropertyChanged([CallerMemberName]string propname = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propname));
-            }
+	        var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(propname));
         }
 
         #endregion

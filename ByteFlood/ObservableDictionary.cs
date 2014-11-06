@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
 
@@ -224,14 +225,16 @@ namespace ByteFlood
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (CollectionChanged != null)
-                CollectionChanged(this, args);
+	        var handler = CollectionChanged;
+	        if (handler != null)
+                handler(this, args);
         }
 
-        protected virtual void OnPropertyChanged(string name)
+        protected virtual void OnPropertyChanged([CallerMemberName]string name = null)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
+	        var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(name));
         }
 
         protected virtual bool RemoveEntry(TKey key)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -766,11 +767,16 @@ namespace ByteFlood
 
         public void UpdateList(params string[] columns)
         {
-            if (PropertyChanged == null)
-                return;
             foreach (string str in columns)
-                PropertyChanged(this, new PropertyChangedEventArgs(str));
+				UpdateSingle(str);
         }
+
+	    public void UpdateSingle([CallerMemberName] string name = null)
+	    {
+		    var handler = PropertyChanged;
+		    if (handler != null)
+			    handler(this, new PropertyChangedEventArgs(name));
+	    }
 
         #endregion
 

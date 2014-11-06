@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,7 +21,7 @@ namespace Aga.Controls.Tree
 			internal set
 			{
 				_node = value;
-				OnPropertyChanged("Node");
+				OnPropertyChanged();
 			}
 		}
 
@@ -94,10 +95,11 @@ namespace Aga.Controls.Tree
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		private void OnPropertyChanged(string name)
+		private void OnPropertyChanged([CallerMemberName]string name = null)
 		{
-			if (PropertyChanged != null)
-				PropertyChanged(this, new PropertyChangedEventArgs(name));
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
 		}
 
 		#endregion
