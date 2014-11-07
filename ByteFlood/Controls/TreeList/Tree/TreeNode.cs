@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -66,10 +67,11 @@ namespace Aga.Controls.Tree
 		#region INotifyPropertyChanged Members
 
 		public event PropertyChangedEventHandler PropertyChanged;
-		private void OnPropertyChanged(string name)
+		private void OnPropertyChanged([CallerMemberName]string name = null)
 		{
-			if (PropertyChanged != null)
-				PropertyChanged(this, new PropertyChangedEventArgs(name));
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
 		}
 
 		#endregion
@@ -146,7 +148,7 @@ namespace Aga.Controls.Tree
 				if (value != IsExpanded)
 				{
 					Tree.SetIsExpanded(this, value);
-					OnPropertyChanged("IsExpanded");
+					OnPropertyChanged();
 					OnPropertyChanged("IsExpandable");
 				}
 			}
@@ -174,7 +176,7 @@ namespace Aga.Controls.Tree
 				if (value != _isSelected)
 				{
 					_isSelected = value;
-					OnPropertyChanged("IsSelected");
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -353,7 +355,7 @@ namespace Aga.Controls.Tree
 					break;
 			}
 			HasChildren = Children.Count > 0;
-			OnPropertyChanged("IsExpandable");
+			OnPropertyChanged();
 		}
 
 		private void RemoveChildAt(int index)
