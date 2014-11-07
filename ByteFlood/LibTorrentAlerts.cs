@@ -94,10 +94,17 @@ namespace ByteFlood
                         TorrentFinished(tfa.Handle);
                     }
 
+
+                    if (alert_type == typeof(MetadataReceivedAlert)) 
+                    {
+                        MetadataReceivedAlert mra = (MetadataReceivedAlert)alert;
+                        MetadataReceived(mra.Handle);
+                    }
+
                     /*
                         case typeof(Ragnar.FileCompletedAlert):
                         case typeof(Ragnar.FileRenamedAlert):
-                        case typeof(Ragnar.MetadataReceivedAlert):
+
                         case typeof(Ragnar.PeerAlert):
                         case typeof(Ragnar.PeerBanAlert):
                         case typeof(Ragnar.PeerConnectAlert):
@@ -140,7 +147,13 @@ namespace ByteFlood
 
         public delegate void TorrentFinishedEvent(TorrentHandle handle);
         public event TorrentFinishedEvent TorrentFinished;
-    
+
+
+        public delegate void TorrentMetadataReceivedEvent(TorrentHandle handle);
+        /// <summary>
+        /// This event only fire when torrent metadata has been completly received
+        /// </summary>
+        public event TorrentMetadataReceivedEvent MetadataReceived;
 
     }
 }

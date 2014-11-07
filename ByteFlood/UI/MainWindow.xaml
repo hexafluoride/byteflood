@@ -41,7 +41,8 @@
         <formatters:PeerSoftwareToIcon x:Key="PeerSoftwareToIcon" />
         <formatters:SettingsGetter x:Key="SettingsGetter" />
         <formatters:PeerCountryToIcon x:Key="PeerCountryToIcon" />
-
+        <formatters:ForegroundColorProvider x:Key="ForegroundColorProvider"/>
+        
         <RoutedUICommand x:Key="Commands.AddTorrent" />
         <RoutedUICommand x:Key="Commands.AddMagnet" />
         <RoutedUICommand x:Key="Commands.AddRssFeed" />
@@ -68,6 +69,9 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <SolidColorBrush x:Key="ElementsColorBrush" Color="{Binding ElementsColor,FallbackValue=#000}"/>
+        
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -116,7 +120,24 @@
                 <TreeViewItem Name="torrents_treeview" Selected="SwitchTorrentDisplay">
                     <TreeViewItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/torrents_all.png" Height="16" Width="13" Margin="0,0,3,0"/>
+                            <Viewbox Stretch="Uniform" Height="16" Width="13" Margin="0,0,3,0">
+                                <Canvas Width="128" Height="128">
+                                    <Canvas.RenderTransform>
+                                        <TranslateTransform X="0" Y="0"/>
+                                    </Canvas.RenderTransform>
+                                    <Canvas.Resources/>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 88 80 L 128 40 L 104 40 L 104 0 L 72 0 L 72 40 L 48 40 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 40 48 L 80 88 L 56 88 L 56 128 L 24 128 L 24 88 L 0 88 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Text="{Binding TorrentCount, StringFormat='Torrents ({0})', FallbackValue='Torrents'}"/>
                         </StackPanel>
                     </TreeViewItem.Header>
@@ -124,7 +145,19 @@
                     <TreeViewItem Tag="downloading" Selected="SwitchTorrentDisplay">
                         <TreeViewItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/downloading.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <Viewbox Stretch="Uniform" Height="16" Width="10" Margin="0,0,3,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+                                        <Path Fill="{StaticResource ElementsColorBrush}">
+                                            <Path.Data>
+                                                <PathGeometry Figures="m 64 128 64 -64 -38.4 0 0 -64 -51.2 0 0 64 L 0 64 z" FillRule="NonZero"/>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Text="{Binding DownloadingTorrentCount, StringFormat='Downloading ({0})', FallbackValue='Downloading'}"/>
                             </StackPanel>
                         </TreeViewItem.Header>
@@ -133,7 +166,20 @@
                     <TreeViewItem Tag="seeding" Selected="SwitchTorrentDisplay">
                         <TreeViewItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/seeding.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <Viewbox Stretch="Uniform" Height="16" Width="10" Margin="0,0,3,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+
+                                        <Path Fill="{StaticResource ElementsColorBrush}">
+                                            <Path.Data>
+                                                <PathGeometry Figures="m 64 0 64 64 -38.4 0 0 64 -51.2 0 0 -64 L 0 64 z" FillRule="NonZero"/>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Text="{Binding SeedingTorrentCount, StringFormat='Seeding ({0})', FallbackValue='Seeding'}"/>
                             </StackPanel>
                         </TreeViewItem.Header>
@@ -141,8 +187,20 @@
 
                     <TreeViewItem Tag="finished" Selected="SwitchTorrentDisplay">
                         <TreeViewItem.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/complete.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                            <StackPanel Orientation="Horizontal">   
+                                <Viewbox Stretch="Uniform" Height="16" Width="10" Margin="0,0,3,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+                                        <Path Fill="{StaticResource ElementsColorBrush}">
+                                            <Path.Data>
+                                                <PathGeometry Figures="M 48 68.923079 104 0 128 29.538462 48 128 C 31.589843 107.8029 16.410157 88.999996 0 68.802886 L 24 39.384617 z" FillRule="NonZero"/>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Text="{Binding FinishedTorrentCount, StringFormat='Finished ({0})', FallbackValue='Finished'}"/>
                             </StackPanel>
                         </TreeViewItem.Header>
@@ -151,7 +209,27 @@
                     <TreeViewItem Tag="active" Selected="SwitchTorrentDisplay">
                         <TreeViewItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/active.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <Viewbox Stretch="Uniform" Height="16" Width="10" Margin="0,0,3,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+
+                                        <Canvas Opacity="1">
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="M 115.98812 38.464995 C 106.9766 15.042282 86.833517 0 64.122412 0 40.900826 0 19.679485 16.460892 11.31909 40.952252 l 17.601107 7.68675 c 5.568388 -16.335906 19.721157 -27.303584 35.202215 -27.303584 14.944532 0 28.159686 9.805292 34.280226 25.066302 L 85.562528 52.201153 118.39987 73.630313 128 33.040525 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 64.122412 106.67083 c -14.803892 0 -28.30554 -10.105265 -34.342735 -25.266278 L 42.437472 75.873842 9.9439219 54.913389 0 94.42203 12.116063 89.122547 C 20.950475 112.45777 41.577993 128 64.122412 128 87.432548 128 108.07048 112.18279 116.70175 87.710189 L 99.183982 79.804708 C 93.422863 96.121864 79.665976 106.67083 64.122412 106.67083 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Text="{Binding ActiveTorrentCount, StringFormat='Active ({0})', FallbackValue='Active'}"/>
                             </StackPanel>
                         </TreeViewItem.Header>
@@ -160,7 +238,27 @@
                     <TreeViewItem Tag="inactive" Selected="SwitchTorrentDisplay">
                         <TreeViewItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/lefttree/inactive.png" Height="16" Width="10" Margin="0,0,3,0"/>
+                                <Viewbox Stretch="Uniform" Height="16" Width="10" Margin="0,0,3,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+
+                                        <Canvas Opacity="0.4">
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="M 115.98812 38.464995 C 106.9766 15.042282 86.833517 0 64.122412 0 40.900826 0 19.679485 16.460892 11.31909 40.952252 l 17.601107 7.68675 c 5.568388 -16.335906 19.721157 -27.303584 35.202215 -27.303584 14.944532 0 28.159686 9.805292 34.280226 25.066302 L 85.562528 52.201153 118.39987 73.630313 128 33.040525 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 64.122412 106.67083 c -14.803892 0 -28.30554 -10.105265 -34.342735 -25.266278 L 42.437472 75.873842 9.9439219 54.913389 0 94.42203 12.116063 89.122547 C 20.950475 112.45777 41.577993 128 64.122412 128 87.432548 128 108.07048 112.18279 116.70175 87.710189 L 99.183982 79.804708 C 93.422863 96.121864 79.665976 106.67083 64.122412 106.67083 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Text="{Binding InactiveTorrentCount, StringFormat='Inactive ({0})', FallbackValue='Inactive'}"/>
                             </StackPanel>
                         </TreeViewItem.Header>
@@ -170,7 +268,30 @@
                 <TreeViewItem Name="feeds_tree_item" Selected="SwitchTorrentDisplay">
                     <TreeViewItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/rss.png" Height="16" Width="13" Margin="0,0,3,0"/>
+                            <Viewbox Stretch="Uniform" Height="16" Width="13" Margin="0,0,3,0">
+                                <Canvas Width="256" Height="256">
+                                    <Canvas.RenderTransform>
+                                        <TranslateTransform X="0" Y="0"/>
+                                    </Canvas.RenderTransform>
+                                    <Canvas.Resources/>
+
+                                    <Ellipse Canvas.Left="44" Canvas.Top="165" Width="48" Height="48" Fill="{StaticResource ElementsColorBrush}">
+                                        <Ellipse.RenderTransform>
+                                            <TranslateTransform X="-22.779661" Y="23.864407"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 167.59322 257.47458 H 118.01403 A 119.57335 114.97253 0 0 0 -1.559322 142.50205 V 94.830508 A 169.15254 162.64407 0 0 1 167.59322 257.47458 z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 203.94576 256.18643 A 204.21694 203.34916 0 0 0 -0.271186 52.837288 V 2 A 255.27118 254.18643 0 0 1 255 256.18643 z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Viewbox>
                             <TextBlock Text="{Binding ElementName=feeds_tree_item, Path=ItemsSource.Count, StringFormat='Feeds ({0})', FallbackValue='Feeds'}"/>
                         </StackPanel>
                     </TreeViewItem.Header>
@@ -216,27 +337,144 @@
 
                     <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}"
                             ToolTip="Add torrent(s) from file">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/add.png" />
+                        
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 48 8 L 48 48 L 8 48 L 8 80 L 48 80 L 48 120 L 80 120 L 80 80 L 120 80 L 120 48 L 80 48 L 80 8 Z " FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}"
                             ToolTip="Add torrent from a URL">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/link.png" />
+                       
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Canvas Opacity="1">
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 25.46875 94.179688 L 36.300781 105.011719 C 41.957031 110.667969 53.273438 110.667969 58.929688 105.011719 L 104.183594 59.757812 C 110.03125 53.910156 109.839844 42.785156 103.898438 36.84375 L 93.15625 26.105469 C 87.214844 20.160156 75.898438 20.160156 70.242188 25.816406 L 24.988281 71.070312 C 19.332031 76.726562 19.332031 88.042969 25.46875 94.179688 Z M 36.300781 82.386719 L 81.558594 37.128906 C 87.214844 31.472656 87.214844 31.472656 92.871094 37.128906 C 98.527344 42.785156 98.527344 42.785156 92.871094 48.445312 L 47.617188 93.699219 C 41.957031 99.355469 41.957031 99.355469 36.300781 93.699219 C 30.644531 88.042969 30.644531 88.042969 36.300781 82.386719 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 77.3125 41.371094 L 111.253906 7.429688 C 116.914062 1.773438 128.226562 13.089844 122.570312 18.746094 L 88.628906 52.6875 C 82.972656 58.34375 71.65625 47.03125 77.3125 41.371094 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 9.429688 109.253906 L 43.371094 75.3125 C 49.03125 69.65625 60.34375 80.96875 54.6875 86.628906 L 20.746094 120.570312 C 15.089844 126.226562 3.773438 114.910156 9.429688 109.253906 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                                <Canvas Opacity=".102">
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 77.3125 41.371094 L 111.253906 7.429688 C 116.914062 1.773438 128.226562 13.089844 122.570312 18.746094 L 88.628906 52.6875 C 82.972656 58.34375 71.65625 47.03125 77.3125 41.371094 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 9.429688 109.253906 L 43.371094 75.3125 C 49.03125 69.65625 60.34375 80.96875 54.6875 86.628906 L 20.746094 120.570312 C 15.089844 126.226562 3.773438 114.910156 9.429688 109.253906 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}"
                             ToolTip="Add a new RSS feed">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/rss.png" />
+
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="256" Height="256">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+
+                                <Ellipse Canvas.Left="44" Canvas.Top="165" Width="48" Height="48" Fill="{StaticResource ElementsColorBrush}">
+                                    <Ellipse.RenderTransform>
+                                        <TranslateTransform X="-22.779661" Y="23.864407"/>
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 167.59322 257.47458 H 118.01403 A 119.57335 114.97253 0 0 0 -1.559322 142.50205 V 94.830508 A 169.15254 162.64407 0 0 1 167.59322 257.47458 z" FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 203.94576 256.18643 A 204.21694 203.34916 0 0 0 -0.271186 52.837288 V 2 A 255.27118 254.18643 0 0 1 255 256.18643 z" FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}"
                             ToolTip="Search for torrents on the internet">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/search.png" />
+                       
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Canvas>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 53.015625 0 C 23.722656 0 0 23.703125 0 53.015625 C 0 82.308594 23.722656 106.03125 53.015625 106.03125 C 61.101562 106.03125 68.695312 104.242188 75.589844 101.0625 L 95.46875 120.941406 C 104.8125 130.351562 104.90625 130.351562 114.316406 120.941406 C 123.660156 111.597656 123.660156 111.507812 114.316406 102.097656 L 96.089844 83.871094 C 102.320312 75.125 106.03125 64.546875 106.03125 53.015625 C 106.03125 23.703125 82.308594 0 53.015625 0 Z M 52.1875 26.507812 C 59.359375 26.285156 66.320312 28.976562 71.472656 33.972656 C 76.625 38.96875 79.527344 45.839844 79.523438 53.015625 C 79.523438 67.652344 67.65625 79.515625 53.015625 79.515625 C 38.375 79.515625 26.507812 67.652344 26.507812 53.015625 C 26.496094 38.695312 37.871094 26.957031 52.1875 26.507812 Z " FillRule="evenodd"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 26.507812 53.003906 C 26.507812 67.640625 38.375 79.507812 53.015625 79.507812 C 67.65625 79.507812 79.523438 67.640625 79.523438 53.003906 C 79.523438 38.371094 67.65625 26.503906 53.015625 26.503906 C 38.375 26.503906 26.507812 38.371094 26.507812 53.003906 Z " FillRule="evenodd"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="White">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 26.507812 53.003906 C 26.507812 67.640625 38.375 79.507812 53.015625 79.507812 C 67.65625 79.507812 79.523438 67.640625 79.523438 53.003906 C 79.523438 38.371094 67.65625 26.503906 53.015625 26.503906 C 38.375 26.503906 26.507812 38.371094 26.507812 53.003906 Z " FillRule="evenodd"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}"
                             ToolTip="Modify and change ByteFlood settings">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/settings.png" />
+
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 74.277832 54.820969 127.82051 108.19465 108.37107 127.82051 54.712035 74.324128 C 20.473346 84.075707 -1.5359949 62.136114 0.90754798 25.56623 L 40.748933 49.854617 49.819132 40.190677 25.366248 1.184359 c 31.789329 -7.3151454 61.140935 26.818305 48.911584 53.63661 z" FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
 
                     <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
@@ -244,24 +482,113 @@
                     <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"
                             ToolTip="Start selected torrent(s)">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/start.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 8 0 L 8 128 L 120 64 Z " FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"
                             ToolTip="Stop selected torrent(s)">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/stop.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 8 8 L 120 8 L 120 120 L 8 120 Z " FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
+                    
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause"
                             ToolTip="Pause selected torrent(s)">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/pause.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+                                <Canvas Opacity="1">
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 8 8 L 56 8 L 56 120 L 8 120 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="{StaticResource ElementsColorBrush}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 72 8 L 120 8 L 120 120 L 72 120 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
+                    
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist"
                             ToolTip="Remove selected torrent(s) from the list">
-                        <Image Source="pack://siteoforigin:,,,/Assets/Icons/toolbar/remove.png" Style="{DynamicResource SelectedItemCheckerImage}" />
+                        
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Width="128" Height="128">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources/>
+
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 112 40 L 112 115.429688 C 112 128 112 128 98.285156 128 L 29.714844 128 C 16 128 16 128 16 115.429688 L 16 40 C 43.429688 40 91.429688 40 112 40 Z " FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                                <Canvas Opacity=".667">
+                                    <Path Fill="White">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 24 56 L 24 112 L 40 112 L 40 56 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="White">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 56 56 L 56 112 L 72 112 L 72 56 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                    <Path Fill="White">
+                                        <Path.Data>
+                                            <PathGeometry Figures="M 88 56 L 88 112 L 104 112 L 104 56 Z " FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Canvas>
+                                <Path Fill="{StaticResource ElementsColorBrush}">
+                                    <Path.Data>
+                                        <PathGeometry Figures="M 16 32 L 112 32 L 112 16 L 88 16 L 88 0 L 40 0 L 40 16 L 16 16 Z " FillRule="NonZero"/>
+                                    </Path.Data>
+                                </Path>
+                            </Canvas>
+                        </Viewbox>
+                        
                     </Button>
+                    
                 </StackPanel>
 
                 <ListView Grid.Row="1" Name="mainlist"
@@ -272,7 +599,8 @@
                           AlternationCount="2">
 
                     <ListView.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                         
                         <ContextMenu x:Key="ItemContextMenu">
                             <MenuItem Header="Open containing folder" 
                                       Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="OpenDownloadDirectory" />
@@ -330,10 +658,10 @@
                                     <Setter Property="Background" Value="#19000000"/>
                                 </Trigger>
                                 <!-- Note: The mouse over style should be the last style
-                                            since triggers are applied in order -->
+                                since triggers are applied in order -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <!--<Setter Property="BorderBrush" Value="Blue"/>
-                                <Setter Property="BorderThickness" Value="0"/>-->
+                                    <Setter Property="BorderThickness" Value="0"/>-->
                                     <Setter Property="Background" Value="LightBlue"/>
                                 </Trigger>
                             </Style.Triggers>
@@ -381,7 +709,20 @@
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/info.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                                
+                                <Viewbox Stretch="Uniform" Height="13" Width="13" Margin="0,0,5,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+                                        <Path Fill="{StaticResource ElementsColorBrush}">
+                                            <Path.Data>
+                                                <PathGeometry Figures="M 64.000005 0 C 28.727637 0 0 28.727639 0 63.999999 0 99.272361 28.727637 128 64.000005 128 99.272379 128 128 99.272361 128 63.999999 128 28.727639 99.272379 0 64.000005 0 z m 0 23.999267 c 4.417829 0 7.997803 3.585829 7.997803 8.003663 0 4.417834 -3.579974 7.997802 -7.997803 7.997802 -4.417832 0 -7.997805 -3.579968 -7.997805 -7.997802 0 -4.417834 3.579973 -8.003663 7.997805 -8.003663 z m -11.999634 23.999267 19.997437 0 0 47.998535 8.003658 0 0 8.003661 -32.002925 0 0 -8.003661 8.003659 0 0 -39.994871 -4.001829 0 z" FillRule="NonZero"/>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
                                 <TextBlock Text="Overview"/>
                             </StackPanel>
                         </TabItem.Header>
@@ -471,7 +812,26 @@
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/files.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                               
+                                <Viewbox Stretch="Uniform" Width="13" Height="13" Margin="0,0,5,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+
+                                        <Path Fill="{StaticResource ElementsColorBrush}" Opacity="0.5">
+                                            <Path.Data>
+                                                <PathGeometry Figures="m 18.164064 97.183592 c -1.824224 0 -3.347656 -2.027344 -3.347656 -3.941408 l 0 -74.503904 c 0 -2.042968 1.765624 -3.921872 3.687496 -3.921872 l 90.953126 0 c 1.96094 0 3.72656 1.878904 3.72656 3.921872 l 0 67.503904 c 0 2.132816 -1.76562 3.937504 -3.72656 3.937504 l -35.531246 0 0 3.062496 c 0 2.02344 -1.699224 3.88672 -3.66016 3.88672 l -51.76172 0 c -0.132808 0 -0.26172 0 -0.32812 0 z" FillRule="NonZero"/>
+                                            </Path.Data>
+                                        </Path>
+                                        <Path Fill="{StaticResource ElementsColorBrush}">
+                                            <Path.Data>
+                                                <PathGeometry Figures="M 4.339844 40 C 1.976562 40 0 41.894531 0 43.78125 L 0 116.199219 C 0 118.265625 2.292969 120 4.804688 120 L 123.199219 120 C 125.761719 120 128 118.265625 128 116.199219 L 128 50.535156 C 128 48.535156 125.761719 46.667969 123.199219 46.667969 L 76.992188 46.667969 L 76.992188 43.78125 C 76.992188 41.820312 74.625 40 72.128906 40 L 4.792969 40 C 4.664062 40 4.472656 40 4.410156 40 Z " FillRule="NonZero"/>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+
                                 <TextBlock Text="Files"/>
                             </StackPanel>
                         </TabItem.Header>
@@ -616,7 +976,41 @@
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/trackers.png" Height="13" Width="13" Margin="0,0,5,0"/>
+                             
+                                <Viewbox Stretch="Uniform" Height="13" Width="13" Margin="0,0,5,0">
+                                    <Canvas Width="128" Height="128">
+                                        <Canvas.RenderTransform>
+                                            <TranslateTransform X="0" Y="0"/>
+                                        </Canvas.RenderTransform>
+                                        <Canvas.Resources/>
+                                        <Canvas Opacity="1">
+                                            <Canvas.RenderTransform>
+                                                <MatrixTransform Matrix="1.3341471 0 0 1.5038781 -21.346307 -32.415623"/>
+                                            </Canvas.RenderTransform>
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="M 45.5625 21.554688 C 44 21.71875 42.6875 23.183594 42.695312 24.753906 l 0 25.378906 c 0 1.675782 1.523438 3.199219 3.199219 3.199219 l 36.210938 0 c 1.675781 0 3.199219 -1.523437 3.199219 -3.199219 l 0 -25.378906 c 0 -1.675781 -1.523438 -3.199218 -3.199219 -3.199218 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 18.867188 74.886719 c -1.5625 0.167969 -2.875 1.632812 -2.867188 3.199219 l 0 25.378902 c 0 1.67579 1.523438 3.20313 3.199219 3.20313 l 36.210937 0 c 1.675782 0 3.199219 -1.52734 3.199219 -3.20313 l 0 -25.378902 c 0 -1.671876 -1.523437 -3.199219 -3.199219 -3.199219 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 72.199219 74.886719 c -1.5625 0.167969 -2.875 1.632812 -2.867188 3.199219 l 0 25.378902 c 0 1.67579 1.527344 3.20313 3.203125 3.20313 l 36.207034 0 c 1.67578 0 3.19922 -1.52734 3.19922 -3.20313 l 0 -25.378902 c 0 -1.671876 -1.52344 -3.199219 -3.19922 -3.199219 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                            <Path Fill="{StaticResource ElementsColorBrush}">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 61.332031 56 0 5.332031 -26.664062 0 0 10.667969 L 40 72 l 0 -5.332031 48 0 L 88 72 l 5.332031 0 0 -10.667969 -26.664062 0 0 -5.332031 z" FillRule="NonZero"/>
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                    </Canvas>
+                                </Viewbox>
+
                                 <TextBlock Text="Trackers"/>
                             </StackPanel>
                         </TabItem.Header>
