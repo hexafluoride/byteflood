@@ -131,6 +131,7 @@
     <Compile Include="InfoClasses\TrackerInfo.cs" />
     <Compile Include="LibTorrentAlerts.cs" />
     <Compile Include="Listener.cs" />
+    <Compile Include="NotificationManager.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
     <Compile Include="Services\GeoIPCountry.cs" />
