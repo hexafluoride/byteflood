@@ -113,7 +113,7 @@ namespace ByteFlood
             this.LibTorrentAlerts.TorrentStateChanged += LibTorrentAlerts_TorrentStateChanged;
             this.LibTorrentAlerts.TorrentStatsUpdated += LibTorrentAlerts_TorrentStatsUpdated;
             this.LibTorrentAlerts.TorrentFinished += LibTorrentAlerts_TorrentFinished;
-
+            this.LibTorrentAlerts.MetadataReceived += LibTorrentAlerts_MetadataReceived;
             if (File.Exists(LtSessionFilePath))
             {
                 this.LibtorrentSession.LoadState(File.ReadAllBytes(LtSessionFilePath));
@@ -144,7 +144,8 @@ namespace ByteFlood
                     if (File.Exists(resume_file))
                     {
                         // Loading the resume data will load all torrents settings,
-                        // with the exception of byteflood settings {RatioLimit, RanCommand, PickedMovieData}
+                        // with the exception of byteflood settings {RatioLimit, RanCommand, PickedMovieData, ...}
+                        // See TorrentInfo.LoadMiscSettings() method
                         para.ResumeData = File.ReadAllBytes(resume_file);
                     }
 
@@ -182,6 +183,18 @@ namespace ByteFlood
 
         #region LibTorrent Alerts Handling
 
+        void LibTorrentAlerts_MetadataReceived(Ragnar.TorrentHandle handle)
+        {
+            this.LibTorrentAlerts_TorrentAdded(handle);
+
+            // This is critical, without it byteflood won't load this torrent at the next startup
+            byte[] data = this.BackUpMangetLinkMetadata(handle.TorrentFile);
+
+            this.SaveMagnetLink(data, handle.TorrentFile.Name);
+
+            NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
+        }
+
         void LibTorrentAlerts_TorrentFinished(Ragnar.TorrentHandle handle)
         {
             var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
@@ -211,13 +224,16 @@ namespace ByteFlood
 
         void LibTorrentAlerts_TorrentAdded(Ragnar.TorrentHandle handle)
         {
-            uiContext.Post(_ =>
+            if (handle.HasMetadata)
             {
-                if (!Torrents.Any(t => t.Torrent.InfoHash.ToHex() == handle.InfoHash.ToHex()))
+                uiContext.Post(_ =>
                 {
-                    Torrents.Add(new TorrentInfo(handle));
-                }
-            }, null);
+                    if (!Torrents.Any(t => t.Torrent.InfoHash.ToHex() == handle.InfoHash.ToHex()))
+                    {
+                        Torrents.Add(new TorrentInfo(handle));
+                    }
+                }, null);
+            }
         }
 
         void LibTorrentAlerts_ResumeDataArrived(Ragnar.TorrentHandle handle, byte[] data)
@@ -251,7 +267,7 @@ namespace ByteFlood
 
             this.LibTorrentAlerts.StopWatching();
 
-            while (this.LibTorrentAlerts.IsRunning) ;
+            while (this.LibTorrentAlerts.IsRunning) ; // Do nothing while waiting for all resume data events to be processed
 
             this.LibtorrentSession.Dispose();
 
@@ -450,6 +466,16 @@ namespace ByteFlood
             return newpath;
         }
 
+        private byte[] BackUpMangetLinkMetadata(Ragnar.TorrentInfo info)
+        {
+            Ragnar.TorrentCreator tc = new Ragnar.TorrentCreator(info);
+            byte[] f = tc.Generate();
+            tc.Dispose();
+            string path = System.IO.Path.Combine(State.TorrentsStateSaveDirectory, info.InfoHash + ".torrent");
+            File.WriteAllBytes(path, f);
+            return f;
+        }
+
         public bool AddTorrentRss(string path, Services.RSS.RssUrlEntry entry)
         {
             Torrent t = null;
@@ -481,101 +507,60 @@ namespace ByteFlood
                     UploadLimit = entry.DefaultSettings.MaxUploadSpeed
                 })));
 
-             
+
             }, null);
             return success;
         }
 
         public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
-            MessageBox.Show("Not supported yet", "Info");
-            return;
+            MagnetLink mg = null;
 
-            //MagnetLink mg = null;
+            try { mg = new MagnetLink(magnet); }
+            catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
 
-            //try { mg = new MagnetLink(magnet); }
-            //catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
+            if (this.ContainTorrent(mg.InfoHash.ToHex()))
+            {
+                if (notifyIfAdded)
+                {
+                    MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                return;
+            }
 
-            //if (this.ContainTorrent(mg.InfoHash.ToHex()))
-            //{
-            //    if (notifyIfAdded)
-            //    {
-            //        MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    }
-            //    return;
-            //}
+            if (App.Settings.PreferMagnetCacheWebsites)
+            {
+                byte[] torrent_data = State.GetMagnetFromCache(mg); // TODO: Move this to a non-blocking call
+                if (torrent_data != null)
+                {
+                    string path = this.SaveMagnetLink(torrent_data, mg.Name);
+                    this.AddTorrentByPath(path);
+                    return;
+                }
+            }
 
-            //if (!Directory.Exists(App.Settings.TorrentFileSavePath))
-            //    Directory.CreateDirectory(App.Settings.TorrentFileSavePath);
+            this.LibtorrentSession.AsyncAddTorrent(new Ragnar.AddTorrentParams()
+            {
+                SavePath = App.Settings.DefaultDownloadPath,
+                Url = magnet
+            });
 
-            //string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, mg.InfoHash.ToHex() + ".torrent");
-
-            //AddTorrentDialog atd = new AddTorrentDialog("") { Icon = App.Current.MainWindow.Icon };
-            //atd.Show();
-            //bool use_cache_services = false;
-            //ThreadPool.QueueUserWorkItem(delegate
-            //{
-
-            //    if (use_cache_services)
-            //    {
-            //        byte[] data = GetMagnetFromCache(mg);
-            //        if (data != null)
-            //        {
-            //            File.WriteAllBytes(path, data);
-            //            this.AddTorrentByPath(path, atd);
-            //            return;
-            //        }
-            //    }
-
-            //    this.LibtorrentSession.AsyncAddTorrent(new Ragnar.AddTorrentParams() 
-            //    {
-            //        SavePath = App.Settings.DefaultDownloadPath,
-            //        Url = magnet
-            //    });
-
-
-            //});
+            NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
         }
 
-        //public byte[] MagnetLinkTorrentFile(string magnet)
-        //{
-        //    return null;
-
-        //    MagnetLink mg = null;
-
-        //    try { mg = new MagnetLink(magnet); }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-
-        //    string hash = mg.InfoHash.ToHex();
-        //    string path = System.IO.Path.Combine(App.Settings.TorrentFileSavePath, hash + ".torrent");
-        //    string temp_save = System.IO.Path.Combine(System.IO.Path.GetTempPath(), hash);
-        //    Directory.CreateDirectory(temp_save);
-        //    TorrentManager tm = new TorrentManager(mg, temp_save, new TorrentSettings(), path);
-
-
-        //    tm.Start();
-
-
-        //    int i = 0;
-
-        //    tm.Stop();
-        //    tm.Dispose();
-
-
-        //    byte[] data = null;
-
-        //    if (File.Exists(path))
-        //    {
-        //        data = File.ReadAllBytes(path);
-        //        File.Delete(path);
-        //    }
-
-        //    Directory.Delete(temp_save, true);
-        //    return data;
-        //}
+        /// <summary>
+        /// Save a .torrent file inside the default download directory using
+        /// the provided metadata bytes
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="torrent_name"></param>
+        /// <returns>A path to where the file was saved</returns>
+        private string SaveMagnetLink(byte[] data, string torrent_name)
+        {
+            string path = Path.Combine(App.Settings.DefaultDownloadPath, Utility.CleanFileName(torrent_name) + ".torrent");
+            File.WriteAllBytes(path, data);
+            return path;
+        }
 
         #region Magnets From Cache Websites
 

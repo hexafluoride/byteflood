@@ -38,9 +38,9 @@ namespace ByteFlood
         public string FileRegex { get; set; }
         public bool EnableFileRegex { get; set; }
         public bool DownloadAllRSS { get; set; }
-        public string RSSRegex { get; set; }
+        
         public string TorrentFileSavePath { get; set; }
-        public bool RSSCheckForDuplicates { get; set; }
+       
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
@@ -95,6 +95,13 @@ namespace ByteFlood
         public bool DisplayStripsOnTorrentList { get; set; }
 
         /// <summary>
+        /// Indicate if byteflood should look for a cached .torrent file 
+        /// before attempting to get metadata from peers if a magnet link
+        /// is used
+        /// </summary>
+        public bool PreferMagnetCacheWebsites { get; set; }
+
+        /// <summary>
         /// For the "wide" and "compact" style
         /// wide = 0
         /// compact = 1
@@ -118,9 +125,6 @@ namespace ByteFlood
                     DHTListeningPort = 1026,
                     FileRegex = "",
                     EnableFileRegex = false,
-                    DownloadAllRSS = false,
-                    /*RSSRegex = "",
-                    RSSCheckForDuplicates = false,*/
                     MetroStyleHover = false,
                     EnableQueue = true,
                     BottomCanvasVisible = true,
@@ -149,7 +153,8 @@ namespace ByteFlood
                     ApplicationStyle = 1,
                     SeedingTorrentsAreActive = false,
                     DisplayStripsOnTorrentList = false,
-                    StatusBarVisible = true
+                    StatusBarVisible = true,
+                    PreferMagnetCacheWebsites = true
                 };
             }
         }
