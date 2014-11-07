@@ -682,8 +682,8 @@
 
                             <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
 
-                            <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
-                            <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="80" Header="Wanted" DisplayMemberBinding="{Binding WantedBytes, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="100" Header="Done" DisplayMemberBinding="{Binding WantedBytesDone, Converter={StaticResource SizeToString}}" />
 
                             <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
                             <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
