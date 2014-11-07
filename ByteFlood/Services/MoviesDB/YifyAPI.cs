@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Jayrock;
@@ -40,7 +41,7 @@ namespace ByteFlood.Services.MoviesDatabases
                             Downloaded = Convert.ToString(movie["Downloaded"]),
                             Genre = Convert.ToString(movie["Genre"]),
                             ImdbCode = Convert.ToString(movie["ImdbCode"]),
-                            MovieRating = float.Parse(Convert.ToString(movie["MovieRating"])),
+                            MovieRating = float.Parse(Convert.ToString(movie["MovieRating"]), CultureInfo.InvariantCulture.NumberFormat),
                             DateUploaded = new DateTime(1970, 1, 1).AddSeconds(Convert.ToInt32(movie["DateUploadedEpoch"])),
                             ImdbLink = Convert.ToString(movie["ImdbLink"]),
                             MovieTitle = Convert.ToString(movie["MovieTitle"]),
