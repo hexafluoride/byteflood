@@ -323,16 +323,23 @@ namespace ByteFloodUpdater
 
         private static void send_shutdown_signal()
         {
-            TcpClient tcp = new TcpClient();
+            var tcp = new TcpClient();
             tcp.Connect("127.0.0.1", 65432);
-            NetworkStream ns = tcp.GetStream();
-            StreamWriter sw = new StreamWriter(ns);
-            JsonObject jo = new JsonObject();
-            jo.Add("id", 0);
-            jo.Add("method", "shutdown");
-            sw.WriteLine(jo.ToString());
-            sw.Flush();
-            tcp.Close();
+
+            var ns = tcp.GetStream();
+	        using (var sw = new StreamWriter(ns))
+	        {
+		        var jo = new JsonObject
+		        {
+			        { "id", 0 },
+			        { "method", "shutdown" }
+		        };
+
+		        sw.WriteLine(jo.ToString());
+		        sw.Flush();
+		    }
+
+			tcp.Close();
         }
 
     }
