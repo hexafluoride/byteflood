@@ -422,7 +422,9 @@ namespace ByteFlood
 
         public void DoStatsUpdate(Ragnar.TorrentStatus stats)
         {
+            var previous = this.StatusData;
             this.StatusData = stats;
+            previous.Dispose();
             Update();
             UpdateGraphData();
         }
@@ -784,7 +786,7 @@ namespace ByteFlood
         {
             if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
             {
-                this.Torrent.Pause();
+                this.Pause();
             }
         }
 

@@ -30,12 +30,17 @@
                     <Button Canvas.Left="6" Canvas.Top="71" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
                     <Button Canvas.Left="6" Canvas.Top="99" Content="Associate ByteFlood with torrent files" Height="23" Width="218" Click="AssociateFiles" />
                     <Button Canvas.Left="6" Canvas.Top="128" Content="Import torrents from uTorrent" Height="23" Click="ImportTorrents" Width="218" />
-                    <TextBlock Canvas.Left="7" Canvas.Top="179" Height="23" Text="Maximum active torrents" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" />
-                    <TextBox Canvas.Left="305" Canvas.Top="177" Height="23" Text="{Binding QueueSize}" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Width="120" />
-                    <CheckBox Canvas.Left="10" Canvas.Top="161" Content="Enable queueing" Height="16" Name="enablequeue" IsChecked="{Binding EnableQueue}" />
-                    <CheckBox Canvas.Left="10" Canvas.Top="202" Content="Consider seeding torrents as inactive"
+                    <TextBlock Canvas.Left="7" Canvas.Top="225" Height="23" Text="Maximum active torrents" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Visibility="Collapsed" />
+                    <TextBox Canvas.Left="305" Canvas.Top="223" Height="23" Text="{Binding QueueSize}" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Width="120" Visibility="Collapsed" />
+                    <CheckBox Canvas.Left="8" Canvas.Top="159" Height="28" IsChecked="{Binding PreferMagnetCacheWebsites}" Width="409">
+                        <TextBlock TextWrapping="Wrap">
+                            When adding magnet links, prioritize torrent cache websites instead of downloading data from peers
+                        </TextBlock>
+                    </CheckBox>
+                    <CheckBox Canvas.Left="10" Canvas.Top="207" Content="Enable queueing" Height="16" Name="enablequeue" IsChecked="{Binding EnableQueue}" Visibility="Collapsed" />
+                    <CheckBox Canvas.Left="10" Canvas.Top="248" Content="Consider seeding torrents as inactive"
                               IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}"
-                              Height="16" Name="seedingTorrentsInac" IsChecked="{Binding SeedingTorrentsAreActive,Mode=OneWay}" />
+                              Height="16" Name="seedingTorrentsInac" IsChecked="{Binding SeedingTorrentsAreActive,Mode=OneWay}" Visibility="Collapsed" />
                 </Canvas>
             </TabItem>
             <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">

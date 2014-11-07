@@ -1,0 +1,1 @@
+All theses icons are based on the !(numix icon theme)[https://github.com/numixproject/numix-icon-theme], therefore they are legally licensed under the GPLv3.
