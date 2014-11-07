@@ -713,6 +713,7 @@ namespace ByteFlood
         {
             get
             {
+				// this value should be preferably retrieved from AssemblyInfo.cs
                 return 62;
             }
         }
