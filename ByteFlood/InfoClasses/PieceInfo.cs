@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.ComponentModel;
 
@@ -19,7 +20,7 @@ namespace ByteFlood
                 if (value != f) 
                 {
                     f = value;
-                    if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs("Finished")); }
+					OnPropertyChanged();
                 }
             }
         }
@@ -35,10 +36,15 @@ namespace ByteFlood
         }
         public void UpdateList(params string[] columns)
         {
-            if (PropertyChanged == null)
-                return;
             foreach (string str in columns)
-                PropertyChanged(this, new PropertyChangedEventArgs(str));
+                OnPropertyChanged(str);
         }
+
+		public void OnPropertyChanged([CallerMemberName]string name = null)
+		{
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(name));
+		}
     }
 }
