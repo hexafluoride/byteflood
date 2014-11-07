@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Net;
+using System.Threading.Tasks;
 using Jayrock.Json;
 using Jayrock.Json.Conversion;
 
@@ -11,35 +12,34 @@ namespace ByteFlood.Services
 {
     public static class AutoUpdater
     {
-        public static string UpdateURL = "https://api.github.com/repos/hexafluoride/byteflood/releases";
+        public const string UpdateURL = "https://api.github.com/repos/hexafluoride/byteflood/releases";
 
-        static Thread bg;
+	    private static CancellationTokenSource _monitoringTokenSource;
 
         public static void StartMonitoring()
         {
-            bg = new Thread(loop);
-            bg.IsBackground = true;
-            bg.Start();
+			_monitoringTokenSource = new CancellationTokenSource();
+	        Task.Run(() => Loop(_monitoringTokenSource.Token), _monitoringTokenSource.Token);
         }
 
         public static void StopMonitoring()
         {
-            if (bg != null && bg.IsAlive)
-            {
-                bg.Abort();
-            }
+			if (_monitoringTokenSource != null)
+				_monitoringTokenSource.Cancel();
         }
 
-        private static void loop()
+        private async static Task Loop(CancellationToken token)
         {
             while (true)
             {
-                CheckforUpdates();
-                Thread.Sleep(3600000); //1 hour
+				if (token.IsCancellationRequested)
+		            break;
+
+	            await Task.WhenAll(CheckforUpdatesAsync(token), Task.Delay(TimeSpan.FromHours(1), token));
             }
         }
 
-        public static NewUpdateInfo CheckforUpdates(bool fire_events = true)
+        public static async Task<NewUpdateInfo> CheckforUpdatesAsync(CancellationToken token, bool fire_events = true)
         {
             try
             {
@@ -48,7 +48,9 @@ namespace ByteFlood.Services
                     nc.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 6.1; rv:31.0) Firefox/31.0");
                     nc.Headers.Add(HttpRequestHeader.IfNoneMatch, App.Settings.UpdateSourceEtag);
 
-                    string data = nc.DownloadString(UpdateURL);
+                    var task = nc.DownloadStringTaskAsync(UpdateURL);
+					token.Register(nc.CancelAsync);
+	                var data = await task;
 
                     App.Settings.UpdateSourceEtag = nc.ResponseHeaders[HttpResponseHeader.ETag];
 
