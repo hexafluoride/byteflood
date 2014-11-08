@@ -422,6 +422,12 @@ namespace ByteFlood
                 if (atd.UserOK)
                 {
                     ti.Name = atd.TorrentName;
+
+                    if (atd.TorrentSavePath != ti.SavePath) 
+                    {
+                        ti.ChangeSavePath(atd.TorrentSavePath);
+                    }
+
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
                     ti.RatioLimit = atd.RatioLimit;
