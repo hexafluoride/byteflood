@@ -450,6 +450,12 @@ namespace ByteFlood
             this.UpdateList("TorrentSettings");
         }
 
+        public void ChangeSavePath(string newpath,  TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace) 
+        {
+            this.Torrent.MoveStorage(newpath, flags);
+            this.StatusData = this.Torrent.QueryStatus();
+        }
+
         /*
         private void Torrent_PeerConnected(object sender, PeerConnectionEventArgs e)
         {
