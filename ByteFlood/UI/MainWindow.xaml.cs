@@ -160,13 +160,18 @@ namespace ByteFlood
                             ReDrawGraph();
                         }
 
+                        string dsp = Utility.PrettifySpeed(status.DownloadRate);
+                        string usp = Utility.PrettifySpeed(status.UploadRate);
+
                         this.DownloadStatus.Text = string.Format("D: {0} T: {1}",
-                            Utility.PrettifySpeed(status.DownloadRate), Utility.PrettifyAmount(status.TotalDownload));
+                            dsp, Utility.PrettifyAmount(status.TotalDownload));
 
                         this.UploadStatus.Text = string.Format("U: {0} T: {1}",
-                            Utility.PrettifySpeed(status.UploadRate), Utility.PrettifyAmount(status.TotalUpload));
+                           usp, Utility.PrettifyAmount(status.TotalUpload));
 
                         this.DHTStatus.Text = string.Format("DHT Peers: {0}", status.DhtNodes);
+
+                        this.Title = string.Format("ByteFlood [D: {0}, U: {1}]", dsp, usp);
 
                         status.Dispose();
 
