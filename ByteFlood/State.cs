@@ -29,37 +29,39 @@ namespace ByteFlood
 
         #region Global Statistics Properties
 
-        public int DHTPeers
-        {
-            get
-            {
-                if (this.LibtorrentSession.IsDhtRunning)
-                {
-                    return this.LibtorrentSession.QueryStatus().DhtNodes;
-                }
-                return 0;
-            }
-        }
-
         public int GlobalMaxDownloadSpeed
         {
-            get { return this.LibtorrentSession.QuerySettings().DownloadRateLimit; }
+            get 
+            {
+                using (var s = this.LibtorrentSession.QuerySettings()) 
+                {
+                    return s.DownloadRateLimit;
+                }
+            }
             set
             {
                 var settings = this.LibtorrentSession.QuerySettings();
                 settings.DownloadRateLimit = value;
                 this.LibtorrentSession.SetSettings(settings);
+                settings.Dispose(); // Not sure about this
             }
         }
 
         public int GlobalMaxUploadSpeed
         {
-            get { return this.LibtorrentSession.QuerySettings().UploadRateLimit; }
+            get 
+            {
+                using (var s = this.LibtorrentSession.QuerySettings())
+                {
+                    return s.UploadRateLimit;
+                }
+            }
             set
             {
                 var settings = this.LibtorrentSession.QuerySettings();
                 settings.UploadRateLimit = value;
                 this.LibtorrentSession.SetSettings(settings);
+                settings.Dispose(); // Not sure about this
             }
         }
 
@@ -115,6 +117,7 @@ namespace ByteFlood
             this.LibTorrentAlerts.TorrentStatsUpdated += LibTorrentAlerts_TorrentStatsUpdated;
             this.LibTorrentAlerts.TorrentFinished += LibTorrentAlerts_TorrentFinished;
             this.LibTorrentAlerts.MetadataReceived += LibTorrentAlerts_MetadataReceived;
+
             if (File.Exists(LtSessionFilePath))
             {
                 this.LibtorrentSession.LoadState(File.ReadAllBytes(LtSessionFilePath));
