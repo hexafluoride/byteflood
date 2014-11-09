@@ -88,12 +88,7 @@
         <CommandBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" Executed="TorrentListCommands_ActionOnSelectedTorrents" />
     </Window.CommandBindings>
 
-    <Window.Title>
-        <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
-            <Binding Path="TotalDownSpeed" Converter="{StaticResource SpeedFormatter}" />
-            <Binding Path="TotalUpSpeed" Converter="{StaticResource SpeedFormatter}" />
-        </MultiBinding>
-    </Window.Title>
+    <Window.Title>ByteFlood</Window.Title>
 
     <Window.InputBindings>
         <KeyBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist" Key="Delete"/>
