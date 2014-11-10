@@ -29,37 +29,39 @@ namespace ByteFlood
 
         #region Global Statistics Properties
 
-        public int DHTPeers
-        {
-            get
-            {
-                if (this.LibtorrentSession.IsDhtRunning)
-                {
-                    return this.LibtorrentSession.QueryStatus().DhtNodes;
-                }
-                return 0;
-            }
-        }
-
         public int GlobalMaxDownloadSpeed
         {
-            get { return this.LibtorrentSession.QuerySettings().DownloadRateLimit; }
+            get 
+            {
+                using (var s = this.LibtorrentSession.QuerySettings()) 
+                {
+                    return s.DownloadRateLimit;
+                }
+            }
             set
             {
                 var settings = this.LibtorrentSession.QuerySettings();
                 settings.DownloadRateLimit = value;
                 this.LibtorrentSession.SetSettings(settings);
+                settings.Dispose(); // Not sure about this
             }
         }
 
         public int GlobalMaxUploadSpeed
         {
-            get { return this.LibtorrentSession.QuerySettings().UploadRateLimit; }
+            get 
+            {
+                using (var s = this.LibtorrentSession.QuerySettings())
+                {
+                    return s.UploadRateLimit;
+                }
+            }
             set
             {
                 var settings = this.LibtorrentSession.QuerySettings();
                 settings.UploadRateLimit = value;
                 this.LibtorrentSession.SetSettings(settings);
+                settings.Dispose(); // Not sure about this
             }
         }
 
@@ -115,6 +117,7 @@ namespace ByteFlood
             this.LibTorrentAlerts.TorrentStatsUpdated += LibTorrentAlerts_TorrentStatsUpdated;
             this.LibTorrentAlerts.TorrentFinished += LibTorrentAlerts_TorrentFinished;
             this.LibTorrentAlerts.MetadataReceived += LibTorrentAlerts_MetadataReceived;
+
             if (File.Exists(LtSessionFilePath))
             {
                 this.LibtorrentSession.LoadState(File.ReadAllBytes(LtSessionFilePath));
@@ -186,12 +189,14 @@ namespace ByteFlood
 
         void LibTorrentAlerts_MetadataReceived(Ragnar.TorrentHandle handle)
         {
-            this.LibTorrentAlerts_TorrentAdded(handle);
+            TorrentInfo ti = new TorrentInfo(handle);
 
             // This is critical, without it byteflood won't load this torrent at the next startup
             byte[] data = this.BackUpMangetLinkMetadata(handle.TorrentFile);
 
-            this.SaveMagnetLink(data, handle.TorrentFile.Name);
+            ti.OriginalTorrentFilePath = this.SaveMagnetLink(data, handle.TorrentFile.Name);
+
+            this.Torrents.Add(ti);
 
             NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
         }
@@ -317,6 +322,7 @@ namespace ByteFlood
                 {
                     TorrentInfo ti = this.Torrents[index];
                     Ragnar.TorrentHandle handle = ti.Torrent;
+                    if (!handle.HasMetadata) { continue; }
 
                     if (handle.NeedSaveResumeData())
                     {
@@ -380,7 +386,7 @@ namespace ByteFlood
                 {
                     if (notifyIfAdded)
                     {
-                        MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        NotificationManager.Notify(new TorrentAlreadyAddedNotification(t.Name, t.InfoHash.ToHex()));
                     }
                     return;
                 }
@@ -419,6 +425,12 @@ namespace ByteFlood
                 if (atd.UserOK)
                 {
                     ti.Name = atd.TorrentName;
+
+                    if (atd.TorrentSavePath != ti.SavePath) 
+                    {
+                        ti.ChangeSavePath(atd.TorrentSavePath);
+                    }
+
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
                     ti.RatioLimit = atd.RatioLimit;
@@ -477,40 +489,44 @@ namespace ByteFlood
             return f;
         }
 
+        /// <summary>
+        /// Used by the feed manager
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="entry"></param>
+        /// <returns>Return weither the torrent was loaded</returns>
         public bool AddTorrentRss(string path, Services.RSS.RssUrlEntry entry)
         {
-            Torrent t = null;
-            try
-            {
-                t = Torrent.Load(path);
-            }
-            catch { return false; }
+            if (!File.Exists(path)) { return false; }
 
-            bool success = true;
-            uiContext.Send(x =>
+            Ragnar.TorrentInfo torrent = new Ragnar.TorrentInfo(File.ReadAllBytes(path));
+
+            if (torrent.IsValid)
             {
-                if (this.ContainTorrent(t.InfoHash.ToHex()))
+                if (this.ContainTorrent(torrent.InfoHash))
                 {
-                    success = false;
-                    return;
+                    return false;
                 }
-                Directory.CreateDirectory(entry.DownloadDirectory);
-
-                this.Torrents.Add(new TorrentInfo(
-                 this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
+                else
                 {
-                    SavePath = entry.DownloadDirectory,
-                    TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path)),
+                    Directory.CreateDirectory(entry.DownloadDirectory);
 
-                    DownloadLimit = entry.DefaultSettings.MaxDownloadSpeed,
-                    MaxConnections = entry.DefaultSettings.MaxConnections,
-                    MaxUploads = entry.DefaultSettings.UploadSlots,
-                    UploadLimit = entry.DefaultSettings.MaxUploadSpeed
-                })));
+                    this.Torrents.Add(new TorrentInfo(
+                     this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
+                     {
+                         SavePath = entry.DownloadDirectory,
+                         TorrentInfo = torrent,
 
+                         DownloadLimit = entry.DefaultSettings.MaxDownloadSpeed,
+                         MaxConnections = entry.DefaultSettings.MaxConnections,
+                         MaxUploads = entry.DefaultSettings.UploadSlots,
+                         UploadLimit = entry.DefaultSettings.MaxUploadSpeed
+                     })));
+                    return true;
+                }
+            }
 
-            }, null);
-            return success;
+            return false;
         }
 
         public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
@@ -524,7 +540,7 @@ namespace ByteFlood
             {
                 if (notifyIfAdded)
                 {
-                    MessageBox.Show("This torrent is already added.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    NotificationManager.Notify(new TorrentAlreadyAddedNotification(mg.Name, mg.InfoHash.ToHex()));
                 }
                 return;
             }
@@ -608,9 +624,9 @@ namespace ByteFlood
 
         protected void NotifySinglePropertyChanged([CallerMemberName]string name = null)
         {
-	        var handler = PropertyChanged;
-			if (handler != null)
-				handler(this, new PropertyChangedEventArgs(name));
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(name));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

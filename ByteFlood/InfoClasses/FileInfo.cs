@@ -60,6 +60,7 @@ namespace ByteFlood
         public void ChangePriority(int pr)
         {
             this.Owner.Torrent.SetFilePriority(this.FileIndex, pr);
+            this.Owner.UpdateSingle("WantedBytes");
             UpdateSingle("Priority");
         }
 
