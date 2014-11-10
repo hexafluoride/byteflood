@@ -79,6 +79,21 @@ namespace ByteFlood
             get { return this.StatusData.SavePath; }
         }
 
+        public string RootDownloadDirectory 
+        {
+            get 
+            {
+                if (this.Torrent.TorrentFile.NumFiles > 1) 
+                {
+                    return System.IO.Path.Combine(this.SavePath, this.Torrent.TorrentFile.Name);
+                }
+                else
+                {
+                    return this.SavePath;
+                }
+            }
+        }
+
         private string _custom_name = null;
         public string Name
         {
@@ -664,7 +679,7 @@ namespace ByteFlood
             if (this.PickedMovieData != null && this.PickedMovieData.Value != null)
             {
                 if (is_lmdif_loading_data) { return; }
-                string save_path = System.IO.Path.Combine(this.SavePath, "folder.jpg");
+                string save_path = System.IO.Path.Combine(this.RootDownloadDirectory, "folder.jpg");
                 if (!System.IO.File.Exists(save_path))
                 {
                     Task.Factory.StartNew(new Action(() =>
@@ -680,6 +695,7 @@ namespace ByteFlood
                                     byte[] data = nc.DownloadData(this.PickedMovieData.Value.PosterImageUri);
                                     System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(save_path));
                                     System.IO.File.WriteAllBytes(save_path, data);
+                                    break;
                                 }
                             }
                             catch (System.Net.WebException wex)
