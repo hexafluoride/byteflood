@@ -53,54 +53,6 @@ namespace ByteFlood
         public State state;
         int ticks = 0;
 
-        #region ClientEngine Statistics Properties
-
-        #region TotalDownSpeed
-        public int TotalDownSpeed
-        {
-            get { return (int)GetValue(TotalDownSpeedProperty); }
-            set { SetValue(TotalDownSpeedProperty, value); }
-        }
-
-        public static readonly DependencyProperty TotalDownSpeedProperty =
-            DependencyProperty.Register("TotalDownSpeed", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
-        #endregion
-
-        #region TotalUpSpeed
-        public int TotalUpSpeed
-        {
-            get { return (int)GetValue(TotalUpSpeedProperty); }
-            set { SetValue(TotalUpSpeedProperty, value); }
-        }
-
-        public static readonly DependencyProperty TotalUpSpeedProperty =
-            DependencyProperty.Register("TotalUpSpeed", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
-        #endregion
-
-        #region TotalDownloaded
-        public long TotalDownloaded
-        {
-            get { return (long)GetValue(TotalDownloadedProperty); }
-            set { SetValue(TotalDownloadedProperty, value); }
-        }
-
-        public static readonly DependencyProperty TotalDownloadedProperty =
-            DependencyProperty.Register("TotalDownloaded", typeof(long), typeof(MainWindow), new PropertyMetadata(0L));
-        #endregion
-
-        #region TotalUploaded
-        public long TotalUploaded
-        {
-            get { return (long)GetValue(TotalUploadedProperty); }
-            set { SetValue(TotalUploadedProperty, value); }
-        }
-
-        public static readonly DependencyProperty TotalUploadedProperty =
-            DependencyProperty.Register("TotalUploaded", typeof(long), typeof(MainWindow), new PropertyMetadata(0L));
-        #endregion
-
-        #endregion
-
         /// <summary>
         /// Color used to paint the toolbar and info tabs buttons
         /// </summary>
@@ -208,12 +160,21 @@ namespace ByteFlood
                             ReDrawGraph();
                         }
 
+                        string dsp = Utility.PrettifySpeed(status.DownloadRate);
+                        string usp = Utility.PrettifySpeed(status.UploadRate);
 
-                        this.TotalDownSpeed = status.DownloadRate;
-                        this.TotalUpSpeed = status.UploadRate;
-                        this.TotalDownloaded = status.TotalDownload;
-                        this.TotalUploaded = status.TotalUpload;
-                        this.DHTStatus.Text = string.Format("DHT Peers: {0}", this.state.DHTPeers);
+                        this.DownloadStatus.Text = string.Format("D: {0} T: {1}",
+                            dsp, Utility.PrettifyAmount(status.TotalDownload));
+
+                        this.UploadStatus.Text = string.Format("U: {0} T: {1}",
+                           usp, Utility.PrettifyAmount(status.TotalUpload));
+
+                        this.DHTStatus.Text = string.Format("DHT Peers: {0}", status.DhtNodes);
+
+                        this.Title = string.Format("ByteFlood [D: {0}, U: {1}]", dsp, usp);
+
+                        status.Dispose();
+
                         this.ElementsColor = Utility.WindowsAero.ColorizationColor.ToWPFColor();
 
                     }, null);

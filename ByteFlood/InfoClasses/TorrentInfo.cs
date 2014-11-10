@@ -6,7 +6,6 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading;
-using System.Xml.Serialization;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Web;
@@ -201,6 +200,10 @@ namespace ByteFlood
 
         public long Uploaded { get { return this.StatusData.AllTimeUpload; } }
 
+        public long WantedBytesDone { get { return this.StatusData.TotalWantedDone; } }
+
+        public long WantedBytes { get { return this.StatusData.TotalWanted; } }
+
         public int QueueNumber
         {
             get
@@ -219,7 +222,7 @@ namespace ByteFlood
             {
                 if (this.Torrent.IsPaused)
                 {
-                    if (this.IsComplete)
+                    if (this.IsStopped)
                     {
                         return "Stopped";
                     }
@@ -447,6 +450,12 @@ namespace ByteFlood
             this.UpdateList("TorrentSettings");
         }
 
+        public void ChangeSavePath(string newpath,  TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace) 
+        {
+            this.Torrent.MoveStorage(newpath, flags);
+            this.StatusData = this.Torrent.QueryStatus();
+        }
+
         /*
         private void Torrent_PeerConnected(object sender, PeerConnectionEventArgs e)
         {
@@ -577,9 +586,17 @@ namespace ByteFlood
 
         public void UpdateGraphData()
         {
-            var status = this.Torrent.QueryStatus();
-            downspeeds.Add(status.DownloadRate);
-            upspeeds.Add(status.UploadRate);
+            if (this.downspeeds.Count == 50) 
+            {
+                this.downspeeds.RemoveAt(0);
+            }
+            this.downspeeds.Add(this.DownloadSpeed);
+
+            if (this.upspeeds.Count == 50)
+            {
+                this.upspeeds.RemoveAt(0);
+            }
+            this.upspeeds.Add(this.UploadSpeed);
         }
 
         public void Recheck()
@@ -626,7 +643,8 @@ namespace ByteFlood
                     "Leechers", "Downloaded",
                     "Uploaded", "Progress",
                     "Ratio", "ETA",
-                    "Size", "Elapsed",
+                    "Elapsed",
+                    "WantedBytesDone",
                     "WastedBytes",
                     //"HashFails",
                     "AverageDownloadSpeed", "AverageUploadSpeed",

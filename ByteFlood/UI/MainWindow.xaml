@@ -88,12 +88,7 @@
         <CommandBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" Executed="TorrentListCommands_ActionOnSelectedTorrents" />
     </Window.CommandBindings>
 
-    <Window.Title>
-        <MultiBinding StringFormat="{}ByteFlood [D: {0}, U: {1}]">
-            <Binding Path="TotalDownSpeed" Converter="{StaticResource SpeedFormatter}" />
-            <Binding Path="TotalUpSpeed" Converter="{StaticResource SpeedFormatter}" />
-        </MultiBinding>
-    </Window.Title>
+    <Window.Title>ByteFlood</Window.Title>
 
     <Window.InputBindings>
         <KeyBinding Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist" Key="Delete"/>
@@ -682,8 +677,8 @@
 
                             <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
 
-                            <GridViewColumn Width="80" Header="Size" DisplayMemberBinding="{Binding Size, Converter={StaticResource SizeToString}}" />
-                            <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="80" Header="Wanted" DisplayMemberBinding="{Binding WantedBytes, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="100" Header="Done" DisplayMemberBinding="{Binding WantedBytesDone, Converter={StaticResource SizeToString}}" />
 
                             <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
                             <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
@@ -1058,37 +1053,16 @@
                 </Style>
             </StatusBar.Resources>
 
-            <!--<StatusBar.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Grid HorizontalAlignment="Right">
-                        </Grid>
-                    </ItemsPanelTemplate>
-                </StatusBar.ItemsPanel>-->
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="UploadStatus" MouseRightButtonUp="GenerateUploadContextMenu">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="U: {0} T: {1}">
-                            <Binding Path="TotalUpSpeed" Converter="{StaticResource SpeedFormatter}" />
-                            <Binding Path="TotalUploaded" Converter="{StaticResource SizeToString}" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                <TextBlock Name="UploadStatus" MouseRightButtonUp="GenerateUploadContextMenu" Text="U: 0 T: 0" />
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="DownloadStatus" MouseRightButtonUp="GenerateDownloadContextMenu">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="D: {0} T: {1}">
-                            <Binding Path="TotalDownSpeed" Converter="{StaticResource SpeedFormatter}" />
-                            <Binding Path="TotalDownloaded" Converter="{StaticResource SizeToString}" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                <TextBlock Name="DownloadStatus" MouseRightButtonUp="GenerateDownloadContextMenu" Text="D: 0 T: 0" />
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Name="DHTStatus" Text="DHT Peers"/>
-
+                <TextBlock Name="DHTStatus" Text="DHT Peers" />
             </StatusBarItem>
             <Separator DockPanel.Dock="Right" />
             <StatusBarItem />

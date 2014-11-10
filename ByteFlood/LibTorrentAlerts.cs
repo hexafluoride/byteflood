@@ -112,8 +112,6 @@ namespace ByteFlood
                         case typeof(Ragnar.PieceFinishedAlert):
 
                         case typeof(Ragnar.ScrapeReplyAlert):
-
-
                         case typeof(Ragnar.StorageMovedAlert):
 
                         case typeof(Ragnar.TorrentCheckedAlert):
@@ -134,7 +132,6 @@ namespace ByteFlood
 
         public delegate void ResumeDataEvent(TorrentHandle handle, byte[] data);
         public event ResumeDataEvent ResumeDataArrived;
-
 
         public delegate void TorrentAddedEvent(TorrentHandle handle);
         public event TorrentAddedEvent TorrentAdded;

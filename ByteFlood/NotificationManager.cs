@@ -78,6 +78,18 @@ namespace ByteFlood
         }
     }
 
+    public class TorrentAlreadyAddedNotification : Notification 
+    {
+        public TorrentAlreadyAddedNotification(string name, string infohash) 
+        {
+            this.Title = "Torrent already added";
+
+            this.Message = string.Format("The torrent \"{0}\" has been already added to the torrent list.", name);
+
+            this.ID = "torrent_added_" + infohash;
+        }
+    }
+
     public class MagnetLinkNotification : Notification
     {
         private string infohash = null;
