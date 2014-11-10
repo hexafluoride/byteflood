@@ -9,11 +9,32 @@ namespace ByteFlood
 {
     public class FileInfo : INotifyPropertyChanged
     {
+        /// <summary>
+        /// This is the relative file name.
+        /// </summary>
         public string Name
         {
             get
             {
-                return this.File.Path.Replace(this.Owner.SavePath, "");
+                return this.File.Path.Replace(this.Owner.RootDownloadDirectory, "");
+            }
+        }
+
+        public string FullPath 
+        {
+            get 
+            {
+                // even thought libtorrent documentation specify that the Path property is the
+                // full path, sometimes this isn't true (returns the relative path),
+                // so we need to workaround it
+                if (System.IO.Path.IsPathRooted(this.File.Path)) 
+                {
+                    return this.File.Path;
+                }
+                else 
+                {
+                    return System.IO.Path.Combine(this.Owner.SavePath, this.File.Path);
+                }
             }
         }
 
@@ -53,7 +74,25 @@ namespace ByteFlood
             get 
             {
                 int a = this.Owner.Torrent.GetFilePriority(this.FileIndex);
-                return a.ToString();
+                switch (a) 
+                {
+                    case 0:
+                       return "Skip";
+                    case 1:
+                       return "Lowest";
+                    case 2:
+                       return "Low";
+                    case 3:
+                       return "Normal";
+                    case 4:
+                       return "Above normal";
+                    case 5:
+                       return "High";
+                    case 6:
+                       return "Highest";
+                    default :
+                       return string.Format("Custom: {0}", a);
+                }
             }
         }
 
@@ -182,19 +221,5 @@ namespace ByteFlood
                 ProcessFile(other, (DirectoryKey)trunk[node], owner, f, index);
             }
         }
-
-
-    }
-
-    [Serializable]
-    [XmlType(TypeName = "FilePriority")]
-    public struct FilePriority
-    {
-        public string Key
-        { get; set; }
-
-        public MonoTorrent.Common.Priority Value
-        { get; set; }
-
     }
 }

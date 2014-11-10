@@ -400,7 +400,7 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.Path);
+                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.FullPath);
 
                     if (fifo.Exists)
                     {
@@ -468,9 +468,9 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.Path);
-                    System.IO.Directory.CreateDirectory(fifo.Directory.FullName);
-                    Process.Start("explorer.exe", string.Format("\"{0}\"", fifo.Directory.FullName));
+                    string directory = System.IO.Path.GetDirectoryName(fi.FullPath);
+                    System.IO.Directory.CreateDirectory(directory);
+                    Process.Start("explorer.exe", string.Format("\"{0}\"", directory));
                     return;
                 }
 
