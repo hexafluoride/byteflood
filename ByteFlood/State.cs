@@ -31,9 +31,9 @@ namespace ByteFlood
 
         public int GlobalMaxDownloadSpeed
         {
-            get 
+            get
             {
-                using (var s = this.LibtorrentSession.QuerySettings()) 
+                using (var s = this.LibtorrentSession.QuerySettings())
                 {
                     return s.DownloadRateLimit;
                 }
@@ -49,7 +49,7 @@ namespace ByteFlood
 
         public int GlobalMaxUploadSpeed
         {
-            get 
+            get
             {
                 using (var s = this.LibtorrentSession.QuerySettings())
                 {
@@ -195,6 +195,8 @@ namespace ByteFlood
             byte[] data = this.BackUpMangetLinkMetadata(handle.TorrentFile);
 
             ti.OriginalTorrentFilePath = this.SaveMagnetLink(data, handle.TorrentFile.Name);
+
+            set_files_priorities(handle, 3);
 
             this.Torrents.Add(ti);
 
@@ -417,6 +419,11 @@ namespace ByteFlood
             ti.OriginalTorrentFilePath = path;
             ti.ApplyTorrentSettings(App.Settings.DefaultTorrentProperties);
 
+            // we don't want all files to have a "lowest" file priorities since initialize priorities with the value 1
+            // we change it to 3, the priority "normal" as considered by byteflood.
+
+            set_files_priorities(handle, 3);
+
             uiContext.Send(x =>
             {
                 App.Current.MainWindow.Activate();
@@ -426,7 +433,7 @@ namespace ByteFlood
                 {
                     ti.Name = atd.TorrentName;
 
-                    if (atd.TorrentSavePath != ti.SavePath) 
+                    if (atd.TorrentSavePath != ti.SavePath)
                     {
                         ti.ChangeSavePath(atd.TorrentSavePath);
                     }
@@ -448,6 +455,16 @@ namespace ByteFlood
                     this.Torrents.Remove(ti);
                 }
             }, null);
+        }
+
+        private void set_files_priorities(Ragnar.TorrentHandle handle, int value)
+        {
+            int[] prs = new int[handle.TorrentFile.NumFiles];
+            for (int i = 0; i < prs.Length; i++)
+            {
+                prs[i] = value;
+            }
+            handle.SetFilePriorities(prs);
         }
 
         public void DeleteTorrentStateData(string infohash)
@@ -511,8 +528,7 @@ namespace ByteFlood
                 {
                     Directory.CreateDirectory(entry.DownloadDirectory);
 
-                    this.Torrents.Add(new TorrentInfo(
-                     this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
+                    Ragnar.TorrentHandle handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
                      {
                          SavePath = entry.DownloadDirectory,
                          TorrentInfo = torrent,
@@ -521,7 +537,14 @@ namespace ByteFlood
                          MaxConnections = entry.DefaultSettings.MaxConnections,
                          MaxUploads = entry.DefaultSettings.UploadSlots,
                          UploadLimit = entry.DefaultSettings.MaxUploadSpeed
-                     })));
+                     });
+
+                    set_files_priorities(handle, 3);
+
+                    // normally, adding a torrent will fire the TorrentAdded Event, so this line 
+                    // is somewhat unecessary.
+                    
+                    //this.Torrents.Add(new TorrentInfo(handle));
                     return true;
                 }
             }
