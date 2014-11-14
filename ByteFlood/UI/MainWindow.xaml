@@ -23,7 +23,6 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:controls="clr-namespace:ByteFlood.Controls"
         xmlns:aga="clr-namespace:Aga.Controls.Tree"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen"
         TextOptions.TextFormattingMode="Display"
         MinHeight="100"
@@ -42,7 +41,7 @@
         <formatters:SettingsGetter x:Key="SettingsGetter" />
         <formatters:PeerCountryToIcon x:Key="PeerCountryToIcon" />
         <formatters:ForegroundColorProvider x:Key="ForegroundColorProvider"/>
-        
+
         <RoutedUICommand x:Key="Commands.AddTorrent" />
         <RoutedUICommand x:Key="Commands.AddMagnet" />
         <RoutedUICommand x:Key="Commands.AddRssFeed" />
@@ -70,8 +69,8 @@
             </Style.Triggers>
         </Style>
 
-        <SolidColorBrush x:Key="ElementsColorBrush" Color="{Binding ElementsColor,FallbackValue=#000}"/>
-        
+        <SolidColorBrush x:Key="ElementsColorBrush" Color="{Binding Self.ElementsColor,FallbackValue=#000}"/>
+
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -112,7 +111,7 @@
             </Grid.ColumnDefinitions>
 
             <TreeView Grid.Column="0" Name="left_treeview" Width="170" Margin="5">
-                <TreeViewItem Name="torrents_treeview" Selected="SwitchTorrentDisplay">
+                <TreeViewItem Selected="SwitchTorrentDisplay">
                     <TreeViewItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Viewbox Stretch="Uniform" Height="16" Width="13" Margin="0,0,3,0">
@@ -133,7 +132,14 @@
                                     </Path>
                                 </Canvas>
                             </Viewbox>
-                            <TextBlock Text="{Binding TorrentCount, StringFormat='Torrents ({0})', FallbackValue='Torrents'}"/>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1})">
+                                        <Binding Path="Language.TreeList_Torrents" FallbackValue="Torrents"/>
+                                        <Binding Path="AppState.TorrentCount" FallbackValue="" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                         </StackPanel>
                     </TreeViewItem.Header>
 
@@ -153,7 +159,14 @@
                                         </Path>
                                     </Canvas>
                                 </Viewbox>
-                                <TextBlock Text="{Binding DownloadingTorrentCount, StringFormat='Downloading ({0})', FallbackValue='Downloading'}"/>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Language.TreeList_Downloading" FallbackValue="Downloading"/>
+                                            <Binding Path="AppState.DownloadingTorrentCount" FallbackValue="" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </TreeViewItem.Header>
                     </TreeViewItem>
@@ -175,14 +188,21 @@
                                         </Path>
                                     </Canvas>
                                 </Viewbox>
-                                <TextBlock Text="{Binding SeedingTorrentCount, StringFormat='Seeding ({0})', FallbackValue='Seeding'}"/>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Language.TreeList_Seeding" FallbackValue="Seeding"/>
+                                            <Binding Path="AppState.SeedingTorrentCount" FallbackValue="" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </TreeViewItem.Header>
                     </TreeViewItem>
 
                     <TreeViewItem Tag="finished" Selected="SwitchTorrentDisplay">
                         <TreeViewItem.Header>
-                            <StackPanel Orientation="Horizontal">   
+                            <StackPanel Orientation="Horizontal">
                                 <Viewbox Stretch="Uniform" Height="16" Width="10" Margin="0,0,3,0">
                                     <Canvas Width="128" Height="128">
                                         <Canvas.RenderTransform>
@@ -196,7 +216,14 @@
                                         </Path>
                                     </Canvas>
                                 </Viewbox>
-                                <TextBlock Text="{Binding FinishedTorrentCount, StringFormat='Finished ({0})', FallbackValue='Finished'}"/>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Language.TreeList_Finished" FallbackValue="Finished"/>
+                                            <Binding Path="AppState.FinishedTorrentCount" FallbackValue="" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </TreeViewItem.Header>
                     </TreeViewItem>
@@ -225,7 +252,14 @@
                                         </Canvas>
                                     </Canvas>
                                 </Viewbox>
-                                <TextBlock Text="{Binding ActiveTorrentCount, StringFormat='Active ({0})', FallbackValue='Active'}"/>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Language.TreeList_Active" FallbackValue="Active"/>
+                                            <Binding Path="AppState.ActiveTorrentCount" FallbackValue="" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </TreeViewItem.Header>
                     </TreeViewItem>
@@ -254,7 +288,14 @@
                                         </Canvas>
                                     </Canvas>
                                 </Viewbox>
-                                <TextBlock Text="{Binding InactiveTorrentCount, StringFormat='Inactive ({0})', FallbackValue='Inactive'}"/>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1})">
+                                            <Binding Path="Language.TreeList_Inactive" FallbackValue="Inactive"/>
+                                            <Binding Path="AppState.InactiveTorrentCount" FallbackValue="" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </TreeViewItem.Header>
                     </TreeViewItem>
@@ -287,7 +328,14 @@
                                     </Path>
                                 </Canvas>
                             </Viewbox>
-                            <TextBlock Text="{Binding ElementName=feeds_tree_item, Path=ItemsSource.Count, StringFormat='Feeds ({0})', FallbackValue='Feeds'}"/>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1})">
+                                        <Binding Path="Language.TreeList_Feeds" FallbackValue="Feeds"/>
+                                        <Binding Path="ItemsSource.Count" ElementName="feeds_tree_item" FallbackValue="" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                         </StackPanel>
                     </TreeViewItem.Header>
                     <TreeViewItem.Resources>
@@ -332,7 +380,7 @@
 
                     <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}"
                             ToolTip="Add torrent(s) from file">
-                        
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -346,12 +394,12 @@
                                 </Path>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}"
                             ToolTip="Add torrent from a URL">
-                       
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -389,7 +437,7 @@
                                 </Canvas>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}"
@@ -419,12 +467,12 @@
                                 </Path>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}"
                             ToolTip="Search for torrents on the internet">
-                       
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -450,7 +498,7 @@
                                 </Canvas>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}"
@@ -469,7 +517,7 @@
                                 </Path>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
 
                     <Rectangle Height="28" HorizontalAlignment="Center" Width="1" Stroke="Gray" />
@@ -477,7 +525,7 @@
                     <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"
                             ToolTip="Start selected torrent(s)">
-                        
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -491,13 +539,13 @@
                                 </Path>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"
                             ToolTip="Stop selected torrent(s)">
-                        
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -511,13 +559,13 @@
                                 </Path>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
-                    
+
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause"
                             ToolTip="Pause selected torrent(s)">
-                        
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -538,13 +586,13 @@
                                 </Canvas>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
-                    
+
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist"
                             ToolTip="Remove selected torrent(s) from the list">
-                        
+
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
                                 <Canvas.RenderTransform>
@@ -581,9 +629,9 @@
                                 </Path>
                             </Canvas>
                         </Viewbox>
-                        
+
                     </Button>
-                    
+
                 </StackPanel>
 
                 <ListView Grid.Row="1" Name="mainlist"
@@ -595,7 +643,7 @@
 
                     <ListView.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
-                         
+
                         <ContextMenu x:Key="ItemContextMenu">
                             <MenuItem Header="Open containing folder" 
                                       Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="OpenDownloadDirectory" />
@@ -664,10 +712,12 @@
                     </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
-                            <!--<GridViewColumn Width="20" Header="#" DisplayMemberBinding="{Binding QueueNumber}" />-->
-                            <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Width="20" Header="#" DisplayMemberBinding="{Binding QueueNumber}" />
+                            <GridViewColumn Width="200" Header="{Binding Language.TorrentList_NameColumn, FallbackValue=Name}" 
+                                            DisplayMemberBinding="{Binding Name}" />
 
-                            <GridViewColumn Width="100" x:Name="progress_column" Header="Progress">
+                            <GridViewColumn Width="100" x:Name="progress_column" 
+                                            Header="{Binding Language.TorrentList_ProgressColumn, FallbackValue=Progress}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWayToSource}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
@@ -675,19 +725,35 @@
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
 
-                            <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}" />
+                            <GridViewColumn Width="80" Header="{Binding Language.TorrentList_StatusColumn, FallbackValue=Status}"
+                                            DisplayMemberBinding="{Binding Status}" />
 
-                            <GridViewColumn Width="80" Header="Wanted" DisplayMemberBinding="{Binding WantedBytes, Converter={StaticResource SizeToString}}" />
-                            <GridViewColumn Width="100" Header="Done" DisplayMemberBinding="{Binding WantedBytesDone, Converter={StaticResource SizeToString}}" />
+                            <GridViewColumn Width="80" Header="{Binding Language.TorrentList_WantedColumn, FallbackValue=Wanted}" 
+                                            DisplayMemberBinding="{Binding WantedBytes, Converter={StaticResource SizeToString}}" />
 
-                            <GridViewColumn Width="100" Header="ETA" DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
-                            <GridViewColumn Width="75" Header="Down Speed" DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                            <GridViewColumn Width="75" Header="Up Speed" DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                            <GridViewColumn Width="50" Header="Peers" DisplayMemberBinding="{Binding PeerCount}" />
-                            <GridViewColumn Width="50" Header="Seeds" DisplayMemberBinding="{Binding Seeders}" />
-                            <GridViewColumn Width="50" Header="Leechers" DisplayMemberBinding="{Binding Leechers}" />
+                            <GridViewColumn Width="100" Header="{Binding Language.TorrentList_DoneColumn, FallbackValue=Done}" 
+                                            DisplayMemberBinding="{Binding WantedBytesDone, Converter={StaticResource SizeToString}}" />
 
-                            <GridViewColumn Width="50" Header="Ratio" DisplayMemberBinding="{Binding Ratio}" />
+                            <GridViewColumn Width="100" Header="{Binding Language.TorrentList_ETAColumn, FallbackValue=ETA}"
+                                            DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
+
+                            <GridViewColumn Width="75" Header="{Binding Language.TorrentList_DownSpeedColumn, FallbackValue=DownSpeed}" 
+                                            DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+
+                            <GridViewColumn Width="75" Header="{Binding Language.TorrentList_UpSpeedColumn, FallbackValue=UpSpeed}"
+                                            DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+
+                            <GridViewColumn Width="50" Header="{Binding Language.TorrentList_PeersColumn, FallbackValue=Peers}"
+                                            DisplayMemberBinding="{Binding PeerCount}" />
+
+                            <GridViewColumn Width="50" Header="{Binding Language.TorrentList_SeedsColumn, FallbackValue=Seeds}"
+                                            DisplayMemberBinding="{Binding Seeders}" />
+
+                            <GridViewColumn Width="50" Header="{Binding Language.TorrentList_LeechsColumn, FallbackValue=Leechs}" 
+                                            DisplayMemberBinding="{Binding Leechers}" />
+
+                            <GridViewColumn Width="50" Header="{Binding Language.TorrentList_RatioColumn, FallbackValue=Ratio}"
+                                            DisplayMemberBinding="{Binding Ratio}" />
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -704,7 +770,7 @@
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                
+
                                 <Viewbox Stretch="Uniform" Height="13" Width="13" Margin="0,0,5,0">
                                     <Canvas Width="128" Height="128">
                                         <Canvas.RenderTransform>
@@ -718,71 +784,113 @@
                                         </Path>
                                     </Canvas>
                                 </Viewbox>
-                                <TextBlock Text="Overview"/>
+                                <TextBlock Text="{Binding Language.InfoTab_Overview, FallbackValue=Overview}"/>
                             </StackPanel>
                         </TabItem.Header>
                         <ScrollViewer>
                             <Canvas Name="overview_canvas">
-                                <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text=" Transfer" Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" Text="Time elapsed:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" Text="Downloaded:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23" Text="Download speed:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" Text="Download speed limit:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" Text="Status:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Text="{Binding Downloaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23"  HorizontalAlignment="Right">
+                                <!-- first column headers -->
+                                <TextBlock Canvas.Left="0" Canvas.Top="6" Height="23" Text="{Binding Language.OverviewTab_HeaderTransfer, FallbackValue=Transfer}" 
+                                           Width="{Binding ElementName=overview_canvas, Path=ActualWidth}" Background="WhiteSmoke" FontWeight="Bold" />
+
+                                <TextBlock Canvas.Left="7" Canvas.Top="35" Height="23" 
+                                           Text="{Binding Language.OverviewTab_TimeElapsed, FallbackValue=TimeElapsed}" />
+
+                                <TextBlock Canvas.Left="7" Canvas.Top="54" Height="23" 
+                                           Text="{Binding Language.OverviewTab_Downloaded, FallbackValue=Downloaded}" />
+
+                                <TextBlock Canvas.Left="7" Canvas.Top="73" Height="23"
+                                           Text="{Binding Language.OverviewTab_DownSpeed, FallbackValue=DownSpeed}" />
+
+                                <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" 
+                                           Text="{Binding Language.OverviewTab_DownSpeedLimit, FallbackValue=DownSpeedLimit}" />
+                                
+                                <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" 
+                                           Text="{Binding Language.OverviewTab_Status, FallbackValue=Status}" />
+                               
+                                <!-- first column values -->
+                                <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Text="{Binding Self.SelectedTorrent.Elapsed, Converter={StaticResource TimeSpanToString}}" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Text="{Binding Self.SelectedTorrent.Downloaded, Converter={StaticResource SizeToString}}" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="73" Height="23">
                                     <TextBlock.Text>
                                         <MultiBinding StringFormat="{}{0} (avg. {1})">
-                                            <Binding Path="DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                            <Binding Path="AverageDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                            <Binding Path="Self.SelectedTorrent.DownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                            <Binding Path="Self.SelectedTorrent.AverageDownloadSpeed" Converter="{StaticResource SpeedFormatter}" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Text="{Binding MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Text="{Binding Status}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" Text="ETA:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" Text="Uploaded:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23" Text="Upload speed:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" Text="Upload speed limit:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Text="{Binding ETA, Converter={StaticResource TimeSpanToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Text="{Binding Uploaded, Converter={StaticResource SizeToString}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23" HorizontalAlignment="Right">
+                                <TextBlock Canvas.Left="150" Canvas.Top="92" Height="23" Text="{Binding Self.SelectedTorrent.MaxDownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                                <TextBlock Canvas.Left="150" Canvas.Top="111" Height="23" Text="{Binding Self.SelectedTorrent.Status}" />
+
+                                <!-- second column headers -->
+                                <TextBlock Canvas.Left="333" Canvas.Top="35" Height="23" 
+                                           Text="{Binding Language.OverviewTab_ETA, FallbackValue=ETA}" />
+
+                                <TextBlock Canvas.Left="333" Canvas.Top="54" Height="23" 
+                                           Text="{Binding Language.OverviewTab_Uploaded, FallbackValue=Uploaded}" />
+
+                                <TextBlock Canvas.Left="333" Canvas.Top="73" Height="23"
+                                           Text="{Binding Language.OverviewTab_UploadSpeed, FallbackValue=UploadSpeed}" />
+
+                                <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" 
+                                           Text="{Binding Language.OverviewTab_UploadSpeedLimit, FallbackValue=UploadSpeedLimit}" />
+                                
+                                <!-- second column values -->
+                                <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Text="{Binding Self.SelectedTorrent.ETA, Converter={StaticResource TimeSpanToString}}" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Text="{Binding Self.SelectedTorrent.Uploaded, Converter={StaticResource SizeToString}}" />
+                                <TextBlock Canvas.Left="450" Canvas.Top="73" Height="23">
                                     <TextBlock.Text>
                                         <MultiBinding StringFormat="{}{0} (avg. {1})">
-                                            <Binding Path="UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
-                                            <Binding Path="AverageUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                            <Binding Path="Self.SelectedTorrent.UploadSpeed" Converter="{StaticResource SpeedFormatter}" />
+                                            <Binding Path="Self.SelectedTorrent.AverageUploadSpeed" Converter="{StaticResource SpeedFormatter}" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Text="{Binding MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23" Text="Wasted:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23" Text="Seeds:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" Text="Peers:" HorizontalAlignment="Right" />
-                                <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23"  Text="Ratio:" HorizontalAlignment="Right" />
-                                <TextBlock Height="23" Name="textBlock14" Canvas.Left="745" Canvas.Top="35" HorizontalAlignment="Right">
+                                <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Text="{Binding Self.SelectedTorrent.MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                                
+                                <!-- thrid column headers -->
+                                <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23"
+                                           Text="{Binding Language.OverviewTab_Wasted, FallbackValue=Wasted}" />
+                                
+                                <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23"
+                                           Text="{Binding Language.OverviewTab_Seeds, FallbackValue=Seeds}" />
+
+                                <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" 
+                                           Text="{Binding Language.OverviewTab_Peers, FallbackValue=Peers}" />
+                                
+                                <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" 
+                                           Text="{Binding Language.OverviewTab_Ratio, FallbackValue=Ratio}" />
+                                
+                                <!-- thrid column values -->
+                                <TextBlock Height="23" Canvas.Left="745" Canvas.Top="35">
                                     <TextBlock.Text>
                                         <MultiBinding StringFormat="{}{0} ({1} hashfails)">
-                                            <Binding Path="WastedBytes" Converter="{StaticResource SizeToString}" />
-                                            <Binding Path="HashFails" />
+                                            <Binding Path="Self.SelectedTorrent.WastedBytes" Converter="{StaticResource SizeToString}" />
+                                            <Binding Path="Self.SelectedTorrent.HashFails" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
-                                <TextBlock Height="23" Text="{Binding Seeders}" Canvas.Left="745" Canvas.Top="54" HorizontalAlignment="Right" />
-                                <TextBlock Height="23" Text="{Binding PeerCount}" Canvas.Left="745" Canvas.Top="73" HorizontalAlignment="Right" />
-                                <TextBlock Height="23" Text="{Binding Ratio}" Canvas.Left="745" Canvas.Top="92" HorizontalAlignment="Right" />
+                                <TextBlock Height="23" Text="{Binding Self.SelectedTorrent.Seeders}" Canvas.Left="745" Canvas.Top="54" />
+                                <TextBlock Height="23" Text="{Binding Self.SelectedTorrent.PeerCount}" Canvas.Left="745" Canvas.Top="73" />
+                                <TextBlock Height="23" Text="{Binding Self.SelectedTorrent.Ratio}" Canvas.Left="745" Canvas.Top="92" />
                             </Canvas>
                         </ScrollViewer>
                     </TabItem>
-                    <TabItem Header="Speed" Name="graphtab" MouseUp="graphtab_MouseUp">
+                    <TabItem Header="{Binding Language.InfoTab_Speed, FallbackValue=Speed}" Name="graphtab" MouseUp="graphtab_MouseUp">
                         <Canvas Name="parent_canvas">
                             <Canvas SnapsToDevicePixels="True" Width="{Binding ActualWidth, ElementName=parent_canvas}" Height="{Binding ActualHeight, ElementName=parent_canvas}" Name="graph_canvas" Background="AliceBlue">
                             </Canvas>
 
                             <ComboBox Canvas.Left="7" Canvas.Top="6" Height="23" Name="graph_selector" Width="146" IsEditable="False">
-                                <ComboBoxItem Content="Download &amp; Upload" IsSelected="True" />
-                                <ComboBoxItem Content="Download" />
-                                <ComboBoxItem Content="Upload" />
+                                <ComboBoxItem IsSelected="True">
+                                    <TextBlock Text="{Binding Language.SpeedTab_DownloadAndUpload, FallbackValue='Download &amp; Upload'}" />
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock Text="{Binding Language.SpeedTab_Download, FallbackValue=Download}" />
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock Text="{Binding Language.SpeedTab_Upload, FallbackValue=Upload}" />
+                                </ComboBoxItem>
                             </ComboBox>
                         </Canvas>
                     </TabItem>
@@ -807,7 +915,7 @@
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
-                               
+
                                 <Viewbox Stretch="Uniform" Width="13" Height="13" Margin="0,0,5,0">
                                     <Canvas Width="128" Height="128">
                                         <Canvas.RenderTransform>
@@ -827,7 +935,7 @@
                                     </Canvas>
                                 </Viewbox>
 
-                                <TextBlock Text="Files"/>
+                                <TextBlock Text="{Binding Language.InfoTab_Files, FallbackValue=Files}"/>
                             </StackPanel>
                         </TabItem.Header>
                         <aga:TreeList x:Name="files_tree">
@@ -909,10 +1017,17 @@
 
                             <aga:TreeList.View>
                                 <GridView>
-                                    <GridViewColumn Width="260" Header="Path" CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
-                                    <GridViewColumn Width="140" x:Name="file_progress_column" Header="Progress" CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"/>
-                                    <GridViewColumn Width="130" Header="Priority" CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}" />
-                                    <GridViewColumn Width="80" Header="Size" CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
+                                    <GridViewColumn Width="300" Header="{Binding Language.FilesTab_Path, FallbackValue=Path}"
+                                                    CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
+
+                                    <GridViewColumn Width="140" x:Name="file_progress_column" Header="{Binding Language.FilesTab_Progress, FallbackValue=Progress}"
+                                                    CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"/>
+
+                                    <GridViewColumn Width="130" Header="{Binding Language.FilesTab_Priority, FallbackValue=Priority}" 
+                                                    CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}" />
+
+                                    <GridViewColumn Width="100" Header="{Binding Language.FilesTab_Size, FallbackValue=Size}" 
+                                                    CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
                                 </GridView>
                             </aga:TreeList.View>
 
@@ -925,7 +1040,7 @@
                         </aga:TreeList>
 
                     </TabItem>
-                    <TabItem Visibility="Collapsed">
+                    <!--<TabItem Visibility="Collapsed">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/peers.png" Height="13" Width="13" Margin="0,0,5,0"/>
@@ -967,11 +1082,11 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                    </TabItem>
+                    </TabItem>-->
                     <TabItem>
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
-                             
+
                                 <Viewbox Stretch="Uniform" Height="13" Width="13" Margin="0,0,5,0">
                                     <Canvas Width="128" Height="128">
                                         <Canvas.RenderTransform>
@@ -1006,23 +1121,26 @@
                                     </Canvas>
                                 </Viewbox>
 
-                                <TextBlock Text="Trackers"/>
+                                <TextBlock Text="{Binding Language.InfoTab_Trackers, FallbackValue=Trackers}"/>
                             </StackPanel>
                         </TabItem.Header>
                         <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Width="300" Header="URL" DisplayMemberBinding="{Binding URL}" />
-                                    <GridViewColumn Width="130" Header="Update In" 
+                                    <GridViewColumn Width="300" Header="{Binding Language.TrackersTab_URL, FallbackValue=URL}"
+                                                    DisplayMemberBinding="{Binding URL}" />
+
+                                    <GridViewColumn Width="130" Header="{Binding Language.TrackersTab_UpdateIn, FallbackValue=UpdateIn}" 
                                                     DisplayMemberBinding="{Binding UpdateInString}" />
                                     <!--<GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding State}" />
                                     <GridViewColumn Width="80" Header="Peers" DisplayMemberBinding="{Binding PeersCount}" />-->
-                                    <GridViewColumn Width="260" Header="Message" DisplayMemberBinding="{Binding FailureMessage}" />
+                                    <GridViewColumn Width="260" Header="{Binding Language.TrackersTab_Message, FallbackValue=Message}"
+                                                    DisplayMemberBinding="{Binding FailureMessage}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
                     </TabItem>
-                    <TabItem Name="webseeds_tab" Visibility="Collapsed">
+                    <!--<TabItem Name="webseeds_tab" Visibility="Collapsed">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="pack://siteoforigin:,,,/Assets/Icons/tabs/webseeds.png" Height="13" Width="13" Margin="0,0,5,0"/>
@@ -1037,7 +1155,7 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                    </TabItem>
+                    </TabItem>-->
                 </TabControl>
             </Grid>
         </Grid>

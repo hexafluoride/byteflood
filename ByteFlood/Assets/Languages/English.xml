@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageEngine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  
+  <TorrentList_NameColumn>Name</TorrentList_NameColumn>
+  <TorrentList_ProgressColumn>Progress</TorrentList_ProgressColumn>
+  <TorrentList_StatusColumn>Status</TorrentList_StatusColumn>
+  <TorrentList_WantedColumn>Wanted</TorrentList_WantedColumn>
+  <TorrentList_DoneColumn>Done</TorrentList_DoneColumn>
+  <TorrentList_ETAColumn>ETA</TorrentList_ETAColumn>
+  <TorrentList_DownSpeedColumn>Down speed</TorrentList_DownSpeedColumn>
+  <TorrentList_UpSpeedColumn>Up speed</TorrentList_UpSpeedColumn>
+  <TorrentList_PeersColumn>Peers</TorrentList_PeersColumn>
+  <TorrentList_SeedsColumn>Seeds</TorrentList_SeedsColumn>
+  <TorrentList_LeechsColumn>Leeches</TorrentList_LeechsColumn>
+  <TorrentList_RatioColumn>Ratio</TorrentList_RatioColumn>
+
+  <TreeList_Torrents>Torrents</TreeList_Torrents>
+  <TreeList_Downloading>Downloading</TreeList_Downloading>
+  <TreeList_Seeding>Seeding</TreeList_Seeding>
+  <TreeList_Finished>Finished</TreeList_Finished>
+  <TreeList_Active>Active</TreeList_Active>
+  <TreeList_Inactive>Inactive</TreeList_Inactive>
+  <TreeList_Feeds>Feeds</TreeList_Feeds>
+  
+  <InfoTab_Overview>Overview</InfoTab_Overview>
+  <InfoTab_Speed>Speeds</InfoTab_Speed>
+  <InfoTab_Files>Files</InfoTab_Files>
+  <InfoTab_Trackers>Trackers</InfoTab_Trackers>
+  
+  <OverviewTab_HeaderTransfer> Transfer</OverviewTab_HeaderTransfer>
+  <OverviewTab_TimeElapsed>Time Elapsed:</OverviewTab_TimeElapsed>
+  <OverviewTab_Downloaded>Downloaded:</OverviewTab_Downloaded>
+  <OverviewTab_DownSpeed>Download speed:</OverviewTab_DownSpeed>
+  <OverviewTab_DownSpeedLimit>Download speed limit:</OverviewTab_DownSpeedLimit>
+  <OverviewTab_Status>Status:</OverviewTab_Status>
+  <OverviewTab_ETA>ETA:</OverviewTab_ETA>
+  <OverviewTab_Uploaded>Uploaded:</OverviewTab_Uploaded>
+  <OverviewTab_UploadSpeed>Upload speed:</OverviewTab_UploadSpeed>
+  <OverviewTab_UploadSpeedLimit>Upload speed limit:</OverviewTab_UploadSpeedLimit>
+  <OverviewTab_Wasted>Wasted:</OverviewTab_Wasted>
+  <OverviewTab_Seeds>Seeds:</OverviewTab_Seeds>
+  <OverviewTab_Peers>Peers:</OverviewTab_Peers>
+  <OverviewTab_Ratio>Ratio:</OverviewTab_Ratio>
+  
+  <SpeedTab_DownloadAndUpload>Download &amp; Upload</SpeedTab_DownloadAndUpload>
+  <SpeedTab_Download>Download</SpeedTab_Download>
+  <SpeedTab_Upload>Upload</SpeedTab_Upload>
+ 
+  <FilesTab_Path>Path</FilesTab_Path>
+  <FilesTab_Progress>Progress</FilesTab_Progress>
+  <FilesTab_Priority>Priority</FilesTab_Priority>
+  <FilesTab_Size>Size</FilesTab_Size>
+  
+  <TrackersTab_URL>URL</TrackersTab_URL>
+  <TrackersTab_UpdateIn>Update In</TrackersTab_UpdateIn>
+  <TrackersTab_Message>Message</TrackersTab_Message>
+  
+</LanguageEngine>

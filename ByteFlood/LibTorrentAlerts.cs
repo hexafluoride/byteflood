@@ -65,18 +65,21 @@ namespace ByteFlood
                     {
                         SaveResumeDataAlert srda = (SaveResumeDataAlert)alert;
                         ResumeDataArrived(srda.Handle, srda.ResumeData);
+                        continue;
                     }
 
                     if (alert_type == typeof(TorrentAddedAlert))
                     {
                         TorrentAddedAlert taa = (TorrentAddedAlert)alert;
                         TorrentAdded(taa.Handle);
+                        continue;
                     }
 
                     if (alert_type == typeof(StateChangedAlert))
                     {
                         StateChangedAlert taa = (StateChangedAlert)alert;
                         TorrentStateChanged(taa.Handle, taa.PreviousState, taa.State);
+                        continue;
                     }
 
                     if (alert_type == typeof(StateUpdateAlert))
@@ -86,12 +89,14 @@ namespace ByteFlood
                         {
                             TorrentStatsUpdated(s);
                         }
+                        continue;
                     }
 
                     if (alert_type == typeof(TorrentFinishedAlert))
                     {
                         TorrentFinishedAlert tfa = (TorrentFinishedAlert)alert;
                         TorrentFinished(tfa.Handle);
+                        continue;
                     }
 
 
@@ -99,6 +104,7 @@ namespace ByteFlood
                     {
                         MetadataReceivedAlert mra = (MetadataReceivedAlert)alert;
                         MetadataReceived(mra.Handle);
+                        continue;
                     }
 
                     /*

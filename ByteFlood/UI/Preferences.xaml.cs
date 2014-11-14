@@ -81,6 +81,7 @@ namespace ByteFlood
             LoadNetworkInterfaces();
             styleCombox.SelectedIndex = local.ApplicationStyle;
             styleCombox.SelectionChanged += this.ReloadStyle;
+            LoadLangs();
         }
 
         private void LoadNetworkInterfaces()
@@ -101,6 +102,13 @@ namespace ByteFlood
                 interfaces.SelectedIndex = 0;
             }
             interfaces.SelectionChanged += interfaces_SelectionChanged;
+        }
+
+        private void LoadLangs() 
+        {
+            string[] langs = Utility.GetAvailableLanguages();
+            this.langCombox.ItemsSource = langs;
+            this.langCombox.SelectedIndex = Array.IndexOf(langs, App.Settings.DefaultLanguage);
         }
 
         void interfaces_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -194,6 +202,24 @@ namespace ByteFlood
             local.Theme = (Theme)themeCombox.SelectedItem;
 
             //bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
+
+            if (this.langCombox.SelectedIndex > -1)
+            {
+                string new_choice = this.langCombox.SelectedValue.ToString();
+                if (new_choice != local.DefaultLanguage)
+                {
+                    local.DefaultLanguage = new_choice;
+
+                    if (App.CurrentLanguage != null)
+                    {
+                        App.CurrentLanguage.ReloadLang(local.DefaultLanguage);
+                    }
+                    else
+                    {
+                        App.CurrentLanguage = LanguageEngine.LoadDefault();
+                    }
+                }
+            }
 
             App.Settings = (Settings)Utility.CloneObject(local);
             //if (iface_changed)

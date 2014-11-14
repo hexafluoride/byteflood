@@ -25,7 +25,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
-using MonoTorrent.Client;
 using Microsoft.Win32;
 using System.Threading;
 using System.Diagnostics;
@@ -64,6 +63,15 @@ namespace ByteFlood
 
         public static readonly DependencyProperty ElementsColorProperty =
             DependencyProperty.Register("ElementsColor", typeof(Color), typeof(MainWindow), new PropertyMetadata(Color.FromArgb(255, 38, 139, 210)));
+
+        internal TorrentInfo SelectedTorrent
+        {
+            get { return (TorrentInfo)GetValue(SelectedTorrentProperty); }
+            set { SetValue(SelectedTorrentProperty, value); }
+        }
+
+        public static readonly DependencyProperty SelectedTorrentProperty =
+            DependencyProperty.Register("SelectedTorrent", typeof(TorrentInfo), typeof(MainWindow), new PropertyMetadata(null));
 
         public MainWindow()
         {
@@ -197,6 +205,7 @@ namespace ByteFlood
                 Thread.Sleep(1000);
             }
         }
+
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -506,11 +515,12 @@ namespace ByteFlood
 
         private void SetDataContext(TorrentInfo ti)
         {
+            this.SelectedTorrent = ti;
             //peers_list.ItemsSource = ti.Peers;
             files_tree.Model = ti.FilesTree;
             //piece_bar.AttachTorrent(ti);
             trackers_list.ItemsSource = ti.Trackers;
-            overview_canvas.DataContext = ti;
+
             //if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
             //{
             //    webseeds_tab.Visibility = Visibility.Visible;
@@ -520,13 +530,14 @@ namespace ByteFlood
 
         private void ResetDataContext()
         {
+            this.SelectedTorrent = null;
             //peers_list.ItemsSource = null;
             files_tree.Model = null;
             //piece_bar.DetachTorrent();
             trackers_list.ItemsSource = null;
-            overview_canvas.DataContext = null;
-            webseeds_list.ItemsSource = null;
-            webseeds_tab.Visibility = Visibility.Collapsed;
+
+            //webseeds_list.ItemsSource = null;
+            //webseeds_tab.Visibility = Visibility.Collapsed;
         }
 
         private void mainlist_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -537,8 +548,12 @@ namespace ByteFlood
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            LanguageEngine.SaveDummy();
+#endif
             NotifyIcon.Icon = new System.Drawing.Icon("Assets/icon-16.ico");
             this.Icon = new BitmapImage(new Uri("Assets/icon-allsizes.ico", UriKind.Relative));
+            this.Icon.Freeze();
 
 	        var cts = new CancellationTokenSource();
 	        
@@ -550,10 +565,11 @@ namespace ByteFlood
 
 	        Task.Run(() => Update(cts.Token), cts.Token);
 
-            mainlist.ItemsSource = state.Torrents;
-            mainlist.DataContext = App.Settings;
-            torrents_treeview.DataContext = state;
+            this.DataContext = new NiceDataContext<MainWindow>(this);
+            this.mainlist.ItemsSource = this.state.Torrents;
+
             itemselector = ShowAll;
+
             graph = new GraphDrawer(graph_canvas);
 
             foreach (string str in App.to_add)
@@ -564,15 +580,11 @@ namespace ByteFlood
                     state.AddTorrentByPath(str);
             }
 
-            left_treeview.DataContext = App.Settings;
-
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
 
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
-
-            DHTStatus.DataContext = state;
 
             Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
             Services.AutoUpdater.StartMonitoring();
