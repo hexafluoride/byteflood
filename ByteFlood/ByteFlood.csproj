@@ -29,6 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>0108</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -129,8 +130,10 @@
     <Compile Include="InfoClasses\PeerInfo.cs" />
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
+    <Compile Include="LanguageEngine.cs" />
     <Compile Include="LibTorrentAlerts.cs" />
     <Compile Include="Listener.cs" />
+    <Compile Include="NiceDataContext.cs" />
     <Compile Include="NotificationManager.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
@@ -311,6 +314,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Assets\Languages\English.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Languages\Francais.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="boost_chrono-vc120-mt-1_55.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

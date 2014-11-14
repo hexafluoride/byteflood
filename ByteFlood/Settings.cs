@@ -109,6 +109,8 @@ namespace ByteFlood
         /// </summary>
         public int ApplicationStyle { get; set; }
 
+        public string DefaultLanguage { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -155,7 +157,8 @@ namespace ByteFlood
                     SeedingTorrentsAreActive = false,
                     DisplayStripsOnTorrentList = false,
                     StatusBarVisible = true,
-                    PreferMagnetCacheWebsites = true
+                    PreferMagnetCacheWebsites = true,
+                    DefaultLanguage = "English"
                 };
             }
         }

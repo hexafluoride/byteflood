@@ -37,6 +37,7 @@ namespace ByteFlood
     {
         public static ByteFlood.Settings Settings = new Settings();
 
+        public static ByteFlood.LanguageEngine CurrentLanguage = new LanguageEngine();
 
 #if !DEBUG
         public App() 
@@ -106,9 +107,10 @@ namespace ByteFlood
 
             Settings = Settings.Load("./config.xml");
 
+            CurrentLanguage = LanguageEngine.LoadDefault();
+
             LoadTheme(Settings.Theme);
         }
-
 
         private static Dictionary<Theme, string> theme_mapping = new Dictionary<Theme, string>() 
         {

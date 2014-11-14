@@ -230,14 +230,14 @@ namespace ByteFlood
             }
         }
 
-        public static void Serialize<T>(T t, string path)
+        public static void Serialize<T>(T t, string path, bool indent = false)
         {
             string temp_file = path + ".b";
             try
             {
                 using (XmlWriter xw = XmlWriter.Create(temp_file, new XmlWriterSettings()
                 {
-                    Indent = false
+                    Indent = indent
                 }))
                 {
                     new XmlSerializer(typeof(T)).Serialize(xw, t);
@@ -713,9 +713,23 @@ namespace ByteFlood
         {
             get
             {
-				// this value should be preferably retrieved from AssemblyInfo.cs
+                // this value should be preferably retrieved from AssemblyInfo.cs
                 return 62;
             }
+        }
+
+        public static string[] GetAvailableLanguages()
+        {
+            if (Directory.Exists("./Assets/Languages"))
+            {
+                List<string> a = new List<string>();
+                foreach (string file in Directory.EnumerateFiles("./Assets/Languages", "*.xml"))
+                {
+                    a.Add(System.IO.Path.GetFileNameWithoutExtension(file));
+                }
+                return a.ToArray();
+            }
+            return new string[0];
         }
 
         public static class WindowsAero

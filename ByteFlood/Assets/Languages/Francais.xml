@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageEngine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  
+  <TorrentList_NameColumn>Nom</TorrentList_NameColumn>
+  <TorrentList_ProgressColumn>Progrès</TorrentList_ProgressColumn>
+  <TorrentList_StatusColumn>Statut</TorrentList_StatusColumn>
+  <TorrentList_WantedColumn>Nécessaire</TorrentList_WantedColumn>
+  <TorrentList_DoneColumn>Complet</TorrentList_DoneColumn>
+  <TorrentList_ETAColumn>Finis en</TorrentList_ETAColumn>
+  <TorrentList_DownSpeedColumn>Vit. télécharg.</TorrentList_DownSpeedColumn>
+  <TorrentList_UpSpeedColumn>Vit. télévers.</TorrentList_UpSpeedColumn>
+  <TorrentList_PeersColumn>Peers</TorrentList_PeersColumn>
+  <TorrentList_SeedsColumn>Seeds</TorrentList_SeedsColumn>
+  <TorrentList_LeechsColumn>Leeches</TorrentList_LeechsColumn>
+  <TorrentList_RatioColumn>Rapport</TorrentList_RatioColumn>
+ 
+  <TreeList_Torrents>Torrents</TreeList_Torrents>
+  <TreeList_Downloading>Téléchargement</TreeList_Downloading>
+  <TreeList_Seeding>Téléversement</TreeList_Seeding>
+  <TreeList_Finished>Terminé</TreeList_Finished>
+  <TreeList_Active>Active</TreeList_Active>
+  <TreeList_Inactive>Inactive</TreeList_Inactive>
+  <TreeList_Feeds>RSS</TreeList_Feeds>
+  
+  <InfoTab_Overview>Vue général</InfoTab_Overview>
+  <InfoTab_Speed>Vitesse</InfoTab_Speed>
+  <InfoTab_Files>Dossiers</InfoTab_Files>
+  <InfoTab_Trackers>Trackers</InfoTab_Trackers>
+  
+  <OverviewTab_HeaderTransfer> Transfert</OverviewTab_HeaderTransfer>
+  <OverviewTab_TimeElapsed>Temps écoulé:</OverviewTab_TimeElapsed>
+  <OverviewTab_Downloaded>Téléchargé:</OverviewTab_Downloaded>
+  <OverviewTab_DownSpeed>Vitesse de télécharg. :</OverviewTab_DownSpeed>
+  <OverviewTab_DownSpeedLimit>Limite de vitesse de télécharg. :</OverviewTab_DownSpeedLimit>
+  <OverviewTab_Status>Statut:</OverviewTab_Status>
+  <OverviewTab_ETA>ETA:</OverviewTab_ETA>
+  <OverviewTab_Uploaded>Téléversé:</OverviewTab_Uploaded>
+  <OverviewTab_UploadSpeed>Vistess de télévers. :</OverviewTab_UploadSpeed>
+  <OverviewTab_UploadSpeedLimit>Limite de vitesse de télévers. :</OverviewTab_UploadSpeedLimit>
+  <OverviewTab_Wasted>Perdut:</OverviewTab_Wasted>
+  <OverviewTab_Seeds>Seeds:</OverviewTab_Seeds>
+  <OverviewTab_Peers>Peers:</OverviewTab_Peers>
+  <OverviewTab_Ratio>Rapport:</OverviewTab_Ratio>
+  
+  <SpeedTab_DownloadAndUpload>Téléchargement &amp; Téléversement</SpeedTab_DownloadAndUpload>
+  <SpeedTab_Download>Téléchargement</SpeedTab_Download>
+  <SpeedTab_Upload>Téléversement </SpeedTab_Upload>
+ 
+  <FilesTab_Path>Chemin</FilesTab_Path>
+  <FilesTab_Progress>Progrés</FilesTab_Progress>
+  <FilesTab_Priority>Priorité</FilesTab_Priority>
+  <FilesTab_Size>Taille</FilesTab_Size>
+  
+  <TrackersTab_URL>URL</TrackersTab_URL>
+  <TrackersTab_UpdateIn>Mise à jour dans</TrackersTab_UpdateIn>
+  <TrackersTab_Message>Message</TrackersTab_Message>
+  
+</LanguageEngine>

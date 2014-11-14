@@ -344,11 +344,13 @@ namespace ByteFlood
         {
             get
             {
-                if (true) // TODO: Find a way to make Ragnar work as a project/implement IsValid
+                return this.Torrent.InfoHash.ToHex();
+
+                /*if (true) // TODO: Find a way to make Ragnar work as a project/implement IsValid
                 {
                     return this.Torrent.InfoHash.ToHex();
                 }
-                return null;
+                return null;*/
             }
         }
 

@@ -69,6 +69,13 @@
                         </ComboBox.Items>
                     </ComboBox>
 
+                    <TextBlock Height="19" Text="Language:" Canvas.Left="237" Canvas.Top="139" />
+                    <ComboBox Name="langCombox"
+                              Height="23" Width="123"
+                              SelectedIndex="0"
+                              Canvas.Right="5" Canvas.Left="294" Canvas.Top="137">
+                    </ComboBox>
+
                     <CheckBox Canvas.Left="6" Canvas.Top="111" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
                     <CheckBox Canvas.Left="247" Canvas.Top="111" Content="Display strips on torrent list" Height="16" IsChecked="{Binding DisplayStripsOnTorrentList}" />
                     <CheckBox Canvas.Left="6" Canvas.Top="133" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />

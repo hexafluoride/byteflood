@@ -81,7 +81,7 @@ namespace ByteFlood.Services.RSS
                     }
                 }
 #if DEBUG
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw;
                 }
