@@ -76,12 +76,19 @@ namespace ByteFlood
         public string TrackersTab_UpdateIn { get; set; }
         public string TrackersTab_Message { get; set; }
 
+        // Feeds items context menu
+
+        public string FeedsItemsContextMenu_Refresh { get; set; }
+        public string FeedsItemsContextMenu_Remove { get; set; }
+        public string FeedsItemsContextMenu_Edit { get; set; }
+        public string FeedsItemsContextMenu_ViewFeeds { get; set; }
+
+
         // list of todo in the main window:
         // todo: toolbar tooltips
         // todo: status bar items
         // todo: file tab menu
         // todo: torrent list menu
-        // todo: feeds menu
         // todo: notify icon menu
 
         // list of other todo:

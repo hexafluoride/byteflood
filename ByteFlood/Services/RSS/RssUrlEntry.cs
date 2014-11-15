@@ -18,6 +18,10 @@ namespace ByteFlood.Services.RSS
 {
     public class RssUrlEntry : INotifyPropertyChanged
     {
+        // This is needed so the feed context menu works correctly
+        [XmlIgnore]
+        public static LanguageEngine Language { get { return App.CurrentLanguage; } }
+
         public string Url { get; set; }
 
         public string Alias { get; set; }

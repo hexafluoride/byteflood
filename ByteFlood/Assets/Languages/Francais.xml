@@ -54,5 +54,10 @@
   <TrackersTab_URL>URL</TrackersTab_URL>
   <TrackersTab_UpdateIn>Mise à jour dans</TrackersTab_UpdateIn>
   <TrackersTab_Message>Message</TrackersTab_Message>
+
+  <FeedsItemsContextMenu_Refresh>Rafraîchir</FeedsItemsContextMenu_Refresh>
+  <FeedsItemsContextMenu_Remove>Supprimer</FeedsItemsContextMenu_Remove>
+  <FeedsItemsContextMenu_Edit>Éditer</FeedsItemsContextMenu_Edit>
+  <FeedsItemsContextMenu_ViewFeeds>Voir les éleménts</FeedsItemsContextMenu_ViewFeeds>
   
 </LanguageEngine>

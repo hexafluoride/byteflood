@@ -30,7 +30,6 @@ namespace ByteFlood
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BitTorrent")
         };
         public ObservableCollection<TorrentListing> list = new ObservableCollection<TorrentListing>();
-        public List<TorrentInfo> selected = new List<TorrentInfo>();
         public MainWindow MainWindow = (App.Current.MainWindow as MainWindow);
         public State AppState = (App.Current.MainWindow as MainWindow).state;
 
@@ -147,15 +146,14 @@ namespace ByteFlood
                     Ragnar.AddTorrentParams param = new Ragnar.AddTorrentParams()
                     {
                         SavePath = savepath,
-                        TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(torrent_file_path))
+                        TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(torrent_file_path)),
+                        Name = listing.Name
                     };
 
+                  
+                    // calling LibtorrentSession.AsyncAddTorrent will fire the TorrentAddedEvent
                     var handle = AppState.LibtorrentSession.AddTorrent(param);
-
-                    TorrentInfo ti = new TorrentInfo(handle);
-                    ti.Name = listing.Name;
-
-                    selected.Add(ti);
+                    AppState.set_files_priorities(handle, 3);
                 }
                 catch
                 {

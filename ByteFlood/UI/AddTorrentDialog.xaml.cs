@@ -60,6 +60,16 @@ namespace ByteFlood
                 (Do as AddTorrentDialog).UpdateSize();
             })));
 
+
+        public Ragnar.TorrentInfo TorrentFileInfo
+        {
+            get { return (Ragnar.TorrentInfo)GetValue(TorrentFileInfoProperty); }
+            set { SetValue(TorrentFileInfoProperty, value); }
+        }
+
+        public static readonly DependencyProperty TorrentFileInfoProperty =
+            DependencyProperty.Register("TorrentFileInfo", typeof(Ragnar.TorrentInfo), typeof(AddTorrentDialog), new PropertyMetadata(null));
+
         public List<string> SavedPathList
         {
             get { return App.Settings.PreviousPaths; }
@@ -70,6 +80,7 @@ namespace ByteFlood
             InitializeComponent();
             this.Closed += (s, e) => { this.WindowClosed = true; };
             this.TorrentInfo = torrent;
+            this.TorrentFileInfo = torrent.Torrent.TorrentFile;
             Load();
         }
 

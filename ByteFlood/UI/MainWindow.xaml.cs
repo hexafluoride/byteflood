@@ -138,11 +138,6 @@ namespace ByteFlood
             {
                 it.ShowDialog(); // calling show dialog will call window_loaded and therefore the real Load() statement
 
-                foreach (TorrentInfo ti in it.selected)
-                {
-                    state.Torrents.Add(ti);
-                    ti.Start();
-                }
                 return true;
             }
             return false;
@@ -152,8 +147,8 @@ namespace ByteFlood
         {
             while (true)
             {
-	            if (cancellationToken.IsCancellationRequested)
-		            break;
+                if (cancellationToken.IsCancellationRequested)
+                    break;
 
                 var status = this.state.LibtorrentSession.QueryStatus();
 
@@ -268,12 +263,10 @@ namespace ByteFlood
             switch (tag)
             {
                 case "pause":
-                    foreach (TorrentInfo ti in state.Torrents)
-                        ti.Pause();
+                    this.state.LibtorrentSession.Pause();
                     break;
                 case "resume":
-                    foreach (TorrentInfo ti in state.Torrents)
-                        ti.Start();
+                    this.state.LibtorrentSession.Resume();
                     break;
             }
         }
@@ -322,6 +315,11 @@ namespace ByteFlood
                     return;
                 }
 
+                if (!query.Url.StartsWith("http://") || !query.Url.StartsWith("https://"))
+                {
+                    query.Url = "http://" + query.Url;
+                }
+
                 var rss_entry = new RssUrlEntry()
                 {
                     Url = query.Url,
@@ -334,14 +332,14 @@ namespace ByteFlood
                     DefaultSettings = App.Settings.DefaultTorrentProperties
                 };
 
-	            if (await rss_entry.TestAsync())
-		            FeedsManager.Add(rss_entry);
-	            else
-		            MessageBox.Show(
-						this,
-			            "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
-			            "Error",
-			            MessageBoxButton.OK, MessageBoxImage.Error);
+                if (await rss_entry.TestAsync())
+                    FeedsManager.Add(rss_entry);
+                else
+                    MessageBox.Show(
+                        this,
+                        "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
+                        "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -555,15 +553,15 @@ namespace ByteFlood
             this.Icon = new BitmapImage(new Uri("Assets/icon-allsizes.ico", UriKind.Relative));
             this.Icon.Freeze();
 
-	        var cts = new CancellationTokenSource();
-	        
+            var cts = new CancellationTokenSource();
+
             state = new State
             {
-	            uiContext = uiContext,
-				MainTaskCancellationTokenSource = cts
+                uiContext = uiContext,
+                MainTaskCancellationTokenSource = cts
             };
 
-	        Task.Run(() => Update(cts.Token), cts.Token);
+            Task.Run(() => Update(cts.Token), cts.Token);
 
             this.DataContext = new NiceDataContext<MainWindow>(this);
             this.mainlist.ItemsSource = this.state.Torrents;
@@ -873,7 +871,7 @@ namespace ByteFlood
 
             MenuItem source = (MenuItem)e.Source;
 
-            entry = (RssUrlEntry)source.DataContext;
+            entry = (RssUrlEntry)source.CommandParameter;
 
             switch (source.Tag.ToString())
             {
@@ -1003,35 +1001,38 @@ namespace ByteFlood
         {
             t.Invisible = true;
             t.UpdateList("Invisible", "ShowOnList");
-            ThreadPool.QueueUserWorkItem(delegate
+            string hash = t.InfoHash;
+
+            t.Torrent.AutoManaged = false;
+            t.Torrent.Pause();
+
+            this.state.LibtorrentSession.RemoveTorrent(t.Torrent);
+            this.state.DeleteTorrentStateData(hash);
+
+            uiContext.Send(x =>
             {
-                t.Torrent.AutoManaged = false;
-                t.Torrent.Pause();
+                state._torrents.Remove(hash);
+                state.Torrents.Remove(t);
+            }, null);
 
-                this.state.LibtorrentSession.RemoveTorrent(t.Torrent);
-                this.state.DeleteTorrentStateData(t.InfoHash);
+            switch (action)
+            {
+                case "remove_torrent_torrentonly":
+                    DeleteTorrent(t);
+                    break;
+                case "remove_torrent_dataonly":
+                    DeleteData(t);
+                    break;
+                case "remove_torrent_both":
+                    DeleteData(t);
+                    DeleteTorrent(t);
+                    break;
+                default:
+                    break;
+            }
 
-                uiContext.Send(x =>
-                {
-                    state.Torrents.Remove(t);
-                }, null);
 
-                switch (action)
-                {
-                    case "remove_torrent_torrentonly":
-                        DeleteTorrent(t);
-                        break;
-                    case "remove_torrent_dataonly":
-                        DeleteData(t);
-                        break;
-                    case "remove_torrent_both":
-                        DeleteData(t);
-                        DeleteTorrent(t);
-                        break;
-                    default:
-                        break;
-                }
-            });
+            t.OffMyself();
         }
 
         private void DeleteTorrent(TorrentInfo t)
