@@ -340,10 +340,17 @@
                     </TreeViewItem.Header>
                     <TreeViewItem.Resources>
                         <ContextMenu x:Key="RssItemContextMenu">
-                            <MenuItem Header="Refresh" Tag="Refresh" DataContext="{Binding}" Click="OperationOnRssItem" />
-                            <MenuItem Header="Remove" Tag="Remove" DataContext="{Binding}" Click="OperationOnRssItem" />
-                            <MenuItem Header="Edit" Tag="Edit"  DataContext="{Binding}" Click="OperationOnRssItem" />
-                            <MenuItem Header="View feeds" Tag="View"  DataContext="{Binding}" Click="OperationOnRssItem" />
+                            <MenuItem Header="{Binding Language.FeedsItemsContextMenu_Refresh, FallbackValue=Refresh}"
+                                      Tag="Refresh" Click="OperationOnRssItem" CommandParameter="{Binding}" />
+
+                            <MenuItem Header="{Binding Language.FeedsItemsContextMenu_Remove, FallbackValue=Remove}" 
+                                      Tag="Remove" CommandParameter="{Binding}" Click="OperationOnRssItem" />
+                            
+                            <MenuItem Header="{Binding Language.FeedsItemsContextMenu_Edit, FallbackValue=Edit}" 
+                                      Tag="Edit" CommandParameter="{Binding}" Click="OperationOnRssItem" />
+
+                            <MenuItem Header="{Binding Language.FeedsItemsContextMenu_ViewFeeds, FallbackValue=ViewFeeds}" 
+                                      Tag="View" CommandParameter="{Binding}" Click="OperationOnRssItem" />
                         </ContextMenu>
                     </TreeViewItem.Resources>
                     <TreeViewItem.ItemTemplate>

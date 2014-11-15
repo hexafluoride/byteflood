@@ -55,4 +55,9 @@
   <TrackersTab_UpdateIn>Update In</TrackersTab_UpdateIn>
   <TrackersTab_Message>Message</TrackersTab_Message>
   
+  <FeedsItemsContextMenu_Refresh>Refresh</FeedsItemsContextMenu_Refresh>
+  <FeedsItemsContextMenu_Remove>Remove</FeedsItemsContextMenu_Remove>
+  <FeedsItemsContextMenu_Edit>Edit</FeedsItemsContextMenu_Edit>
+  <FeedsItemsContextMenu_ViewFeeds>View feeds</FeedsItemsContextMenu_ViewFeeds>
+
 </LanguageEngine>
