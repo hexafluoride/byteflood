@@ -8,18 +8,18 @@
   <TorrentList_DoneColumn>Complet</TorrentList_DoneColumn>
   <TorrentList_ETAColumn>Finis en</TorrentList_ETAColumn>
   <TorrentList_DownSpeedColumn>Vit. télécharg.</TorrentList_DownSpeedColumn>
-  <TorrentList_UpSpeedColumn>Vit. télévers.</TorrentList_UpSpeedColumn>
+  <TorrentList_UpSpeedColumn>Vit. d'envoi</TorrentList_UpSpeedColumn>
   <TorrentList_PeersColumn>Peers</TorrentList_PeersColumn>
   <TorrentList_SeedsColumn>Seeds</TorrentList_SeedsColumn>
-  <TorrentList_LeechsColumn>Leeches</TorrentList_LeechsColumn>
-  <TorrentList_RatioColumn>Rapport</TorrentList_RatioColumn>
+  <TorrentList_LeechsColumn>Leechers</TorrentList_LeechsColumn>
+  <TorrentList_RatioColumn>Ratio</TorrentList_RatioColumn>
 
   <TreeList_Torrents>Torrents</TreeList_Torrents>
   <TreeList_Downloading>Téléchargement</TreeList_Downloading>
   <TreeList_Seeding>Téléversement</TreeList_Seeding>
   <TreeList_Finished>Terminé</TreeList_Finished>
   <TreeList_Active>Active</TreeList_Active>
-  <TreeList_Inactive>Inactive</TreeList_Inactive>
+  <TreeList_Inactive>Inactif</TreeList_Inactive>
   <TreeList_Feeds>Flux RSS</TreeList_Feeds>
 
   <InfoTab_Overview>Vue général</InfoTab_Overview>
@@ -33,14 +33,14 @@
   <OverviewTab_DownSpeed>Vitesse de télécharg. :</OverviewTab_DownSpeed>
   <OverviewTab_DownSpeedLimit>Limite de vitesse de télécharg. :</OverviewTab_DownSpeedLimit>
   <OverviewTab_Status>Statut:</OverviewTab_Status>
-  <OverviewTab_ETA>ETA:</OverviewTab_ETA>
-  <OverviewTab_Uploaded>Téléversé:</OverviewTab_Uploaded>
-  <OverviewTab_UploadSpeed>Vistess de télévers. :</OverviewTab_UploadSpeed>
-  <OverviewTab_UploadSpeedLimit>Limite de vitesse de télévers. :</OverviewTab_UploadSpeedLimit>
-  <OverviewTab_Wasted>Perdut:</OverviewTab_Wasted>
+  <OverviewTab_ETA>Finis en:</OverviewTab_ETA>
+  <OverviewTab_Uploaded>Envoyé:</OverviewTab_Uploaded>
+  <OverviewTab_UploadSpeed>Vistess d'envoi:</OverviewTab_UploadSpeed>
+  <OverviewTab_UploadSpeedLimit>Limite de vitesse  d'envoi:</OverviewTab_UploadSpeedLimit>
+  <OverviewTab_Wasted>Perdu:</OverviewTab_Wasted>
   <OverviewTab_Seeds>Seeds:</OverviewTab_Seeds>
   <OverviewTab_Peers>Peers:</OverviewTab_Peers>
-  <OverviewTab_Ratio>Rapport:</OverviewTab_Ratio>
+  <OverviewTab_Ratio>Ratio:</OverviewTab_Ratio>
 
   <SpeedTab_DownloadAndUpload>Téléchargement &amp; Téléversement</SpeedTab_DownloadAndUpload>
   <SpeedTab_Download>Téléchargement</SpeedTab_Download>
@@ -60,18 +60,18 @@
   <FeedsItemsContextMenu_Edit>Éditer</FeedsItemsContextMenu_Edit>
   <FeedsItemsContextMenu_ViewFeeds>Voir les éleménts</FeedsItemsContextMenu_ViewFeeds>
 
-  <TorrentListContextMenu_OpenContainingFolder>Ouvrir le dossier contenant</TorrentListContextMenu_OpenContainingFolder>
-  <TorrentListContextMenu_ForceStart>Forcé le démarrerage</TorrentListContextMenu_ForceStart>
+  <TorrentListContextMenu_OpenContainingFolder>Ouvrir le répertoire de destination</TorrentListContextMenu_OpenContainingFolder>
+  <TorrentListContextMenu_ForceStart>Forcer le démarrerage</TorrentListContextMenu_ForceStart>
   <TorrentListContextMenu_Start>Démarrer</TorrentListContextMenu_Start>
   <TorrentListContextMenu_Pause>Pause</TorrentListContextMenu_Pause>
-  <TorrentListContextMenu_ForcePause>Forcé la pause</TorrentListContextMenu_ForcePause>
+  <TorrentListContextMenu_ForcePause>Forcer la mise en pause</TorrentListContextMenu_ForcePause>
   <TorrentListContextMenu_Stop>Arrêter</TorrentListContextMenu_Stop>
-  <TorrentListContextMenu_ForceRecheck>Forcé la revérification de Hash</TorrentListContextMenu_ForceRecheck>
-  <TorrentListContextMenu_CopyMagnetLink>Copier le lien magnétique</TorrentListContextMenu_CopyMagnetLink>
+  <TorrentListContextMenu_ForceRecheck>Forcer la revérification</TorrentListContextMenu_ForceRecheck>
+  <TorrentListContextMenu_CopyMagnetLink>Copier le lien magnet</TorrentListContextMenu_CopyMagnetLink>
   <TorrentListContextMenu_DownloadMovieData>Télécharger l'affiche du film</TorrentListContextMenu_DownloadMovieData>
   <TorrentListContextMenu_Remove>Supprimer</TorrentListContextMenu_Remove>
   <TorrentListContextMenu_RemoveAnd>Supprimer et ...</TorrentListContextMenu_RemoveAnd>
-  <TorrentListContextMenu_DeleteData>supprimmé les données</TorrentListContextMenu_DeleteData>
+  <TorrentListContextMenu_DeleteData>supprimmer les données</TorrentListContextMenu_DeleteData>
   <TorrentListContextMenu_DeleteTorrentFile>supprimer le fichier .torrent</TorrentListContextMenu_DeleteTorrentFile>
   <TorrentListContextMenu_DeleteDataAndTorrentFile>supprimer les 2 à la fois</TorrentListContextMenu_DeleteDataAndTorrentFile>
   <TorrentListContextMenu_ChangeTorrentOptions>Modifier les options de ce torrent</TorrentListContextMenu_ChangeTorrentOptions>
@@ -86,7 +86,7 @@
   <FilePriority_Normal>Normal</FilePriority_Normal>
   <FilePriority_Low>Faible</FilePriority_Low>
   <FilePriority_Lowest>La plus faible</FilePriority_Lowest>
-  <FilePriority_Skip>Ne pas téléchargé</FilePriority_Skip>
+  <FilePriority_Skip>Ne pas télécharger</FilePriority_Skip>
   <FilePriority_Custom>Personalisé</FilePriority_Custom>
 
   <NotifyIcon_ResumeAll>Reprendre tous les torrents</NotifyIcon_ResumeAll>
