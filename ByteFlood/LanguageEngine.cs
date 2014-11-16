@@ -83,16 +83,61 @@ namespace ByteFlood
         public string FeedsItemsContextMenu_Edit { get; set; }
         public string FeedsItemsContextMenu_ViewFeeds { get; set; }
 
+        // Torrents list context menu
 
-        // list of todo in the main window:
-        // todo: toolbar tooltips
-        // todo: status bar items
-        // todo: file tab menu
-        // todo: torrent list menu
-        // todo: notify icon menu
+        public string TorrentListContextMenu_OpenContainingFolder { get; set; }
+        public string TorrentListContextMenu_ForceStart { get; set; }
+        public string TorrentListContextMenu_Start { get; set; }
+        public string TorrentListContextMenu_Pause { get; set; }
+        public string TorrentListContextMenu_ForcePause { get; set; }
+        public string TorrentListContextMenu_Stop { get; set; }
+        public string TorrentListContextMenu_ForceRecheck { get; set; }
+        public string TorrentListContextMenu_CopyMagnetLink { get; set; }
+        public string TorrentListContextMenu_DownloadMovieData { get; set; }
+        public string TorrentListContextMenu_Remove { get; set; }
+        public string TorrentListContextMenu_RemoveAnd { get; set; }
+        public string TorrentListContextMenu_DeleteData { get; set; }
+        public string TorrentListContextMenu_DeleteTorrentFile { get; set; }
+        public string TorrentListContextMenu_DeleteDataAndTorrentFile { get; set; }
+        public string TorrentListContextMenu_ChangeTorrentOptions { get; set; }
 
-        // list of other todo:
-        // todo: all other windows :^)
+        // File list context menu
+
+        public string FileListContextMenu_OpenFile { get; set; }
+        public string FileListContextMenu_OpenContainingFolder { get; set; }
+        public string FileListContextMenu_SetPriority { get; set; }
+
+        // File priorities
+
+        public string FilePriority_Immediate { get; set; }
+        public string FilePriority_Highest { get; set; }
+        public string FilePriority_High { get; set; }
+        public string FilePriority_Normal { get; set; }
+        public string FilePriority_Low { get; set; }
+        public string FilePriority_Lowest { get; set; }
+        public string FilePriority_Skip { get; set; }
+        public string FilePriority_Custom { get; set; }
+
+        // NotifyIcon menu
+
+        public string NotifyIcon_ResumeAll { get; set; }
+        public string NotifyIcon_PauseAll { get; set; }
+        public string NotifyIcon_ShowHide { get; set; }
+        public string NotifyIcon_Exit { get; set; }
+
+        // MainWindow Toolbar tooltips
+
+        public string MainWindowToolbarTooltips_AddTorrentFromFile { get; set; }
+        public string MainWindowToolbarTooltips_AddTorrentMagnetLink { get; set; }
+        public string MainWindowToolbarTooltips_AddRSSFeed { get; set; }
+        public string MainWindowToolbarTooltips_SearchTorrentsOnline { get; set; }
+        public string MainWindowToolbarTooltips_EditPreferences { get; set; }
+        public string MainWindowToolbarTooltips_StartSelectedTorrents { get; set; }
+        public string MainWindowToolbarTooltips_PauseSelectedTorrents { get; set; }
+        public string MainWindowToolbarTooltips_StopSelectedTorrents { get; set; }
+        public string MainWindowToolbarTooltips_RemoveSelectedTorrents { get; set; }
+
+        // todo: status bar items and other windows
 
         #region Public methods
 

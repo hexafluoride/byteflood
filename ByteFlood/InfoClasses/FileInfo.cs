@@ -9,6 +9,8 @@ namespace ByteFlood
 {
     public class FileInfo : INotifyPropertyChanged
     {
+        public static LanguageEngine Language { get { return App.CurrentLanguage; } }
+
         /// <summary>
         /// This is the relative file name.
         /// </summary>
@@ -77,21 +79,21 @@ namespace ByteFlood
                 switch (a) 
                 {
                     case 0:
-                       return "Skip";
+                       return Language.FilePriority_Skip;
                     case 1:
-                       return "Lowest";
+                       return Language.FilePriority_Lowest;
                     case 2:
-                       return "Low";
+                       return Language.FilePriority_Low;
                     case 3:
-                       return "Normal";
+                       return Language.FilePriority_Normal;
                     case 4:
-                       return "Above normal";
+                       return Language.FilePriority_High;
                     case 5:
-                       return "High";
+                       return Language.FilePriority_Highest;
                     case 6:
-                       return "Highest";
+                       return Language.FilePriority_Immediate;
                     default :
-                       return string.Format("Custom: {0}", a);
+                       return string.Format("{0}: {1}", Language.FilePriority_Custom, a);
                 }
             }
         }

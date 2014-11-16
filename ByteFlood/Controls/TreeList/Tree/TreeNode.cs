@@ -11,6 +11,8 @@ namespace Aga.Controls.Tree
 {
 	public sealed class TreeNode : INotifyPropertyChanged
 	{
+        //Totally not a hack
+        public static ByteFlood.LanguageEngine Language { get { return ByteFlood.App.CurrentLanguage; } }
 		#region NodeCollection
 		private class NodeCollection : Collection<TreeNode>
 		{

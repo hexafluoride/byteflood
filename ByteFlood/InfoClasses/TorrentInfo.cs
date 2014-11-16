@@ -19,6 +19,8 @@ namespace ByteFlood
     {
         #region Properties and variables
 
+        public static LanguageEngine Language { get { return App.CurrentLanguage; } }
+
         public TorrentHandle Torrent { get; private set; }
 
         private TorrentStatus StatusData = null;
@@ -219,15 +221,15 @@ namespace ByteFlood
 
         public long WantedBytes { get { return this.StatusData.TotalWanted; } }
 
-        public int QueueNumber
+        public string QueueNumber
         {
             get
             {
-                if (this.Torrent.AutoManaged)
+                if (this.Torrent.QueuePosition != -1)
                 {
-                    return this.Torrent.QueuePosition;
+                    return this.Torrent.QueuePosition.ToString();
                 }
-                return -1;
+                return string.Empty;
             }
         }
 
