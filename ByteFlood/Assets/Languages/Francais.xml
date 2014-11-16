@@ -64,9 +64,9 @@
   <TorrentListContextMenu_ForceStart>Forcé le démarrerage</TorrentListContextMenu_ForceStart>
   <TorrentListContextMenu_Start>Démarrer</TorrentListContextMenu_Start>
   <TorrentListContextMenu_Pause>Pause</TorrentListContextMenu_Pause>
-  <TorrentListContextMenu_ForcePause>Force le pause</TorrentListContextMenu_ForcePause>
+  <TorrentListContextMenu_ForcePause>Forcé la pause</TorrentListContextMenu_ForcePause>
   <TorrentListContextMenu_Stop>Arrêter</TorrentListContextMenu_Stop>
-  <TorrentListContextMenu_ForceRecheck>Forcé la revérication de Hash</TorrentListContextMenu_ForceRecheck>
+  <TorrentListContextMenu_ForceRecheck>Forcé la revérification de Hash</TorrentListContextMenu_ForceRecheck>
   <TorrentListContextMenu_CopyMagnetLink>Copier le lien magnétique</TorrentListContextMenu_CopyMagnetLink>
   <TorrentListContextMenu_DownloadMovieData>Télécharger l'affiche du film</TorrentListContextMenu_DownloadMovieData>
   <TorrentListContextMenu_Remove>Supprimer</TorrentListContextMenu_Remove>
