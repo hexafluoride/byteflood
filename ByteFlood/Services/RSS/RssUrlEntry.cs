@@ -63,6 +63,7 @@ namespace ByteFlood.Services.RSS
         [XmlIgnore]
         private int tick = 1000;
 
+        [XmlIgnore]
         public ObservableDictionary<string, RssTorrent> items { get; private set; }
 
         [XmlIgnore]
