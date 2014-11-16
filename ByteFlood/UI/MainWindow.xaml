@@ -345,7 +345,7 @@
 
                             <MenuItem Header="{Binding Language.FeedsItemsContextMenu_Remove, FallbackValue=Remove}" 
                                       Tag="Remove" CommandParameter="{Binding}" Click="OperationOnRssItem" />
-                            
+
                             <MenuItem Header="{Binding Language.FeedsItemsContextMenu_Edit, FallbackValue=Edit}" 
                                       Tag="Edit" CommandParameter="{Binding}" Click="OperationOnRssItem" />
 
@@ -386,7 +386,7 @@
                             HorizontalAlignment="Left">
 
                     <Button Height="26" Margin="5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddTorrent}"
-                            ToolTip="Add torrent(s) from file">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_AddTorrentFromFile, FallbackValue=AddTorrentFromFile}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -405,7 +405,7 @@
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddMagnet}"
-                            ToolTip="Add torrent from a URL">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_AddTorrentMagnetLink, FallbackValue=AddTorrentMagnetLink}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -448,7 +448,7 @@
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.AddRssFeed}"
-                            ToolTip="Add a new RSS feed">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_AddRSSFeed, FallbackValue=AddRSSFeed}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="256" Height="256">
@@ -478,7 +478,7 @@
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.SearchOnlineTorrents}"
-                            ToolTip="Search for torrents on the internet">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_SearchTorrentsOnline, FallbackValue=SearchTorrentsOnline}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -509,7 +509,7 @@
                     </Button>
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" BorderThickness="0" Command="{StaticResource Commands.OpenPreferences}"
-                            ToolTip="Modify and change ByteFlood settings">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_EditPreferences, FallbackValue=EditPreferences}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -531,7 +531,7 @@
 
                     <Button Height="26" Margin="5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"
-                            ToolTip="Start selected torrent(s)">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_StartSelectedTorrents, FallbackValue=StartSelectedTorrents}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -551,7 +551,7 @@
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"
-                            ToolTip="Stop selected torrent(s)">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_StopSelectedTorrents, FallbackValue=StopSelectedTorrents}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -571,7 +571,7 @@
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause"
-                            ToolTip="Pause selected torrent(s)">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_PauseSelectedTorrents, FallbackValue=PauseSelectedTorrents}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -598,7 +598,7 @@
 
                     <Button Height="26" Margin="0,0,5,0" Background="Transparent" Style="{DynamicResource SelectedItemCheckerButton}" BorderThickness="0" 
                             Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="remove_torrent_unlist"
-                            ToolTip="Remove selected torrent(s) from the list">
+                            ToolTip="{Binding Language.MainWindowToolbarTooltips_RemoveSelectedTorrents, FallbackValue=RemoveSelectedTorrents}">
 
                         <Viewbox Stretch="Uniform">
                             <Canvas Width="128" Height="128">
@@ -652,39 +652,59 @@
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
 
                         <ContextMenu x:Key="ItemContextMenu">
-                            <MenuItem Header="Open containing folder" 
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_OpenContainingFolder, FallbackValue=OpenContainingFolder}" 
                                       Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="OpenDownloadDirectory" />
                             <Separator />
 
-                            <MenuItem Header="Force Start" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="ForceStart" />
-                            <MenuItem Header="Start" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"/>
-                            <MenuItem Header="Pause" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause" />
-                            <MenuItem Header="Force Pause" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="ForcePause"/>
-                            <MenuItem Header="Stop" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"/>
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_ForceStart, FallbackValue=ForceStart}" 
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="ForceStart" />
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_Start, FallbackValue=Start}"
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Start"/>
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_Pause, FallbackValue=Pause}" 
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Pause" />
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_ForcePause, FallbackValue=ForcePause}"
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="ForcePause"/>
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_Stop, FallbackValue=Stop}"
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Stop"/>
                             <Separator />
 
-                            <MenuItem Header="Force Hash Re-check" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Recheck" />
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_ForceRecheck, FallbackValue=ForceRecheck}"
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="Recheck" />
                             <Separator />
 
-                            <MenuItem Header="Copy magnet link" Click="CopyMagnetLink" />
-                            <MenuItem Header="Download movie data" Click="Torrent_RetrieveMovieInfo" />
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_CopyMagnetLink, FallbackValue=CopyMagnetLink}"
+                                      Click="CopyMagnetLink" />
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_DownloadMovieData, FallbackValue=DownloadMovieData}"
+                                      Click="Torrent_RetrieveMovieInfo" />
                             <Separator />
 
-                            <MenuItem Header="Remove" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_Remove, FallbackValue=Remove}" 
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
                                       CommandParameter="remove_torrent_unlist" />
 
-                            <MenuItem Header="Remove and" Background="WhiteSmoke">
-                                <MenuItem Header="Delete data" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_RemoveAnd, FallbackValue=RemoveAnd}" Background="WhiteSmoke">
+
+                                <MenuItem Header="{Binding Language.TorrentListContextMenu_DeleteData, FallbackValue=DeleteData}"
+                                          Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
                                       CommandParameter="remove_torrent_dataonly" />
-                                <MenuItem Header="Delete .torrent" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+
+                                <MenuItem Header="{Binding Language.TorrentListContextMenu_DeleteTorrentFile, FallbackValue=DeleteTorrentFile}"
+                                          Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}"
                                       CommandParameter="remove_torrent_torrentonly"/>
-                                <MenuItem Header="Delete data + .torrent" Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
+
+                                <MenuItem Header="{Binding Language.TorrentListContextMenu_DeleteDataAndTorrentFile, FallbackValue=DeleteDataAndTorrentFile}"
+                                          Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 
                                       CommandParameter="remove_torrent_both" />
                             </MenuItem>
 
                             <Separator />
 
-                            <MenuItem Header="Change torrent options"
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_ChangeTorrentOptions, FallbackValue=ChangeTorrentOptions}"
                                       Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="EditProperties"  />
                         </ContextMenu>
 
@@ -811,10 +831,10 @@
 
                                 <TextBlock Canvas.Left="7" Canvas.Top="92" Height="23" 
                                            Text="{Binding Language.OverviewTab_DownSpeedLimit, FallbackValue=DownSpeedLimit}" />
-                                
+
                                 <TextBlock Canvas.Left="7" Canvas.Top="111" Height="23" 
                                            Text="{Binding Language.OverviewTab_Status, FallbackValue=Status}" />
-                               
+
                                 <!-- first column values -->
                                 <TextBlock Canvas.Left="150" Canvas.Top="35" Height="23" Text="{Binding Self.SelectedTorrent.Elapsed, Converter={StaticResource TimeSpanToString}}" />
                                 <TextBlock Canvas.Left="150" Canvas.Top="54" Height="23" Text="{Binding Self.SelectedTorrent.Downloaded, Converter={StaticResource SizeToString}}" />
@@ -841,7 +861,7 @@
 
                                 <TextBlock Canvas.Left="333" Canvas.Top="92" Height="23" 
                                            Text="{Binding Language.OverviewTab_UploadSpeedLimit, FallbackValue=UploadSpeedLimit}" />
-                                
+
                                 <!-- second column values -->
                                 <TextBlock Canvas.Left="450" Canvas.Top="35" Height="23" Text="{Binding Self.SelectedTorrent.ETA, Converter={StaticResource TimeSpanToString}}" />
                                 <TextBlock Canvas.Left="450" Canvas.Top="54" Height="23" Text="{Binding Self.SelectedTorrent.Uploaded, Converter={StaticResource SizeToString}}" />
@@ -854,20 +874,20 @@
                                     </TextBlock.Text>
                                 </TextBlock>
                                 <TextBlock Canvas.Left="450" Canvas.Top="92" Height="23" Text="{Binding Self.SelectedTorrent.MaxUploadSpeed, Converter={StaticResource SpeedFormatter}}" />
-                                
+
                                 <!-- thrid column headers -->
                                 <TextBlock Canvas.Left="622" Canvas.Top="35" Height="23"
                                            Text="{Binding Language.OverviewTab_Wasted, FallbackValue=Wasted}" />
-                                
+
                                 <TextBlock Canvas.Left="622" Canvas.Top="54" Height="23"
                                            Text="{Binding Language.OverviewTab_Seeds, FallbackValue=Seeds}" />
 
                                 <TextBlock Canvas.Left="622" Canvas.Top="73" Height="23" 
                                            Text="{Binding Language.OverviewTab_Peers, FallbackValue=Peers}" />
-                                
+
                                 <TextBlock Canvas.Left="622" Canvas.Top="92" Height="23" 
                                            Text="{Binding Language.OverviewTab_Ratio, FallbackValue=Ratio}" />
-                                
+
                                 <!-- thrid column values -->
                                 <TextBlock Height="23" Canvas.Left="745" Canvas.Top="35">
                                     <TextBlock.Text>
@@ -949,17 +969,37 @@
                             <aga:TreeList.Resources>
 
                                 <ContextMenu x:Key="FileItemContextMenu">
-                                    <MenuItem Header="Open" Command="{StaticResource TorrentCommands.OpenFile}" />
-                                    <MenuItem Header="Open containing folder" Command="{StaticResource TorrentCommands.OpenFileLocation}" />
-                                    <MenuItem Header="Set priority" Background="WhiteSmoke">
-                                        <MenuItem Header="Immediate" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="6" />
-                                        <MenuItem Header="Highest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="5" />
-                                        <MenuItem Header="High" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="4" />
-                                        <MenuItem Header="Normal" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="3" />
-                                        <MenuItem Header="Low" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="2" />
-                                        <MenuItem Header="Lowest" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="1" />
-                                        <MenuItem Header="Skip" Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="0" />
+                                    <MenuItem Header="{Binding Language.FileListContextMenu_OpenFile, FallbackValue=OpenFile}"
+                                              Command="{StaticResource TorrentCommands.OpenFile}" />
+
+                                    <MenuItem Header="{Binding Language.FileListContextMenu_OpenContainingFolder, FallbackValue=OpenContainingFolder}"
+                                              Command="{StaticResource TorrentCommands.OpenFileLocation}" />
+
+                                    <MenuItem Header="{Binding Language.FileListContextMenu_SetPriority, FallbackValue=SetPriority}" Background="WhiteSmoke">
+
+                                        <MenuItem Header="{Binding Language.FilePriority_Immediate, FallbackValue=Immediate}"
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="6" />
+                                        
+                                        <MenuItem Header="{Binding Language.FilePriority_Highest, FallbackValue=Highest}"
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="5" />
+
+                                        <MenuItem Header="{Binding Language.FilePriority_High, FallbackValue=High}"
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="4" />
+
+                                        <MenuItem Header="{Binding Language.FilePriority_Normal, FallbackValue=Normal}"
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="3" />
+
+                                        <MenuItem Header="{Binding Language.FilePriority_Low, FallbackValue=Low}"
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="2" />
+
+                                        <MenuItem Header="{Binding Language.FilePriority_Lowest, FallbackValue=Lowest}" 
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="1" />
+
+                                        <MenuItem Header="{Binding Language.FilePriority_Skip, FallbackValue=Skip}"
+                                                  Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="0" />
+                                  
                                     </MenuItem>
+
                                 </ContextMenu>
 
                                 <controls:FileListTemplateSelector x:Key="FileListPathTemplateSelector">
@@ -1203,10 +1243,10 @@
                     MenuActivation="None">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu TextOptions.TextFormattingMode="Display">
-                    <MenuItem Header="Resume all torrents" Click="ActionOnAllTorrents" Tag="resume" />
-                    <MenuItem Header="Pause all torrents" Click="ActionOnAllTorrents" Tag="pause" />
-                    <MenuItem Header="Show/Hide ByteFlood" Click="ShowHide" />
-                    <MenuItem Header="Quit ByteFlood" Click="Exit" />
+                    <MenuItem Header="{Binding Language.NotifyIcon_ResumeAll, FallbackValue=ResumeAll}" Click="ActionOnAllTorrents" Tag="resume" />
+                    <MenuItem Header="{Binding Language.NotifyIcon_PauseAll, FallbackValue=PauseAll}" Click="ActionOnAllTorrents" Tag="pause" />
+                    <MenuItem Header="{Binding Language.NotifyIcon_ShowHide, FallbackValue=ShowHide}" Click="ShowHide" />
+                    <MenuItem Header="{Binding Language.NotifyIcon_Exit, FallbackValue=Exit}" Click="Exit" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

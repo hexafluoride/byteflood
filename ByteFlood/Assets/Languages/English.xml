@@ -60,4 +60,48 @@
   <FeedsItemsContextMenu_Edit>Edit</FeedsItemsContextMenu_Edit>
   <FeedsItemsContextMenu_ViewFeeds>View feeds</FeedsItemsContextMenu_ViewFeeds>
 
+  <TorrentListContextMenu_OpenContainingFolder>Open Containing Folder</TorrentListContextMenu_OpenContainingFolder>
+  <TorrentListContextMenu_ForceStart>Force Start</TorrentListContextMenu_ForceStart>
+  <TorrentListContextMenu_Start>Start</TorrentListContextMenu_Start>
+  <TorrentListContextMenu_Pause>Pause</TorrentListContextMenu_Pause>
+  <TorrentListContextMenu_ForcePause>Force Pause</TorrentListContextMenu_ForcePause>
+  <TorrentListContextMenu_Stop>Stop</TorrentListContextMenu_Stop>
+  <TorrentListContextMenu_ForceRecheck>Force Hash Recheck</TorrentListContextMenu_ForceRecheck>
+  <TorrentListContextMenu_CopyMagnetLink>Copy Magnet Link</TorrentListContextMenu_CopyMagnetLink>
+  <TorrentListContextMenu_DownloadMovieData>Download Movie Poster</TorrentListContextMenu_DownloadMovieData>
+  <TorrentListContextMenu_Remove>Remove</TorrentListContextMenu_Remove>
+  <TorrentListContextMenu_RemoveAnd>Remove and...</TorrentListContextMenu_RemoveAnd>
+  <TorrentListContextMenu_DeleteData>delete data</TorrentListContextMenu_DeleteData>
+  <TorrentListContextMenu_DeleteTorrentFile>delete .torrent file</TorrentListContextMenu_DeleteTorrentFile>
+  <TorrentListContextMenu_DeleteDataAndTorrentFile>delete both</TorrentListContextMenu_DeleteDataAndTorrentFile>
+  <TorrentListContextMenu_ChangeTorrentOptions>Change Torrent Options</TorrentListContextMenu_ChangeTorrentOptions>
+  
+  <FileListContextMenu_OpenFile>Open</FileListContextMenu_OpenFile>
+  <FileListContextMenu_OpenContainingFolder>Open Containing Folder</FileListContextMenu_OpenContainingFolder>
+  <FileListContextMenu_SetPriority>Priority</FileListContextMenu_SetPriority>
+  
+  <FilePriority_Immediate>Immediate</FilePriority_Immediate>
+  <FilePriority_Highest>Highest</FilePriority_Highest>
+  <FilePriority_High>High</FilePriority_High>
+  <FilePriority_Normal>Normal</FilePriority_Normal>
+  <FilePriority_Low>Low</FilePriority_Low>
+  <FilePriority_Lowest>Lowest</FilePriority_Lowest>
+  <FilePriority_Skip>Skip</FilePriority_Skip>
+  <FilePriority_Custom>Custom</FilePriority_Custom>
+  
+  <NotifyIcon_ResumeAll>Resume all torrents</NotifyIcon_ResumeAll>
+  <NotifyIcon_PauseAll>Pause all torrents</NotifyIcon_PauseAll>
+  <NotifyIcon_ShowHide>Show/Hide ByteFlood</NotifyIcon_ShowHide>
+  <NotifyIcon_Exit>Quit</NotifyIcon_Exit>
+  
+  <MainWindowToolbarTooltips_AddTorrentFromFile>Add a torrent from file(s)</MainWindowToolbarTooltips_AddTorrentFromFile>
+  <MainWindowToolbarTooltips_AddTorrentMagnetLink>Add a torrent from a magnet link</MainWindowToolbarTooltips_AddTorrentMagnetLink>
+  <MainWindowToolbarTooltips_AddRSSFeed>Add a new RSS feed</MainWindowToolbarTooltips_AddRSSFeed>
+  <MainWindowToolbarTooltips_SearchTorrentsOnline>Search for torrents on the internet</MainWindowToolbarTooltips_SearchTorrentsOnline>
+  <MainWindowToolbarTooltips_EditPreferences>Modify and change ByteFlood settings</MainWindowToolbarTooltips_EditPreferences>
+  <MainWindowToolbarTooltips_StartSelectedTorrents>Start selected torrent(s)</MainWindowToolbarTooltips_StartSelectedTorrents>
+  <MainWindowToolbarTooltips_PauseSelectedTorrents>Pause selected torrent(s)</MainWindowToolbarTooltips_PauseSelectedTorrents>
+  <MainWindowToolbarTooltips_StopSelectedTorrents>Stop selected torrent(s)</MainWindowToolbarTooltips_StopSelectedTorrents>
+  <MainWindowToolbarTooltips_RemoveSelectedTorrents>Remove selected torrent(s)</MainWindowToolbarTooltips_RemoveSelectedTorrents>
+
 </LanguageEngine>
