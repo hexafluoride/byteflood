@@ -191,7 +191,13 @@ namespace ByteFlood
 
         void LibTorrentAlerts_MetadataReceived(Ragnar.TorrentHandle handle)
         {
-            TorrentInfo ti = new TorrentInfo(handle);
+            string key = handle.InfoHash.ToHex();
+
+            TorrentInfo ti = null;
+
+            while (!this._torrents.ContainsKey(key)) ; // HACK
+
+            ti = this._torrents[key];
 
             // This is critical, without it byteflood won't load this torrent at the next startup
             byte[] data = this.BackUpMangetLinkMetadata(handle.TorrentFile);
@@ -200,15 +206,10 @@ namespace ByteFlood
 
             set_files_priorities(handle, 3);
 
-            string key = handle.InfoHash.ToHex();
-            if (!this._torrents.ContainsKey(key))
-            {
-                this._torrents.Add(key, ti);
-                this.Torrents.Add(ti);
-            }
+            ti.DoMetadataDownloadComplete();
 
-            NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
-            
+            //NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
+
             handle_torrent_file_selection(ti);
         }
 
@@ -241,18 +242,15 @@ namespace ByteFlood
 
         void LibTorrentAlerts_TorrentAdded(Ragnar.TorrentHandle handle)
         {
-            if (handle.HasMetadata)
+            uiContext.Post(_ =>
             {
-                uiContext.Post(_ =>
+                if (!_torrents.ContainsKey(handle.InfoHash.ToHex()))
                 {
-                    if (!_torrents.ContainsKey(handle.InfoHash.ToHex()))
-                    {
-                        TorrentInfo ti = new TorrentInfo(handle);
-                        this._torrents.Add(handle.InfoHash.ToHex(), ti);
-                        this.Torrents.Add(ti);
-                    }
-                }, null);
-            }
+                    TorrentInfo ti = new TorrentInfo(handle);
+                    this._torrents.Add(handle.InfoHash.ToHex(), ti);
+                    this.Torrents.Add(ti);
+                }
+            }, null);
         }
 
         void LibTorrentAlerts_ResumeDataArrived(Ragnar.TorrentHandle handle, byte[] data)
@@ -443,7 +441,7 @@ namespace ByteFlood
         /// and enable file selection. This will only work if the torrent has metadata. 
         /// </summary>
         /// <param name="ti"></param>
-        private void handle_torrent_file_selection(TorrentInfo ti) 
+        private void handle_torrent_file_selection(TorrentInfo ti)
         {
             uiContext.Send(x =>
             {
@@ -461,6 +459,8 @@ namespace ByteFlood
 
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
+                    else { ti.Stop(); }
+
                     ti.RatioLimit = atd.RatioLimit;
 
                     if (!this._torrents.ContainsKey(ti.InfoHash))
@@ -470,10 +470,10 @@ namespace ByteFlood
                     }
                 }
                 else
-                { 
+                {
                     this.Torrents.Remove(ti);
                     this._torrents.Remove(ti.InfoHash);
-                    this.LibtorrentSession.RemoveTorrent(ti.Torrent);
+                    this.LibtorrentSession.RemoveTorrent(ti.Torrent, true);
                     this.DeleteTorrentStateData(ti.InfoHash);
                     ti.OffMyself();
                 }
@@ -615,7 +615,7 @@ namespace ByteFlood
                 Name = mg.Name
             });
 
-            NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
+            //NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
         }
 
         /// <summary>

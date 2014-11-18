@@ -1171,7 +1171,8 @@
                                 <TextBlock Text="{Binding Language.InfoTab_Trackers, FallbackValue=Trackers}"/>
                             </StackPanel>
                         </TabItem.Header>
-                        <ListView Name="trackers_list" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <ListView Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding Self.SelectedTorrent}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="300" Header="{Binding Language.TrackersTab_URL, FallbackValue=URL}"
