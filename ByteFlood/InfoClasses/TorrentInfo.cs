@@ -103,7 +103,10 @@ namespace ByteFlood
             {
                 if (_custom_name == null)
                 {
-                    return this.Torrent.TorrentFile.Name;
+                    if (this.Torrent.HasMetadata)
+                        return this.Torrent.TorrentFile.Name;
+                    else
+                        return "[metadata mode]";
                 }
                 else
                 {
@@ -155,7 +158,10 @@ namespace ByteFlood
         {
             get
             {
-                return this.Torrent.TorrentFile.TotalSize;
+                if (this.Torrent.HasMetadata)
+                    return this.Torrent.TorrentFile.TotalSize;
+                else
+                    return -1;
             }
         }
 
@@ -219,7 +225,10 @@ namespace ByteFlood
         {
             get
             {
-                return this.Torrent.TorrentFile.PieceLength;
+                if (this.Torrent.HasMetadata)
+                    return this.Torrent.TorrentFile.PieceLength;
+                else
+                    return -1;
             }
         }
 
@@ -257,6 +266,11 @@ namespace ByteFlood
             {
                 if (this.Torrent.IsPaused)
                 {
+                    if (!string.IsNullOrEmpty(this.StatusData.Error))
+                    {
+                        return this.StatusData.Error;
+                    }
+
                     if (this.IsStopped)
                     {
                         return "Stopped";
@@ -268,7 +282,33 @@ namespace ByteFlood
                 }
                 else
                 {
-                    return this.StatusData.State.ToString();
+                    switch (this.StatusData.State) 
+                    {
+                        case TorrentState.Downloading:
+                            return "Downloading";
+
+                        case TorrentState.DownloadingMetadata:
+                            return "Metadata";
+
+                        case TorrentState.CheckingFiles:
+                        case TorrentState.CheckingResumeData:
+                            return "Checking files";
+
+                        case TorrentState.Allocating:
+                            return "Allocating files";
+
+                        case TorrentState.Finished:
+                            return "Finished";
+
+                        case TorrentState.QueuedForChecking :
+                            return "Queued for files check";
+
+                        case TorrentState.Seeding:
+                            return "Seeding";
+
+                        default:
+                            return this.StatusData.State.ToString(); 
+                    }
                 }
             }
         }
@@ -282,6 +322,8 @@ namespace ByteFlood
         }
 
         public string CompletionCommand { get; set; }
+
+        public bool HasMetadata { get { return this.Torrent.HasMetadata; } }
 
         public bool ShowOnList
         {
@@ -305,7 +347,7 @@ namespace ByteFlood
 
         public List<FileInfo> FileInfoList = new List<FileInfo>();
 
-        public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
+        public ObservableCollection<TrackerInfo> Trackers { get; private set; }
 
         public DirectoryKey FilesTree { get; private set; }
 
@@ -384,10 +426,24 @@ namespace ByteFlood
 
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
+            this.Trackers = new ObservableCollection<TrackerInfo>();
 
-            PopulateFileList();
+            if (t.HasMetadata)
+            {
+                SetupTorrent();
+            }
+
             PopulateTrackerList();
+        }
+
+        private bool _torrent_initialized = false;
+
+        private void SetupTorrent()
+        {
+            if (this._torrent_initialized) { return; }
+            PopulateFileList();
             LoadMiscSettings();
+            this._torrent_initialized = true;
         }
 
         private void LoadMiscSettings()
@@ -469,6 +525,13 @@ namespace ByteFlood
             UpdateGraphData();
         }
 
+        public void DoMetadataDownloadComplete()
+        {
+            SetupTorrent();
+            // Notify WPF bindings that the following properties were changed.
+            UpdateList("FilesTree", "Name", "PieceLength", "Size", "WantedBytes");
+        }
+
         #endregion
 
         public TorrentProperties TorrentSettings { get; private set; }
@@ -484,7 +547,7 @@ namespace ByteFlood
             this.CompletionCommand = props.OnFinish;
             this.RatioLimit = props.RatioLimit;
 
-            this.UpdateList("TorrentSettings");
+            this.UpdateList("TorrentSettings", "MaxDownloadSpeed", "MaxUploadSpeed", "RatioLimit");
         }
 
         public void ChangeSavePath(string newpath, TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace)
@@ -664,7 +727,10 @@ namespace ByteFlood
         {
             try // I hate having to do this
             {
-                UpdateProperties();
+                if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
+                {
+                    this.Pause();
+                }
 
                 if (this.Torrent.QueryStatus().State == TorrentState.Downloading)
                 {
@@ -682,8 +748,7 @@ namespace ByteFlood
                     "Ratio", "ETA",
                     "Elapsed",
                     "WantedBytesDone",
-                    "WastedBytes",
-                    //"HashFails",
+                    "WastedBytes", "HashFails",
                     "AverageDownloadSpeed", "AverageUploadSpeed",
                     "ShowOnList", "ProgressBarColor",
                     "Status");
@@ -774,7 +839,6 @@ namespace ByteFlood
             {
                 this.Trackers.Add(new TrackerInfo(tracker, this));
             }
-
         }
 
         #region ListsUpdaters
@@ -804,6 +868,7 @@ namespace ByteFlood
 
         long[] files_progresses = null;
 
+        // This is only called when the torrent is in Downloading State
         private void UpdateFileList(object obj)
         {
             if (this.files_progresses != null)
@@ -837,14 +902,6 @@ namespace ByteFlood
         }
 
         #endregion
-
-        private void UpdateProperties()
-        {
-            if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
-            {
-                this.Pause();
-            }
-        }
 
         public bool Equals(TorrentInfo other)
         {

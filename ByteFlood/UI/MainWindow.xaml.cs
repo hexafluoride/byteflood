@@ -517,8 +517,6 @@ namespace ByteFlood
             //peers_list.ItemsSource = ti.Peers;
             files_tree.Model = ti.FilesTree;
             //piece_bar.AttachTorrent(ti);
-            trackers_list.ItemsSource = ti.Trackers;
-
             //if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
             //{
             //    webseeds_tab.Visibility = Visibility.Visible;
@@ -532,8 +530,6 @@ namespace ByteFlood
             //peers_list.ItemsSource = null;
             files_tree.Model = null;
             //piece_bar.DetachTorrent();
-            trackers_list.ItemsSource = null;
-
             //webseeds_list.ItemsSource = null;
             //webseeds_tab.Visibility = Visibility.Collapsed;
         }
@@ -958,8 +954,15 @@ namespace ByteFlood
                     case "EditProperties":
                         f = new Action<TorrentInfo>(t =>
                         {
-                            var editor = new TorrentPropertiesEditor(t) { Owner = this, Icon = this.Icon };
-                            editor.ShowDialog();
+                            if (t.HasMetadata)
+                            {
+                                var editor = new TorrentPropertiesEditor(t) { Owner = this, Icon = this.Icon };
+                                editor.ShowDialog();
+                            }
+                            else 
+                            {
+                                MessageBox.Show("Cannot edit properties because torrent has no metadata");
+                            }
                         });
                         break;
                     case "Start":
