@@ -208,7 +208,8 @@ namespace ByteFlood
             }
 
             NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
-
+            
+            handle_torrent_file_selection(ti);
         }
 
         void LibTorrentAlerts_TorrentFinished(Ragnar.TorrentHandle handle)
@@ -434,6 +435,16 @@ namespace ByteFlood
 
             set_files_priorities(handle, 3);
 
+            handle_torrent_file_selection(ti);
+        }
+
+        /// <summary>
+        /// This will bring up the AddTorrentDialog, ask the user about the download path
+        /// and enable file selection. This will only work if the torrent has metadata. 
+        /// </summary>
+        /// <param name="ti"></param>
+        private void handle_torrent_file_selection(TorrentInfo ti) 
+        {
             uiContext.Send(x =>
             {
                 App.Current.MainWindow.Activate();
@@ -459,12 +470,12 @@ namespace ByteFlood
                     }
                 }
                 else
-                {
+                { 
+                    this.Torrents.Remove(ti);
                     this._torrents.Remove(ti.InfoHash);
-                    this.LibtorrentSession.RemoveTorrent(handle);
+                    this.LibtorrentSession.RemoveTorrent(ti.Torrent);
                     this.DeleteTorrentStateData(ti.InfoHash);
                     ti.OffMyself();
-                    this.Torrents.Remove(ti);
                 }
             }, null);
         }
@@ -600,7 +611,8 @@ namespace ByteFlood
             this.LibtorrentSession.AsyncAddTorrent(new Ragnar.AddTorrentParams()
             {
                 SavePath = App.Settings.DefaultDownloadPath,
-                Url = magnet
+                Url = magnet,
+                Name = mg.Name
             });
 
             NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
