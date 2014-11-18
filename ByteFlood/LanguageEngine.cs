@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ByteFlood
 {
@@ -210,7 +211,11 @@ namespace ByteFlood
                 catch { }
             }
 
-            // If a null LanguageEngine is returned, ByteFlood language bindings will use the fallback values
+            if (le == null) 
+            {
+                le = LanguageEngine.GetDummyLanguageEngine();
+            }
+
             return le;
         }
 
@@ -220,6 +225,12 @@ namespace ByteFlood
         /// </summary>
         public static void SaveDummy()
         {
+            Utility.Serialize<LanguageEngine>(LanguageEngine.GetDummyLanguageEngine(),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "byteflood_lang_empty.xml"), true);
+        }
+
+        private static LanguageEngine GetDummyLanguageEngine() 
+        {
             var le = new LanguageEngine();
 
             Type t = typeof(LanguageEngine);
@@ -228,11 +239,10 @@ namespace ByteFlood
 
             foreach (var prop in props)
             {
-                prop.SetValue(le, prop.Name);
+                prop.SetValue(le, prop.Name.Split('_').Last());
             }
 
-            Utility.Serialize<LanguageEngine>(le,
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "byteflood_lang_empty.xml"), true);
+            return le;
         }
 
         #endregion
