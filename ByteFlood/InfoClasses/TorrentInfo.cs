@@ -81,11 +81,11 @@ namespace ByteFlood
             get { return this.StatusData.SavePath; }
         }
 
-        public string RootDownloadDirectory 
+        public string RootDownloadDirectory
         {
-            get 
+            get
             {
-                if (this.Torrent.TorrentFile.NumFiles > 1) 
+                if (this.Torrent.TorrentFile.NumFiles > 1)
                 {
                     return System.IO.Path.Combine(this.SavePath, this.Torrent.TorrentFile.Name);
                 }
@@ -167,11 +167,27 @@ namespace ByteFlood
             }
         }
 
+        public int MaxDownloadSpeed
+        {
+            get
+            {
+                return this.Torrent.DownloadLimit;
+            }
+        }
+
         public int UploadSpeed
         {
             get
             {
                 return this.StatusData.UploadRate;
+            }
+        }
+
+        public int MaxUploadSpeed
+        {
+            get
+            {
+                return this.StatusData.UploadsLimit;
             }
         }
 
@@ -208,6 +224,8 @@ namespace ByteFlood
         }
 
         public long WastedBytes { get { return this.StatusData.TotalFailedBytes; } }
+
+        public long HashFails { get { return this.StatusData.TotalFailedBytes / this.PieceLength; } }
 
         public int Seeders { get { return this.StatusData.NumSeeds; } }
 
@@ -400,7 +418,7 @@ namespace ByteFlood
                 this.IsStopped = false;
             }
 
-            this.TorrentSettings = new TorrentProperties() 
+            this.TorrentSettings = new TorrentProperties()
             {
                 EnablePeerExchange = true,
                 UploadSlots = this.Torrent.MaxUploads,
@@ -455,7 +473,7 @@ namespace ByteFlood
 
         public TorrentProperties TorrentSettings { get; private set; }
 
-        public void ApplyTorrentSettings(TorrentProperties props) 
+        public void ApplyTorrentSettings(TorrentProperties props)
         {
             this.TorrentSettings = props;
 
@@ -469,7 +487,7 @@ namespace ByteFlood
             this.UpdateList("TorrentSettings");
         }
 
-        public void ChangeSavePath(string newpath,  TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace) 
+        public void ChangeSavePath(string newpath, TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace)
         {
             this.Torrent.MoveStorage(newpath, flags);
             this.StatusData = this.Torrent.QueryStatus();
@@ -605,7 +623,7 @@ namespace ByteFlood
 
         public void UpdateGraphData()
         {
-            if (this.downspeeds.Count == 50) 
+            if (this.downspeeds.Count == 50)
             {
                 this.downspeeds.RemoveAt(0);
             }
@@ -784,7 +802,7 @@ namespace ByteFlood
             });
         }*/
 
-        long[] files_progresses = null; 
+        long[] files_progresses = null;
 
         private void UpdateFileList(object obj)
         {
@@ -808,15 +826,15 @@ namespace ByteFlood
         public void UpdateList(params string[] columns)
         {
             foreach (string str in columns)
-				UpdateSingle(str);
+                UpdateSingle(str);
         }
 
-	    public void UpdateSingle([CallerMemberName] string name = null)
-	    {
-		    var handler = PropertyChanged;
-		    if (handler != null)
-			    handler(this, new PropertyChangedEventArgs(name));
-	    }
+        public void UpdateSingle([CallerMemberName] string name = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(name));
+        }
 
         #endregion
 
