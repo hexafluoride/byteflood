@@ -452,7 +452,7 @@ namespace ByteFlood
                     { ti.Start(); }
                     ti.RatioLimit = atd.RatioLimit;
 
-                    if (!this._torrents.ContainsKey(ti.InfoHash)) 
+                    if (!this._torrents.ContainsKey(ti.InfoHash))
                     {
                         this._torrents.Add(ti.InfoHash, ti);
                         this.Torrents.Add(ti);
@@ -529,7 +529,7 @@ namespace ByteFlood
             if (!File.Exists(path)) { return false; }
 
             Ragnar.TorrentInfo torrent = new Ragnar.TorrentInfo(File.ReadAllBytes(path));
-            
+
             if (torrent.IsValid)
             {
                 if (this.ContainTorrent(torrent.InfoHash))
@@ -553,7 +553,7 @@ namespace ByteFlood
 
                     set_files_priorities(handle, 3);
 
-                    if (!entry.AutoDownload) 
+                    if (!entry.AutoDownload)
                     {
                         handle.AutoManaged = false;
                         handle.Pause();
@@ -570,7 +570,7 @@ namespace ByteFlood
             return false;
         }
 
-        public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
+        public async void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
             MagnetLink mg = null;
 
@@ -588,7 +588,7 @@ namespace ByteFlood
 
             if (App.Settings.PreferMagnetCacheWebsites)
             {
-                byte[] torrent_data = State.GetMagnetFromCache(mg); // TODO: Move this to a non-blocking call
+                byte[] torrent_data = await System.Threading.Tasks.Task.Run<byte[]>(() => State.GetMagnetFromCache(mg));
                 if (torrent_data != null)
                 {
                     string path = this.SaveMagnetLink(torrent_data, mg.Name);
