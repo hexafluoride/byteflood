@@ -1,6 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageEngine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  
+
+  <Buttons_OK>OK</Buttons_OK>
+  <Buttons_Cancel>Cancel</Buttons_Cancel>
+  <Buttons_Add>Add</Buttons_Add>
+  <Buttons_Search>Search</Buttons_Search>
+  <Buttons_Paste>Paste</Buttons_Paste>
+  <Buttons_SaveSettings>Save Settings</Buttons_SaveSettings>
+  <Buttons_DiscardSettings>Discard Settings</Buttons_DiscardSettings>
+  <Buttons_LoadDefaultSettings>Load default settings</Buttons_LoadDefaultSettings>
+
   <TorrentList_NameColumn>Name</TorrentList_NameColumn>
   <TorrentList_ProgressColumn>Progress</TorrentList_ProgressColumn>
   <TorrentList_StatusColumn>Status</TorrentList_StatusColumn>
@@ -104,4 +113,7 @@
   <MainWindowToolbarTooltips_StopSelectedTorrents>Stop selected torrent(s)</MainWindowToolbarTooltips_StopSelectedTorrents>
   <MainWindowToolbarTooltips_RemoveSelectedTorrents>Remove selected torrent(s)</MainWindowToolbarTooltips_RemoveSelectedTorrents>
 
+  <AddMagnetLinkWindow_Title>Add magnet..</AddMagnetLinkWindow_Title>
+  <AddMagnetLinkWindow_EnterMagnetURL>Enter magnet URL:</AddMagnetLinkWindow_EnterMagnetURL>
+  
 </LanguageEngine>

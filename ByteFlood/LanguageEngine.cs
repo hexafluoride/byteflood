@@ -9,6 +9,16 @@ namespace ByteFlood
     {
         // I will stick to this naming convention: TorrentList_NameColumn, MainWindow_ExitButton and so on.
 
+        public string Buttons_OK { get; set; }
+        public string Buttons_Cancel { get; set; }
+        public string Buttons_Add { get; set; }
+        public string Buttons_Search { get; set; }
+        public string Buttons_Paste { get; set; }
+
+        public string Buttons_SaveSettings { get; set; }
+        public string Buttons_DiscardSettings { get; set; }
+        public string Buttons_LoadDefaultSettings { get; set; }
+
         // Torrent list columns
 
         public string TorrentList_NameColumn { get; set; }
@@ -140,6 +150,9 @@ namespace ByteFlood
 
         // todo: status bar items and other windows
 
+        public string AddMagnetLinkWindow_Title { get; set; }
+        public string AddMagnetLinkWindow_EnterMagnetURL { get; set; } 
+
         #region Public methods
 
         public void ReloadLang(string name)
@@ -211,7 +224,7 @@ namespace ByteFlood
                 catch { }
             }
 
-            if (le == null) 
+            if (le == null)
             {
                 le = LanguageEngine.GetDummyLanguageEngine();
             }
@@ -229,7 +242,7 @@ namespace ByteFlood
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "byteflood_lang_empty.xml"), true);
         }
 
-        private static LanguageEngine GetDummyLanguageEngine() 
+        private static LanguageEngine GetDummyLanguageEngine()
         {
             var le = new LanguageEngine();
 

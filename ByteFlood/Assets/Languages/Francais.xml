@@ -1,6 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageEngine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
+  <Buttons_OK>OK</Buttons_OK>
+  <Buttons_Cancel>Annuler</Buttons_Cancel>
+  <Buttons_Add>Ajouter</Buttons_Add>
+  <Buttons_Search>Rechercher</Buttons_Search>
+  <Buttons_Paste>Coller</Buttons_Paste>
+  <Buttons_SaveSettings>Sauvgarder les paramètres</Buttons_SaveSettings>
+  <Buttons_DiscardSettings>Annuler</Buttons_DiscardSettings>
+  <Buttons_LoadDefaultSettings>Charger les paramètres défaut</Buttons_LoadDefaultSettings>
+
   <TorrentList_NameColumn>Nom</TorrentList_NameColumn>
   <TorrentList_ProgressColumn>Progrès</TorrentList_ProgressColumn>
   <TorrentList_StatusColumn>Statut</TorrentList_StatusColumn>
@@ -95,7 +104,7 @@
   <NotifyIcon_Exit>Quitter</NotifyIcon_Exit>
 
   <MainWindowToolbarTooltips_AddTorrentFromFile>Ajouter un torrent à partie d'un/des fichier(s)</MainWindowToolbarTooltips_AddTorrentFromFile>
-  <MainWindowToolbarTooltips_AddTorrentMagnetLink>Ajouter un torrent à partir d'un lien aimant</MainWindowToolbarTooltips_AddTorrentMagnetLink>
+  <MainWindowToolbarTooltips_AddTorrentMagnetLink>Ajouter un torrent à partir d'un lien magnet</MainWindowToolbarTooltips_AddTorrentMagnetLink>
   <MainWindowToolbarTooltips_AddRSSFeed>Ajouter un nouveau flux RSS</MainWindowToolbarTooltips_AddRSSFeed>
   <MainWindowToolbarTooltips_SearchTorrentsOnline>Rechercher des torrents sur Internet</MainWindowToolbarTooltips_SearchTorrentsOnline>
   <MainWindowToolbarTooltips_EditPreferences>Modifier les paramètres de ByteFlood</MainWindowToolbarTooltips_EditPreferences>
@@ -103,5 +112,8 @@
   <MainWindowToolbarTooltips_PauseSelectedTorrents>Pause les torrents sélectionnés</MainWindowToolbarTooltips_PauseSelectedTorrents>
   <MainWindowToolbarTooltips_StopSelectedTorrents>Arrêter les torrents sélectionnés</MainWindowToolbarTooltips_StopSelectedTorrents>
   <MainWindowToolbarTooltips_RemoveSelectedTorrents>Supprimer les torrents sélectionné</MainWindowToolbarTooltips_RemoveSelectedTorrents>
+
+  <AddMagnetLinkWindow_Title>Ajouter un lien manget...</AddMagnetLinkWindow_Title>
+  <AddMagnetLinkWindow_EnterMagnetURL>Veuillez entrer le lien magnet:</AddMagnetLinkWindow_EnterMagnetURL>
 
 </LanguageEngine>
