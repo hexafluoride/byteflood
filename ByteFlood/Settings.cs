@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Reflection;
-using MonoTorrent.Client;
 using System.Runtime.InteropServices;
 
 namespace ByteFlood
@@ -25,6 +24,10 @@ namespace ByteFlood
     {
         MinimizeToTray, MinimizeToTaskbar, Exit
     }
+    public enum EncryptionTypeEnum
+    {
+        Unknown = -1, Forced = 0, Preffered = 1, DoesntMatter = 2
+    }
     public class Settings : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,9 +42,9 @@ namespace ByteFlood
         public string FileRegex { get; set; }
         public bool EnableFileRegex { get; set; }
         public bool DownloadAllRSS { get; set; }
-        
+
         public string TorrentFileSavePath { get; set; }
-       
+
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
@@ -54,7 +57,7 @@ namespace ByteFlood
         public TrayIconBehavior TrayIconRightClickBehavior { get; set; }
         public TrayIconBehavior TrayIconClickBehavior { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
-        public EncryptionForceType EncryptionType { get; set; }
+        public EncryptionTypeEnum EncryptionType { get; set; }
         public int OutgoingPortsStart { get; set; }
         public int OutgoingPortsEnd { get; set; }
         public int MaxDHTPeers { get; set; }
@@ -123,7 +126,7 @@ namespace ByteFlood
                     UploadColor = Colors.Red,
                     DefaultDownloadPath = GetDefaultDownloadDirectory(),
                     TorrentFileSavePath = "./Torrents",
-                    EncryptionType = EncryptionForceType.DoesntMatter,
+                    EncryptionType = EncryptionTypeEnum.DoesntMatter,
                     ListeningPort = 1025,
                     DHTListeningPort = 1026,
                     FileRegex = "",
@@ -171,7 +174,7 @@ namespace ByteFlood
                 string path = null;
                 SHGetKnownFolderPath(DownloadsFolder, 0, IntPtr.Zero, out path);
 
-                if (!string.IsNullOrWhiteSpace(path)) 
+                if (!string.IsNullOrWhiteSpace(path))
                 {
                     return path;
                 }
@@ -233,12 +236,12 @@ namespace ByteFlood
                 OnPropertyChanged(str);
         }
 
-		protected void OnPropertyChanged([CallerMemberName]string name = null)
-		{
-			var handler = PropertyChanged;
-			if (handler != null)
-				handler(this, new PropertyChangedEventArgs(name));
-		}
+        protected void OnPropertyChanged([CallerMemberName]string name = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(name));
+        }
 
         public static Settings CompleteNullProperties(Settings s)
         {

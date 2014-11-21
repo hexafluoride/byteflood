@@ -20,8 +20,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
-
-using MonoTorrent.Common;
 using System.IO;
 
 namespace ByteFlood

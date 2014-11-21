@@ -12,7 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using System.Collections.ObjectModel;
-using MonoTorrent.Client;
 
 namespace ByteFlood
 {
@@ -52,8 +51,6 @@ namespace ByteFlood
 
         public ComboBox[] TrayIconComboBoxes;
         public ComboBox[] WindowComboBoxes;
-
-        public EncryptionForceType[] EncryptionTypes = (EncryptionForceType[])Enum.GetValues(typeof(EncryptionForceType));
 
         public string[] EncryptionTypesReadable = new string[]
         {
@@ -193,8 +190,8 @@ namespace ByteFlood
             local.TrayIconDoubleClickBehavior = TrayIconBehaviors[tdcb.SelectedIndex];
             local.MinimizeBehavior = WindowBehaviors[mb.SelectedIndex];
             local.ExitBehavior = WindowBehaviors[cb.SelectedIndex];
-            local.EncryptionType = EncryptionTypes[enctype.SelectedIndex];
-            local.SeedingTorrentsAreActive = this.seedingTorrentsInac.IsChecked == true;
+            local.EncryptionType = (EncryptionTypeEnum)enctype.SelectedIndex;
+
             MainWindow mw = (App.Current.MainWindow as MainWindow);
 
             //mw.state.ce.Settings.Force = local.EncryptionType;
