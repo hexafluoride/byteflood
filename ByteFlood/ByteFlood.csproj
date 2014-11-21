@@ -131,6 +131,16 @@
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
     <Compile Include="LanguageEngine.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedDictionary.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedList.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedNumber.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedString.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodingException.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\IBEncodedValue.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\RawReader.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.Common\InfoHash.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.Common\MagnetLink.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.Common\Message.cs" />
     <Compile Include="LibTorrentAlerts.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="NiceDataContext.cs" />
@@ -355,10 +365,6 @@
     <ProjectReference Include="..\ByteFloodUpdater\ByteFloodUpdater.csproj">
       <Project>{aeada459-a688-4bc5-8160-845f5f9d8ca4}</Project>
       <Name>ByteFloodUpdater</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
-      <Project>{411a9e0e-fdc6-4e25-828a-0c2cd1cd96f8}</Project>
-      <Name>MonoTorrent</Name>
     </ProjectReference>
     <ProjectReference Include="..\NotifyIconWpf\NotifyIconWpf.csproj">
       <Project>{7ac63864-7638-41c4-969c-d3197ef2bed9}</Project>

@@ -7,7 +7,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using MonoTorrent;
 using System.Xml.Serialization;
-using MonoTorrent.Common;
 using System.Threading;
 using System.IO;
 using Jayrock.Json;
@@ -389,24 +388,29 @@ namespace ByteFlood
 
         public void AddTorrentByPath(string path, bool notifyIfAdded = true)
         {
+            Ragnar.TorrentInfo torrent = null;
+
             try
             {
-                Torrent t = Torrent.Load(path);
+                torrent = new Ragnar.TorrentInfo(File.ReadAllBytes(path));
 
-                if (this.ContainTorrent(t.InfoHash.ToHex()))
+                if (!torrent.IsValid)
+                {
+                    torrent.Dispose();
+                    MessageBox.Show(string.Format("Invalid torrent file {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (this.ContainTorrent(torrent.InfoHash))
                 {
                     if (notifyIfAdded)
                     {
-                        NotificationManager.Notify(new TorrentAlreadyAddedNotification(t.Name, t.InfoHash.ToHex()));
+                        NotificationManager.Notify(new TorrentAlreadyAddedNotification(torrent.Name, torrent.InfoHash));
                     }
                     return;
                 }
-                path = BackupTorrent(path, t);
-            }
-            catch (TorrentException)
-            {
-                MessageBox.Show(string.Format("Invalid torrent file {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+
+                path = BackupTorrent(path, torrent);
             }
             catch (Exception ex)
             {
@@ -416,7 +420,7 @@ namespace ByteFlood
 
             var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
             {
-                TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path)),
+                TorrentInfo = torrent,
                 SavePath = App.Settings.DefaultDownloadPath,
             });
 
@@ -511,9 +515,9 @@ namespace ByteFlood
         /// </summary>
         /// <param name="path">The path of the torrent file to be copied.</param>
         /// <returns>The new path of the torrent file.</returns>
-        public string BackupTorrent(string path, Torrent t)
+        public string BackupTorrent(string path, Ragnar.TorrentInfo t)
         {
-            string newpath = System.IO.Path.Combine(State.TorrentsStateSaveDirectory, t.InfoHash.ToHex() + ".torrent");
+            string newpath = System.IO.Path.Combine(State.TorrentsStateSaveDirectory, t.InfoHash + ".torrent");
             if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
                 File.Copy(path, newpath, true);
             return newpath;
@@ -584,7 +588,7 @@ namespace ByteFlood
         public async void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
             MagnetLink mg = null;
-
+            
             try { mg = new MagnetLink(magnet); }
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
 
