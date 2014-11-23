@@ -114,6 +114,8 @@ namespace ByteFlood
 
         public string DefaultLanguage { get; set; }
 
+        public string SaveTorrentDialogLastPath { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -161,7 +163,8 @@ namespace ByteFlood
                     DisplayStripsOnTorrentList = false,
                     StatusBarVisible = true,
                     PreferMagnetCacheWebsites = true,
-                    DefaultLanguage = "English"
+                    DefaultLanguage = "English",
+                    SaveTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
                 };
             }
         }

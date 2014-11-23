@@ -145,7 +145,8 @@ namespace ByteFlood.UI
             this.RemoveEvent = new RoutedEventHandler(this.Filters_Remove);
             this.DownloadPath = App.Settings.DefaultDownloadPath;
             this.ManualUpdateIntervalSeconds = "120";
-            this.DefaultTorrentProperties = (TorrentProperties)Utility.CloneObject(TorrentProperties.DefaultTorrentProperties);
+            this.DefaultTorrentProperties = Utility.CloneObject(TorrentProperties.DefaultTorrentProperties);
+            this.DataContext = new NiceDataContext<AddRSSFeed>(this);
         }
 
         #region Commands

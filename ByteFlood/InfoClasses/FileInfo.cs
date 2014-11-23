@@ -8,6 +8,8 @@ namespace ByteFlood
     {
         public static LanguageEngine Language { get { return App.CurrentLanguage; } }
 
+        private string _name = null;
+
         /// <summary>
         /// This is the relative file name.
         /// </summary>
@@ -15,22 +17,26 @@ namespace ByteFlood
         {
             get
             {
-                return this.File.Path.Replace(this.Owner.RootDownloadDirectory, "");
+                if (_name == null)
+                {
+                    _name = this.File.Path.Replace(this.Owner.RootDownloadDirectory, "");
+                }
+                return _name;
             }
         }
 
-        public string FullPath 
+        public string FullPath
         {
-            get 
+            get
             {
                 // even thought libtorrent documentation specify that the Path property is the
                 // full path, sometimes this isn't true (returns the relative path),
                 // so we need to workaround it
-                if (System.IO.Path.IsPathRooted(this.File.Path)) 
+                if (System.IO.Path.IsPathRooted(this.File.Path))
                 {
                     return this.File.Path;
                 }
-                else 
+                else
                 {
                     return System.IO.Path.Combine(this.Owner.SavePath, this.File.Path);
                 }
@@ -43,12 +49,12 @@ namespace ByteFlood
         }
 
         private long _downloaded_bytes = 0;
-        public long DownloadedBytes 
+        public long DownloadedBytes
         {
             get { return this._downloaded_bytes; }
-            set 
+            set
             {
-                if (value != this._downloaded_bytes) 
+                if (value != this._downloaded_bytes)
                 {
                     this._downloaded_bytes = value;
                     UpdateList("DownloadedBytes", "Progress");
@@ -56,41 +62,41 @@ namespace ByteFlood
             }
         }
 
-        public double Progress 
+        public double Progress
         {
-            get 
+            get
             {
-                if (this.RawSize > 0) 
+                if (this.RawSize > 0)
                 {
                     return Convert.ToDouble(this.DownloadedBytes) / Convert.ToDouble(this.RawSize);
                 }
                 return 100d;
-            } 
+            }
         }
 
         public string Priority
         {
-            get 
+            get
             {
                 int a = this.Owner.Torrent.GetFilePriority(this.FileIndex);
-                switch (a) 
+                switch (a)
                 {
                     case 0:
-                       return Language.FilePriority_Skip;
+                        return Language.FilePriority_Skip;
                     case 1:
-                       return Language.FilePriority_Lowest;
+                        return Language.FilePriority_Lowest;
                     case 2:
-                       return Language.FilePriority_Low;
+                        return Language.FilePriority_Low;
                     case 3:
-                       return Language.FilePriority_Normal;
+                        return Language.FilePriority_Normal;
                     case 4:
-                       return Language.FilePriority_High;
+                        return Language.FilePriority_High;
                     case 5:
-                       return Language.FilePriority_Highest;
+                        return Language.FilePriority_Highest;
                     case 6:
-                       return Language.FilePriority_Immediate;
-                    default :
-                       return string.Format("{0}: {1}", Language.FilePriority_Custom, a);
+                        return Language.FilePriority_Immediate;
+                    default:
+                        return string.Format("{0}: {1}", Language.FilePriority_Custom, a);
                 }
             }
         }
@@ -146,18 +152,18 @@ namespace ByteFlood
 
         public void UpdateSingle([CallerMemberName]string name = null)
         {
-	        var handler = PropertyChanged;
+            var handler = PropertyChanged;
             if (handler != null)
-				handler(this, new PropertyChangedEventArgs(name));
+                handler(this, new PropertyChangedEventArgs(name));
         }
 
-	    public void UpdateList(params string[] str)
-	    {
-		    foreach (string s in str)
-			    UpdateSingle(s);
-	    }
+        public void UpdateList(params string[] str)
+        {
+            foreach (string s in str)
+                UpdateSingle(s);
+        }
 
-	    public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
     }

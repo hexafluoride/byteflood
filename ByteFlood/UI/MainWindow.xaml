@@ -677,7 +677,10 @@
                             <Separator />
 
                             <MenuItem Header="{Binding Language.TorrentListContextMenu_CopyMagnetLink, FallbackValue=CopyMagnetLink}"
-                                      Click="CopyMagnetLink" />
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="CopyMagnetLink" />
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_SaveTorrentFile, FallbackValue=SaveTorrentFile}"
+                                       Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="SaveTorrentFile" />
 
                             <MenuItem Header="{Binding Language.TorrentListContextMenu_DownloadMovieData, FallbackValue=DownloadMovieData}"
                                       Click="Torrent_RetrieveMovieInfo" />

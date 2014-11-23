@@ -726,12 +726,6 @@ namespace ByteFlood
                 mainlist.ClearValue(ListView.AlternationCountProperty);
         }
 
-        private void CopyMagnetLink(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
-            Clipboard.SetText(ti.GetMagnetLink());
-        }
-
         private void Torrent_RetrieveMovieInfo(object sender, RoutedEventArgs e)
         {
             TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
@@ -959,7 +953,7 @@ namespace ByteFlood
                                 var editor = new TorrentPropertiesEditor(t) { Owner = this, Icon = this.Icon };
                                 editor.ShowDialog();
                             }
-                            else 
+                            else
                             {
                                 MessageBox.Show("Cannot edit properties because torrent has no metadata");
                             }
@@ -983,7 +977,32 @@ namespace ByteFlood
                     case "Recheck":
                         f = new Action<TorrentInfo>(t => t.Recheck());
                         break;
-
+                    case "CopyMagnetLink":
+                        if (this.SelectedTorrent != null)
+                        {
+                            Clipboard.SetText(this.SelectedTorrent.GetMagnetLink()); 
+                        }
+                        break;
+                    case "SaveTorrentFile":
+                        if (this.SelectedTorrent != null)
+                        {
+                            if (this.SelectedTorrent.HasMetadata)
+                            {
+                                SaveFileDialog sfd = new SaveFileDialog();
+                                sfd.Filter = "Torrent file|*.torrent";
+                                sfd.FileName = this.SelectedTorrent.Name;
+                                sfd.InitialDirectory = App.Settings.SaveTorrentDialogLastPath;
+                                if (sfd.ShowDialog() == true)
+                                {
+                                    Ragnar.TorrentCreator tc = new Ragnar.TorrentCreator(this.SelectedTorrent.Torrent.TorrentFile);
+                                    byte[] data = tc.Generate();
+                                    tc.Dispose();
+                                    System.IO.File.WriteAllBytes(sfd.FileName, data);
+                                    App.Settings.SaveTorrentDialogLastPath = System.IO.Path.GetDirectoryName(sfd.FileName);
+                                }
+                            }
+                        }
+                        break;
                     case "remove_torrent_unlist":
                     case "remove_torrent_torrentonly":
                     case "remove_torrent_dataonly":
