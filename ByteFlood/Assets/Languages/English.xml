@@ -77,6 +77,7 @@
   <TorrentListContextMenu_Stop>Stop</TorrentListContextMenu_Stop>
   <TorrentListContextMenu_ForceRecheck>Force Hash Recheck</TorrentListContextMenu_ForceRecheck>
   <TorrentListContextMenu_CopyMagnetLink>Copy Magnet Link</TorrentListContextMenu_CopyMagnetLink>
+  <TorrentListContextMenu_SaveTorrentFile>Save .torrent</TorrentListContextMenu_SaveTorrentFile>
   <TorrentListContextMenu_DownloadMovieData>Download Movie Poster</TorrentListContextMenu_DownloadMovieData>
   <TorrentListContextMenu_Remove>Remove</TorrentListContextMenu_Remove>
   <TorrentListContextMenu_RemoveAnd>Remove and...</TorrentListContextMenu_RemoveAnd>

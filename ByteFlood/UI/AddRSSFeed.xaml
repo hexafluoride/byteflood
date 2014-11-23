@@ -4,7 +4,6 @@
         xmlns:controls="clr-namespace:ByteFlood.Controls"
         Title="Add new feed" Height="418.676" Width="983.724"
         TextOptions.TextFormattingMode="Display"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <RoutedUICommand x:Key="Commands.Add"/>
@@ -24,22 +23,22 @@
     <Canvas>
 
         <TextBlock Text="Feed url:" FontSize="16" Canvas.Left="10" Canvas.Top="20" />
-        <TextBox Text="{Binding Url}" IsEnabled="{Binding AllowUrlChange}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="16"/>
+        <TextBox Text="{Binding Self.Url}" IsEnabled="{Binding Self.AllowUrlChange}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="16"/>
 
         <TextBlock Text="Custom Alias:" FontSize="16" Canvas.Left="10" Canvas.Top="59" />
-        <TextBox Text="{Binding CustomAlias}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="55"/>
+        <TextBox Text="{Binding Self.CustomAlias}" Height="25" Width="371" Canvas.Left="113" Canvas.Top="55"/>
         <TextBlock Text="(Leave empty for default)" FontSize="10" Canvas.Left="10" Canvas.Top="82" />
 
         <GroupBox Header="Options" FontSize="17" Height="336" Width="474" Canvas.Left="489" Canvas.Top="10">
             <Canvas>
-                <CheckBox IsChecked="{Binding AutoDownload}" Content="Automatically start the download of new items" FontSize="13" Canvas.Left="10" Canvas.Top="10" Width="442"/>
+                <CheckBox IsChecked="{Binding Self.AutoDownload}" Content="Automatically start the download of new items" FontSize="13" Canvas.Left="10" Canvas.Top="10" Width="442"/>
 
                 <TextBlock Text="Download in:" FontSize="13" Canvas.Left="10" Canvas.Top="39" />
-                <TextBox FontSize="13" Text="{Binding DownloadPath}" Height="25" Width="326" Canvas.Left="90" Canvas.Top="36"/>
+                <TextBox FontSize="13" Text="{Binding Self.DownloadPath}" Height="25" Width="326" Canvas.Left="90" Canvas.Top="36"/>
                 <Button Content="..." Command="{StaticResource Commands.Browse}" Height="28" Width="31" Canvas.Left="421" Canvas.Top="32"/>
 
                 <TextBlock Text="Update interval:" FontSize="13" Canvas.Left="10" Canvas.Top="71" />
-                <ComboBox FontSize="13" SelectedIndex="{Binding UpdateIntervalType}" Width="95" Canvas.Left="106" Canvas.Top="68" Height="23">
+                <ComboBox FontSize="13" SelectedIndex="{Binding Self.UpdateIntervalType}" Width="95" Canvas.Left="106" Canvas.Top="68" Height="23">
                     <ComboBox.Items>
                         <ComboBoxItem Content="Auto"/>
                         <ComboBoxItem Content="Manual"/>
@@ -50,14 +49,14 @@
                     <StackPanel.Style>
                         <Style TargetType="{x:Type StackPanel}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding UpdateIntervalType}" Value="0">
+                                <DataTrigger Binding="{Binding Self.UpdateIntervalType}" Value="0">
                                     <Setter Property="Visibility" Value="Hidden"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <TextBox FontSize="13"  VerticalAlignment="Center" Text="{Binding ManualUpdateIntervalSeconds,UpdateSourceTrigger=PropertyChanged}" Width="91" RenderTransformOrigin="0.527,0.207"/>
-                    <TextBlock FontSize="13" VerticalAlignment="Center" Text="{Binding ManualUpdateIntervalSecondsText,FallbackValue='x seconds'}"/>
+                    <TextBox FontSize="13"  VerticalAlignment="Center" Text="{Binding Self.ManualUpdateIntervalSeconds,UpdateSourceTrigger=PropertyChanged}" Width="91" RenderTransformOrigin="0.527,0.207"/>
+                    <TextBlock FontSize="13" VerticalAlignment="Center" Text="{Binding Self.ManualUpdateIntervalSecondsText,FallbackValue='x seconds'}"/>
                 </StackPanel>
                 <Button FontSize="12" Content="Change default torrent properties" Command="{StaticResource Commands.ChangeDefaultTorrentSettings}" Height="28" Width="268" Canvas.Left="10" Canvas.Top="103"/>
             </Canvas>
@@ -65,7 +64,7 @@
 
         <GroupBox Header="Filters" FontSize="17" Canvas.Left="10" Canvas.Top="99" Height="247" Width="474">
             <Canvas>
-                <ListView ItemsSource="{Binding Filters}" Height="107" Width="442" Canvas.Left="10" Canvas.Top="10" BorderBrush="Black">
+                <ListView ItemsSource="{Binding Self.Filters}" Height="107" Width="442" Canvas.Left="10" Canvas.Top="10" BorderBrush="Black">
                     <ListView.View>
                         <controls:RssFiltersView/>
                     </ListView.View>
@@ -75,11 +74,11 @@
                         Command="{StaticResource Filters.Add}"/>
 
                 <TextBlock Text="Filter expression:" FontSize="13" Canvas.Left="9" Canvas.Top="126" Height="22" Width="97" />
-                <TextBox Text="{Binding FilterExpression}" FontSize="14" Height="25" Width="341" Canvas.Left="111" Canvas.Top="123"/>
+                <TextBox Text="{Binding Self.FilterExpression}" FontSize="14" Height="25" Width="341" Canvas.Left="111" Canvas.Top="123"/>
                 <TextBlock Text="(filter expression will run on torrent names, expression is case-insensitive)" FontSize="10" Canvas.Left="10" Canvas.Top="153" />
                 <TextBlock Text="Note: Having no filters will disable this functionality" FontSize="10" Canvas.Left="10" Canvas.Top="196" />
                 <TextBlock Text="Filter action:" FontSize="13" Canvas.Left="10" Canvas.Top="174" Height="22" Width="97" />
-                <ComboBox SelectedIndex="{Binding FilterAction}" Height="27" Width="154" Canvas.Left="107" Canvas.Top="169"
+                <ComboBox SelectedIndex="{Binding Self.FilterAction}" Height="27" Width="154" Canvas.Left="107" Canvas.Top="169"
                           FontSize="13">
                     <ComboBox.Items>
                         <ComboBoxItem Content="Download"/>

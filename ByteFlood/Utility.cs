@@ -475,11 +475,11 @@ namespace ByteFlood
             return new ProcessStartInfo(filename, args);
         }
 
-        public static object CloneObject(object source)
+        public static T CloneObject<T>(T source)
         {
             Type type = source.GetType();
             object target;
-            if (type == Settings.DefaultSettings.GetType())
+            if (type == typeof(Settings))
                 target = Settings.DefaultSettings;
             else
                 target = Activator.CreateInstance(type);
@@ -508,8 +508,9 @@ namespace ByteFlood
                     }
                 }
             }
-            return target;
+            return (T)target;
         }
+
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
         public static void SetAssociation(string KeyName = "ByteFlood", string Description = "TORRENT File", string Extension = ".torrent")
