@@ -475,9 +475,16 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    string directory = System.IO.Path.GetDirectoryName(fi.FullPath);
-                    System.IO.Directory.CreateDirectory(directory);
-                    Process.Start("explorer.exe", string.Format("\"{0}\"", directory));
+                    if (System.IO.File.Exists(fi.FullPath))
+                    {
+                        Process.Start("explorer.exe", string.Format("/select, \"{0}\"", fi.FullPath));
+                    }
+                    else
+                    {
+                        string directory = System.IO.Path.GetDirectoryName(fi.FullPath);
+                        System.IO.Directory.CreateDirectory(directory);
+                        Process.Start("explorer.exe", string.Format("\"{0}\"", directory)); 
+                    }
                     return;
                 }
 
@@ -493,12 +500,13 @@ namespace ByteFlood
                         string partial_path = GetDirectoryKeyRelativePath(item.Parent);
                         string full_path = System.IO.Path.Combine(dk.OwnerTorrent.SavePath, partial_path);
                         System.IO.Directory.CreateDirectory(full_path);
-                        Process.Start("explorer.exe", string.Format("\"{0}\"", full_path));
+                        Process.Start("explorer.exe", string.Format("/select, \"{0}\"", full_path));
                     }
                     else
                     {
                         //it's a root dir
-                        Process.Start("explorer.exe", string.Format("\"{0}\"", dk.OwnerTorrent.SavePath));
+                        System.IO.Directory.CreateDirectory(dk.OwnerTorrent.SavePath);
+                        Process.Start("explorer.exe", string.Format("/select, \"{0}\"", dk.OwnerTorrent.SavePath));
                     }
                 }
             }
@@ -942,7 +950,7 @@ namespace ByteFlood
                         f = new Action<TorrentInfo>(t =>
                         {
                             System.IO.Directory.CreateDirectory(t.SavePath);
-                            Process.Start("explorer.exe", "\"" + t.SavePath + "\"");
+                            Process.Start("explorer.exe", "/select, \"" + t.SavePath + "\"");
                         });
                         break;
                     case "EditProperties":
