@@ -241,7 +241,7 @@ namespace ByteFlood
 
         void LibTorrentAlerts_TorrentAdded(Ragnar.TorrentHandle handle)
         {
-            uiContext.Post(_ =>
+            App.Current.Dispatcher.Invoke(new Action(() =>
             {
                 if (!_torrents.ContainsKey(handle.InfoHash.ToHex()))
                 {
@@ -249,7 +249,7 @@ namespace ByteFlood
                     this._torrents.Add(handle.InfoHash.ToHex(), ti);
                     this.Torrents.Add(ti);
                 }
-            }, null);
+            }));
         }
 
         void LibTorrentAlerts_ResumeDataArrived(Ragnar.TorrentHandle handle, byte[] data)
