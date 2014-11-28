@@ -15,96 +15,228 @@
     <Grid>
         <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
             <TreeViewItem Header="General" Name="general_tree" IsSelected="True" />
-            <!--<TreeViewItem Header="RSS" Name="rss_tree" />-->
-            <TreeViewItem Header="UI" Name="ui_tree" />
-            <TreeViewItem Header="Network" Name="conn_tree"  />
+            <TreeViewItem Header="UI Interactions" Name="uin_tree" />
+            <TreeViewItem Header="UI Customization" Name="uic_tree" />
+            <TreeViewItem Header="Directories" Name="dir_tree" />
+            <TreeViewItem Header="Torrents Defaults" Name="tor_tree" />
+            <TreeViewItem Header="Connection" Name="conn_tree" />
+            <TreeViewItem Header="Bandwidth" Name="band_tree" Visibility="Collapsed" />
+            <TreeViewItem Header="BitTorrent" Name="bitt_tree" Visibility="Collapsed" />
+            <TreeViewItem Header="Queueing" Name="queue_tree" />
+            <TreeViewItem Header="Network" Name="net_tree" Visibility="Collapsed" />
         </TreeView>
         <TabControl HorizontalAlignment="Left" Margin="158,10,0,0" Name="tabControl1" Width="437" Height="431" VerticalAlignment="Top">
-            <TabItem Name="general" IsSelected="{Binding IsSelected, ElementName=general_tree}" Height="0">
+            <TabItem IsSelected="{Binding ElementName=general_tree, Path=IsSelected}" Height="0">
                 <Canvas>
-                    <TextBlock Height="23" Text="Default download path" Canvas.Left="5" Canvas.Top="13" />
-                    <TextBox Height="23" Name="downpath" Width="244" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="136" Canvas.Top="10" />
-                    <Button Content="..." Height="23"  Width="40" Click="PickPath" Canvas.Left="385" Canvas.Top="9" />
-                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="43" />
-                    <TextBox Canvas.Left="305" Canvas.Top="40" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="120" />
-                    <Button Canvas.Left="6" Canvas.Top="71" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
-                    <Button Canvas.Left="6" Canvas.Top="99" Content="Associate ByteFlood with torrent files" Height="23" Width="218" Click="AssociateFiles" />
-                    <Button Canvas.Left="6" Canvas.Top="128" Content="Import torrents from uTorrent" Height="23" Click="ImportTorrents" Width="218" />
-                    <TextBlock Canvas.Left="7" Canvas.Top="225" Height="23" Text="Maximum active torrents" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Visibility="Collapsed" />
-                    <TextBox Canvas.Left="305" Canvas.Top="223" Height="23" Text="{Binding QueueSize}" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Width="120" Visibility="Collapsed" />
-                    <CheckBox Canvas.Left="8" Canvas.Top="159" Height="28" IsChecked="{Binding PreferMagnetCacheWebsites}" Width="409">
+
+                    <GroupBox Header="Language" Height="58" Width="407" Canvas.Left="10" Canvas.Top="10">
+                        <Canvas>
+                            <TextBlock Height="19" Text="Language:" Canvas.Left="10" Canvas.Top="10" RenderTransformOrigin="0.824,0.368" />
+                            <ComboBox Name="langCombox"
+                              Height="23" Width="312"
+                              SelectedIndex="0" Canvas.Left="83" Canvas.Top="8"/>
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="Windows Integration" Canvas.Top="73" Canvas.Left="10" Width="407" Height="89">
+                        <Canvas>
+                            <Button Content="Associate with .torrent files" Height="23" Click="AssociateFiles" Canvas.Left="10" Canvas.Top="10" Width="166" />
+                            <Button Content="Associate with magnet URIs" Height="23" Click="AssociateFiles" Canvas.Left="10" Canvas.Top="38" Width="166" />
+
+                            <CheckBox Canvas.Left="205" Canvas.Top="28">
+                                <TextBlock>Check association on startup</TextBlock>
+                            </CheckBox>
+
+                            <CheckBox Canvas.Left="205" Canvas.Top="10">
+                                <TextBlock>Start ByteFlood on system startup</TextBlock>
+                            </CheckBox>
+
+                        </Canvas>
+
+                    </GroupBox>
+
+                    <GroupBox Header="Privacy" Canvas.Left="10" Canvas.Top="167" Height="49" Width="407">
+                        <Canvas>
+                            <CheckBox Canvas.Left="10" Canvas.Top="10">
+                                <TextBlock>Check for updates automatically</TextBlock>
+                            </CheckBox>
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="When Downloading" Canvas.Left="10" Canvas.Top="221" Height="67" Width="407">
+                        <Canvas>
+                            <CheckBox Canvas.Left="10" Canvas.Top="10">
+                                <TextBlock>Prevent standby if there are active torrents</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="28">
+                                <TextBlock>Pre-allocate all files</TextBlock>
+                            </CheckBox>
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="Misc" Canvas.Left="10" Canvas.Top="293" Height="74" Width="407">
+                        <Canvas>
+                            <Button Content="Import torrents from BitTorrent / uTorrent" Height="23" Click="ImportTorrents" Width="253" Canvas.Left="10" Canvas.Top="10"  />
+                        </Canvas>
+                    </GroupBox>
+
+                </Canvas>
+            </TabItem>
+            <TabItem IsSelected="{Binding ElementName=uin_tree, Path=IsSelected}" Height="0">
+                <Canvas>
+                    <GroupBox Header="Display Options" Height="105" Width="407" Canvas.Left="10" Canvas.Top="10">
+                        <Canvas>
+                            <CheckBox Canvas.Left="10" Canvas.Top="10">
+                                <TextBlock>Confirm when deleting torrents</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="28">
+                                <TextBlock>Show confirmation dialog on exit</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="46">
+                                <TextBlock>Show current speed in the title bar</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Top="64" Canvas.Left="10">
+                                <TextBlock>Use fine grained file priorities</TextBlock>
+                            </CheckBox>
+
+                            <CheckBox Canvas.Left="204" Canvas.Top="10">
+                                <TextBlock>Confirm when deleting trackers</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="204" Canvas.Top="28">
+                                <TextBlock>Alternate list background color</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="204" Canvas.Top="46">
+                                <TextBlock>Show speed limits in the status bar</TextBlock>
+                            </CheckBox>
+                        </Canvas>
+                    </GroupBox>
+                    <GroupBox Header="System Tray" Canvas.Left="10" Canvas.Top="120" Height="193" Width="407">
+                        <Canvas>
+                            <TextBlock Height="23" Text="Tray icon click behavior:" Canvas.Left="10" Canvas.Top="10" />
+                            <ComboBox Height="23" SelectedIndex="{Binding TrayIconClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tcb" Width="175" Canvas.Left="210" Canvas.Top="10" />
+
+                            <TextBlock Height="23" Text="Tray icon double click behavior:" Canvas.Left="10" Canvas.Top="38" />
+                            <ComboBox Height="23" SelectedIndex="{Binding TrayIconDoubleClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tdcb" Width="175" Canvas.Left="210" Canvas.Top="38" />
+
+                            <TextBlock Height="23" Text="Tray icon right click behavior" Canvas.Left="10" Canvas.Top="66" />
+                            <ComboBox Height="23" SelectedIndex="{Binding TrayIconRightClickBehavior, Converter={StaticResource ObjectToInt}}" Name="trcb" Width="175" Canvas.Left="210" Canvas.Top="66" />
+
+                            <TextBlock Height="23" Text="Minimize behavior" Canvas.Left="10" Canvas.Top="94" />
+                            <ComboBox Height="23" SelectedIndex="{Binding MinimizeBehavior, Converter={StaticResource ObjectToInt}}" Name="mb" Width="175" Canvas.Left="210" Canvas.Top="94" />
+
+                            <TextBlock Height="23" Text="Close behavior" Canvas.Left="10" Canvas.Top="122" />
+                            <ComboBox  Height="23" SelectedIndex="{Binding ExitBehavior, Converter={StaticResource ObjectToInt}}" Name="cb" Width="175" Canvas.Left="210" Canvas.Top="122" />
+
+                            <CheckBox Height="16" IsChecked="{Binding NotifyOnTray}" Canvas.Left="10" Canvas.Top="150">
+                                <TextBlock Text="Show a notification when ByteFlood minimizes to tray" />
+                            </CheckBox>
+                        </Canvas>
+                    </GroupBox>
+
+
+                </Canvas>
+            </TabItem>
+            <TabItem IsSelected="{Binding ElementName=uic_tree, Path=IsSelected}" Height="0">
+                <Canvas>
+
+                    <GroupBox Header="Colors" Height="154" Width="407" Canvas.Left="10" Canvas.Top="10">
+                        <Canvas>
+
+                            <CheckBox Name="dgr_chkbox" Content="Draw graph grid" Height="16" IsChecked="{Binding DrawGrid}" Canvas.Left="10" Canvas.Top="10" />
+
+                            <GroupBox Header="Speed graph colors" IsEnabled="{Binding ElementName=dgr_chkbox, Path=IsChecked}" Canvas.Left="10" Canvas.Top="31" Height="79" Width="375">
+                                <Canvas>
+                                    <TextBlock Height="23" Text="Download color" Canvas.Left="10" Canvas.Top="10" />
+                                    <Button Height="23" Name="downcolor" Width="75" Click="SelectDownloadColor" Background="{Binding DownloadBrush}" Canvas.Left="278" Canvas.Top="10" />
+
+                                    <TextBlock Height="23" Text="Upload color" Canvas.Left="10" Canvas.Top="33" />
+                                    <Button Height="23" Name="upcolor" Width="75" Click="SelectUploadColor" Background="{Binding UploadBrush}" Canvas.Left="278" Canvas.Top="33" />
+
+                                </Canvas>
+                            </GroupBox>
+
+                            <CheckBox Canvas.Left="10" Canvas.Top="115">
+                                <TextBlock>Enable Windows Aero color integration</TextBlock>
+                            </CheckBox>
+
+
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="UI Elements" Canvas.Left="10" Canvas.Top="169" Height="75" Width="407">
+                        <Canvas>
+                            <CheckBox Content="Information canvas visible" Height="16" IsChecked="{Binding BottomCanvasVisible}" Canvas.Left="10" Canvas.Top="31" />
+                            <CheckBox Content="Display strips on torrent list" Height="16" IsChecked="{Binding DisplayStripsOnTorrentList}" Canvas.Left="205" Canvas.Top="31" />
+                            <CheckBox Content="Left treeview visible" Height="16" IsChecked="{Binding TreeViewVisible}" Canvas.Left="10" Canvas.Top="10" />
+                            <CheckBox Content="Status bar visible" Height="16" IsChecked="{Binding StatusBarVisible}" Canvas.Left="205" Canvas.Top="10" />
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="Icons" Canvas.Left="10" Canvas.Top="249" Height="52" Width="407">
+                        <Canvas>
+                            <CheckBox Content="Show file icons throughout the UI" Height="16" IsChecked="{Binding ShowFileIcons}" Canvas.Left="159" Canvas.Top="10" />
+
+                            <CheckBox Content="Show torrent client icons" Height="16" IsChecked="{Binding ShowClientIcons}" Canvas.Left="10" Canvas.Top="10" />
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="Theme" Canvas.Left="10" Canvas.Top="306" Height="95" Width="407">
+                        <Canvas>
+
+                            <TextBlock Height="23" Text="Theme:" Canvas.Left="10" Canvas.Top="10" />
+                            <ComboBox Height="23" Width="246"  SelectionChanged="ReloadTheme" Name="themeCombox" Canvas.Left="139" Canvas.Top="10" />
+
+                            <TextBlock Height="19" Text="Style:" Canvas.Top="48" Canvas.Left="10" />
+
+                            <ComboBox Name="styleCombox" Height="23" Width="246" SelectedIndex="0" Canvas.Left="139" Canvas.Top="44">
+                                <ComboBox.Items>
+                                    <ComboBoxItem>Wide</ComboBoxItem>
+                                    <ComboBoxItem>Compact</ComboBoxItem>
+                                </ComboBox.Items>
+                            </ComboBox>
+
+                        </Canvas>
+                    </GroupBox>
+
+                </Canvas>
+            </TabItem>
+            <TabItem IsSelected="{Binding ElementName=dir_tree, Path=IsSelected,FallbackValue=True}" Height="0">
+                <Canvas>
+
+                    <GroupBox Header="Location of Downloaded Files" Height="66" Width="407" Canvas.Left="10" Canvas.Top="10">
+                        <Canvas>
+                            <TextBlock Height="23" Text="Default download path:" Canvas.Left="6" Canvas.Top="14" />
+
+                            <TextBox Height="23" Name="downpath" Width="216" IsReadOnly="True" Text="{Binding DefaultDownloadPath}" Canvas.Left="124" Canvas.Top="10" />
+
+                            <Button Content="..." Height="23"  Width="40" Click="PickPath" Canvas.Left="345" Canvas.Top="10"/>
+                        </Canvas>
+                    </GroupBox>
+
+                    <GroupBox Header="Location of .torrents" Canvas.Left="10" Canvas.Top="81" Height="69" Width="407" Visibility="Collapsed">
+                        <Canvas>
+                            <!-- TODO THIS -->
+                        </Canvas>
+                    </GroupBox>
+                </Canvas>
+            </TabItem>
+            <TabItem IsSelected="{Binding ElementName=tor_tree, Path=IsSelected}" Height="0">
+                <Canvas>
+
+                    <CheckBox Name="ignore_files" Content="Don't download files that match this pattern:" Canvas.Left="6" IsChecked="{Binding EnableFileRegex}" Canvas.Top="16" />
+
+                    <TextBox Canvas.Left="244" Canvas.Top="10" Height="23" Name="textBox1" Text="{Binding FileRegex}" IsEnabled="{Binding ElementName=ignore_files, Path=IsChecked}" Width="173" />
+
+                    <Button Canvas.Left="10" Canvas.Top="71" Content="Change default torrent settings" Height="23" Name="default_settings" Width="218" Click="ChangeDefaultSettings" />
+
+                    <CheckBox Canvas.Left="6" Canvas.Top="38" Height="28" IsChecked="{Binding PreferMagnetCacheWebsites}" Width="407">
                         <TextBlock TextWrapping="Wrap">
                             When adding magnet links, prioritize torrent cache websites instead of downloading data from peers
                         </TextBlock>
                     </CheckBox>
-                    <CheckBox Canvas.Left="10" Canvas.Top="207" Content="Enable queueing" Height="16" Name="enablequeue" IsChecked="{Binding EnableQueue}" Visibility="Collapsed" />
-                    <CheckBox Canvas.Left="10" Canvas.Top="248" Content="Consider seeding torrents as inactive"
-                              IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}"
-                              Height="16" Name="seedingTorrentsInac" IsChecked="{Binding SeedingTorrentsAreActive,Mode=OneWay}" Visibility="Collapsed" />
                 </Canvas>
             </TabItem>
-            <TabItem Name="ui" IsSelected="{Binding IsSelected, ElementName=ui_tree}" Height="0">
-                <Canvas>
-                    <CheckBox Content="Draw graph grid" Height="16" Name="checkBox2" IsChecked="{Binding DrawGrid}" Canvas.Left="6" Canvas.Top="7" />
-                    <TextBlock Height="23" Text="Download color" Canvas.Left="6" Canvas.Top="28" />
-                    <Button Height="23" Name="downcolor" Width="75" Click="SelectDownloadColor" Background="{Binding DownloadBrush}" Canvas.Left="350" Canvas.Top="25" />
-
-                    <TextBlock Height="23" Canvas.Left="6" Canvas.Top="55" Text="Upload color" />
-                    <Button Height="23" Canvas.Left="350" Canvas.Top="53" Name="upcolor" Width="75" Click="SelectUploadColor" Background="{Binding UploadBrush}" />
-
-                    <ComboBox Height="23" Width="160" 
-                              SelectionChanged="ReloadTheme"
-                              Name="themeCombox" Canvas.Right="5" Canvas.Left="75" Canvas.Top="83" />
-
-                    <TextBlock Height="23" Canvas.Left="6" Canvas.Top="83" Text="Theme" />
-
-                    <TextBlock Height="19" Text="Style" Canvas.Left="256" Canvas.Top="87" />
-                    <ComboBox Name="styleCombox"
-                              Height="23" Width="123"
-                              SelectedIndex="0"
-                              Canvas.Right="5" Canvas.Left="294" Canvas.Top="83">
-                        <ComboBox.Items>
-                            <ComboBoxItem>Wide</ComboBoxItem>
-                            <ComboBoxItem>Compact</ComboBoxItem>
-                        </ComboBox.Items>
-                    </ComboBox>
-
-                    <TextBlock Height="19" Text="Language:" Canvas.Left="237" Canvas.Top="139" />
-                    <ComboBox Name="langCombox"
-                              Height="23" Width="123"
-                              SelectedIndex="0"
-                              Canvas.Right="5" Canvas.Left="294" Canvas.Top="137">
-                    </ComboBox>
-
-                    <CheckBox Canvas.Left="6" Canvas.Top="111" Content="Information canvas visible" Height="16" Name="checkBox3" IsChecked="{Binding BottomCanvasVisible}" />
-                    <CheckBox Canvas.Left="247" Canvas.Top="111" Content="Display strips on torrent list" Height="16" IsChecked="{Binding DisplayStripsOnTorrentList}" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="133" Content="Left treeview visible" Height="16" Name="checkBox4" IsChecked="{Binding TreeViewVisible}" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="177" Content="Show file icons throughout the UI" Height="16" IsChecked="{Binding ShowFileIcons}" Name="checkBox5" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="199" Content="Show torrent client icons" Height="16" IsChecked="{Binding ShowClientIcons}" Name="checkBox6" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="265" Height="23" Text="Tray icon click behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="294" Height="23" Text="Tray icon double click behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="323" Height="23" Text="Tray icon right click behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="352" Height="23" Text="Minimize behavior" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="381" Height="23" Text="Close behavior" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="221" Content="Show relative paths instead of absolute ones" Height="16" IsChecked="{Binding ShowRelativePaths}" Name="checkBox7" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="265" Height="23" SelectedIndex="{Binding TrayIconClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tcb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="294" Height="23" SelectedIndex="{Binding TrayIconDoubleClickBehavior, Converter={StaticResource ObjectToInt}}" Name="tdcb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="323" Height="23" SelectedIndex="{Binding TrayIconRightClickBehavior, Converter={StaticResource ObjectToInt}}" Name="trcb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="352" Height="23" SelectedIndex="{Binding MinimizeBehavior, Converter={StaticResource ObjectToInt}}" Name="mb" Width="120" />
-                    <ComboBox Canvas.Left="305" Canvas.Top="381" Height="23" SelectedIndex="{Binding ExitBehavior, Converter={StaticResource ObjectToInt}}" Name="cb" Width="120" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="243" Content="Show a notification when ByteFlood minimizes to tray" Height="16" IsChecked="{Binding NotifyOnTray}" Name="checkBox8" />
-                    <CheckBox Canvas.Left="6" Canvas.Top="155" Content="Status bar visible" Height="16" IsChecked="{Binding StatusBarVisible}" Name="checkBox1" />
-                </Canvas>
-            </TabItem>
-            <!--<TabItem Name="rss" IsSelected="{Binding IsSelected, ElementName=rss_tree}" Height="0">
-                <Canvas>
-                    <RadioButton Content="Download all new content" Height="16" HorizontalAlignment="Left" Margin="6,6,0,0" Name="rss_all_selector" VerticalAlignment="Top" IsChecked="{Binding DownloadAllRSS}" GroupName="rss_content_selectors" />
-                    <RadioButton Content="Download content matching regex: " Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="rss_regex_selector" VerticalAlignment="Top" GroupName="rss_content_selectors" />
-                    <TextBox Height="23" HorizontalAlignment="Left" Margin="220,26,0,0" Name="rss_regex" VerticalAlignment="Top" Width="205" Text="{Binding RSSRegex}" IsEnabled="{Binding ElementName=rss_regex_selector, Path=IsChecked}"/>
-                    <CheckBox Content="Check for duplicates" Height="16" HorizontalAlignment="Left" Margin="6,50,0,0" Name="dupes" IsChecked="{Binding RSSCheckForDuplicates}" VerticalAlignment="Top" />
-                </Canvas>
-            </TabItem>-->
-            <TabItem Name="conn" IsSelected="{Binding IsSelected, ElementName=conn_tree}" Height="0">
+            <TabItem IsSelected="{Binding ElementName=conn_tree, Path=IsSelected}" Height="0">
                 <Canvas>
                     <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing" Height="77" Width="414">
                         <Canvas>
@@ -138,6 +270,15 @@
                     </Button>
                     <TextBlock Canvas.Left="6" Canvas.Top="210" Height="23" Text="DHT listening port" />
                     <TextBox Canvas.Left="305" Canvas.Top="207" Height="23" Text="{Binding MaxDHTPeers}" Width="120" />
+                </Canvas>
+            </TabItem>
+            <TabItem IsSelected="{Binding ElementName=queue_tree, Path=IsSelected}" Height="0">
+                <Canvas IsEnabled="False">
+                    <CheckBox Content="Enable queueing" Height="16" Name="enablequeue" IsChecked="{Binding EnableQueue}" Canvas.Left="10" Canvas.Top="10" />
+
+                    <TextBlock Height="23" Text="Maximum active torrents:" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Canvas.Left="10" Canvas.Top="41" />
+
+                    <TextBox Height="23" Text="{Binding QueueSize}" IsEnabled="{Binding ElementName=enablequeue, Path=IsChecked}" Width="130" Canvas.Left="133" Canvas.Top="37"/>
                 </Canvas>
             </TabItem>
         </TabControl>

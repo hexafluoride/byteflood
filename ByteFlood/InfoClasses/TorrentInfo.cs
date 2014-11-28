@@ -492,6 +492,10 @@ namespace ByteFlood
         public void DoStateChanged(Ragnar.TorrentState oldstate, Ragnar.TorrentState newstate)
         {
             UpdateList("Status");
+            if (this.Torrent.NeedSaveResumeData()) 
+            {
+                this.Torrent.SaveResumeData();
+            }
         }
 
         public void DoTorrentComplete()
