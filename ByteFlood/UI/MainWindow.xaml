@@ -968,7 +968,10 @@
                                 <TextBlock Text="{Binding Language.InfoTab_Files, FallbackValue=Files}"/>
                             </StackPanel>
                         </TabItem.Header>
-                        <aga:TreeList x:Name="files_tree">
+                        <aga:TreeList x:Name="files_tree"
+                                      IsSynchronizedWithCurrentItem="True"
+                                      controls:GridViewSort.AutoSort="True"
+                                      controls:GridViewSort.ShowSortGlyph="True">
                             <aga:TreeList.Resources>
 
                                 <ContextMenu x:Key="FileItemContextMenu">
@@ -1059,7 +1062,9 @@
                                     </controls:FileListTemplateSelector.FileTemplate>
 
                                     <controls:FileListTemplateSelector.DirectoryTemplate>
-                                        <DataTemplate></DataTemplate>
+                                        <DataTemplate DataType="{x:Type bf:DirectoryKey}">
+                                                <TextBlock Text="{Binding Size}" HorizontalAlignment="Center"/>
+                                        </DataTemplate>
                                     </controls:FileListTemplateSelector.DirectoryTemplate>
                                 </controls:FileListTemplateSelector>
 
@@ -1068,16 +1073,20 @@
                             <aga:TreeList.View>
                                 <GridView>
                                     <GridViewColumn Width="300" Header="{Binding Language.FilesTab_Path, FallbackValue=Path}"
-                                                    CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"/>
+                                                    CellTemplateSelector="{StaticResource FileListPathTemplateSelector}"
+                                                    controls:GridViewSort.PropertyName="Tag.Name"/>
 
                                     <GridViewColumn Width="140" x:Name="file_progress_column" Header="{Binding Language.FilesTab_Progress, FallbackValue=Progress}"
-                                                    CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"/>
+                                                    CellTemplateSelector="{StaticResource FileListProgressTemplateSelector}"
+                                                    controls:GridViewSort.PropertyName="Tag.Progress" />
 
                                     <GridViewColumn Width="130" Header="{Binding Language.FilesTab_Priority, FallbackValue=Priority}" 
-                                                    CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}" />
+                                                    CellTemplateSelector="{StaticResource FileListPriorityTemplateSelector}"
+                                                    controls:GridViewSort.PropertyName="Tag.Priority"/>
 
                                     <GridViewColumn Width="100" Header="{Binding Language.FilesTab_Size, FallbackValue=Size}" 
-                                                    CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}" />
+                                                    CellTemplateSelector="{StaticResource FileListSizeTemplateSelector}"
+                                                    controls:GridViewSort.PropertyName="Tag.RawSize"/>
                                 </GridView>
                             </aga:TreeList.View>
 

@@ -94,6 +94,12 @@ namespace ByteFlood
 
         public LibTorrentAlertsWatcher LibTorrentAlerts { get; private set; }
 
+        Ragnar.SessionAlertCategory Alerts_Mask =
+            Ragnar.SessionAlertCategory.Error | //Ragnar.SessionAlertCategory.IPBlock |
+            Ragnar.SessionAlertCategory.Performance | Ragnar.SessionAlertCategory.PortMapping |
+             Ragnar.SessionAlertCategory.Progress | Ragnar.SessionAlertCategory.Status |
+             Ragnar.SessionAlertCategory.Storage | Ragnar.SessionAlertCategory.Tracker;
+
         public void Initialize()
         {
             Directory.CreateDirectory(State.StateSaveDirectory);
@@ -101,7 +107,7 @@ namespace ByteFlood
 
             this.LibtorrentSession = new Ragnar.Session();
 
-            this.LibtorrentSession.SetAlertMask(Ragnar.SessionAlertCategory.All);
+            this.LibtorrentSession.SetAlertMask(Alerts_Mask);
 
             this.LibtorrentSession.ListenOn(App.Settings.ListeningPort, App.Settings.ListeningPort);
 
@@ -118,6 +124,7 @@ namespace ByteFlood
             this.LibTorrentAlerts.TorrentStatsUpdated += LibTorrentAlerts_TorrentStatsUpdated;
             this.LibTorrentAlerts.TorrentFinished += LibTorrentAlerts_TorrentFinished;
             this.LibTorrentAlerts.MetadataReceived += LibTorrentAlerts_MetadataReceived;
+            //this.LibTorrentAlerts.TorrentNetworkStatisticsUpdated += LibTorrentAlerts_TorrentNetworkStatisticsUpdated;
 
             if (File.Exists(LtSessionFilePath))
             {
@@ -187,6 +194,16 @@ namespace ByteFlood
         }
 
         #region LibTorrent Alerts Handling
+
+        //void LibTorrentAlerts_TorrentNetworkStatisticsUpdated(Ragnar.StatsAlert sa)
+        //{        
+        //    string key = sa.Handle.InfoHash.ToHex();
+
+        //    if (this._torrents.ContainsKey(key)) 
+        //    {
+        //        this._torrents[key].DoNetStatsUpdate(sa);
+        //    }
+        //}
 
         void LibTorrentAlerts_MetadataReceived(Ragnar.TorrentHandle handle)
         {
@@ -426,7 +443,7 @@ namespace ByteFlood
 
             handle.AutoManaged = false;
             handle.Pause();
-            
+
 
             TorrentInfo ti = new TorrentInfo(handle);
             ti.OriginalTorrentFilePath = path;
@@ -588,7 +605,7 @@ namespace ByteFlood
         public async void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
             MagnetLink mg = null;
-            
+
             try { mg = new MagnetLink(magnet); }
             catch { MessageBox.Show("Invalid magnet link", "Error", MessageBoxButton.OK, MessageBoxImage.Error); return; }
 

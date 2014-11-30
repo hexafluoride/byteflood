@@ -35,6 +35,9 @@ namespace ByteFlood.Services
 				if (token.IsCancellationRequested)
 		            break;
 
+                if (!App.Settings.CheckForUpdates)
+                    break;
+
 	            await Task.WhenAll(CheckforUpdatesAsync(token), Task.Delay(TimeSpan.FromHours(1), token));
             }
         }

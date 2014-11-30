@@ -194,11 +194,7 @@ namespace ByteFlood
 
             MainWindow mw = (App.Current.MainWindow as MainWindow);
 
-            //mw.state.ce.Settings.Force = local.EncryptionType;
-
             local.Theme = (Theme)themeCombox.SelectedItem;
-
-            //bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
 
             if (this.langCombox.SelectedIndex > -1)
             {
@@ -218,11 +214,17 @@ namespace ByteFlood
                 }
             }
 
+            if (local.CheckForUpdates) 
+            {
+                mw.StartAutoUpdater();
+            }
+            else 
+            {
+                mw.StopAutoUpdater();
+            }
+
             App.Settings = (Settings)Utility.CloneObject(local);
-            //if (iface_changed)
-            //{
-            //    mw.state.ChangeNetworkInterface();
-            //}
+
             this.Close();
         }
 

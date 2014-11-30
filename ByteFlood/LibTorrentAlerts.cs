@@ -100,7 +100,7 @@ namespace ByteFlood
                     }
 
 
-                    if (alert_type == typeof(MetadataReceivedAlert)) 
+                    if (alert_type == typeof(MetadataReceivedAlert))
                     {
                         MetadataReceivedAlert mra = (MetadataReceivedAlert)alert;
                         MetadataReceived(mra.Handle);
@@ -147,6 +147,9 @@ namespace ByteFlood
 
         public delegate void TorrentStatsUpdatedEvent(TorrentStatus status);
         public event TorrentStatsUpdatedEvent TorrentStatsUpdated;
+
+        //public delegate void TorrentNetStatsUpdatedEvent(StatsAlert sa);
+        //public event TorrentNetStatsUpdatedEvent TorrentNetworkStatisticsUpdated;
 
         public delegate void TorrentFinishedEvent(TorrentHandle handle);
         public event TorrentFinishedEvent TorrentFinished;
