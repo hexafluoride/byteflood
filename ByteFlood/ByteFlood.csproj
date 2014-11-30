@@ -117,6 +117,7 @@
     <Compile Include="Controls\VistaFolderBrowser\library\WPFFolderBrowserDialog.cs" />
     <Compile Include="Formatters\ColorsFormatter.cs" />
     <Compile Include="Formatters\InvertBooleanConverter.cs" />
+    <Compile Include="Formatters\NullableToNonNullableConverter.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
     <Compile Include="Formatters\PeerCountryToIcon.cs" />

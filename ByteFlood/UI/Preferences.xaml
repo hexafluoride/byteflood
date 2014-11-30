@@ -11,6 +11,7 @@
     <Window.Resources>
         <formatters:ObjectToIntConverter x:Key="ObjectToInt" />
         <formatters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
+        <formatters:NullableBoolToReferenceBoolConverter x:Key="NBoolC" />
     </Window.Resources>
     <Grid>
         <TreeView Height="429" HorizontalAlignment="Left" Margin="12,12,0,0" Name="treeView1" VerticalAlignment="Top" Width="140">
@@ -57,24 +58,30 @@
 
                     <GroupBox Header="Privacy" Canvas.Left="10" Canvas.Top="167" Height="49" Width="407">
                         <Canvas>
-                            <CheckBox Canvas.Left="10" Canvas.Top="10">
+                            <CheckBox Canvas.Left="10" Canvas.Top="10" IsChecked="{Binding CheckForUpdates, Converter={StaticResource NBoolC}}">
                                 <TextBlock>Check for updates automatically</TextBlock>
                             </CheckBox>
                         </Canvas>
                     </GroupBox>
 
-                    <GroupBox Header="When Downloading" Canvas.Left="10" Canvas.Top="221" Height="67" Width="407">
+                    <GroupBox Header="When Downloading" Canvas.Left="10" Canvas.Top="221" Height="76" Width="407">
                         <Canvas>
-                            <CheckBox Canvas.Left="10" Canvas.Top="10">
+                            <CheckBox Name="psat_chkbox" Canvas.Left="10" Canvas.Top="10"
+                                      IsChecked="{Binding PreventStandbyWithActiveTorrents, Converter={StaticResource NBoolC}}">
                                 <TextBlock>Prevent standby if there are active torrents</TextBlock>
                             </CheckBox>
-                            <CheckBox Canvas.Left="10" Canvas.Top="28">
+                            <CheckBox Canvas.Left="34" Canvas.Top="23"
+                                      IsChecked="{Binding AllowStandbyOnBatteryPower, Converter={StaticResource NBoolC}}"
+                                      IsEnabled="{Binding ElementName=psat_chkbox, Path=IsChecked}">
+                                <TextBlock>Allow standby when running on battery power</TextBlock>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="41" IsEnabled="False">
                                 <TextBlock>Pre-allocate all files</TextBlock>
                             </CheckBox>
                         </Canvas>
                     </GroupBox>
 
-                    <GroupBox Header="Misc" Canvas.Left="10" Canvas.Top="293" Height="74" Width="407">
+                    <GroupBox Header="Misc" Canvas.Left="10" Canvas.Top="302" Height="74" Width="407">
                         <Canvas>
                             <Button Content="Import torrents from BitTorrent / uTorrent" Height="23" Click="ImportTorrents" Width="253" Canvas.Left="10" Canvas.Top="10"  />
                         </Canvas>
@@ -84,7 +91,7 @@
             </TabItem>
             <TabItem IsSelected="{Binding ElementName=uin_tree, Path=IsSelected}" Height="0">
                 <Canvas>
-                    <GroupBox Header="Display Options" Height="105" Width="407" Canvas.Left="10" Canvas.Top="10">
+                    <GroupBox Header="Display Options" Height="105" Width="407" Canvas.Left="10" Canvas.Top="10" IsEnabled="False">
                         <Canvas>
                             <CheckBox Canvas.Left="10" Canvas.Top="10">
                                 <TextBlock>Confirm when deleting torrents</TextBlock>

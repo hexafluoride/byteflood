@@ -421,12 +421,12 @@ namespace ByteFlood
             var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
             {
                 TorrentInfo = torrent,
-                SavePath = App.Settings.DefaultDownloadPath,
+                SavePath = App.Settings.DefaultDownloadPath
             });
 
             handle.AutoManaged = false;
             handle.Pause();
-
+            
 
             TorrentInfo ti = new TorrentInfo(handle);
             ti.OriginalTorrentFilePath = path;
