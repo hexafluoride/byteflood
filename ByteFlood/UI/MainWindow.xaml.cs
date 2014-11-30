@@ -182,6 +182,14 @@ namespace ByteFlood
 
                     }, null);
 
+                    if (App.Settings.PreventStandbyWithActiveTorrents && state.ActiveTorrentCount > 0)
+                        if (Utility.IsRunningOnBatteries && App.Settings.AllowStandbyOnBatteryPower)
+                            Utility.UndoDisableSleep();
+                        else
+                            Utility.DisableSleep();
+                    else
+                        Utility.UndoDisableSleep();
+
                     // TODO: Update theses values only when they are really changed.
                     state.NotifyChanged("DownloadingTorrentCount", "SeedingTorrentCount",
                         "InactiveTorrentCount", "ActiveTorrentCount", "FinishedTorrentCount");
@@ -483,7 +491,7 @@ namespace ByteFlood
                     {
                         string directory = System.IO.Path.GetDirectoryName(fi.FullPath);
                         System.IO.Directory.CreateDirectory(directory);
-                        Process.Start("explorer.exe", string.Format("\"{0}\"", directory)); 
+                        Process.Start("explorer.exe", string.Format("\"{0}\"", directory));
                     }
                     return;
                 }
@@ -988,7 +996,7 @@ namespace ByteFlood
                     case "CopyMagnetLink":
                         if (this.SelectedTorrent != null)
                         {
-                            Clipboard.SetText(this.SelectedTorrent.GetMagnetLink()); 
+                            Clipboard.SetText(this.SelectedTorrent.GetMagnetLink());
                         }
                         break;
                     case "SaveTorrentFile":

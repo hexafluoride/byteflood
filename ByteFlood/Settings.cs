@@ -98,6 +98,12 @@ namespace ByteFlood
 
         public bool DisplayStripsOnTorrentList { get; set; }
 
+        public bool CheckForUpdates { get; set; }
+
+        public bool PreventStandbyWithActiveTorrents { get; set; }
+
+        public bool AllowStandbyOnBatteryPower { get; set; }
+
         /// <summary>
         /// Indicate if byteflood should look for a cached .torrent file 
         /// before attempting to get metadata from peers if a magnet link
@@ -164,7 +170,10 @@ namespace ByteFlood
                     StatusBarVisible = true,
                     PreferMagnetCacheWebsites = true,
                     DefaultLanguage = "English",
-                    SaveTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+                    SaveTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    CheckForUpdates = true,
+                    PreventStandbyWithActiveTorrents = true,
+                    AllowStandbyOnBatteryPower = true
                 };
             }
         }
@@ -255,6 +264,10 @@ namespace ByteFlood
 
             foreach (PropertyInfo prop in props)
             {
+                if (prop.PropertyType == typeof(Boolean))
+                {
+                    continue;
+                }
                 if (prop.CanWrite)
                 {
                     try
