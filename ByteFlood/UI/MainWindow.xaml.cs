@@ -596,8 +596,32 @@ namespace ByteFlood
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
 
-            Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
-            Services.AutoUpdater.StartMonitoring();
+
+            if (App.Settings.CheckForUpdates)
+            {
+                StartAutoUpdater();
+            }
+        }
+        private bool auto_updater_started = false;
+        public void StartAutoUpdater() 
+        {
+            if (!auto_updater_started) 
+            {
+                Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
+                Services.AutoUpdater.StartMonitoring();
+                auto_updater_started = true;
+                notify_later_clicked = false;
+            }
+        }
+
+        public void StopAutoUpdater() 
+        {
+            if (auto_updater_started)
+            {
+                Services.AutoUpdater.StopMonitoring();
+                Services.AutoUpdater.NewUpdate -= AutoUpdater_NewUpdate;
+                auto_updater_started = false;
+            }
         }
 
         bool notify_later_clicked = false;

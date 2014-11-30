@@ -178,6 +178,40 @@ namespace ByteFlood
 
         public string Name { get; private set; }
         public TorrentInfo OwnerTorrent { get; private set; }
+
+        public string Size 
+        {
+            get { return Utility.PrettifyAmount(RawSize); }
+        }
+
+        long _size = -1;
+        public long RawSize 
+        {
+            get 
+            {
+                if (_size < 0)
+                {
+                    _size = 0;
+                    foreach (object a in this.Values) 
+                    {
+                        if (a is FileInfo) 
+                        {
+                            this._size += ((FileInfo)a).RawSize;
+                        }
+                        else 
+                        {
+                            this._size += ((DirectoryKey)a).RawSize;
+                        }
+                    }
+                }
+                return _size;
+            }
+        }
+
+        public string Priority { get { return string.Empty; } }
+
+        public double Progress { get { return 0; } }
+
         public System.Collections.IEnumerable GetChildren(object parent)
         {
             if (parent == null)
