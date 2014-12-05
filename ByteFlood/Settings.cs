@@ -104,6 +104,15 @@ namespace ByteFlood
 
         public bool AllowStandbyOnBatteryPower { get; set; }
 
+        public bool EnableDHT { get; set; }
+        public bool EnableLSD { get; set; }
+        public bool EnableuTP { get; set; }
+        public bool Enable_UDP_Trackers { get; set; }
+        public bool Enable_Trackers_Scrape { get; set; }
+        public bool EnablePEX { get; set; }
+        public bool EnableNAT_PMP { get; set; }
+        public bool Enable_UPNP { get; set; }
+
         /// <summary>
         /// Indicate if byteflood should look for a cached .torrent file 
         /// before attempting to get metadata from peers if a magnet link

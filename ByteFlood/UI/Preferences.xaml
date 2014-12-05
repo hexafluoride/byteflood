@@ -22,7 +22,7 @@
             <TreeViewItem Header="Torrents Defaults" Name="tor_tree" />
             <TreeViewItem Header="Connection" Name="conn_tree" />
             <TreeViewItem Header="Bandwidth" Name="band_tree" Visibility="Collapsed" />
-            <TreeViewItem Header="BitTorrent" Name="bitt_tree" Visibility="Collapsed" />
+            <TreeViewItem Header="BitTorrent" Name="bitt_tree" />
             <TreeViewItem Header="Queueing" Name="queue_tree" />
             <TreeViewItem Header="Network" Name="net_tree" Visibility="Collapsed" />
         </TreeView>
@@ -245,38 +245,75 @@
             </TabItem>
             <TabItem IsSelected="{Binding ElementName=conn_tree, Path=IsSelected}" Height="0">
                 <Canvas>
-                    <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing" Height="77" Width="414">
+                    <GroupBox Canvas.Left="6" Canvas.Top="6" Header="Outgoing" Height="114" Width="414">
                         <Canvas>
-                            <RadioButton Height="16" Name="selectoports" Canvas.Top="29" Canvas.Left="10" IsChecked="{Binding OutgoingPortsRandom, Converter={StaticResource InvertBooleanConverter}}" GroupName="out" />
-                            <StackPanel Orientation="Horizontal" Canvas.Left="26" Canvas.Top="24" IsEnabled="{Binding ElementName=selectoports, Path=IsChecked}">
-                                <TextBlock Height="Auto" Margin="5,0,0,0" VerticalAlignment="Center" Name="textBlock5" Text="From" />
-                                <TextBox Height="23" Margin="7,0,0,0" VerticalAlignment="Center" Text="{Binding OutgoingPortsStart}" Width="66" />
+                            <RadioButton Height="23" Name="selectoports" Canvas.Top="31" Canvas.Left="10" IsChecked="{Binding OutgoingPortsRandom, Converter={StaticResource InvertBooleanConverter}}" GroupName="out" RenderTransformOrigin="0.667,1.625" Width="211">
+                                <StackPanel Orientation="Horizontal" Canvas.Left="26" Canvas.Top="24" IsEnabled="{Binding ElementName=selectoports, Path=IsChecked}">
+                                    <TextBlock Height="Auto" Margin="5,0,0,0" VerticalAlignment="Center" Name="textBlock5" Text="From" />
+                                    <TextBox Height="23" Margin="7,0,0,0" VerticalAlignment="Center" Text="{Binding OutgoingPortsStart}" Width="66" />
 
-                                <TextBlock Height="Auto" Margin="7,0,0,0" VerticalAlignment="Center" Name="textBlock6" Text="to" />
-                                <TextBox Height="23" Margin="7,0,0,0" VerticalAlignment="Center" Text="{Binding OutgoingPortsEnd}" Width="66" />
-                            </StackPanel>
-                            <RadioButton Canvas.Left="10" Canvas.Top="7" Content="Use random ports (recommended)" IsChecked="{Binding OutgoingPortsRandom}" Height="16" GroupName="out" />
+                                    <TextBlock Height="Auto" Margin="7,0,0,0" VerticalAlignment="Center" Name="textBlock6" Text="to" />
+                                    <TextBox Height="23" Margin="7,0,0,0" VerticalAlignment="Center" Text="{Binding OutgoingPortsEnd}" Width="66" />
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton Canvas.Left="10" Canvas.Top="10" Content="Use random ports (recommended)" IsChecked="{Binding OutgoingPortsRandom}" Height="16" GroupName="out" />
+                            <CheckBox Canvas.Left="10" Canvas.Top="59">
+                                <TextBlock Text="Enable NAT-PMP"/>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="77">
+                                <TextBlock Text="Enable UPnP"/>
+                            </CheckBox>
                         </Canvas>
                     </GroupBox>
-                    <TextBlock Canvas.Left="6" Canvas.Top="183" Height="20" Text="Encryption type" />
-                    <ComboBox Canvas.Left="275" Canvas.Top="179" Height="23" Name="enctype" SelectedIndex="{Binding EncryptionType, Converter={StaticResource ObjectToInt}}" Width="150" />
-                    <TextBlock Canvas.Left="6" Canvas.Top="240" Height="20" Text="Network interface" />
-                    <ComboBox Canvas.Left="275" Canvas.Top="236" Height="23" Name="interfaces" Width="150" />
-                    <GroupBox Canvas.Left="6" Canvas.Top="89" Header="Incoming" Height="88" Width="414">
+                    <TextBlock Canvas.Left="10" Canvas.Top="208" Height="20" Text="Encryption type" />
+                    <ComboBox Canvas.Left="267" Canvas.Top="208" Height="23" Name="enctype" SelectedIndex="{Binding EncryptionType, Converter={StaticResource ObjectToInt}}" Width="150" />
+                
+                    <TextBlock Canvas.Left="41" Canvas.Top="318" Height="20" Text="Network interface" Visibility="Collapsed" />
+                    <ComboBox Canvas.Left="127" Canvas.Top="304" Height="23" Name="interfaces" Width="150" Visibility="Collapsed" />
+                    
+                    <GroupBox Canvas.Left="6" Canvas.Top="125" Header="Incoming" Height="78" Width="414">
                         <Canvas>
                             <TextBlock Height="23" Text="Listening port" Canvas.Left="4" Canvas.Top="9" />
-                            <TextBox Height="23" Text="{Binding ListeningPort}" Width="120" Canvas.Left="276" Canvas.Top="6" />
+                            <TextBox Height="23" Text="{Binding ListeningPort}" Width="138" Canvas.Left="258" Canvas.Top="6" />
                             <TextBlock Height="23" Text="DHT listening port" Canvas.Left="4" Canvas.Top="38" />
-                            <TextBox Height="23" Text="{Binding DHTListeningPort}" Width="120" Canvas.Left="276" Canvas.Top="35" />
+                            <TextBox Height="23" Text="{Binding DHTListeningPort}" Width="138" Canvas.Left="258" Canvas.Top="35" />
                         </Canvas>
                     </GroupBox>
-                    <TextBlock Name="iface_error" Text="Warning: This interface is down!" Canvas.Left="275" Canvas.Top="264" Height="34" Width="142"
-                               Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed"/>
-                    <Button ToolTip="Refresh" Canvas.Left="245" Canvas.Top="236" Width="25" Height="25" Click="RefreshNetworkInterfaces">
+
+                    <TextBlock  Visibility="Collapsed" Name="iface_error" Text="Warning: This interface is down!" Canvas.Left="275" Canvas.Top="264" Height="34" Width="142"
+                               Foreground="Red" TextWrapping="Wrap"/>
+                    <Button Visibility="Collapsed" ToolTip="Refresh" Canvas.Left="186" Canvas.Top="313" Width="25" Height="25" Click="RefreshNetworkInterfaces">
                         <Path Width="15" Height="20" Stretch="Fill" Fill="#FF000000" Data="F1 M 38,20.5833C 42.9908,20.5833 47.4912,22.6825 50.6667,26.046L 50.6667,17.4167L 55.4166,22.1667L 55.4167,34.8333L 42.75,34.8333L 38,30.0833L 46.8512,30.0833C 44.6768,27.6539 41.517,26.125 38,26.125C 31.9785,26.125 27.0037,30.6068 26.2296,36.4167L 20.6543,36.4167C 21.4543,27.5397 28.9148,20.5833 38,20.5833 Z M 38,49.875C 44.0215,49.875 48.9963,45.3932 49.7703,39.5833L 55.3457,39.5833C 54.5457,48.4603 47.0852,55.4167 38,55.4167C 33.0092,55.4167 28.5088,53.3175 25.3333,49.954L 25.3333,58.5833L 20.5833,53.8333L 20.5833,41.1667L 33.25,41.1667L 38,45.9167L 29.1487,45.9167C 31.3231,48.3461 34.483,49.875 38,49.875 Z "/>
                     </Button>
-                    <TextBlock Canvas.Left="6" Canvas.Top="210" Height="23" Text="DHT listening port" />
-                    <TextBox Canvas.Left="305" Canvas.Top="207" Height="23" Text="{Binding MaxDHTPeers}" Width="120" />
+                    
+                    <TextBlock Canvas.Left="10" Canvas.Top="233" Height="23" Text="DHT listening port" />
+                    <TextBox Canvas.Left="267" Canvas.Top="236" Height="23" Text="{Binding MaxDHTPeers}" Width="150" />
+                </Canvas>
+            </TabItem>
+            <TabItem IsSelected="{Binding ElementName=bitt_tree, Path=IsSelected}" Height="0">
+                <Canvas>
+                    <GroupBox Header="BitTorrent Features" Height="102" Width="407" Canvas.Left="10" Canvas.Top="10">
+                        <Canvas>
+                            <CheckBox Canvas.Left="10" Canvas.Top="10" IsChecked="{Binding EnableDHT, Converter={StaticResource NBoolC}}">
+                                <TextBlock Text="Enable DHT Network"/>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="28" IsChecked="{Binding EnableLSD, Converter={StaticResource NBoolC}}">
+                                <TextBlock Text="Enable Local Peer Discovery"/>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="192" Canvas.Top="28" IsChecked="{Binding EnableuTP, Converter={StaticResource NBoolC}}">
+                                <TextBlock Text="Enable bandwidth mangement [uTP]"/>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="64" IsChecked="{Binding Enable_UDP_Trackers, Converter={StaticResource NBoolC}}">
+                                <TextBlock Text="Enable UDP tracker support"/>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="192" Canvas.Top="10" IsChecked="{Binding Enable_Trackers_Scrape, Converter={StaticResource NBoolC}}">
+                                <TextBlock Text="Enable trackers scrape"/>
+                            </CheckBox>
+                            <CheckBox Canvas.Left="10" Canvas.Top="46" IsChecked="{Binding EnablePEX, Converter={StaticResource NBoolC}}">
+                                <TextBlock Text="Enable Peer Exchange (PEX)"/>
+                            </CheckBox>
+                        </Canvas>
+                    </GroupBox>
                 </Canvas>
             </TabItem>
             <TabItem IsSelected="{Binding ElementName=queue_tree, Path=IsSelected}" Height="0">
