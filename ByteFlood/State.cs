@@ -111,10 +111,17 @@ namespace ByteFlood
 
             this.LibtorrentSession.ListenOn(App.Settings.ListeningPort, App.Settings.ListeningPort);
 
-            this.LibtorrentSession.StartDht();
-            this.LibtorrentSession.StartLsd();
-            this.LibtorrentSession.StartNatPmp();
-            this.LibtorrentSession.StartUpnp();
+            if (App.Settings.EnableDHT)
+               this.LibtorrentSession.StartDht();
+
+            if (App.Settings.EnableLSD)
+                this.LibtorrentSession.StartLsd();
+
+            if (App.Settings.EnableNAT_PMP)
+                this.LibtorrentSession.StartNatPmp();
+
+            if (App.Settings.Enable_UPNP)
+                this.LibtorrentSession.StartUpnp();
 
             this.LibTorrentAlerts = new LibTorrentAlertsWatcher(this.LibtorrentSession);
 

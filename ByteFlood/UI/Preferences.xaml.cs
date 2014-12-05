@@ -223,6 +223,26 @@ namespace ByteFlood
                 mw.StopAutoUpdater();
             }
 
+            if (local.EnableDHT) 
+                mw.state.LibtorrentSession.StartDht();
+            else 
+                mw.state.LibtorrentSession.StopDht();
+
+            if (local.EnableLSD)
+                mw.state.LibtorrentSession.StartLsd();
+            else
+                mw.state.LibtorrentSession.StopLsd();
+
+            if (local.EnableNAT_PMP)
+                mw.state.LibtorrentSession.StartNatPmp();
+            else
+                mw.state.LibtorrentSession.StopNatPmp();
+
+            if (local.Enable_UPNP)
+                mw.state.LibtorrentSession.StartUpnp();
+            else
+                mw.state.LibtorrentSession.StopUpnp();
+       
             App.Settings = (Settings)Utility.CloneObject(local);
 
             this.Close();
