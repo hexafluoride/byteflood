@@ -644,6 +644,9 @@
                 <ListView Grid.Row="1" Name="mainlist"
                           SelectionMode="Extended" 
                           Margin="5"
+                          IsSynchronizedWithCurrentItem="True"
+                          controls:GridViewSort.AutoSort="True"
+                          controls:GridViewSort.ShowSortGlyph="True"
                           SelectionChanged="mainlist_SelectionChanged"
                           MouseLeftButtonDown="mainlist_MouseLeftButtonDown"
                           AlternationCount="2">
@@ -742,12 +745,15 @@
                     </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Width="20" Header="#" DisplayMemberBinding="{Binding QueueNumber}" />
+                            <GridViewColumn Width="20" Header="#" DisplayMemberBinding="{Binding QueueNumber}"
+                                            controls:GridViewSort.PropertyName="QueueNumber" />
                             <GridViewColumn Width="200" Header="{Binding Language.TorrentList_NameColumn, FallbackValue=Name}" 
-                                            DisplayMemberBinding="{Binding Name}" />
+                                            DisplayMemberBinding="{Binding Name}"
+                                             controls:GridViewSort.PropertyName="Name" />
 
                             <GridViewColumn Width="100" x:Name="progress_column" 
-                                            Header="{Binding Language.TorrentList_ProgressColumn, FallbackValue=Progress}">
+                                            Header="{Binding Language.TorrentList_ProgressColumn, FallbackValue=Progress}"
+                                            controls:GridViewSort.PropertyName="Progress">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <ProgressBar Maximum="100" Value="{Binding Progress, Mode=OneWayToSource}" Foreground="{Binding ProgressBarColor}" Width="{Binding ElementName=progress_column, Path=Width, Converter={StaticResource Subtract5Formatter}}" />
@@ -756,34 +762,44 @@
                             </GridViewColumn>
 
                             <GridViewColumn Width="80" Header="{Binding Language.TorrentList_StatusColumn, FallbackValue=Status}"
-                                            DisplayMemberBinding="{Binding Status}" />
+                                            DisplayMemberBinding="{Binding Status}"
+                                            controls:GridViewSort.PropertyName="Status" />
 
                             <GridViewColumn Width="80" Header="{Binding Language.TorrentList_WantedColumn, FallbackValue=Wanted}" 
-                                            DisplayMemberBinding="{Binding WantedBytes, Converter={StaticResource SizeToString}}" />
+                                            DisplayMemberBinding="{Binding WantedBytes, Converter={StaticResource SizeToString}}"
+                                            controls:GridViewSort.PropertyName="WantedBytes" />
 
                             <GridViewColumn Width="100" Header="{Binding Language.TorrentList_DoneColumn, FallbackValue=Done}" 
-                                            DisplayMemberBinding="{Binding WantedBytesDone, Converter={StaticResource SizeToString}}" />
+                                            DisplayMemberBinding="{Binding WantedBytesDone, Converter={StaticResource SizeToString}}"
+                                            controls:GridViewSort.PropertyName="WantedBytesDone" />
 
                             <GridViewColumn Width="100" Header="{Binding Language.TorrentList_ETAColumn, FallbackValue=ETA}"
-                                            DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}" />
+                                            DisplayMemberBinding="{Binding ETA, Converter={StaticResource TimeSpanToString}}"
+                                            controls:GridViewSort.PropertyName="ETA" />
 
                             <GridViewColumn Width="75" Header="{Binding Language.TorrentList_DownSpeedColumn, FallbackValue=DownSpeed}" 
-                                            DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                                            DisplayMemberBinding="{Binding DownloadSpeed, Converter={StaticResource SpeedFormatter}}"
+                                            controls:GridViewSort.PropertyName="DownloadSpeed" />
 
                             <GridViewColumn Width="75" Header="{Binding Language.TorrentList_UpSpeedColumn, FallbackValue=UpSpeed}"
-                                            DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}" />
+                                            DisplayMemberBinding="{Binding UploadSpeed, Converter={StaticResource SpeedFormatter}}"
+                                            controls:GridViewSort.PropertyName="UploadSpeed"/>
 
                             <GridViewColumn Width="50" Header="{Binding Language.TorrentList_PeersColumn, FallbackValue=Peers}"
-                                            DisplayMemberBinding="{Binding PeerCount}" />
+                                            DisplayMemberBinding="{Binding PeerCount}"
+                                            controls:GridViewSort.PropertyName="PeerCount"/>
 
                             <GridViewColumn Width="50" Header="{Binding Language.TorrentList_SeedsColumn, FallbackValue=Seeds}"
-                                            DisplayMemberBinding="{Binding Seeders}" />
+                                            DisplayMemberBinding="{Binding Seeders}"
+                                            controls:GridViewSort.PropertyName="Seeders"/>
 
                             <GridViewColumn Width="50" Header="{Binding Language.TorrentList_LeechsColumn, FallbackValue=Leechs}" 
-                                            DisplayMemberBinding="{Binding Leechers}" />
+                                            DisplayMemberBinding="{Binding Leechers}"
+                                            controls:GridViewSort.PropertyName="Leechers"/>
 
                             <GridViewColumn Width="50" Header="{Binding Language.TorrentList_RatioColumn, FallbackValue=Ratio}"
-                                            DisplayMemberBinding="{Binding Ratio}" />
+                                            DisplayMemberBinding="{Binding Ratio}"
+                                            controls:GridViewSort.PropertyName="RawRatio"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -985,7 +1001,7 @@
 
                                         <MenuItem Header="{Binding Language.FilePriority_Immediate, FallbackValue=Immediate}"
                                                   Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="6" />
-                                        
+
                                         <MenuItem Header="{Binding Language.FilePriority_Highest, FallbackValue=Highest}"
                                                   Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="5" />
 
@@ -1003,7 +1019,7 @@
 
                                         <MenuItem Header="{Binding Language.FilePriority_Skip, FallbackValue=Skip}"
                                                   Command="{StaticResource TorrentCommands.ChangeFilePriority}" CommandParameter="0" />
-                                  
+
                                     </MenuItem>
 
                                 </ContextMenu>
@@ -1063,7 +1079,7 @@
 
                                     <controls:FileListTemplateSelector.DirectoryTemplate>
                                         <DataTemplate DataType="{x:Type bf:DirectoryKey}">
-                                                <TextBlock Text="{Binding Size}" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Size}" HorizontalAlignment="Center"/>
                                         </DataTemplate>
                                     </controls:FileListTemplateSelector.DirectoryTemplate>
                                 </controls:FileListTemplateSelector>
