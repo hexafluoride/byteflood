@@ -59,32 +59,34 @@ namespace ByteFlood
                 string p = Path.Combine(dir, "resume.dat");
                 if (File.Exists(p))
                 {
-                    var fs = new FileStream(p, FileMode.Open);
-                    var val = BEncodedDictionary.Decode(fs);
-                    BEncodedDictionary dict = val as BEncodedDictionary;
-                    foreach (var pair in dict)
+                    using (var fs = new FileStream(p, FileMode.Open))
                     {
-                        try
+                        var val = BEncodedDictionary.Decode(fs);
+                        BEncodedDictionary dict = val as BEncodedDictionary;
+                        foreach (var pair in dict)
                         {
-                            string key = pair.Key.ToString();
-                            if (key != ".fileguard") // special case
+                            try
                             {
-                                TorrentListing tl = new TorrentListing();
-                                tl.Path = Path.Combine(dir, key);
-                                BEncodedDictionary values = pair.Value as BEncodedDictionary;
-                                tl.Name = values[new BEncodedString("caption")].ToString();
-                                tl.SavePath = values[new BEncodedString("path")].ToString();
-                                tl.Import = true;
-                                list.Add(tl);
-                                if (fast_load)
+                                string key = pair.Key.ToString();
+                                if (key != ".fileguard") // special case
                                 {
-                                    fs.Close();
-                                    return;
+                                    TorrentListing tl = new TorrentListing();
+                                    tl.Path = Path.Combine(dir, key);
+                                    BEncodedDictionary values = pair.Value as BEncodedDictionary;
+                                    tl.Name = values[new BEncodedString("caption")].ToString();
+                                    tl.SavePath = values[new BEncodedString("path")].ToString();
+                                    tl.Import = true;
+                                    list.Add(tl);
+                                    if (fast_load)
+                                    {
+                                        fs.Close();
+                                        return;
+                                    }
                                 }
                             }
+                            catch
+                            { }
                         }
-                        catch
-                        { }
                     }
                 }
             }
