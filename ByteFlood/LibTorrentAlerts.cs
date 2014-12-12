@@ -11,12 +11,16 @@ namespace ByteFlood
     {
         private System.Threading.Thread watcher_thread;
 
+        private System.Windows.Threading.Dispatcher main_thread_dispatcher;
+
         private Ragnar.Session ses;
         private Ragnar.IAlertFactory alerts;
         public LibTorrentAlertsWatcher(Ragnar.Session session)
         {
             ses = session;
             alerts = ses.Alerts;
+
+            main_thread_dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
 
             watcher_thread = new System.Threading.Thread(monitor);
             watcher_thread.Priority = System.Threading.ThreadPriority.AboveNormal;
@@ -64,21 +68,21 @@ namespace ByteFlood
                     if (alert_type == typeof(SaveResumeDataAlert))
                     {
                         SaveResumeDataAlert srda = (SaveResumeDataAlert)alert;
-                        ResumeDataArrived(srda.Handle, srda.ResumeData);
-                        continue;
+                        main_thread_dispatcher.Invoke(() => ResumeDataArrived(srda.Handle, srda.ResumeData));
+						continue;
                     }
 
                     if (alert_type == typeof(TorrentAddedAlert))
                     {
                         TorrentAddedAlert taa = (TorrentAddedAlert)alert;
-                        TorrentAdded(taa.Handle);
+                        main_thread_dispatcher.Invoke(() => TorrentAdded(taa.Handle));
                         continue;
                     }
 
                     if (alert_type == typeof(StateChangedAlert))
                     {
                         StateChangedAlert taa = (StateChangedAlert)alert;
-                        TorrentStateChanged(taa.Handle, taa.PreviousState, taa.State);
+                        main_thread_dispatcher.Invoke(() => TorrentStateChanged(taa.Handle, taa.PreviousState, taa.State));
                         continue;
                     }
 
@@ -87,15 +91,15 @@ namespace ByteFlood
                         StateUpdateAlert sua = (StateUpdateAlert)alert;
                         foreach (var s in sua.Statuses)
                         {
-                            TorrentStatsUpdated(s);
+                            main_thread_dispatcher.Invoke(() => TorrentStatsUpdated(s));
                         }
-                        continue;
+						continue;
                     }
 
                     if (alert_type == typeof(TorrentFinishedAlert))
                     {
                         TorrentFinishedAlert tfa = (TorrentFinishedAlert)alert;
-                        TorrentFinished(tfa.Handle);
+                        main_thread_dispatcher.Invoke(() => TorrentFinished(tfa.Handle));
                         continue;
                     }
 
@@ -103,7 +107,7 @@ namespace ByteFlood
                     if (alert_type == typeof(MetadataReceivedAlert))
                     {
                         MetadataReceivedAlert mra = (MetadataReceivedAlert)alert;
-                        MetadataReceived(mra.Handle);
+                        main_thread_dispatcher.Invoke(() => MetadataReceived(mra.Handle));
                         continue;
                     }
 
