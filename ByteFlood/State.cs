@@ -84,9 +84,12 @@ namespace ByteFlood
 
         #endregion
 
+        public LabelManager LabelManager { get; private set; }
+
         public State()
         {
             this.Torrents.CollectionChanged += (s, e) => { NotifySinglePropertyChanged("TorrentCount"); };
+            this.LabelManager = new LabelManager(this);
             this.Initialize();
         }
 
@@ -383,6 +386,8 @@ namespace ByteFlood
                         jo.Add("OriginalTorrentFilePath", ti.OriginalTorrentFilePath);
 
                         jo.Add("IsStopped", ti.IsStopped);
+
+                        jo.Add("Labels", this.LabelManager.GetLabelsForTorrent(ti));
 
                         using (TextWriter tw = File.CreateText(
                             Path.Combine(State.TorrentsStateSaveDirectory, ti.InfoHash + ".tjson")))

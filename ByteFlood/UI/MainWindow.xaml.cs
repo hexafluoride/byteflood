@@ -603,9 +603,9 @@ namespace ByteFlood
             }
         }
         private bool auto_updater_started = false;
-        public void StartAutoUpdater() 
+        public void StartAutoUpdater()
         {
-            if (!auto_updater_started) 
+            if (!auto_updater_started)
             {
                 Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
                 Services.AutoUpdater.StartMonitoring();
@@ -614,7 +614,7 @@ namespace ByteFlood
             }
         }
 
-        public void StopAutoUpdater() 
+        public void StopAutoUpdater()
         {
             if (auto_updater_started)
             {
@@ -821,6 +821,57 @@ namespace ByteFlood
             }
         }
 
+        private void Handle_Label_Selection(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem source = e.OriginalSource as TreeViewItem;
+
+            if (source.Header.GetType() == typeof(TorrentLabel))
+            {
+                TorrentLabel l = (TorrentLabel)source.Header;
+                state.LabelManager.EnableFilter = true;
+                state.LabelManager.SelectedLabel = l.Name;
+            }
+            else if (source.Header.GetType() == typeof(StackPanel))
+            {
+                state.LabelManager.EnableFilter = false;
+                state.LabelManager.SelectedLabel = null;
+            }
+
+            foreach (TorrentInfo ti in state.Torrents)
+            {
+                ti.UpdateList("ShowOnList");
+            }
+        }
+
+        public void Handle_AddExistingLabel(object sender, RoutedEventArgs e)
+        {
+            if (mainlist.SelectedItems.Count > 0)
+            {
+                TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
+                mainlist.SelectedItems.CopyTo(arr, 0);
+                Action<TorrentInfo> f = new Action<TorrentInfo>(t => { });
+
+                MenuItem source = e.OriginalSource as MenuItem;
+
+                if (source.Header is TorrentLabel)
+                {
+                    TorrentLabel l = (TorrentLabel)source.Header;
+                    if (l.Name == null)
+                    {
+                        //clear the labels
+                        f = new Action<TorrentInfo>(t => state.LabelManager.ClearLabels(t));
+                    }
+                    else
+                    {
+                        f = new Action<TorrentInfo>(t => state.LabelManager.AddLabelForTorrent(t, l));
+                    }
+                }
+
+                foreach (var t in arr)
+                    f(t);
+            }
+        }
+
         private void ShowHide(object sender, RoutedEventArgs e)
         {
             if (this.WindowState == System.Windows.WindowState.Minimized)
@@ -894,6 +945,14 @@ namespace ByteFlood
         }
 
         #endregion
+
+        private void Handle_Label_ContextMenu(object sender, RoutedEventArgs e)
+        {
+            MenuItem send = sender as MenuItem;
+            TorrentLabel l = send.CommandParameter as TorrentLabel;
+            state.LabelManager.RemoveLabel(l);
+            return;
+        }
 
         private void OperationOnRssItem(object sender, RoutedEventArgs e)
         {
@@ -1043,6 +1102,17 @@ namespace ByteFlood
                             }
                         }
                         break;
+                    case "AddLabel":
+                        f = new Action<TorrentInfo>(t =>
+                        {
+                            UI.AddLabelDialog dl = new UI.AddLabelDialog() { Owner = this, Icon = this.Icon };
+
+                            if (dl.ShowDialog() == true)
+                            {
+                                state.LabelManager.AddLabelForTorrent(t, dl.LabelText);
+                            }
+                        });
+                        break;
                     case "remove_torrent_unlist":
                     case "remove_torrent_torrentonly":
                     case "remove_torrent_dataonly":
@@ -1075,6 +1145,7 @@ namespace ByteFlood
             {
                 state._torrents.Remove(hash);
                 state.Torrents.Remove(t);
+                state.LabelManager.ClearLabels(t);
             }, null);
 
             switch (action)
