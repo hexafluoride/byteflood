@@ -21,6 +21,8 @@ namespace ByteFlood
 
         public static LanguageEngine Language { get { return App.CurrentLanguage; } }
 
+        public State AppState { get { return this.MainAppWindow.state; } }
+
         public TorrentHandle Torrent { get; private set; }
 
         private TorrentStatus StatusData = null;
@@ -282,7 +284,7 @@ namespace ByteFlood
                 }
                 else
                 {
-                    switch (this.StatusData.State) 
+                    switch (this.StatusData.State)
                     {
                         case TorrentState.Downloading:
                             return "Downloading";
@@ -300,14 +302,14 @@ namespace ByteFlood
                         case TorrentState.Finished:
                             return "Finished";
 
-                        case TorrentState.QueuedForChecking :
+                        case TorrentState.QueuedForChecking:
                             return "Queued for files check";
 
                         case TorrentState.Seeding:
                             return "Seeding";
 
                         default:
-                            return this.StatusData.State.ToString(); 
+                            return this.StatusData.State.ToString();
                     }
                 }
             }
@@ -329,9 +331,13 @@ namespace ByteFlood
         {
             get
             {
-                if (Torrent == null)
+                if (Invisible || Torrent == null)
                     return false;
-                return Invisible || this.MainAppWindow.itemselector(this);
+                
+                if (this.MainAppWindow.state.LabelManager.Can_I_ShowUP(this))
+                    return this.MainAppWindow.itemselector(this);
+
+                return false;
             }
         }
 
@@ -416,6 +422,14 @@ namespace ByteFlood
             }
         }
 
+        public string Label 
+        {
+            get 
+            {
+                return AppState.LabelManager.GetFirstLabelForTorrent(this);
+            }
+        }
+
         #endregion
 
         public TorrentInfo(TorrentHandle t)
@@ -462,6 +476,15 @@ namespace ByteFlood
                     this.Name = Convert.ToString(jo["CustomName"]);
                     this._otfp = Convert.ToString(jo["OriginalTorrentFilePath"]);
                     this.IsStopped = Convert.ToBoolean(jo["IsStopped"]);
+
+                    Jayrock.Json.JsonArray labels = jo["Labels"] as Jayrock.Json.JsonArray;
+                    if (labels != null)
+                    {
+                        foreach (var a in labels)
+                        {
+                            this.MainAppWindow.state.LabelManager.AddLabelForTorrent(this, a.ToString());
+                        }
+                    }
                 }
             }
             else
@@ -492,7 +515,7 @@ namespace ByteFlood
         public void DoStateChanged(Ragnar.TorrentState oldstate, Ragnar.TorrentState newstate)
         {
             UpdateList("Status");
-            if (this.Torrent.NeedSaveResumeData()) 
+            if (this.Torrent.NeedSaveResumeData())
             {
                 this.Torrent.SaveResumeData();
             }

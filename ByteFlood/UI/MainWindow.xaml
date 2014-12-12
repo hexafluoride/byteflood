@@ -301,6 +301,43 @@
                     </TreeViewItem>
 
                 </TreeViewItem>
+
+                <TreeViewItem Name="labels_tree_item" ItemsSource="{Binding AppState.LabelManager.Labels}"
+                              Selected="Handle_Label_Selection">
+                    <TreeViewItem.Resources>
+                        <ContextMenu x:Key="LabelContextMenu">
+                            <MenuItem Header="{Binding Language.FeedsItemsContextMenu_RemoveLabel, FallbackValue=Remove}"
+                                      Tag="Remove" Click="Handle_Label_ContextMenu" CommandParameter="{Binding}" />
+                        </ContextMenu>
+                    </TreeViewItem.Resources>
+
+                    <TreeViewItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <!-- add icon -->
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1})">
+                                        <Binding Path="Language.TreeList_Labels" FallbackValue="Labels"/>
+                                        <Binding Path="ItemsSource.Count" ElementName="labels_tree_item" FallbackValue="" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </TreeViewItem.Header>
+                    <TreeViewItem.ItemTemplate>
+                        <HierarchicalDataTemplate>
+                            <TextBlock Tag="{Binding}" ContextMenu="{StaticResource LabelContextMenu}">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1})">
+                                        <Binding Path="Name" TargetNullValue="No label" />
+                                        <Binding Path="Count" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </HierarchicalDataTemplate>
+                    </TreeViewItem.ItemTemplate>
+                </TreeViewItem>
+
                 <TreeViewItem Name="feeds_tree_item" Selected="SwitchTorrentDisplay">
                     <TreeViewItem.Header>
                         <StackPanel Orientation="Horizontal">
@@ -687,7 +724,29 @@
 
                             <MenuItem Header="{Binding Language.TorrentListContextMenu_DownloadMovieData, FallbackValue=DownloadMovieData}"
                                       Click="Torrent_RetrieveMovieInfo" />
+
+
                             <Separator />
+
+                            <MenuItem Header="{Binding Language.TorrentListContextMenu_Labels, FallbackValue='Labels'}">
+                                <MenuItem Header="{Binding Language.TorrentListContextMenu_AddLabel, FallbackValue='Add label'}"
+                                      Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" CommandParameter="AddLabel" />
+
+                                <Separator Visibility="{Binding AppState.LabelManager.CustomLabelsExists}" />
+
+                                <MenuItem Header="Choose existing..." ItemsSource="{Binding AppState.LabelManager.Labels}"
+                                          Click="Handle_AddExistingLabel" Visibility="{Binding AppState.LabelManager.CustomLabelsExists}">
+                                    <MenuItem.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Tag="{Binding}" Text="{Binding Name, TargetNullValue='No label'}"/>
+                                        </DataTemplate>
+                                    </MenuItem.ItemTemplate>
+                                </MenuItem>
+
+                            </MenuItem>
+
+                            <Separator />
+
 
                             <MenuItem Header="{Binding Language.TorrentListContextMenu_Remove, FallbackValue=Remove}" 
                                       Command="{StaticResource TorrentListCommands.ActionOnSelectedTorrents}" 

@@ -131,6 +131,7 @@
     <Compile Include="InfoClasses\PeerInfo.cs" />
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
+    <Compile Include="LabelManager.cs" />
     <Compile Include="LanguageEngine.cs" />
     <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedDictionary.cs" />
     <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedList.cs" />
@@ -198,6 +199,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TorrentProperties.cs" />
+    <Compile Include="UI\AddLabelDialog.xaml.cs">
+      <DependentUpon>AddLabelDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
       <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
     </Compile>
@@ -252,6 +256,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\AddLabelDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
