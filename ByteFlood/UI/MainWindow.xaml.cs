@@ -1103,15 +1103,13 @@ namespace ByteFlood
                         }
                         break;
                     case "AddLabel":
-                        f = new Action<TorrentInfo>(t =>
-                        {
-                            UI.AddLabelDialog dl = new UI.AddLabelDialog() { Owner = this, Icon = this.Icon };
+                        UI.AddLabelDialog dl = new UI.AddLabelDialog() { Owner = this, Icon = this.Icon };
 
-                            if (dl.ShowDialog() == true)
-                            {
-                                state.LabelManager.AddLabelForTorrent(t, dl.LabelText);
-                            }
-                        });
+                        if (dl.ShowDialog() == true)
+                            f = new Action<TorrentInfo>(t => state.LabelManager.AddLabelForTorrent(t, dl.LabelText));
+                        else
+                            return;
+
                         break;
                     case "remove_torrent_unlist":
                     case "remove_torrent_torrentonly":
