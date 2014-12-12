@@ -115,7 +115,7 @@ namespace ByteFlood
             this.LibtorrentSession.ListenOn(App.Settings.ListeningPort, App.Settings.ListeningPort);
 
             if (App.Settings.EnableDHT)
-               this.LibtorrentSession.StartDht();
+                this.LibtorrentSession.StartDht();
 
             if (App.Settings.EnableLSD)
                 this.LibtorrentSession.StartLsd();
@@ -645,7 +645,7 @@ namespace ByteFlood
             {
                 SavePath = App.Settings.DefaultDownloadPath,
                 Url = magnet,
-                Name = mg.Name
+                Name = string.IsNullOrEmpty(mg.Name) ? "" : mg.Name
             });
 
             //NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
@@ -679,10 +679,17 @@ namespace ByteFlood
         {
             for (int i = 0; i < TorrentCaches.Length; i++)
             {
-                byte[] res = TorrentCaches[i].Fetch(mg);
+                try
+                {
+                    byte[] res = TorrentCaches[i].Fetch(mg);
 
-                if (res != null)
-                    return res;
+                    if (res != null)
+                        return res;
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
             return null;
