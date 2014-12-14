@@ -424,7 +424,7 @@ namespace ByteFlood
                         if (dangerous_file_types.Contains(fifo.Extension.ToLower()))
                         {
                             if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data."
-                                + " Are you sure that you want to open {0}?", fi.File.Path),
+                                + " Are you sure that you want to open {0}?", fifo.Name),
                                 "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                             {
                                 Process.Start(fifo.FullName);
@@ -1005,7 +1005,7 @@ namespace ByteFlood
             TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
             if (ti != null)
             {
-                if (ti.Torrent.TorrentFile.Private)
+                if (ti.Info.Private)
                 {
                     MessageBox.Show("You cannot add external peers to a private torrent", "Add peer");
                 }
@@ -1093,7 +1093,7 @@ namespace ByteFlood
                                 sfd.InitialDirectory = App.Settings.SaveTorrentDialogLastPath;
                                 if (sfd.ShowDialog() == true)
                                 {
-                                    Ragnar.TorrentCreator tc = new Ragnar.TorrentCreator(this.SelectedTorrent.Torrent.TorrentFile);
+                                    Ragnar.TorrentCreator tc = new Ragnar.TorrentCreator(this.SelectedTorrent.Info);
                                     byte[] data = tc.Generate();
                                     tc.Dispose();
                                     System.IO.File.WriteAllBytes(sfd.FileName, data);

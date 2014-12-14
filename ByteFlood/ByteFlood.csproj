@@ -339,18 +339,6 @@
     <None Include="Assets\Languages\Francais.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="boost_chrono-vc120-mt-1_55.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_date_time-vc120-mt-1_55.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_system-vc120-mt-1_55.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="torrent.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
     <None Include="packages.config" />
@@ -359,6 +347,26 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_chrono-vc120-mt-1_55.dll">
+      <Link>boost_chrono-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_date_time-vc120-mt-1_55.dll">
+      <Link>boost_date_time-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_system-vc120-mt-1_55.dll">
+      <Link>boost_system-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_thread-vc120-mt-1_55.dll">
+      <Link>boost_thread-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\torrent.dll">
+      <Link>torrent.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\GeoIP.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

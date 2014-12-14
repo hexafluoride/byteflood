@@ -9,6 +9,7 @@ namespace ByteFlood
         public static LanguageEngine Language { get { return App.CurrentLanguage; } }
 
         private string _name = null;
+        private string file_path = null;
 
         /// <summary>
         /// This is the relative file name.
@@ -19,7 +20,7 @@ namespace ByteFlood
             {
                 if (_name == null)
                 {
-                    _name = this.File.Path.Replace(this.Owner.RootDownloadDirectory, "");
+                    _name = this.file_path.Replace(this.Owner.RootDownloadDirectory, "");
                 }
                 return _name;
             }
@@ -32,20 +33,20 @@ namespace ByteFlood
                 // even thought libtorrent documentation specify that the Path property is the
                 // full path, sometimes this isn't true (returns the relative path),
                 // so we need to workaround it
-                if (System.IO.Path.IsPathRooted(this.File.Path))
+                if (System.IO.Path.IsPathRooted(file_path))
                 {
-                    return this.File.Path;
+                    return file_path;
                 }
                 else
                 {
-                    return System.IO.Path.Combine(this.Owner.SavePath, this.File.Path);
+                    return System.IO.Path.Combine(this.Owner.SavePath, file_path);
                 }
             }
         }
 
         public string FileName
         {
-            get { return System.IO.Path.GetFileName(this.File.Path); }
+            get { return System.IO.Path.GetFileName(file_path); }
         }
 
         private long _downloaded_bytes = 0;
@@ -125,11 +126,9 @@ namespace ByteFlood
             }
         }
 
-        public string Size { get { return Utility.PrettifyAmount(this.File.Size); } }
+        public string Size { get { return Utility.PrettifyAmount(this.RawSize); } }
 
-        public Ragnar.FileEntry File { get; private set; }
-
-        public long RawSize { get { return this.File.Size; } }
+        public long RawSize { get; private set; }
 
         public FileInfo() { }
 
@@ -139,7 +138,8 @@ namespace ByteFlood
 
         public FileInfo(TorrentInfo owner, Ragnar.FileEntry file, int file_index)
         {
-            this.File = file;
+            this.file_path = file.Path;
+            this.RawSize = file.Size;
             this.Owner = owner;
             this.FileIndex = file_index;
             if (this.Owner != null)
@@ -179,26 +179,26 @@ namespace ByteFlood
         public string Name { get; private set; }
         public TorrentInfo OwnerTorrent { get; private set; }
 
-        public string Size 
+        public string Size
         {
             get { return Utility.PrettifyAmount(RawSize); }
         }
 
         long _size = -1;
-        public long RawSize 
+        public long RawSize
         {
-            get 
+            get
             {
                 if (_size < 0)
                 {
                     _size = 0;
-                    foreach (object a in this.Values) 
+                    foreach (object a in this.Values)
                     {
-                        if (a is FileInfo) 
+                        if (a is FileInfo)
                         {
                             this._size += ((FileInfo)a).RawSize;
                         }
-                        else 
+                        else
                         {
                             this._size += ((DirectoryKey)a).RawSize;
                         }

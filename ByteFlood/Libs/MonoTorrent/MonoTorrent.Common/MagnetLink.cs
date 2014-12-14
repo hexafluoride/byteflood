@@ -60,6 +60,8 @@ namespace MonoTorrent
                                 else
                                     throw new FormatException("Infohash must be base32 or hex encoded.");
                                 break;
+                            default:
+                                throw new FormatException("Infohash must be base32 or hex encoded.");
                         }
                         break;
                     case "dn"://display name

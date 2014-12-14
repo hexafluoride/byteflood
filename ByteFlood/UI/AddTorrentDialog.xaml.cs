@@ -78,7 +78,7 @@ namespace ByteFlood
             InitializeComponent();
             this.Closed += (s, e) => { this.WindowClosed = true; };
             this.TorrentInfo = torrent;
-            this.TorrentFileInfo = torrent.Torrent.TorrentFile;
+            this.TorrentFileInfo = torrent.Info;
             Load();
         }
 
@@ -98,7 +98,7 @@ namespace ByteFlood
 
             this.RatioLimit = 0f;
 
-            this.TorrentName = this.TorrentInfo.Torrent.TorrentFile.Name;
+            this.TorrentName = this.TorrentInfo.Info.Name;
 
             this.TorrentSavePath = App.Settings.DefaultDownloadPath;
 
