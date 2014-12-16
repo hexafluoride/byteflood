@@ -707,6 +707,14 @@ namespace ByteFlood
             return System.Net.IPAddress.IPv6None;
         }
 
+        static Encoding Windows1252 = Encoding.GetEncoding("Windows-1252");
+
+        //until we fix this in ragnar, we need to use this function.
+        public static string FixUTF8(this string s)
+        {
+            return Encoding.UTF8.GetString(Windows1252.GetBytes(s));
+        }
+
         /// <summary>
         /// Please don't inlude dots. 'v0.6.2' become 062
         /// </summary>

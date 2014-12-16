@@ -118,7 +118,7 @@ namespace ByteFlood
                 if (_custom_name == null)
                 {
                     if (this.Torrent.HasMetadata)
-                        return this.Info.Name;
+                        return this.Info.Name.FixUTF8();
                     else
                         return "[metadata mode]";
                 }
