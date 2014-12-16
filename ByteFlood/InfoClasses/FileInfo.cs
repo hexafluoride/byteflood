@@ -138,7 +138,7 @@ namespace ByteFlood
 
         public FileInfo(TorrentInfo owner, Ragnar.FileEntry file, int file_index)
         {
-            this.file_path = file.Path;
+            this.file_path = file.Path.FixUTF8();
             this.RawSize = file.Size;
             this.Owner = owner;
             this.FileIndex = file_index;
@@ -173,7 +173,7 @@ namespace ByteFlood
 
         public DirectoryKey(string name, TorrentInfo ti)
         {
-            this.Name = name; this.OwnerTorrent = ti;
+            this.Name = name.FixUTF8(); this.OwnerTorrent = ti;
         }
 
         public string Name { get; private set; }
