@@ -25,7 +25,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
-using MonoTorrent.Client;
 using Microsoft.Win32;
 using System.Threading;
 using System.Diagnostics;
@@ -64,6 +63,15 @@ namespace ByteFlood
 
         public static readonly DependencyProperty ElementsColorProperty =
             DependencyProperty.Register("ElementsColor", typeof(Color), typeof(MainWindow), new PropertyMetadata(Color.FromArgb(255, 38, 139, 210)));
+
+        internal TorrentInfo SelectedTorrent
+        {
+            get { return (TorrentInfo)GetValue(SelectedTorrentProperty); }
+            set { SetValue(SelectedTorrentProperty, value); }
+        }
+
+        public static readonly DependencyProperty SelectedTorrentProperty =
+            DependencyProperty.Register("SelectedTorrent", typeof(TorrentInfo), typeof(MainWindow), new PropertyMetadata(null));
 
         public MainWindow()
         {
@@ -130,11 +138,6 @@ namespace ByteFlood
             {
                 it.ShowDialog(); // calling show dialog will call window_loaded and therefore the real Load() statement
 
-                foreach (TorrentInfo ti in it.selected)
-                {
-                    state.Torrents.Add(ti);
-                    ti.Start();
-                }
                 return true;
             }
             return false;
@@ -144,8 +147,8 @@ namespace ByteFlood
         {
             while (true)
             {
-	            if (cancellationToken.IsCancellationRequested)
-		            break;
+                if (cancellationToken.IsCancellationRequested)
+                    break;
 
                 var status = this.state.LibtorrentSession.QueryStatus();
 
@@ -179,6 +182,14 @@ namespace ByteFlood
 
                     }, null);
 
+                    if (App.Settings.PreventStandbyWithActiveTorrents && state.ActiveTorrentCount > 0)
+                        if (Utility.IsRunningOnBatteries && App.Settings.AllowStandbyOnBatteryPower)
+                            Utility.UndoDisableSleep();
+                        else
+                            Utility.DisableSleep();
+                    else
+                        Utility.UndoDisableSleep();
+
                     // TODO: Update theses values only when they are really changed.
                     state.NotifyChanged("DownloadingTorrentCount", "SeedingTorrentCount",
                         "InactiveTorrentCount", "ActiveTorrentCount", "FinishedTorrentCount");
@@ -197,6 +208,7 @@ namespace ByteFlood
                 Thread.Sleep(1000);
             }
         }
+
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -259,12 +271,10 @@ namespace ByteFlood
             switch (tag)
             {
                 case "pause":
-                    foreach (TorrentInfo ti in state.Torrents)
-                        ti.Pause();
+                    this.state.LibtorrentSession.Pause();
                     break;
                 case "resume":
-                    foreach (TorrentInfo ti in state.Torrents)
-                        ti.Start();
+                    this.state.LibtorrentSession.Resume();
                     break;
             }
         }
@@ -313,6 +323,11 @@ namespace ByteFlood
                     return;
                 }
 
+                if (!query.Url.StartsWith("http://") || !query.Url.StartsWith("https://"))
+                {
+                    query.Url = "http://" + query.Url;
+                }
+
                 var rss_entry = new RssUrlEntry()
                 {
                     Url = query.Url,
@@ -325,14 +340,14 @@ namespace ByteFlood
                     DefaultSettings = App.Settings.DefaultTorrentProperties
                 };
 
-	            if (await rss_entry.TestAsync())
-		            FeedsManager.Add(rss_entry);
-	            else
-		            MessageBox.Show(
-						this,
-			            "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
-			            "Error",
-			            MessageBoxButton.OK, MessageBoxImage.Error);
+                if (await rss_entry.TestAsync())
+                    FeedsManager.Add(rss_entry);
+                else
+                    MessageBox.Show(
+                        this,
+                        "This RSS entry seem to be invalid. \n\n If your internet connection is down, try adding it when it's up again.",
+                        "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -400,7 +415,7 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.Path);
+                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.FullPath);
 
                     if (fifo.Exists)
                     {
@@ -409,7 +424,7 @@ namespace ByteFlood
                         if (dangerous_file_types.Contains(fifo.Extension.ToLower()))
                         {
                             if (MessageBox.Show(string.Format(@"Opening files downloaded from the Internet may result in harm to your computer or your data."
-                                + " Are you sure that you want to open {0}?", fi.File.Path),
+                                + " Are you sure that you want to open {0}?", fifo.Name),
                                 "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                             {
                                 Process.Start(fifo.FullName);
@@ -468,9 +483,16 @@ namespace ByteFlood
                 FileInfo fi = item.Tag as FileInfo;
                 if (fi != null)
                 {
-                    System.IO.FileInfo fifo = new System.IO.FileInfo(fi.File.Path);
-                    System.IO.Directory.CreateDirectory(fifo.Directory.FullName);
-                    Process.Start("explorer.exe", string.Format("\"{0}\"", fifo.Directory.FullName));
+                    if (System.IO.File.Exists(fi.FullPath))
+                    {
+                        Process.Start("explorer.exe", string.Format("/select, \"{0}\"", fi.FullPath));
+                    }
+                    else
+                    {
+                        string directory = System.IO.Path.GetDirectoryName(fi.FullPath);
+                        System.IO.Directory.CreateDirectory(directory);
+                        Process.Start("explorer.exe", string.Format("\"{0}\"", directory));
+                    }
                     return;
                 }
 
@@ -486,12 +508,13 @@ namespace ByteFlood
                         string partial_path = GetDirectoryKeyRelativePath(item.Parent);
                         string full_path = System.IO.Path.Combine(dk.OwnerTorrent.SavePath, partial_path);
                         System.IO.Directory.CreateDirectory(full_path);
-                        Process.Start("explorer.exe", string.Format("\"{0}\"", full_path));
+                        Process.Start("explorer.exe", string.Format("/select, \"{0}\"", full_path));
                     }
                     else
                     {
                         //it's a root dir
-                        Process.Start("explorer.exe", string.Format("\"{0}\"", dk.OwnerTorrent.SavePath));
+                        System.IO.Directory.CreateDirectory(dk.OwnerTorrent.SavePath);
+                        Process.Start("explorer.exe", string.Format("/select, \"{0}\"", dk.OwnerTorrent.SavePath));
                     }
                 }
             }
@@ -506,11 +529,10 @@ namespace ByteFlood
 
         private void SetDataContext(TorrentInfo ti)
         {
+            this.SelectedTorrent = ti;
             //peers_list.ItemsSource = ti.Peers;
             files_tree.Model = ti.FilesTree;
             //piece_bar.AttachTorrent(ti);
-            trackers_list.ItemsSource = ti.Trackers;
-            overview_canvas.DataContext = ti;
             //if (ti.Torrent.Torrent.GetRightHttpSeeds.Count > 0)
             //{
             //    webseeds_tab.Visibility = Visibility.Visible;
@@ -520,13 +542,12 @@ namespace ByteFlood
 
         private void ResetDataContext()
         {
+            this.SelectedTorrent = null;
             //peers_list.ItemsSource = null;
             files_tree.Model = null;
             //piece_bar.DetachTorrent();
-            trackers_list.ItemsSource = null;
-            overview_canvas.DataContext = null;
-            webseeds_list.ItemsSource = null;
-            webseeds_tab.Visibility = Visibility.Collapsed;
+            //webseeds_list.ItemsSource = null;
+            //webseeds_tab.Visibility = Visibility.Collapsed;
         }
 
         private void mainlist_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -537,23 +558,28 @@ namespace ByteFlood
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            LanguageEngine.SaveDummy();
+#endif
             NotifyIcon.Icon = new System.Drawing.Icon("Assets/icon-16.ico");
             this.Icon = new BitmapImage(new Uri("Assets/icon-allsizes.ico", UriKind.Relative));
+            this.Icon.Freeze();
 
-	        var cts = new CancellationTokenSource();
-	        
+            var cts = new CancellationTokenSource();
+
             state = new State
             {
-	            uiContext = uiContext,
-				MainTaskCancellationTokenSource = cts
+                uiContext = uiContext,
+                MainTaskCancellationTokenSource = cts
             };
 
-	        Task.Run(() => Update(cts.Token), cts.Token);
+            Task.Run(() => Update(cts.Token), cts.Token);
 
-            mainlist.ItemsSource = state.Torrents;
-            mainlist.DataContext = App.Settings;
-            torrents_treeview.DataContext = state;
+            this.DataContext = new NiceDataContext<MainWindow>(this);
+            this.mainlist.ItemsSource = this.state.Torrents;
+
             itemselector = ShowAll;
+
             graph = new GraphDrawer(graph_canvas);
 
             foreach (string str in App.to_add)
@@ -564,18 +590,38 @@ namespace ByteFlood
                     state.AddTorrentByPath(str);
             }
 
-            left_treeview.DataContext = App.Settings;
-
             feeds_tree_item.ItemsSource = FeedsManager.EntriesList;
 
             if (!App.Settings.ImportedTorrents)
                 ImportTorrents();
             Utility.ReloadTheme(App.Settings.Theme);
 
-            DHTStatus.DataContext = state;
 
-            Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
-            Services.AutoUpdater.StartMonitoring();
+            if (App.Settings.CheckForUpdates)
+            {
+                StartAutoUpdater();
+            }
+        }
+        private bool auto_updater_started = false;
+        public void StartAutoUpdater()
+        {
+            if (!auto_updater_started)
+            {
+                Services.AutoUpdater.NewUpdate += AutoUpdater_NewUpdate;
+                Services.AutoUpdater.StartMonitoring();
+                auto_updater_started = true;
+                notify_later_clicked = false;
+            }
+        }
+
+        public void StopAutoUpdater()
+        {
+            if (auto_updater_started)
+            {
+                Services.AutoUpdater.StopMonitoring();
+                Services.AutoUpdater.NewUpdate -= AutoUpdater_NewUpdate;
+                auto_updater_started = false;
+            }
         }
 
         bool notify_later_clicked = false;
@@ -720,12 +766,6 @@ namespace ByteFlood
                 mainlist.ClearValue(ListView.AlternationCountProperty);
         }
 
-        private void CopyMagnetLink(object sender, RoutedEventArgs e)
-        {
-            TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
-            Clipboard.SetText(ti.GetMagnetLink());
-        }
-
         private void Torrent_RetrieveMovieInfo(object sender, RoutedEventArgs e)
         {
             TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
@@ -778,6 +818,57 @@ namespace ByteFlood
             foreach (TorrentInfo ti in state.Torrents)
             {
                 ti.UpdateList("ShowOnList");
+            }
+        }
+
+        private void Handle_Label_Selection(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem source = e.OriginalSource as TreeViewItem;
+
+            if (source.Header.GetType() == typeof(TorrentLabel))
+            {
+                TorrentLabel l = (TorrentLabel)source.Header;
+                state.LabelManager.EnableFilter = true;
+                state.LabelManager.SelectedLabel = l.Name;
+            }
+            else if (source.Header.GetType() == typeof(StackPanel))
+            {
+                state.LabelManager.EnableFilter = false;
+                state.LabelManager.SelectedLabel = null;
+            }
+
+            foreach (TorrentInfo ti in state.Torrents)
+            {
+                ti.UpdateList("ShowOnList");
+            }
+        }
+
+        public void Handle_AddExistingLabel(object sender, RoutedEventArgs e)
+        {
+            if (mainlist.SelectedItems.Count > 0)
+            {
+                TorrentInfo[] arr = new TorrentInfo[mainlist.SelectedItems.Count];
+                mainlist.SelectedItems.CopyTo(arr, 0);
+                Action<TorrentInfo> f = new Action<TorrentInfo>(t => { });
+
+                MenuItem source = e.OriginalSource as MenuItem;
+
+                if (source.Header is TorrentLabel)
+                {
+                    TorrentLabel l = (TorrentLabel)source.Header;
+                    if (l.Name == null)
+                    {
+                        //clear the labels
+                        f = new Action<TorrentInfo>(t => state.LabelManager.ClearLabels(t));
+                    }
+                    else
+                    {
+                        f = new Action<TorrentInfo>(t => state.LabelManager.AddLabelForTorrent(t, l));
+                    }
+                }
+
+                foreach (var t in arr)
+                    f(t);
             }
         }
 
@@ -855,13 +946,21 @@ namespace ByteFlood
 
         #endregion
 
+        private void Handle_Label_ContextMenu(object sender, RoutedEventArgs e)
+        {
+            MenuItem send = sender as MenuItem;
+            TorrentLabel l = send.CommandParameter as TorrentLabel;
+            state.LabelManager.RemoveLabel(l);
+            return;
+        }
+
         private void OperationOnRssItem(object sender, RoutedEventArgs e)
         {
             RssUrlEntry entry = null;
 
             MenuItem source = (MenuItem)e.Source;
 
-            entry = (RssUrlEntry)source.DataContext;
+            entry = (RssUrlEntry)source.CommandParameter;
 
             switch (source.Tag.ToString())
             {
@@ -906,7 +1005,7 @@ namespace ByteFlood
             TorrentInfo ti = mainlist.SelectedItem as TorrentInfo;
             if (ti != null)
             {
-                if (ti.Torrent.TorrentFile.Private)
+                if (ti.Info.Private)
                 {
                     MessageBox.Show("You cannot add external peers to a private torrent", "Add peer");
                 }
@@ -942,14 +1041,21 @@ namespace ByteFlood
                         f = new Action<TorrentInfo>(t =>
                         {
                             System.IO.Directory.CreateDirectory(t.SavePath);
-                            Process.Start("explorer.exe", "\"" + t.SavePath + "\"");
+                            Process.Start("explorer.exe", "/select, \"" + t.SavePath + "\"");
                         });
                         break;
                     case "EditProperties":
                         f = new Action<TorrentInfo>(t =>
                         {
-                            var editor = new TorrentPropertiesEditor(t) { Owner = this, Icon = this.Icon };
-                            editor.ShowDialog();
+                            if (t.HasMetadata)
+                            {
+                                var editor = new TorrentPropertiesEditor(t) { Owner = this, Icon = this.Icon };
+                                editor.ShowDialog();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Cannot edit properties because torrent has no metadata");
+                            }
                         });
                         break;
                     case "Start":
@@ -970,7 +1076,41 @@ namespace ByteFlood
                     case "Recheck":
                         f = new Action<TorrentInfo>(t => t.Recheck());
                         break;
+                    case "CopyMagnetLink":
+                        if (this.SelectedTorrent != null)
+                        {
+                            Clipboard.SetText(this.SelectedTorrent.GetMagnetLink());
+                        }
+                        break;
+                    case "SaveTorrentFile":
+                        if (this.SelectedTorrent != null)
+                        {
+                            if (this.SelectedTorrent.HasMetadata)
+                            {
+                                SaveFileDialog sfd = new SaveFileDialog();
+                                sfd.Filter = "Torrent file|*.torrent";
+                                sfd.FileName = this.SelectedTorrent.Name;
+                                sfd.InitialDirectory = App.Settings.SaveTorrentDialogLastPath;
+                                if (sfd.ShowDialog() == true)
+                                {
+                                    Ragnar.TorrentCreator tc = new Ragnar.TorrentCreator(this.SelectedTorrent.Info);
+                                    byte[] data = tc.Generate();
+                                    tc.Dispose();
+                                    System.IO.File.WriteAllBytes(sfd.FileName, data);
+                                    App.Settings.SaveTorrentDialogLastPath = System.IO.Path.GetDirectoryName(sfd.FileName);
+                                }
+                            }
+                        }
+                        break;
+                    case "AddLabel":
+                        UI.AddLabelDialog dl = new UI.AddLabelDialog() { Owner = this, Icon = this.Icon };
 
+                        if (dl.ShowDialog() == true)
+                            f = new Action<TorrentInfo>(t => state.LabelManager.AddLabelForTorrent(t, dl.LabelText));
+                        else
+                            return;
+
+                        break;
                     case "remove_torrent_unlist":
                     case "remove_torrent_torrentonly":
                     case "remove_torrent_dataonly":
@@ -991,35 +1131,39 @@ namespace ByteFlood
         {
             t.Invisible = true;
             t.UpdateList("Invisible", "ShowOnList");
-            ThreadPool.QueueUserWorkItem(delegate
+            string hash = t.InfoHash;
+
+            t.Torrent.AutoManaged = false;
+            t.Torrent.Pause();
+
+            this.state.LibtorrentSession.RemoveTorrent(t.Torrent);
+            this.state.DeleteTorrentStateData(hash);
+
+            uiContext.Send(x =>
             {
-                t.Torrent.AutoManaged = false;
-                t.Torrent.Pause();
+                state._torrents.Remove(hash);
+                state.Torrents.Remove(t);
+                state.LabelManager.ClearLabels(t);
+            }, null);
 
-                this.state.LibtorrentSession.RemoveTorrent(t.Torrent);
-                this.state.DeleteTorrentStateData(t.InfoHash);
+            switch (action)
+            {
+                case "remove_torrent_torrentonly":
+                    DeleteTorrent(t);
+                    break;
+                case "remove_torrent_dataonly":
+                    DeleteData(t);
+                    break;
+                case "remove_torrent_both":
+                    DeleteData(t);
+                    DeleteTorrent(t);
+                    break;
+                default:
+                    break;
+            }
 
-                uiContext.Send(x =>
-                {
-                    state.Torrents.Remove(t);
-                }, null);
 
-                switch (action)
-                {
-                    case "remove_torrent_torrentonly":
-                        DeleteTorrent(t);
-                        break;
-                    case "remove_torrent_dataonly":
-                        DeleteData(t);
-                        break;
-                    case "remove_torrent_both":
-                        DeleteData(t);
-                        DeleteTorrent(t);
-                        break;
-                    default:
-                        break;
-                }
-            });
+            t.OffMyself();
         }
 
         private void DeleteTorrent(TorrentInfo t)

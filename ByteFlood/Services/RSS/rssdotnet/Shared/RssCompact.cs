@@ -39,7 +39,7 @@ namespace Rss
 	class SecurityPermissionAttribute : Attribute
 	{
 		public SecurityPermissionAttribute(SecurityAction securityAction) {}
-		public bool Execution;
+		public bool Execution  = false;
 	}
 	/// <summary>Enumerator does not exist on the .NET Compact Framework</summary>
 	enum SecurityAction { RequestMinimum }

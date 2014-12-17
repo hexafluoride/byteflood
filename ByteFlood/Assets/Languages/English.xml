@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageEngine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <Buttons_OK>OK</Buttons_OK>
+  <Buttons_Cancel>Cancel</Buttons_Cancel>
+  <Buttons_Add>Add</Buttons_Add>
+  <Buttons_Search>Search</Buttons_Search>
+  <Buttons_Paste>Paste</Buttons_Paste>
+  <Buttons_SaveSettings>Save Settings</Buttons_SaveSettings>
+  <Buttons_DiscardSettings>Discard Settings</Buttons_DiscardSettings>
+  <Buttons_LoadDefaultSettings>Load default settings</Buttons_LoadDefaultSettings>
+
+  <TorrentList_NameColumn>Name</TorrentList_NameColumn>
+  <TorrentList_ProgressColumn>Progress</TorrentList_ProgressColumn>
+  <TorrentList_StatusColumn>Status</TorrentList_StatusColumn>
+  <TorrentList_WantedColumn>Wanted</TorrentList_WantedColumn>
+  <TorrentList_DoneColumn>Done</TorrentList_DoneColumn>
+  <TorrentList_ETAColumn>ETA</TorrentList_ETAColumn>
+  <TorrentList_DownSpeedColumn>Down speed</TorrentList_DownSpeedColumn>
+  <TorrentList_UpSpeedColumn>Up speed</TorrentList_UpSpeedColumn>
+  <TorrentList_PeersColumn>Peers</TorrentList_PeersColumn>
+  <TorrentList_SeedsColumn>Seeds</TorrentList_SeedsColumn>
+  <TorrentList_LeechsColumn>Leeches</TorrentList_LeechsColumn>
+  <TorrentList_RatioColumn>Ratio</TorrentList_RatioColumn>
+
+  <TreeList_Torrents>Torrents</TreeList_Torrents>
+  <TreeList_Downloading>Downloading</TreeList_Downloading>
+  <TreeList_Seeding>Seeding</TreeList_Seeding>
+  <TreeList_Finished>Finished</TreeList_Finished>
+  <TreeList_Active>Active</TreeList_Active>
+  <TreeList_Inactive>Inactive</TreeList_Inactive>
+  <TreeList_Feeds>Feeds</TreeList_Feeds>
+  
+  <InfoTab_Overview>Overview</InfoTab_Overview>
+  <InfoTab_Speed>Speeds</InfoTab_Speed>
+  <InfoTab_Files>Files</InfoTab_Files>
+  <InfoTab_Trackers>Trackers</InfoTab_Trackers>
+  
+  <OverviewTab_HeaderTransfer> Transfer</OverviewTab_HeaderTransfer>
+  <OverviewTab_TimeElapsed>Time Elapsed:</OverviewTab_TimeElapsed>
+  <OverviewTab_Downloaded>Downloaded:</OverviewTab_Downloaded>
+  <OverviewTab_DownSpeed>Download speed:</OverviewTab_DownSpeed>
+  <OverviewTab_DownSpeedLimit>Download speed limit:</OverviewTab_DownSpeedLimit>
+  <OverviewTab_Status>Status:</OverviewTab_Status>
+  <OverviewTab_ETA>ETA:</OverviewTab_ETA>
+  <OverviewTab_Uploaded>Uploaded:</OverviewTab_Uploaded>
+  <OverviewTab_UploadSpeed>Upload speed:</OverviewTab_UploadSpeed>
+  <OverviewTab_UploadSpeedLimit>Upload speed limit:</OverviewTab_UploadSpeedLimit>
+  <OverviewTab_Wasted>Wasted:</OverviewTab_Wasted>
+  <OverviewTab_Seeds>Seeds:</OverviewTab_Seeds>
+  <OverviewTab_Peers>Peers:</OverviewTab_Peers>
+  <OverviewTab_Ratio>Ratio:</OverviewTab_Ratio>
+  
+  <SpeedTab_DownloadAndUpload>Download &amp; Upload</SpeedTab_DownloadAndUpload>
+  <SpeedTab_Download>Download</SpeedTab_Download>
+  <SpeedTab_Upload>Upload</SpeedTab_Upload>
+ 
+  <FilesTab_Path>Path</FilesTab_Path>
+  <FilesTab_Progress>Progress</FilesTab_Progress>
+  <FilesTab_Priority>Priority</FilesTab_Priority>
+  <FilesTab_Size>Size</FilesTab_Size>
+  
+  <TrackersTab_URL>URL</TrackersTab_URL>
+  <TrackersTab_UpdateIn>Update In</TrackersTab_UpdateIn>
+  <TrackersTab_Message>Message</TrackersTab_Message>
+  
+  <FeedsItemsContextMenu_Refresh>Refresh</FeedsItemsContextMenu_Refresh>
+  <FeedsItemsContextMenu_Remove>Remove</FeedsItemsContextMenu_Remove>
+  <FeedsItemsContextMenu_Edit>Edit</FeedsItemsContextMenu_Edit>
+  <FeedsItemsContextMenu_ViewFeeds>View feeds</FeedsItemsContextMenu_ViewFeeds>
+
+  <TorrentListContextMenu_OpenContainingFolder>Open Containing Folder</TorrentListContextMenu_OpenContainingFolder>
+  <TorrentListContextMenu_ForceStart>Force Start</TorrentListContextMenu_ForceStart>
+  <TorrentListContextMenu_Start>Start</TorrentListContextMenu_Start>
+  <TorrentListContextMenu_Pause>Pause</TorrentListContextMenu_Pause>
+  <TorrentListContextMenu_ForcePause>Force Pause</TorrentListContextMenu_ForcePause>
+  <TorrentListContextMenu_Stop>Stop</TorrentListContextMenu_Stop>
+  <TorrentListContextMenu_ForceRecheck>Force Hash Recheck</TorrentListContextMenu_ForceRecheck>
+  <TorrentListContextMenu_CopyMagnetLink>Copy Magnet Link</TorrentListContextMenu_CopyMagnetLink>
+  <TorrentListContextMenu_SaveTorrentFile>Save .torrent</TorrentListContextMenu_SaveTorrentFile>
+  <TorrentListContextMenu_DownloadMovieData>Download Movie Poster</TorrentListContextMenu_DownloadMovieData>
+  <TorrentListContextMenu_Remove>Remove</TorrentListContextMenu_Remove>
+  <TorrentListContextMenu_RemoveAnd>Remove and...</TorrentListContextMenu_RemoveAnd>
+  <TorrentListContextMenu_DeleteData>delete data</TorrentListContextMenu_DeleteData>
+  <TorrentListContextMenu_DeleteTorrentFile>delete .torrent file</TorrentListContextMenu_DeleteTorrentFile>
+  <TorrentListContextMenu_DeleteDataAndTorrentFile>delete both</TorrentListContextMenu_DeleteDataAndTorrentFile>
+  <TorrentListContextMenu_ChangeTorrentOptions>Change Torrent Options</TorrentListContextMenu_ChangeTorrentOptions>
+  
+  <FileListContextMenu_OpenFile>Open</FileListContextMenu_OpenFile>
+  <FileListContextMenu_OpenContainingFolder>Open Containing Folder</FileListContextMenu_OpenContainingFolder>
+  <FileListContextMenu_SetPriority>Priority</FileListContextMenu_SetPriority>
+  
+  <FilePriority_Immediate>Immediate</FilePriority_Immediate>
+  <FilePriority_Highest>Highest</FilePriority_Highest>
+  <FilePriority_High>High</FilePriority_High>
+  <FilePriority_Normal>Normal</FilePriority_Normal>
+  <FilePriority_Low>Low</FilePriority_Low>
+  <FilePriority_Lowest>Lowest</FilePriority_Lowest>
+  <FilePriority_Skip>Skip</FilePriority_Skip>
+  <FilePriority_Custom>Custom</FilePriority_Custom>
+  
+  <NotifyIcon_ResumeAll>Resume all torrents</NotifyIcon_ResumeAll>
+  <NotifyIcon_PauseAll>Pause all torrents</NotifyIcon_PauseAll>
+  <NotifyIcon_ShowHide>Show/Hide ByteFlood</NotifyIcon_ShowHide>
+  <NotifyIcon_Exit>Quit</NotifyIcon_Exit>
+  
+  <MainWindowToolbarTooltips_AddTorrentFromFile>Add a torrent from file(s)</MainWindowToolbarTooltips_AddTorrentFromFile>
+  <MainWindowToolbarTooltips_AddTorrentMagnetLink>Add a torrent from a magnet link</MainWindowToolbarTooltips_AddTorrentMagnetLink>
+  <MainWindowToolbarTooltips_AddRSSFeed>Add a new RSS feed</MainWindowToolbarTooltips_AddRSSFeed>
+  <MainWindowToolbarTooltips_SearchTorrentsOnline>Search for torrents on the internet</MainWindowToolbarTooltips_SearchTorrentsOnline>
+  <MainWindowToolbarTooltips_EditPreferences>Modify and change ByteFlood settings</MainWindowToolbarTooltips_EditPreferences>
+  <MainWindowToolbarTooltips_StartSelectedTorrents>Start selected torrent(s)</MainWindowToolbarTooltips_StartSelectedTorrents>
+  <MainWindowToolbarTooltips_PauseSelectedTorrents>Pause selected torrent(s)</MainWindowToolbarTooltips_PauseSelectedTorrents>
+  <MainWindowToolbarTooltips_StopSelectedTorrents>Stop selected torrent(s)</MainWindowToolbarTooltips_StopSelectedTorrents>
+  <MainWindowToolbarTooltips_RemoveSelectedTorrents>Remove selected torrent(s)</MainWindowToolbarTooltips_RemoveSelectedTorrents>
+
+  <AddMagnetLinkWindow_Title>Add magnet..</AddMagnetLinkWindow_Title>
+  <AddMagnetLinkWindow_EnterMagnetURL>Enter magnet URL:</AddMagnetLinkWindow_EnterMagnetURL>
+  
+</LanguageEngine>

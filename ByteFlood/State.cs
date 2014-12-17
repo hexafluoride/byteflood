@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using MonoTorrent;
 using System.Xml.Serialization;
-using MonoTorrent.Common;
 using System.Threading;
 using System.IO;
 using Jayrock.Json;
@@ -17,6 +16,8 @@ namespace ByteFlood
 {
     public class State : INotifyPropertyChanged
     {
+        internal Dictionary<string, TorrentInfo> _torrents = new Dictionary<string, TorrentInfo>();
+
         public ObservableCollection<TorrentInfo> Torrents = new ObservableCollection<TorrentInfo>();
 
         public MainWindow window = (MainWindow)App.Current.MainWindow;
@@ -31,9 +32,9 @@ namespace ByteFlood
 
         public int GlobalMaxDownloadSpeed
         {
-            get 
+            get
             {
-                using (var s = this.LibtorrentSession.QuerySettings()) 
+                using (var s = this.LibtorrentSession.QuerySettings())
                 {
                     return s.DownloadRateLimit;
                 }
@@ -49,7 +50,7 @@ namespace ByteFlood
 
         public int GlobalMaxUploadSpeed
         {
-            get 
+            get
             {
                 using (var s = this.LibtorrentSession.QuerySettings())
                 {
@@ -83,15 +84,24 @@ namespace ByteFlood
 
         #endregion
 
+        public LabelManager LabelManager { get; private set; }
+
         public State()
         {
             this.Torrents.CollectionChanged += (s, e) => { NotifySinglePropertyChanged("TorrentCount"); };
+            this.LabelManager = new LabelManager(this);
             this.Initialize();
         }
 
         public Ragnar.Session LibtorrentSession { get; private set; }
 
         public LibTorrentAlertsWatcher LibTorrentAlerts { get; private set; }
+
+        Ragnar.SessionAlertCategory Alerts_Mask =
+            Ragnar.SessionAlertCategory.Error | //Ragnar.SessionAlertCategory.IPBlock |
+            Ragnar.SessionAlertCategory.Performance | Ragnar.SessionAlertCategory.PortMapping |
+             Ragnar.SessionAlertCategory.Progress | Ragnar.SessionAlertCategory.Status |
+             Ragnar.SessionAlertCategory.Storage | Ragnar.SessionAlertCategory.Tracker;
 
         public void Initialize()
         {
@@ -100,14 +110,21 @@ namespace ByteFlood
 
             this.LibtorrentSession = new Ragnar.Session();
 
-            this.LibtorrentSession.SetAlertMask(Ragnar.SessionAlertCategory.All);
+            this.LibtorrentSession.SetAlertMask(Alerts_Mask);
 
             this.LibtorrentSession.ListenOn(App.Settings.ListeningPort, App.Settings.ListeningPort);
 
-            this.LibtorrentSession.StartDht();
-            this.LibtorrentSession.StartLsd();
-            this.LibtorrentSession.StartNatPmp();
-            this.LibtorrentSession.StartUpnp();
+            if (App.Settings.EnableDHT)
+                this.LibtorrentSession.StartDht();
+
+            if (App.Settings.EnableLSD)
+                this.LibtorrentSession.StartLsd();
+
+            if (App.Settings.EnableNAT_PMP)
+                this.LibtorrentSession.StartNatPmp();
+
+            if (App.Settings.Enable_UPNP)
+                this.LibtorrentSession.StartUpnp();
 
             this.LibTorrentAlerts = new LibTorrentAlertsWatcher(this.LibtorrentSession);
 
@@ -117,6 +134,7 @@ namespace ByteFlood
             this.LibTorrentAlerts.TorrentStatsUpdated += LibTorrentAlerts_TorrentStatsUpdated;
             this.LibTorrentAlerts.TorrentFinished += LibTorrentAlerts_TorrentFinished;
             this.LibTorrentAlerts.MetadataReceived += LibTorrentAlerts_MetadataReceived;
+            //this.LibTorrentAlerts.TorrentNetworkStatisticsUpdated += LibTorrentAlerts_TorrentNetworkStatisticsUpdated;
 
             if (File.Exists(LtSessionFilePath))
             {
@@ -187,59 +205,78 @@ namespace ByteFlood
 
         #region LibTorrent Alerts Handling
 
+        //void LibTorrentAlerts_TorrentNetworkStatisticsUpdated(Ragnar.StatsAlert sa)
+        //{        
+        //    string key = sa.Handle.InfoHash.ToHex();
+
+        //    if (this._torrents.ContainsKey(key)) 
+        //    {
+        //        this._torrents[key].DoNetStatsUpdate(sa);
+        //    }
+        //}
+
         void LibTorrentAlerts_MetadataReceived(Ragnar.TorrentHandle handle)
         {
-            TorrentInfo ti = new TorrentInfo(handle);
+            string key = handle.InfoHash.ToHex();
+
+            TorrentInfo ti = null;
+
+            while (!this._torrents.ContainsKey(key)) ; // HACK
+
+            ti = this._torrents[key];
 
             // This is critical, without it byteflood won't load this torrent at the next startup
             byte[] data = this.BackUpMangetLinkMetadata(handle.TorrentFile);
 
             ti.OriginalTorrentFilePath = this.SaveMagnetLink(data, handle.TorrentFile.Name);
 
-            this.Torrents.Add(ti);
+            set_files_priorities(handle, 3);
 
-            NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
+            ti.DoMetadataDownloadComplete();
+
+            //NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadComplete, handle));
+
+            handle_torrent_file_selection(ti);
         }
 
         void LibTorrentAlerts_TorrentFinished(Ragnar.TorrentHandle handle)
         {
-            var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
-            if (results.Count() != 0)
+            string key = handle.InfoHash.ToHex();
+            if (this._torrents.ContainsKey(key))
             {
-                results.First().DoTorrentComplete();
+                this._torrents[key].DoTorrentComplete();
             }
         }
 
         void LibTorrentAlerts_TorrentStatsUpdated(Ragnar.TorrentStatus status)
         {
-            var results = this.Torrents.Where(t => t.InfoHash == status.InfoHash.ToHex());
-            if (results.Count() != 0)
+            string key = status.InfoHash.ToHex();
+            if (this._torrents.ContainsKey(key))
             {
-                results.First().DoStatsUpdate(status);
+                this._torrents[key].DoStatsUpdate(status);
             }
         }
 
         void LibTorrentAlerts_TorrentStateChanged(Ragnar.TorrentHandle handle, Ragnar.TorrentState oldstate, Ragnar.TorrentState newstate)
         {
-            var results = this.Torrents.Where(t => t.InfoHash == handle.InfoHash.ToHex());
-            if (results.Count() != 0)
+            string key = handle.InfoHash.ToHex();
+            if (this._torrents.ContainsKey(key))
             {
-                results.First().DoStateChanged(oldstate, newstate);
+                this._torrents[key].DoStateChanged(oldstate, newstate);
             }
         }
 
         void LibTorrentAlerts_TorrentAdded(Ragnar.TorrentHandle handle)
         {
-            if (handle.HasMetadata)
+            App.Current.Dispatcher.Invoke(new Action(() =>
             {
-                uiContext.Post(_ =>
+                if (!_torrents.ContainsKey(handle.InfoHash.ToHex()))
                 {
-                    if (!Torrents.Any(t => t.Torrent.InfoHash.ToHex() == handle.InfoHash.ToHex()))
-                    {
-                        Torrents.Add(new TorrentInfo(handle));
-                    }
-                }, null);
-            }
+                    TorrentInfo ti = new TorrentInfo(handle);
+                    this._torrents.Add(handle.InfoHash.ToHex(), ti);
+                    this.Torrents.Add(ti);
+                }
+            }));
         }
 
         void LibTorrentAlerts_ResumeDataArrived(Ragnar.TorrentHandle handle, byte[] data)
@@ -350,6 +387,8 @@ namespace ByteFlood
 
                         jo.Add("IsStopped", ti.IsStopped);
 
+                        jo.Add("Labels", this.LabelManager.GetLabelsForTorrent(ti));
+
                         using (TextWriter tw = File.CreateText(
                             Path.Combine(State.TorrentsStateSaveDirectory, ti.InfoHash + ".tjson")))
                         {
@@ -378,24 +417,29 @@ namespace ByteFlood
 
         public void AddTorrentByPath(string path, bool notifyIfAdded = true)
         {
+            Ragnar.TorrentInfo torrent = null;
+
             try
             {
-                Torrent t = Torrent.Load(path);
+                torrent = new Ragnar.TorrentInfo(File.ReadAllBytes(path));
 
-                if (this.ContainTorrent(t.InfoHash.ToHex()))
+                if (!torrent.IsValid)
+                {
+                    torrent.Dispose();
+                    MessageBox.Show(string.Format("Invalid torrent file {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (this.ContainTorrent(torrent.InfoHash))
                 {
                     if (notifyIfAdded)
                     {
-                        NotificationManager.Notify(new TorrentAlreadyAddedNotification(t.Name, t.InfoHash.ToHex()));
+                        NotificationManager.Notify(new TorrentAlreadyAddedNotification(torrent.Name, torrent.InfoHash));
                     }
                     return;
                 }
-                path = BackupTorrent(path, t);
-            }
-            catch (TorrentException)
-            {
-                MessageBox.Show(string.Format("Invalid torrent file {0}", path), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+
+                path = BackupTorrent(path, torrent);
             }
             catch (Exception ex)
             {
@@ -405,8 +449,8 @@ namespace ByteFlood
 
             var handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
             {
-                TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(path)),
-                SavePath = App.Settings.DefaultDownloadPath,
+                TorrentInfo = torrent,
+                SavePath = App.Settings.DefaultDownloadPath
             });
 
             handle.AutoManaged = false;
@@ -417,6 +461,21 @@ namespace ByteFlood
             ti.OriginalTorrentFilePath = path;
             ti.ApplyTorrentSettings(App.Settings.DefaultTorrentProperties);
 
+            // we don't want all files to have a "lowest" file priorities since initialize priorities with the value 1
+            // we change it to 3, the priority "normal" as considered by byteflood.
+
+            set_files_priorities(handle, 3);
+
+            handle_torrent_file_selection(ti);
+        }
+
+        /// <summary>
+        /// This will bring up the AddTorrentDialog, ask the user about the download path
+        /// and enable file selection. This will only work if the torrent has metadata. 
+        /// </summary>
+        /// <param name="ti"></param>
+        private void handle_torrent_file_selection(TorrentInfo ti)
+        {
             uiContext.Send(x =>
             {
                 App.Current.MainWindow.Activate();
@@ -426,28 +485,42 @@ namespace ByteFlood
                 {
                     ti.Name = atd.TorrentName;
 
-                    if (atd.TorrentSavePath != ti.SavePath) 
+                    if (atd.TorrentSavePath != ti.SavePath)
                     {
                         ti.ChangeSavePath(atd.TorrentSavePath);
                     }
 
                     if (atd.AutoStartTorrent)
                     { ti.Start(); }
+                    else { ti.Stop(); }
+
                     ti.RatioLimit = atd.RatioLimit;
 
-                    if (!this.Torrents.Contains(ti))
+                    if (!this._torrents.ContainsKey(ti.InfoHash))
                     {
+                        this._torrents.Add(ti.InfoHash, ti);
                         this.Torrents.Add(ti);
                     }
                 }
                 else
                 {
-                    this.LibtorrentSession.RemoveTorrent(handle);
+                    this.Torrents.Remove(ti);
+                    this._torrents.Remove(ti.InfoHash);
+                    this.LibtorrentSession.RemoveTorrent(ti.Torrent, true);
                     this.DeleteTorrentStateData(ti.InfoHash);
                     ti.OffMyself();
-                    this.Torrents.Remove(ti);
                 }
             }, null);
+        }
+
+        internal void set_files_priorities(Ragnar.TorrentHandle handle, int value)
+        {
+            int[] prs = new int[handle.TorrentFile.NumFiles];
+            for (int i = 0; i < prs.Length; i++)
+            {
+                prs[i] = value;
+            }
+            handle.SetFilePriorities(prs);
         }
 
         public void DeleteTorrentStateData(string infohash)
@@ -471,9 +544,9 @@ namespace ByteFlood
         /// </summary>
         /// <param name="path">The path of the torrent file to be copied.</param>
         /// <returns>The new path of the torrent file.</returns>
-        public string BackupTorrent(string path, Torrent t)
+        public string BackupTorrent(string path, Ragnar.TorrentInfo t)
         {
-            string newpath = System.IO.Path.Combine(State.TorrentsStateSaveDirectory, t.InfoHash.ToHex() + ".torrent");
+            string newpath = System.IO.Path.Combine(State.TorrentsStateSaveDirectory, t.InfoHash + ".torrent");
             if (new DirectoryInfo(newpath).FullName != new DirectoryInfo(path).FullName)
                 File.Copy(path, newpath, true);
             return newpath;
@@ -511,8 +584,7 @@ namespace ByteFlood
                 {
                     Directory.CreateDirectory(entry.DownloadDirectory);
 
-                    this.Torrents.Add(new TorrentInfo(
-                     this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
+                    Ragnar.TorrentHandle handle = this.LibtorrentSession.AddTorrent(new Ragnar.AddTorrentParams()
                      {
                          SavePath = entry.DownloadDirectory,
                          TorrentInfo = torrent,
@@ -521,7 +593,20 @@ namespace ByteFlood
                          MaxConnections = entry.DefaultSettings.MaxConnections,
                          MaxUploads = entry.DefaultSettings.UploadSlots,
                          UploadLimit = entry.DefaultSettings.MaxUploadSpeed
-                     })));
+                     });
+
+                    set_files_priorities(handle, 3);
+
+                    if (!entry.AutoDownload)
+                    {
+                        handle.AutoManaged = false;
+                        handle.Pause();
+                    }
+
+                    // normally, adding a torrent will fire the TorrentAdded Event, so this line 
+                    // is somewhat unecessary.
+
+                    //this.Torrents.Add(new TorrentInfo(handle));
                     return true;
                 }
             }
@@ -529,7 +614,7 @@ namespace ByteFlood
             return false;
         }
 
-        public void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
+        public async void AddTorrentByMagnet(string magnet, bool notifyIfAdded = true)
         {
             MagnetLink mg = null;
 
@@ -547,7 +632,7 @@ namespace ByteFlood
 
             if (App.Settings.PreferMagnetCacheWebsites)
             {
-                byte[] torrent_data = State.GetMagnetFromCache(mg); // TODO: Move this to a non-blocking call
+                byte[] torrent_data = await System.Threading.Tasks.Task.Run<byte[]>(() => State.GetMagnetFromCache(mg));
                 if (torrent_data != null)
                 {
                     string path = this.SaveMagnetLink(torrent_data, mg.Name);
@@ -559,10 +644,11 @@ namespace ByteFlood
             this.LibtorrentSession.AsyncAddTorrent(new Ragnar.AddTorrentParams()
             {
                 SavePath = App.Settings.DefaultDownloadPath,
-                Url = magnet
+                Url = magnet,
+                Name = string.IsNullOrEmpty(mg.Name) ? "" : mg.Name
             });
 
-            NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
+            //NotificationManager.Notify(new MagnetLinkNotification(MagnetLinkNotification.EventType.MetadataDownloadStarted, mg));
         }
 
         /// <summary>
@@ -593,10 +679,17 @@ namespace ByteFlood
         {
             for (int i = 0; i < TorrentCaches.Length; i++)
             {
-                byte[] res = TorrentCaches[i].Fetch(mg);
+                try
+                {
+                    byte[] res = TorrentCaches[i].Fetch(mg);
 
-                if (res != null)
-                    return res;
+                    if (res != null)
+                        return res;
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
             return null;

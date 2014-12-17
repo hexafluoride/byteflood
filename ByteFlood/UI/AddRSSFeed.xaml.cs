@@ -134,6 +134,8 @@ namespace ByteFlood.UI
         public static readonly DependencyProperty ManualUpdateIntervalSecondsTextProperty =
             DependencyProperty.Register("ManualUpdateIntervalSecondsText", typeof(string), typeof(AddRSSFeed), new PropertyMetadata(null));
 
+        public TorrentProperties DefaultTorrentProperties { get; set; }
+
         #endregion
 
         public AddRSSFeed()
@@ -143,6 +145,8 @@ namespace ByteFlood.UI
             this.RemoveEvent = new RoutedEventHandler(this.Filters_Remove);
             this.DownloadPath = App.Settings.DefaultDownloadPath;
             this.ManualUpdateIntervalSeconds = "120";
+            this.DefaultTorrentProperties = Utility.CloneObject(TorrentProperties.DefaultTorrentProperties);
+            this.DataContext = new NiceDataContext<AddRSSFeed>(this);
         }
 
         #region Commands
@@ -190,6 +194,13 @@ namespace ByteFlood.UI
             this.Filters.Remove(filter);
         }
 
+        private void Commands_ChangeDefaultTorrentSettings(object sender, ExecutedRoutedEventArgs e)
+        {
+            var editor = new TorrentPropertiesEditor(this.DefaultTorrentProperties) 
+            { Icon = this.Icon, Owner = this };
+            editor.ShowDialog();
+        }
+
         #endregion
 
         public void LoadFilters(Services.RSS.RssFilter[] filters)
@@ -200,6 +211,8 @@ namespace ByteFlood.UI
                 this.Filters.Add(filter);
             }
         }
+
+
 
 
     }

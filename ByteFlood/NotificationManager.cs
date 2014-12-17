@@ -122,7 +122,7 @@ namespace ByteFlood
                 case EventType.MetadataDownloadComplete:
                     return string.Format("Metadata information has been successfully retrieved for \"{0}\"", mg_name);
                 case EventType.MetadataDownloadStarted:
-                    return string.Format("Download has been started.");
+                    return string.Format("Metadata download has been started. The torrent will be added to the list after a while.");
                 case EventType.MetadataDownloadFailed:
                     return string.Format("Unable to start this magnet link: {0}", mg_name);
                 default:

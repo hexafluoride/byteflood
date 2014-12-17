@@ -12,7 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using System.Collections.ObjectModel;
-using MonoTorrent.Client;
 
 namespace ByteFlood
 {
@@ -53,8 +52,6 @@ namespace ByteFlood
         public ComboBox[] TrayIconComboBoxes;
         public ComboBox[] WindowComboBoxes;
 
-        public EncryptionForceType[] EncryptionTypes = (EncryptionForceType[])Enum.GetValues(typeof(EncryptionForceType));
-
         public string[] EncryptionTypesReadable = new string[]
         {
             "Forced",
@@ -81,6 +78,7 @@ namespace ByteFlood
             LoadNetworkInterfaces();
             styleCombox.SelectedIndex = local.ApplicationStyle;
             styleCombox.SelectionChanged += this.ReloadStyle;
+            LoadLangs();
         }
 
         private void LoadNetworkInterfaces()
@@ -101,6 +99,13 @@ namespace ByteFlood
                 interfaces.SelectedIndex = 0;
             }
             interfaces.SelectionChanged += interfaces_SelectionChanged;
+        }
+
+        private void LoadLangs() 
+        {
+            string[] langs = Utility.GetAvailableLanguages();
+            this.langCombox.ItemsSource = langs;
+            this.langCombox.SelectedIndex = Array.IndexOf(langs, App.Settings.DefaultLanguage);
         }
 
         void interfaces_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -185,21 +190,61 @@ namespace ByteFlood
             local.TrayIconDoubleClickBehavior = TrayIconBehaviors[tdcb.SelectedIndex];
             local.MinimizeBehavior = WindowBehaviors[mb.SelectedIndex];
             local.ExitBehavior = WindowBehaviors[cb.SelectedIndex];
-            local.EncryptionType = EncryptionTypes[enctype.SelectedIndex];
-            local.SeedingTorrentsAreActive = this.seedingTorrentsInac.IsChecked == true;
-            MainWindow mw = (App.Current.MainWindow as MainWindow);
+            local.EncryptionType = (EncryptionTypeEnum)enctype.SelectedIndex;
 
-            //mw.state.ce.Settings.Force = local.EncryptionType;
+            MainWindow mw = (App.Current.MainWindow as MainWindow);
 
             local.Theme = (Theme)themeCombox.SelectedItem;
 
-            //bool iface_changed = App.Settings.NetworkInterfaceID != local.NetworkInterfaceID;
+            if (this.langCombox.SelectedIndex > -1)
+            {
+                string new_choice = this.langCombox.SelectedValue.ToString();
+                if (new_choice != local.DefaultLanguage)
+                {
+                    local.DefaultLanguage = new_choice;
 
+                    if (App.CurrentLanguage != null)
+                    {
+                        App.CurrentLanguage.ReloadLang(local.DefaultLanguage);
+                    }
+                    else
+                    {
+                        App.CurrentLanguage = LanguageEngine.LoadDefault();
+                    }
+                }
+            }
+
+            if (local.CheckForUpdates) 
+            {
+                mw.StartAutoUpdater();
+            }
+            else 
+            {
+                mw.StopAutoUpdater();
+            }
+
+            if (local.EnableDHT) 
+                mw.state.LibtorrentSession.StartDht();
+            else 
+                mw.state.LibtorrentSession.StopDht();
+
+            if (local.EnableLSD)
+                mw.state.LibtorrentSession.StartLsd();
+            else
+                mw.state.LibtorrentSession.StopLsd();
+
+            if (local.EnableNAT_PMP)
+                mw.state.LibtorrentSession.StartNatPmp();
+            else
+                mw.state.LibtorrentSession.StopNatPmp();
+
+            if (local.Enable_UPNP)
+                mw.state.LibtorrentSession.StartUpnp();
+            else
+                mw.state.LibtorrentSession.StopUpnp();
+       
             App.Settings = (Settings)Utility.CloneObject(local);
-            //if (iface_changed)
-            //{
-            //    mw.state.ChangeNetworkInterface();
-            //}
+
             this.Close();
         }
 

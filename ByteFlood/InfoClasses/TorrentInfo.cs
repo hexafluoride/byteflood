@@ -19,6 +19,10 @@ namespace ByteFlood
     {
         #region Properties and variables
 
+        public static LanguageEngine Language { get { return App.CurrentLanguage; } }
+
+        public State AppState { get { return this.MainAppWindow.state; } }
+
         public TorrentHandle Torrent { get; private set; }
 
         private TorrentStatus StatusData = null;
@@ -79,6 +83,33 @@ namespace ByteFlood
             get { return this.StatusData.SavePath; }
         }
 
+        private Ragnar.TorrentInfo _my_info = null;
+
+        public Ragnar.TorrentInfo Info
+        {
+            get
+            {
+                if (_my_info == null)
+                    _my_info = this.Torrent.TorrentFile;
+                return _my_info;
+            }
+        }
+
+        public string RootDownloadDirectory
+        {
+            get
+            {
+                if (this.Info.NumFiles > 1)
+                {
+                    return System.IO.Path.Combine(this.SavePath, this.Info.Name);
+                }
+                else
+                {
+                    return this.SavePath;
+                }
+            }
+        }
+
         private string _custom_name = null;
         public string Name
         {
@@ -86,7 +117,10 @@ namespace ByteFlood
             {
                 if (_custom_name == null)
                 {
-                    return this.Torrent.TorrentFile.Name;
+                    if (this.Torrent.HasMetadata)
+                        return this.Info.Name.FixUTF8();
+                    else
+                        return "[metadata mode]";
                 }
                 else
                 {
@@ -138,7 +172,10 @@ namespace ByteFlood
         {
             get
             {
-                return this.Torrent.TorrentFile.TotalSize;
+                if (this.Torrent.HasMetadata)
+                    return this.Info.TotalSize;
+                else
+                    return -1;
             }
         }
 
@@ -150,11 +187,27 @@ namespace ByteFlood
             }
         }
 
+        public int MaxDownloadSpeed
+        {
+            get
+            {
+                return this.Torrent.DownloadLimit;
+            }
+        }
+
         public int UploadSpeed
         {
             get
             {
                 return this.StatusData.UploadRate;
+            }
+        }
+
+        public int MaxUploadSpeed
+        {
+            get
+            {
+                return this.StatusData.UploadsLimit;
             }
         }
 
@@ -186,11 +239,16 @@ namespace ByteFlood
         {
             get
             {
-                return this.Torrent.TorrentFile.PieceLength;
+                if (this.Torrent.HasMetadata)
+                    return this.Info.PieceLength;
+                else
+                    return -1;
             }
         }
 
         public long WastedBytes { get { return this.StatusData.TotalFailedBytes; } }
+
+        public long HashFails { get { return this.StatusData.TotalFailedBytes / this.PieceLength; } }
 
         public int Seeders { get { return this.StatusData.NumSeeds; } }
 
@@ -204,15 +262,15 @@ namespace ByteFlood
 
         public long WantedBytes { get { return this.StatusData.TotalWanted; } }
 
-        public int QueueNumber
+        public string QueueNumber
         {
             get
             {
-                if (this.Torrent.AutoManaged)
+                if (this.Torrent.QueuePosition != -1)
                 {
-                    return this.Torrent.QueuePosition;
+                    return this.Torrent.QueuePosition.ToString();
                 }
-                return -1;
+                return string.Empty;
             }
         }
 
@@ -222,6 +280,11 @@ namespace ByteFlood
             {
                 if (this.Torrent.IsPaused)
                 {
+                    if (!string.IsNullOrEmpty(this.StatusData.Error))
+                    {
+                        return this.StatusData.Error;
+                    }
+
                     if (this.IsStopped)
                     {
                         return "Stopped";
@@ -233,7 +296,33 @@ namespace ByteFlood
                 }
                 else
                 {
-                    return this.StatusData.State.ToString();
+                    switch (this.StatusData.State)
+                    {
+                        case TorrentState.Downloading:
+                            return "Downloading";
+
+                        case TorrentState.DownloadingMetadata:
+                            return "Metadata";
+
+                        case TorrentState.CheckingFiles:
+                        case TorrentState.CheckingResumeData:
+                            return "Checking files";
+
+                        case TorrentState.Allocating:
+                            return "Allocating files";
+
+                        case TorrentState.Finished:
+                            return "Finished";
+
+                        case TorrentState.QueuedForChecking:
+                            return "Queued for files check";
+
+                        case TorrentState.Seeding:
+                            return "Seeding";
+
+                        default:
+                            return this.StatusData.State.ToString();
+                    }
                 }
             }
         }
@@ -248,13 +337,19 @@ namespace ByteFlood
 
         public string CompletionCommand { get; set; }
 
+        public bool HasMetadata { get { return this.Torrent.HasMetadata; } }
+
         public bool ShowOnList
         {
             get
             {
-                if (Torrent == null)
+                if (Invisible || Torrent == null)
                     return false;
-                return Invisible || this.MainAppWindow.itemselector(this);
+
+                if (this.MainAppWindow.state.LabelManager.Can_I_ShowUP(this))
+                    return this.MainAppWindow.itemselector(this);
+
+                return false;
             }
         }
 
@@ -270,7 +365,7 @@ namespace ByteFlood
 
         public List<FileInfo> FileInfoList = new List<FileInfo>();
 
-        public ObservableCollection<TrackerInfo> Trackers = new ObservableCollection<TrackerInfo>();
+        public ObservableCollection<TrackerInfo> Trackers { get; private set; }
 
         public DirectoryKey FilesTree { get; private set; }
 
@@ -329,11 +424,21 @@ namespace ByteFlood
         {
             get
             {
-                if (true) // TODO: Find a way to make Ragnar work as a project/implement IsValid
+                return this.Torrent.InfoHash.ToHex();
+
+                /*if (true) // TODO: Find a way to make Ragnar work as a project/implement IsValid
                 {
                     return this.Torrent.InfoHash.ToHex();
                 }
-                return null;
+                return null;*/
+            }
+        }
+
+        public string Label
+        {
+            get
+            {
+                return AppState.LabelManager.GetFirstLabelForTorrent(this);
             }
         }
 
@@ -347,10 +452,24 @@ namespace ByteFlood
 
             this.MainAppWindow = (App.Current.MainWindow as MainWindow);
             this.PickedMovieData = new IMDBSRSerializeable<IMovieDBSearchResult>();
+            this.Trackers = new ObservableCollection<TrackerInfo>();
 
-            PopulateFileList();
+            if (t.HasMetadata)
+            {
+                SetupTorrent();
+            }
+
             PopulateTrackerList();
+        }
+
+        private bool _torrent_initialized = false;
+
+        private void SetupTorrent()
+        {
+            if (this._torrent_initialized) { return; }
+            PopulateFileList();
             LoadMiscSettings();
+            this._torrent_initialized = true;
         }
 
         private void LoadMiscSettings()
@@ -369,6 +488,15 @@ namespace ByteFlood
                     this.Name = Convert.ToString(jo["CustomName"]);
                     this._otfp = Convert.ToString(jo["OriginalTorrentFilePath"]);
                     this.IsStopped = Convert.ToBoolean(jo["IsStopped"]);
+
+                    Jayrock.Json.JsonArray labels = jo["Labels"] as Jayrock.Json.JsonArray;
+                    if (labels != null)
+                    {
+                        foreach (var a in labels)
+                        {
+                            this.MainAppWindow.state.LabelManager.AddLabelForTorrent(this, a.ToString());
+                        }
+                    }
                 }
             }
             else
@@ -381,7 +509,7 @@ namespace ByteFlood
                 this.IsStopped = false;
             }
 
-            this.TorrentSettings = new TorrentProperties() 
+            this.TorrentSettings = new TorrentProperties()
             {
                 EnablePeerExchange = true,
                 UploadSlots = this.Torrent.MaxUploads,
@@ -399,6 +527,10 @@ namespace ByteFlood
         public void DoStateChanged(Ragnar.TorrentState oldstate, Ragnar.TorrentState newstate)
         {
             UpdateList("Status");
+            if (this.Torrent.NeedSaveResumeData())
+            {
+                this.Torrent.SaveResumeData();
+            }
         }
 
         public void DoTorrentComplete()
@@ -432,11 +564,18 @@ namespace ByteFlood
             UpdateGraphData();
         }
 
+        public void DoMetadataDownloadComplete()
+        {
+            SetupTorrent();
+            // Notify WPF bindings that the following properties were changed.
+            UpdateList("FilesTree", "Name", "PieceLength", "Size", "WantedBytes");
+        }
+
         #endregion
 
         public TorrentProperties TorrentSettings { get; private set; }
 
-        public void ApplyTorrentSettings(TorrentProperties props) 
+        public void ApplyTorrentSettings(TorrentProperties props)
         {
             this.TorrentSettings = props;
 
@@ -447,10 +586,10 @@ namespace ByteFlood
             this.CompletionCommand = props.OnFinish;
             this.RatioLimit = props.RatioLimit;
 
-            this.UpdateList("TorrentSettings");
+            this.UpdateList("TorrentSettings", "MaxDownloadSpeed", "MaxUploadSpeed", "RatioLimit");
         }
 
-        public void ChangeSavePath(string newpath,  TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace) 
+        public void ChangeSavePath(string newpath, TorrentHandle.MoveFlags flags = TorrentHandle.MoveFlags.DontReplace)
         {
             this.Torrent.MoveStorage(newpath, flags);
             this.StatusData = this.Torrent.QueryStatus();
@@ -586,7 +725,7 @@ namespace ByteFlood
 
         public void UpdateGraphData()
         {
-            if (this.downspeeds.Count == 50) 
+            if (this.downspeeds.Count == 50)
             {
                 this.downspeeds.RemoveAt(0);
             }
@@ -608,6 +747,8 @@ namespace ByteFlood
         public void OffMyself() // Dispose
         {
             this.Torrent.Dispose();
+            if (_my_info != null)
+                _my_info.Dispose();
         }
 
         public string GetMagnetLink()
@@ -627,14 +768,16 @@ namespace ByteFlood
         {
             try // I hate having to do this
             {
-                UpdateProperties();
+                if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
+                {
+                    this.Stop();
+                }
 
                 if (this.Torrent.QueryStatus().State == TorrentState.Downloading)
                 {
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateFileList));
+                    UpdateFileList();
                 }
 
-                //ThreadPool.QueueUserWorkItem(new WaitCallback(UpdatePeerList));
                 ThreadPool.QueueUserWorkItem(new WaitCallback(UpdateTrackerList));
 
                 UpdateList(
@@ -645,17 +788,13 @@ namespace ByteFlood
                     "Ratio", "ETA",
                     "Elapsed",
                     "WantedBytesDone",
-                    "WastedBytes",
-                    //"HashFails",
+                    "WastedBytes", "HashFails",
                     "AverageDownloadSpeed", "AverageUploadSpeed",
                     "ShowOnList", "ProgressBarColor",
                     "Status");
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
-            }
+            catch (Exception)
+            { }
         }
 
         private bool is_lmdif_loading_data = false;
@@ -664,7 +803,7 @@ namespace ByteFlood
             if (this.PickedMovieData != null && this.PickedMovieData.Value != null)
             {
                 if (is_lmdif_loading_data) { return; }
-                string save_path = System.IO.Path.Combine(this.SavePath, "folder.jpg");
+                string save_path = System.IO.Path.Combine(this.RootDownloadDirectory, "folder.jpg");
                 if (!System.IO.File.Exists(save_path))
                 {
                     Task.Factory.StartNew(new Action(() =>
@@ -680,6 +819,7 @@ namespace ByteFlood
                                     byte[] data = nc.DownloadData(this.PickedMovieData.Value.PosterImageUri);
                                     System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(save_path));
                                     System.IO.File.WriteAllBytes(save_path, data);
+                                    break;
                                 }
                             }
                             catch (System.Net.WebException wex)
@@ -711,20 +851,19 @@ namespace ByteFlood
         {
             if (this.FilesTree == null)
             {
-                if (this.Torrent != null)
-                {
-                    DirectoryKey base_dir = new DirectoryKey("/", this);
+                DirectoryKey base_dir = new DirectoryKey("/", this);
 
-                    for (int i = 0; i < this.Torrent.TorrentFile.NumFiles; i++)
+                for (int i = 0, j = this.Info.NumFiles; i < j; i++)
+                {
+                    using (FileEntry file = this.Info.FileAt(i))
                     {
-                        FileEntry file = this.Torrent.TorrentFile.FileAt(i);
                         DirectoryKey.ProcessFile(file.Path, base_dir, this, file, i);
                     }
-
-                    this.FilesTree = base_dir;
-                    UpdateList("FilesTree");
-                    this.files_progresses = new long[this.FileInfoList.Count];
                 }
+
+                this.FilesTree = base_dir;
+                UpdateList("FilesTree");
+                this.files_progresses = new long[this.FileInfoList.Count];
             }
         }
 
@@ -736,7 +875,6 @@ namespace ByteFlood
             {
                 this.Trackers.Add(new TrackerInfo(tracker, this));
             }
-
         }
 
         #region ListsUpdaters
@@ -764,9 +902,10 @@ namespace ByteFlood
             });
         }*/
 
-        long[] files_progresses = null; 
+        long[] files_progresses = null;
 
-        private void UpdateFileList(object obj)
+        // This is only called when the torrent is in Downloading State
+        private void UpdateFileList()
         {
             if (this.files_progresses != null)
             {
@@ -788,25 +927,17 @@ namespace ByteFlood
         public void UpdateList(params string[] columns)
         {
             foreach (string str in columns)
-				UpdateSingle(str);
+                UpdateSingle(str);
         }
 
-	    public void UpdateSingle([CallerMemberName] string name = null)
-	    {
-		    var handler = PropertyChanged;
-		    if (handler != null)
-			    handler(this, new PropertyChangedEventArgs(name));
-	    }
+        public void UpdateSingle([CallerMemberName] string name = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(name));
+        }
 
         #endregion
-
-        private void UpdateProperties()
-        {
-            if (this.RawRatio >= this.RatioLimit && this.RatioLimit != 0)
-            {
-                this.Pause();
-            }
-        }
 
         public bool Equals(TorrentInfo other)
         {

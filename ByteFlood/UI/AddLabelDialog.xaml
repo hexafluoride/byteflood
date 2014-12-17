@@ -1,0 +1,9 @@
+﻿<Window x:Class="ByteFlood.UI.AddLabelDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add label..." Height="70.188" Width="170.944" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Canvas>
+        <TextBox Text="{Binding LabelText}" Width="114" Height="20" Canvas.Left="10" Canvas.Top="10"/>
+        <Button IsDefault="True" Canvas.Left="129" Canvas.Top="10" Click="Button_Click">OK</Button>
+    </Canvas>
+</Window>

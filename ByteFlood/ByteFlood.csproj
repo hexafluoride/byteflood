@@ -29,6 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>0108</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -116,6 +117,7 @@
     <Compile Include="Controls\VistaFolderBrowser\library\WPFFolderBrowserDialog.cs" />
     <Compile Include="Formatters\ColorsFormatter.cs" />
     <Compile Include="Formatters\InvertBooleanConverter.cs" />
+    <Compile Include="Formatters\NullableToNonNullableConverter.cs" />
     <Compile Include="Formatters\ObjectToIntConverter.cs" />
     <Compile Include="Formatters\FileNameToIcon.cs" />
     <Compile Include="Formatters\PeerCountryToIcon.cs" />
@@ -129,8 +131,21 @@
     <Compile Include="InfoClasses\PeerInfo.cs" />
     <Compile Include="InfoClasses\PieceInfo.cs" />
     <Compile Include="InfoClasses\TrackerInfo.cs" />
+    <Compile Include="LabelManager.cs" />
+    <Compile Include="LanguageEngine.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedDictionary.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedList.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedNumber.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodedString.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\BEncodingException.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\IBEncodedValue.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.BEncoding\RawReader.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.Common\InfoHash.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.Common\MagnetLink.cs" />
+    <Compile Include="Libs\MonoTorrent\MonoTorrent.Common\Message.cs" />
     <Compile Include="LibTorrentAlerts.cs" />
     <Compile Include="Listener.cs" />
+    <Compile Include="NiceDataContext.cs" />
     <Compile Include="NotificationManager.cs" />
     <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Services\AutoUpdater.cs" />
@@ -184,6 +199,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TorrentProperties.cs" />
+    <Compile Include="UI\AddLabelDialog.xaml.cs">
+      <DependentUpon>AddLabelDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\AddMagnetTextInputDialog.xaml.cs">
       <DependentUpon>AddMagnetTextInputDialog.xaml</DependentUpon>
     </Compile>
@@ -238,6 +256,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\AddLabelDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -311,18 +333,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="boost_chrono-vc120-mt-1_55.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_date_time-vc120-mt-1_55.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_system-vc120-mt-1_55.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="torrent.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="Assets\Languages\English.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Languages\Francais.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="Controls\PhotoLoader\Info.txt" />
     <None Include="app.config" />
     <None Include="packages.config" />
@@ -331,6 +347,26 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_chrono-vc120-mt-1_55.dll">
+      <Link>boost_chrono-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_date_time-vc120-mt-1_55.dll">
+      <Link>boost_date_time-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_system-vc120-mt-1_55.dll">
+      <Link>boost_system-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\boost_thread-vc120-mt-1_55.dll">
+      <Link>boost_thread-vc120-mt-1_55.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Ragnar.0.6.0\content\net45\torrent.dll">
+      <Link>torrent.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\GeoIP.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -346,10 +382,6 @@
     <ProjectReference Include="..\ByteFloodUpdater\ByteFloodUpdater.csproj">
       <Project>{aeada459-a688-4bc5-8160-845f5f9d8ca4}</Project>
       <Name>ByteFloodUpdater</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
-      <Project>{411a9e0e-fdc6-4e25-828a-0c2cd1cd96f8}</Project>
-      <Name>MonoTorrent</Name>
     </ProjectReference>
     <ProjectReference Include="..\NotifyIconWpf\NotifyIconWpf.csproj">
       <Project>{7ac63864-7638-41c4-969c-d3197ef2bed9}</Project>

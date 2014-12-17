@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Reflection;
-using MonoTorrent.Client;
 using System.Runtime.InteropServices;
 
 namespace ByteFlood
@@ -25,6 +24,10 @@ namespace ByteFlood
     {
         MinimizeToTray, MinimizeToTaskbar, Exit
     }
+    public enum EncryptionTypeEnum
+    {
+        Unknown = -1, Forced = 0, Preffered = 1, DoesntMatter = 2
+    }
     public class Settings : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,9 +42,9 @@ namespace ByteFlood
         public string FileRegex { get; set; }
         public bool EnableFileRegex { get; set; }
         public bool DownloadAllRSS { get; set; }
-        
+
         public string TorrentFileSavePath { get; set; }
-       
+
         public bool MetroStyleHover { get; set; }
         public bool ShowRelativePaths { get; set; }
         public bool NotifyOnTray { get; set; }
@@ -54,7 +57,7 @@ namespace ByteFlood
         public TrayIconBehavior TrayIconRightClickBehavior { get; set; }
         public TrayIconBehavior TrayIconClickBehavior { get; set; }
         public TorrentProperties DefaultTorrentProperties { get; set; }
-        public EncryptionForceType EncryptionType { get; set; }
+        public EncryptionTypeEnum EncryptionType { get; set; }
         public int OutgoingPortsStart { get; set; }
         public int OutgoingPortsEnd { get; set; }
         public int MaxDHTPeers { get; set; }
@@ -95,6 +98,21 @@ namespace ByteFlood
 
         public bool DisplayStripsOnTorrentList { get; set; }
 
+        public bool CheckForUpdates { get; set; }
+
+        public bool PreventStandbyWithActiveTorrents { get; set; }
+
+        public bool AllowStandbyOnBatteryPower { get; set; }
+
+        public bool EnableDHT { get; set; }
+        public bool EnableLSD { get; set; }
+        public bool EnableuTP { get; set; }
+        public bool Enable_UDP_Trackers { get; set; }
+        public bool Enable_Trackers_Scrape { get; set; }
+        public bool EnablePEX { get; set; }
+        public bool EnableNAT_PMP { get; set; }
+        public bool Enable_UPNP { get; set; }
+
         /// <summary>
         /// Indicate if byteflood should look for a cached .torrent file 
         /// before attempting to get metadata from peers if a magnet link
@@ -109,6 +127,10 @@ namespace ByteFlood
         /// </summary>
         public int ApplicationStyle { get; set; }
 
+        public string DefaultLanguage { get; set; }
+
+        public string SaveTorrentDialogLastPath { get; set; }
+
         public static Settings DefaultSettings
         {
             get
@@ -121,7 +143,7 @@ namespace ByteFlood
                     UploadColor = Colors.Red,
                     DefaultDownloadPath = GetDefaultDownloadDirectory(),
                     TorrentFileSavePath = "./Torrents",
-                    EncryptionType = EncryptionForceType.DoesntMatter,
+                    EncryptionType = EncryptionTypeEnum.DoesntMatter,
                     ListeningPort = 1025,
                     DHTListeningPort = 1026,
                     FileRegex = "",
@@ -155,7 +177,12 @@ namespace ByteFlood
                     SeedingTorrentsAreActive = false,
                     DisplayStripsOnTorrentList = false,
                     StatusBarVisible = true,
-                    PreferMagnetCacheWebsites = true
+                    PreferMagnetCacheWebsites = true,
+                    DefaultLanguage = "English",
+                    SaveTorrentDialogLastPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    CheckForUpdates = true,
+                    PreventStandbyWithActiveTorrents = true,
+                    AllowStandbyOnBatteryPower = true
                 };
             }
         }
@@ -168,7 +195,7 @@ namespace ByteFlood
                 string path = null;
                 SHGetKnownFolderPath(DownloadsFolder, 0, IntPtr.Zero, out path);
 
-                if (!string.IsNullOrWhiteSpace(path)) 
+                if (!string.IsNullOrWhiteSpace(path))
                 {
                     return path;
                 }
@@ -230,12 +257,12 @@ namespace ByteFlood
                 OnPropertyChanged(str);
         }
 
-		protected void OnPropertyChanged([CallerMemberName]string name = null)
-		{
-			var handler = PropertyChanged;
-			if (handler != null)
-				handler(this, new PropertyChangedEventArgs(name));
-		}
+        protected void OnPropertyChanged([CallerMemberName]string name = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(name));
+        }
 
         public static Settings CompleteNullProperties(Settings s)
         {
@@ -246,6 +273,10 @@ namespace ByteFlood
 
             foreach (PropertyInfo prop in props)
             {
+                if (prop.PropertyType == typeof(Boolean))
+                {
+                    continue;
+                }
                 if (prop.CanWrite)
                 {
                     try

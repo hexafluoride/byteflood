@@ -230,14 +230,14 @@ namespace ByteFlood
             }
         }
 
-        public static void Serialize<T>(T t, string path)
+        public static void Serialize<T>(T t, string path, bool indent = false)
         {
             string temp_file = path + ".b";
             try
             {
                 using (XmlWriter xw = XmlWriter.Create(temp_file, new XmlWriterSettings()
                 {
-                    Indent = false
+                    Indent = indent
                 }))
                 {
                     new XmlSerializer(typeof(T)).Serialize(xw, t);
@@ -475,11 +475,11 @@ namespace ByteFlood
             return new ProcessStartInfo(filename, args);
         }
 
-        public static object CloneObject(object source)
+        public static T CloneObject<T>(T source)
         {
             Type type = source.GetType();
             object target;
-            if (type == Settings.DefaultSettings.GetType())
+            if (type == typeof(Settings))
                 target = Settings.DefaultSettings;
             else
                 target = Activator.CreateInstance(type);
@@ -508,8 +508,9 @@ namespace ByteFlood
                     }
                 }
             }
-            return target;
+            return (T)target;
         }
+
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
         public static void SetAssociation(string KeyName = "ByteFlood", string Description = "TORRENT File", string Extension = ".torrent")
@@ -706,6 +707,14 @@ namespace ByteFlood
             return System.Net.IPAddress.IPv6None;
         }
 
+        static Encoding Windows1252 = Encoding.GetEncoding("Windows-1252");
+
+        //until we fix this in ragnar, we need to use this function.
+        public static string FixUTF8(this string s)
+        {
+            return Encoding.UTF8.GetString(Windows1252.GetBytes(s));
+        }
+
         /// <summary>
         /// Please don't inlude dots. 'v0.6.2' become 062
         /// </summary>
@@ -713,8 +722,72 @@ namespace ByteFlood
         {
             get
             {
-				// this value should be preferably retrieved from AssemblyInfo.cs
+                // this value should be preferably retrieved from AssemblyInfo.cs
                 return 62;
+            }
+        }
+
+        public static string[] GetAvailableLanguages()
+        {
+            if (Directory.Exists("./Assets/Languages"))
+            {
+                List<string> a = new List<string>();
+                foreach (string file in Directory.EnumerateFiles("./Assets/Languages", "*.xml"))
+                {
+                    a.Add(System.IO.Path.GetFileNameWithoutExtension(file));
+                }
+                return a.ToArray();
+            }
+            return new string[0];
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
+
+        [FlagsAttribute]
+        enum EXECUTION_STATE : uint
+        {
+            ES_AWAYMODE_REQUIRED = 0x00000040,
+            ES_CONTINUOUS = 0x80000000,
+            ES_DISPLAY_REQUIRED = 0x00000002,
+            ES_SYSTEM_REQUIRED = 0x00000001,
+            /// <summary>
+            /// Legacy flag, should not be used.
+            /// </summary>
+            ES_USER_PRESENT = 0x00000004
+        }
+
+        public static bool StandbyDisabled
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Inform the system to not enter the sleep state.
+        /// You can use UndoDisableSleep() to let the system act "normally"
+        /// </summary>
+        public static void DisableSleep()
+        {
+            if (!StandbyDisabled)
+            {
+                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_AWAYMODE_REQUIRED);
+            }
+            StandbyDisabled = true;
+        }
+
+        public static void UndoDisableSleep()
+        {
+            if (StandbyDisabled)
+                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
+            StandbyDisabled = false;
+        }
+
+        public static bool IsRunningOnBatteries
+        {
+            get
+            {
+                return System.Windows.Forms.SystemInformation.PowerStatus.PowerLineStatus == System.Windows.Forms.PowerLineStatus.Offline;
             }
         }
 

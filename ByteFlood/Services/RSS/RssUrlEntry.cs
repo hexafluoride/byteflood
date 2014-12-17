@@ -18,6 +18,10 @@ namespace ByteFlood.Services.RSS
 {
     public class RssUrlEntry : INotifyPropertyChanged
     {
+        // This is needed so the feed context menu works correctly
+        [XmlIgnore]
+        public static LanguageEngine Language { get { return App.CurrentLanguage; } }
+
         public string Url { get; set; }
 
         public string Alias { get; set; }
@@ -59,6 +63,7 @@ namespace ByteFlood.Services.RSS
         [XmlIgnore]
         private int tick = 1000;
 
+        [XmlIgnore]
         public ObservableDictionary<string, RssTorrent> items { get; private set; }
 
         [XmlIgnore]
@@ -248,7 +253,7 @@ namespace ByteFlood.Services.RSS
             {
                 return !wex.Message.Contains("404");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

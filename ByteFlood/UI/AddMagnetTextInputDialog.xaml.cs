@@ -21,6 +21,7 @@ namespace ByteFlood.UI
         public AddMagnetTextInputDialog()
         {
             InitializeComponent();
+            this.DataContext = new NiceDataContext<AddMagnetTextInputDialog>(this);
         }
 
         public string Input

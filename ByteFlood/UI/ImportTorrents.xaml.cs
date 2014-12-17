@@ -1,21 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using MonoTorrent.BEncoding;
-using MonoTorrent.Client;
-using MonoTorrent.Common;
 using System.IO;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace ByteFlood
 {
@@ -30,7 +19,6 @@ namespace ByteFlood
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BitTorrent")
         };
         public ObservableCollection<TorrentListing> list = new ObservableCollection<TorrentListing>();
-        public List<TorrentInfo> selected = new List<TorrentInfo>();
         public MainWindow MainWindow = (App.Current.MainWindow as MainWindow);
         public State AppState = (App.Current.MainWindow as MainWindow).state;
 
@@ -38,18 +26,6 @@ namespace ByteFlood
         {
             InitializeComponent();
         }
-
-        /*private static bool ResumeExist()
-        {
-            foreach (string dir in uTorrentDirs)
-            {
-                string p = Path.Combine(dir, "resume.dat");
-                if (File.Exists(p))
-                    return true;
-            }
-
-            return false;
-        }*/
 
         /// <param name="fast_load">Indicate wither to stop loading at the first torrent found</param>
         public void Load(bool fast_load = false)
@@ -126,15 +102,21 @@ namespace ByteFlood
                 {
                     if (!listing.Import)
                         continue;
-                    Torrent t = Torrent.Load(listing.Path);
 
-                    string torrent_file_path = AppState.BackupTorrent(listing.Path, t);
+                    Ragnar.TorrentInfo torrent = new Ragnar.TorrentInfo(File.ReadAllBytes(listing.Path));
+
+                    if (!torrent.IsValid)
+                    {
+                        continue;
+                    }
+
+                    AppState.BackupTorrent(listing.Path, torrent);
 
                     string savepath = null;
 
-                    if (t.Files.Length > 1)
+                    if (torrent.NumFiles > 1)
                     {
-                        if (listing.SavePath.EndsWith(t.Name))
+                        if (listing.SavePath.EndsWith(torrent.Name))
                         {
                             // then we should download in the parent directory
                             DirectoryInfo di = new DirectoryInfo(listing.SavePath);
@@ -145,7 +127,7 @@ namespace ByteFlood
                             savepath = listing.SavePath;
                         }
                     }
-                    else if (t.Files.Length == 1)
+                    else if (torrent.NumFiles == 1)
                     {
                         savepath = Path.GetDirectoryName(listing.SavePath);
                     }
@@ -157,19 +139,17 @@ namespace ByteFlood
                     Ragnar.AddTorrentParams param = new Ragnar.AddTorrentParams()
                     {
                         SavePath = savepath,
-                        TorrentInfo = new Ragnar.TorrentInfo(File.ReadAllBytes(torrent_file_path))
+                        TorrentInfo = torrent,
+                        Name = listing.Name
                     };
 
+
+                    // calling LibtorrentSession.AsyncAddTorrent will fire the TorrentAddedEvent
                     var handle = AppState.LibtorrentSession.AddTorrent(param);
-
-                    TorrentInfo ti = new TorrentInfo(handle);
-                    ti.Name = listing.Name;
-
-                    selected.Add(ti);
+                    AppState.set_files_priorities(handle, 3);
                 }
                 catch
-                {
-                }
+                { }
             }
             App.Settings.ImportedTorrents = true;
             this.Close();

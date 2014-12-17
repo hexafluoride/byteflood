@@ -4,9 +4,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.ComponentModel;
-using MonoTorrent.Common;
-using MonoTorrent.Client.Tracker;
 using ByteFlood.Formatters;
+
 namespace ByteFlood
 {
     public class TrackerInfo : INotifyPropertyChanged

@@ -1,34 +1,61 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using MonoTorrent.Common;
 using System.ComponentModel;
-using System.Xml.Serialization;
 
 namespace ByteFlood
 {
     public class FileInfo : INotifyPropertyChanged
     {
+        public static LanguageEngine Language { get { return App.CurrentLanguage; } }
+
+        private string _name = null;
+        private string file_path = null;
+
+        /// <summary>
+        /// This is the relative file name.
+        /// </summary>
         public string Name
         {
             get
             {
-                return this.File.Path.Replace(this.Owner.SavePath, "");
+                if (_name == null)
+                {
+                    _name = this.file_path.Replace(this.Owner.RootDownloadDirectory, "");
+                }
+                return _name;
+            }
+        }
+
+        public string FullPath
+        {
+            get
+            {
+                // even thought libtorrent documentation specify that the Path property is the
+                // full path, sometimes this isn't true (returns the relative path),
+                // so we need to workaround it
+                if (System.IO.Path.IsPathRooted(file_path))
+                {
+                    return file_path;
+                }
+                else
+                {
+                    return System.IO.Path.Combine(this.Owner.SavePath, file_path);
+                }
             }
         }
 
         public string FileName
         {
-            get { return System.IO.Path.GetFileName(this.File.Path); }
+            get { return System.IO.Path.GetFileName(file_path); }
         }
 
         private long _downloaded_bytes = 0;
-        public long DownloadedBytes 
+        public long DownloadedBytes
         {
             get { return this._downloaded_bytes; }
-            set 
+            set
             {
-                if (value != this._downloaded_bytes) 
+                if (value != this._downloaded_bytes)
                 {
                     this._downloaded_bytes = value;
                     UpdateList("DownloadedBytes", "Progress");
@@ -36,24 +63,42 @@ namespace ByteFlood
             }
         }
 
-        public double Progress 
+        public double Progress
         {
-            get 
+            get
             {
-                if (this.RawSize > 0) 
+                if (this.RawSize > 0)
                 {
                     return Convert.ToDouble(this.DownloadedBytes) / Convert.ToDouble(this.RawSize);
                 }
                 return 100d;
-            } 
+            }
         }
 
         public string Priority
         {
-            get 
+            get
             {
                 int a = this.Owner.Torrent.GetFilePriority(this.FileIndex);
-                return a.ToString();
+                switch (a)
+                {
+                    case 0:
+                        return Language.FilePriority_Skip;
+                    case 1:
+                        return Language.FilePriority_Lowest;
+                    case 2:
+                        return Language.FilePriority_Low;
+                    case 3:
+                        return Language.FilePriority_Normal;
+                    case 4:
+                        return Language.FilePriority_High;
+                    case 5:
+                        return Language.FilePriority_Highest;
+                    case 6:
+                        return Language.FilePriority_Immediate;
+                    default:
+                        return string.Format("{0}: {1}", Language.FilePriority_Custom, a);
+                }
             }
         }
 
@@ -81,11 +126,9 @@ namespace ByteFlood
             }
         }
 
-        public string Size { get { return Utility.PrettifyAmount(this.File.Size); } }
+        public string Size { get { return Utility.PrettifyAmount(this.RawSize); } }
 
-        public Ragnar.FileEntry File { get; private set; }
-
-        public long RawSize { get { return this.File.Size; } }
+        public long RawSize { get; private set; }
 
         public FileInfo() { }
 
@@ -95,7 +138,8 @@ namespace ByteFlood
 
         public FileInfo(TorrentInfo owner, Ragnar.FileEntry file, int file_index)
         {
-            this.File = file;
+            this.file_path = file.Path.FixUTF8();
+            this.RawSize = file.Size;
             this.Owner = owner;
             this.FileIndex = file_index;
             if (this.Owner != null)
@@ -108,18 +152,18 @@ namespace ByteFlood
 
         public void UpdateSingle([CallerMemberName]string name = null)
         {
-	        var handler = PropertyChanged;
+            var handler = PropertyChanged;
             if (handler != null)
-				handler(this, new PropertyChangedEventArgs(name));
+                handler(this, new PropertyChangedEventArgs(name));
         }
 
-	    public void UpdateList(params string[] str)
-	    {
-		    foreach (string s in str)
-			    UpdateSingle(s);
-	    }
+        public void UpdateList(params string[] str)
+        {
+            foreach (string s in str)
+                UpdateSingle(s);
+        }
 
-	    public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
     }
@@ -129,11 +173,45 @@ namespace ByteFlood
 
         public DirectoryKey(string name, TorrentInfo ti)
         {
-            this.Name = name; this.OwnerTorrent = ti;
+            this.Name = name.FixUTF8(); this.OwnerTorrent = ti;
         }
 
         public string Name { get; private set; }
         public TorrentInfo OwnerTorrent { get; private set; }
+
+        public string Size
+        {
+            get { return Utility.PrettifyAmount(RawSize); }
+        }
+
+        long _size = -1;
+        public long RawSize
+        {
+            get
+            {
+                if (_size < 0)
+                {
+                    _size = 0;
+                    foreach (object a in this.Values)
+                    {
+                        if (a is FileInfo)
+                        {
+                            this._size += ((FileInfo)a).RawSize;
+                        }
+                        else
+                        {
+                            this._size += ((DirectoryKey)a).RawSize;
+                        }
+                    }
+                }
+                return _size;
+            }
+        }
+
+        public string Priority { get { return string.Empty; } }
+
+        public double Progress { get { return 0; } }
+
         public System.Collections.IEnumerable GetChildren(object parent)
         {
             if (parent == null)
@@ -182,19 +260,5 @@ namespace ByteFlood
                 ProcessFile(other, (DirectoryKey)trunk[node], owner, f, index);
             }
         }
-
-
-    }
-
-    [Serializable]
-    [XmlType(TypeName = "FilePriority")]
-    public struct FilePriority
-    {
-        public string Key
-        { get; set; }
-
-        public MonoTorrent.Common.Priority Value
-        { get; set; }
-
     }
 }

@@ -20,8 +20,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
-
-using MonoTorrent.Common;
 using System.IO;
 
 namespace ByteFlood
@@ -60,6 +58,16 @@ namespace ByteFlood
                 (Do as AddTorrentDialog).UpdateSize();
             })));
 
+
+        public Ragnar.TorrentInfo TorrentFileInfo
+        {
+            get { return (Ragnar.TorrentInfo)GetValue(TorrentFileInfoProperty); }
+            set { SetValue(TorrentFileInfoProperty, value); }
+        }
+
+        public static readonly DependencyProperty TorrentFileInfoProperty =
+            DependencyProperty.Register("TorrentFileInfo", typeof(Ragnar.TorrentInfo), typeof(AddTorrentDialog), new PropertyMetadata(null));
+
         public List<string> SavedPathList
         {
             get { return App.Settings.PreviousPaths; }
@@ -70,6 +78,7 @@ namespace ByteFlood
             InitializeComponent();
             this.Closed += (s, e) => { this.WindowClosed = true; };
             this.TorrentInfo = torrent;
+            this.TorrentFileInfo = torrent.Info;
             Load();
         }
 
@@ -89,7 +98,7 @@ namespace ByteFlood
 
             this.RatioLimit = 0f;
 
-            this.TorrentName = this.TorrentInfo.Torrent.TorrentFile.Name;
+            this.TorrentName = this.TorrentInfo.Info.Name;
 
             this.TorrentSavePath = App.Settings.DefaultDownloadPath;
 
