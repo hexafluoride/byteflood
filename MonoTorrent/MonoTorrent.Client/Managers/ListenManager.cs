@@ -7,6 +7,8 @@ using System.Net.Sockets;
 using MonoTorrent.Client.Messages.Standard;
 using MonoTorrent.Client.Messages;
 
+using System.Net;
+
 namespace MonoTorrent.Client
 {
     /// <summary>
@@ -14,6 +16,7 @@ namespace MonoTorrent.Client
     /// </summary>
     public class ListenManager : IDisposable
     {
+
         #region Member Variables
 
         private ClientEngine engine;
