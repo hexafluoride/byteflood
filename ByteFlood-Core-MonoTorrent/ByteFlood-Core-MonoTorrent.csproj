@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3134BC17-F3C6-4B2C-A666-A9F38AB05D27}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ByteFlood.Core.MonoTorrent</RootNamespace>
+    <AssemblyName>ByteFlood-Core-MonoTorrent</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ByteFlood\Services\WebSearch\HAP\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="HMSFormatter.cs" />
+    <Compile Include="InfoClasses\FileInfo.cs" />
+    <Compile Include="InfoClasses\PeerInfo.cs" />
+    <Compile Include="InfoClasses\PieceInfo.cs" />
+    <Compile Include="InfoClasses\TorrentInfo.cs" />
+    <Compile Include="InfoClasses\TrackerInfo.cs" />
+    <Compile Include="Listener.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="ObservableDictionary.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AutoUpdater.cs" />
+    <Compile Include="Services\GeoIPCountry.cs" />
+    <Compile Include="Services\MoviesDB\Imdb.cs" />
+    <Compile Include="Services\MoviesDB\IMovieDB.cs" />
+    <Compile Include="Services\MoviesDB\UniversalSearch.cs" />
+    <Compile Include="Services\MoviesDB\YifyAPI.cs" />
+    <Compile Include="Services\RSS\FeedsManager.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\ExceptionCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssCategoryCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssChannelCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssFeedCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssItemCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssModuleCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssModuleItemCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Collections\RssModuleItemCollectionCollection.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssChannel\RssChannel.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssChannel\RssCloud.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssChannel\RssImage.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssChannel\RssTextInput.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssFeed.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssItem\RssEnclosure.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssItem\RssGuid.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssItem\RssItem.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssItem\RssSource.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssModule.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssModuleItem.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssModules\RssBlogChannel.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssModules\RssCreativeCommon.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssModules\RssPhotoAlbum.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssReader.cs" />
+    <Compile Include="Services\RSS\rssdotnet\RssWriter.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Shared\DBBool.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Shared\RssCategory.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Shared\RssCompact.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Shared\RssDefault.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Shared\RssElement.cs" />
+    <Compile Include="Services\RSS\rssdotnet\Shared\RssEnumerators.cs" />
+    <Compile Include="Services\RSS\RssFilter.cs" />
+    <Compile Include="Services\RSS\RssTorrent.cs" />
+    <Compile Include="Services\RSS\RssUrlEntry.cs" />
+    <Compile Include="Services\TorrentCache\ITorrentCache.cs" />
+    <Compile Include="Services\TorrentCache\TorCache.cs" />
+    <Compile Include="Services\TorrentCache\Torrage.cs" />
+    <Compile Include="Services\TorrentCache\ZoinkIT.cs" />
+    <Compile Include="Services\WebSearch\HAP\HapHelper.cs" />
+    <Compile Include="Services\WebSearch\TorrentzEu.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="State.cs" />
+    <Compile Include="StateRpcHandler.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TorrentProperties.cs" />
+    <Compile Include="TorrentQueue.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Jayrock.Json\Jayrock.Json.csproj">
+      <Project>{f10a6a7d-b8e4-4f8b-8bd9-5b42ace5520e}</Project>
+      <Name>Jayrock.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jayrock\Jayrock.csproj">
+      <Project>{a178a4bb-ce12-4bf3-8b17-6df0d82120c8}</Project>
+      <Name>Jayrock</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoTorrent.Dht\MonoTorrent.Dht.csproj">
+      <Project>{7a2a7e73-fd43-4171-aa34-da413d35459e}</Project>
+      <Name>MonoTorrent.Dht</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
+      <Project>{411a9e0e-fdc6-4e25-828a-0c2cd1cd96f8}</Project>
+      <Name>MonoTorrent</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Services\WebSearch\HAP\HtmlAgilityPack.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
